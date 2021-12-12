@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=odsod
+Comment=odsod's desktop plugin
+Icon=window-duplicate
+Type=Service
+
+X-KDE-PluginInfo-Name=odsod
+X-KDE-PluginInfo-Version=1
+X-KDE-PluginInfo-Author=odsod
+X-KDE-PluginInfo-License=MIT
+X-KDE-PluginInfo-EnabledByDefault=true
+
+X-KDE-ServiceTypes=KWin/Script
+X-Plasma-API=javascript
+X-Plasma-MainScript=code/main.js
