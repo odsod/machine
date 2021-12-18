@@ -35,15 +35,14 @@ class Service(dbus.service.Object):
 
     @dbus.service.method("io.github.odsod.kwin.Service", in_signature="s")
     def run_shortcut(self, payload):
-        syslog.syslog("run_shortcut " + payload)
         shortcut = json.loads(payload)
+        syslog.syslog("run_shortcut: " + str(shortcut))
         subprocess.Popen(shortcut["command"])
 
     @dbus.service.method("io.github.odsod.kwin.Service", in_signature="s")
     def configure_shortcuts(self, payload):
-        syslog.syslog("configure_shortcuts " + payload)
         shortcuts = json.loads(payload)
-        syslog.syslog("loaded shortcuts " + str(shortcuts))
+        syslog.syslog("configure_shortcuts: " + str(shortcuts))
         # Delete old shortcuts
         # for name in [
         # str(name)
@@ -67,6 +66,7 @@ class Service(dbus.service.Object):
             syslog.syslog("registering shortcut: " + str(shortcut["actionId"]))
             self._kglobalaccel.setForeignShortcut(shortcut["actionId"], [keycode])
         syslog.syslog("shortcuts configured successfully")
+        self.quit()
 
     @dbus.service.method("io.github.odsod.kwin.Service")
     def quit(self):
