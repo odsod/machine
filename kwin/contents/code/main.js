@@ -4,39 +4,59 @@ function log(...args) {
 
 const shortcuts = [
   {
-    actionId: ["kwin", "Close Window", "KWin", ""],
+    actionId: ["kwin", "Window Close", "KWin", "Close Window"],
     kind: "builtin",
     key: "Meta+Backspace",
   },
 
   {
-    actionId: ["kwin", "Maximize Window", "KWin", ""],
+    actionId: ["kwin", "Window Maximize", "KWin", "Maximize Window"],
     kind: "builtin",
     key: "Meta+-",
   },
 
   {
-    actionId: ["kwin", "Quick Tile Window to the Bottom", "KWin", ""],
+    actionId: [
+      "kwin",
+      "Window Quick Tile Bottom",
+      "KWin",
+      "Quick Tile Window to the Bottom",
+    ],
     kind: "builtin",
     key: "Meta+j",
   },
 
   {
-    actionId: ["kwin", "Quick Tile Window to the Top", "KWin", ""],
+    actionId: [
+      "kwin",
+      "Window Quick Tile Top",
+      "KWin",
+      "Quick Tile Window to the Top",
+    ],
     kind: "builtin",
     key: "Meta+k",
   },
 
   {
-    actionId: ["kwin", "Quick Tile Window to the Left", "KWin", ""],
+    actionId: [
+      "kwin",
+      "Window Quick Tile Left",
+      "KWin",
+      "Quick Tile Window to the Left",
+    ],
     kind: "builtin",
-    key: "Meta+h",
+    key: "Meta+a",
   },
 
   {
-    actionId: ["kwin", "Quick Tile Window to the Right", "KWin", ""],
+    actionId: [
+      "kwin",
+      "Window Quick Tile Right",
+      "KWin",
+      "Quick Tile Window to the Right",
+    ],
     kind: "builtin",
-    key: "Meta+l",
+    key: "Meta+o",
   },
 
   {

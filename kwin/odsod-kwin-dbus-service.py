@@ -61,7 +61,6 @@ class Service(dbus.service.Object):
             keycode = QKeySequence.fromString(shortcut["key"])[0]
             syslog.syslog("got keycode: " + str(keycode))
             existing_action_id = self._kglobalaccel.action(keycode)
-            syslog.syslog("got existing action id: " + str(existing_action_id))
             if len(existing_action_id) > 0:
                 syslog.syslog("unregistering shortcut: " + str(existing_action_id))
                 self._kglobalaccel.setForeignShortcut(existing_action_id, [])
