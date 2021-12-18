@@ -18,6 +18,6 @@ install-deps:
 	mkdir -p $(dir $@)
 	ln -fs $(abspath $<) $@
 
-~/.config/tmux/tmux.conf: tmux.conf
+~/.config/tmux/tmux.conf: tmux/tmux.conf
 	mkdir -p $(dir $@)
 	ln -fs $(abspath $<) $@
