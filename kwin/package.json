@@ -1,0 +1,11 @@
+{
+  "name": "odsod-desktop-kwin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "contents/code/main.js",
+  "author": "Oscar Söderlund",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^2.5.1"
+  }
+}

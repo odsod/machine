@@ -1,3 +1,0 @@
-[D-BUS Service]
-Name=io.github.odsod.desktop
-Exec=/home/odsod/github.com/odsod/desktop/dbus/service.py

@@ -1,41 +1,227 @@
 function log(...args) {
-  console.log("[odsod/desktop]", ...args)
+  console.log("odsod/kwin:", ...args);
 }
 
-[
-    {key: "Meta+C", app: "calendar", query: "calendar.google.com"},
-    {key: "Meta+U", app: "terminal", query: "terminal"},
-    {key: "Meta+H", app: "browser", query: "google-chrome"},
-    {key: "Meta+T", app: "passwords", query: "keepassxc"},
-    {key: "Meta+G", app: "mail", query: "mail.google.com"},
-    {key: "Meta+G", app: "meet", query: "meet.google.com"},
-    {key: "Meta+R", app: "run"},
-    {key: "Meta+S", app: "slack", query: "einride.slack.com"},
-    {key: "Meta+D", app: "spectacle", query: "spectacle"},
-    {key: "Meta+.", app: "spotify", query: "spotify"},
-    {key: "Meta+L", app: "settings", query: "systemsettings5"},
-    {key: "Meta+Z", app: "zoom", query: "zoom"},
-].forEach(function(config) {
-    log("registering shortcut", config.app)
-    registerShortcut("odsod"+config.app, "[odsod] " + config.app, config.key, function() {
-        log("handling shortcut", config.app)
-        if (config.query) {
-            const client = workspace.clientList().find(function(client) {
-                return client.resourceName.toString() === config.query;
-            });
-            if (client) {
-                if (client.minimized) {
-                    client.minimized = false;
-                    workspace.activeClient = client;
-                } else if (workspace.activeClient != client) {
-                    workspace.activeClient = client;
-                } else {
-                    client.minimized = true;
-                }
-                return
-            }
+const shortcuts = [
+  {
+    actionId: ["kwin", "Close Window", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+Backspace",
+  },
+
+  {
+    actionId: ["kwin", "Maximize Window", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+-",
+  },
+
+  {
+    actionId: ["kwin", "Quick Tile Window to the Bottom", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+j",
+  },
+
+  {
+    actionId: ["kwin", "Quick Tile Window to the Top", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+k",
+  },
+
+  {
+    actionId: ["kwin", "Quick Tile Window to the Left", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+h",
+  },
+
+  {
+    actionId: ["kwin", "Quick Tile Window to the Right", "KWin", ""],
+    kind: "builtin",
+    key: "Meta+l",
+  },
+
+  {
+    actionId: [
+      "kwin",
+      "ExposeAll",
+      "KWin",
+      "Toggle Present Windows (All desktops)",
+    ],
+    kind: "builtin",
+    key: "Meta+'",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] run", "KWin", ""],
+    key: "Meta+R",
+    kind: "command",
+    command: ["krunner"],
+  },
+
+  {
+    actionId: ["kwin", "[odsod] calendar", "KWin", ""],
+    key: "Meta+C",
+    kind: "app",
+    command: ["google-chrome", "--app=https://calendar.google.com"],
+    resourceName: "calendar.google.com",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] terminal", "KWin", ""],
+    key: "Meta+U",
+    kind: "app",
+    command: ["alacrittymux", "terminal"],
+    resourceClass: "terminal",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] browser", "KWin", ""],
+    key: "Meta+H",
+    kind: "app",
+    command: ["google-chrome"],
+    resourceName: "google-chrome",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] passwords", "KWin", ""],
+    key: "Meta+T",
+    kind: "app",
+    command: ["keepassxc"],
+    resourceName: "keepassxc",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] mail", "KWin", ""],
+    key: "Meta+G",
+    kind: "app",
+    command: ["google-chrome", "--app=https://mail.google.com"],
+    resourceName: "mail.google.com",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] meet", "KWin", ""],
+    key: "Meta+M",
+    kind: "app",
+    command: ["google-chrome", "--app=https://meet.google.com"],
+    resourceName: "meet.google.com",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] slack", "KWin", ""],
+    key: "Meta+S",
+    kind: "app",
+    command: ["google-chrome", "--app=https://einride.slack.com"],
+    resourceName: "einride.slack.com",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] screenshot", "KWin", ""],
+    key: "Meta+D",
+    kind: "app",
+    command: ["spectacle"],
+    resourceName: "spectacle",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] spotify", "KWin", ""],
+    key: "Meta+.",
+    kind: "app",
+    command: ["spotify"],
+    resourceName: "spotify",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] settings", "KWin", ""],
+    key: "Meta+L",
+    kind: "app",
+    command: ["systemsettings5"],
+    resourceName: "systemsettings5",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] zoom", "KWin", ""],
+    key: "Meta+Z",
+    kind: "app",
+    command: ["zoom"],
+    resourceName: "zoom",
+  },
+];
+
+function registerAppShortcut(shortcut) {
+  log("registering app shortcut", JSON.stringify(shortcut));
+  registerShortcut(
+    shortcut.actionId[1],
+    shortcut.actionId[3],
+    shortcut.key,
+    function () {
+      log("handling app shortcut", JSON.stringify(shortcut));
+      const client = workspace.clientList().find(function (client) {
+        if (shortcut.resourceName) {
+          return client.resourceName.toString() === shortcut.resourceName;
+        } else if (shortcut.resourceClass) {
+          return client.resourceClass.toString() === shortcut.resourceClass;
+        } else {
+          return false;
         }
-        log("opening", config.app)
-        callDBus("io.github.odsod.desktop", "/", "io.github.odsod.desktop.Service", "open_app", config.app)
-    })
-})
+      });
+      if (client) {
+        if (client.minimized) {
+          client.minimized = false;
+          workspace.activeClient = client;
+        } else if (workspace.activeClient != client) {
+          workspace.activeClient = client;
+        } else {
+          client.minimized = true;
+        }
+        return;
+      }
+      callDBus(
+        "io.github.odsod.kwin",
+        "/",
+        "io.github.odsod.kwin.Service",
+        "run_shortcut",
+        JSON.stringify(shortcut)
+      );
+    }
+  );
+}
+
+function registerCommandShortcut(shortcut) {
+  log("registering command shortcut", JSON.stringify(shortcut));
+  registerShortcut(
+    shortcut.actionId[1],
+    shortcut.actionId[3],
+    shortcut.key,
+    function () {
+      log("handling command shortcut", JSON.stringify(shortcut));
+      callDBus(
+        "io.github.odsod.kwin",
+        "/",
+        "io.github.odsod.kwin.Service",
+        "run_shortcut",
+        JSON.stringify(shortcut)
+      );
+    }
+  );
+}
+
+shortcuts.forEach(function (shortcut) {
+  switch (shortcut.kind) {
+    case "app":
+      registerAppShortcut(shortcut);
+      break;
+    case "command":
+      registerCommandShortcut(shortcut);
+      break;
+  }
+});
+
+callDBus(
+  "io.github.odsod.kwin",
+  "/",
+  "io.github.odsod.kwin.Service",
+  "configure_shortcuts",
+  JSON.stringify(shortcuts),
+  function () {
+    log("shortcuts configured");
+  }
+);
