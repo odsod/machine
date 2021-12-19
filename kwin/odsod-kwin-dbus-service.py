@@ -44,15 +44,15 @@ class Service(dbus.service.Object):
         shortcuts = json.loads(payload)
         syslog.syslog("configure_shortcuts: " + str(shortcuts))
         # Delete old shortcuts
-        # for name in [
-        # str(name)
-        # for name in self._kwin_component.shortcutNames()
-        # if name.startswith("odsod")
-        # or name.startswith("[odsod]")
-        # and name not in {shortcut["name"] for shortcut in shortcuts}
-        # ]:
-        # syslog.syslog("unregistering " + name)
-        # self._kglobalaccel.unregister("kwin", name)
+        for name in [
+            str(name)
+            for name in self._kwin_component.shortcutNames()
+            if name.startswith("odsod")
+            or name.startswith("[odsod]")
+            and name not in {shortcut["name"] for shortcut in shortcuts}
+        ]:
+            syslog.syslog("unregistering " + name)
+            self._kglobalaccel.unregister("kwin", name)
         # Bind current shortcuts
         syslog.syslog("starting shortcut configuration")
         for shortcut in shortcuts:
