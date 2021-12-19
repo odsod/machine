@@ -81,7 +81,11 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] calendar", "KWin", ""],
     key: "Meta+C",
     kind: "app",
-    command: ["google-chrome", "--app=https://calendar.google.com"],
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://calendar.google.com",
+    ],
     resourceName: "calendar.google.com",
   },
 
@@ -97,7 +101,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",
-    command: ["google-chrome"],
+    command: ["google-chrome", "--password-store=basic"],
     resourceName: "google-chrome",
   },
 
@@ -113,7 +117,11 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] mail", "KWin", ""],
     key: "Meta+G",
     kind: "app",
-    command: ["google-chrome", "--app=https://mail.google.com"],
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://mail.google.com",
+    ],
     resourceName: "mail.google.com",
   },
 
@@ -121,7 +129,11 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] meet", "KWin", ""],
     key: "Meta+M",
     kind: "app",
-    command: ["google-chrome", "--app=https://meet.google.com"],
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://meet.google.com",
+    ],
     resourceName: "meet.google.com",
   },
 
@@ -129,7 +141,11 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] slack", "KWin", ""],
     key: "Meta+S",
     kind: "app",
-    command: ["google-chrome", "--app=https://einride.slack.com"],
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://einride.slack.com",
+    ],
     resourceName: "einride.slack.com",
   },
 
