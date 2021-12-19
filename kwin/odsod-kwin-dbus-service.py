@@ -49,7 +49,7 @@ class Service(dbus.service.Object):
             for name in self._kwin_component.shortcutNames()
             if name.startswith("odsod")
             or name.startswith("[odsod]")
-            and name not in {shortcut["name"] for shortcut in shortcuts}
+            and name not in {shortcut["actionId"][1] for shortcut in shortcuts}
         ]:
             syslog.syslog("unregistering " + name)
             self._kglobalaccel.unregister("kwin", name)
