@@ -9,7 +9,7 @@ install: \
 
 .PHONY: install-deps
 install-deps:
-	sudo apt install ripgrep
+	sudo apt install ripgrep fd-find
 
 .PHONY: install-alacritty
 install-tmux:
