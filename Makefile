@@ -1,3 +1,7 @@
+.PHONY: install-deps
+install-deps:
+	sudo apt install keepassxc
+
 .PHONY: dbus-install
 dbus-install:
 	make -C dbus install
