@@ -1,10 +1,15 @@
 .PHONY: install
 install: \
+	install-deps \
 	install-alacritty \
 	install-bash \
 	install-iosevka \
 	install-neovim \
 	install-tmux
+
+.PHONY: install-deps
+install-deps:
+	sudo apt install ripgrep
 
 .PHONY: install-alacritty
 install-tmux:
