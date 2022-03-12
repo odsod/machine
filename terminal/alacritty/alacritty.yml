@@ -17,6 +17,11 @@ font:
 selection:
   save_to_clipboard: true
 
+cursor:
+  style:
+    blinking: Always
+  blink_interval: 500
+
 # Shell
 #
 # You can set `shell.program` to the path of your favorite shell, e.g.
