@@ -1,8 +1,8 @@
 .PHONY: install
 install: \
+	install-deps \
 	~/.config/plasma-workspace/env/ssh-agent-startup.sh \
-	~/.config/plasma-workspace/shutdown/ssh-agent-shutdown.sh \
-	~/.config/python_keyring/keyringrc.cfg
+	~/.config/plasma-workspace/shutdown/ssh-agent-shutdown.sh
 
 .PHONY: install-deps
 install-deps:
@@ -14,9 +14,5 @@ install-deps:
 	ln -fs $(abspath $<) $@
 
 ~/.config/plasma-workspace/shutdown/ssh-agent-shutdown.sh: ssh-agent-shutdown.sh
-	mkdir -p $(dir $@)
-	ln -fs $(abspath $<) $@
-
-~/.config/python_keyring/keyringrc.cfg: keyringrc.cfg
 	mkdir -p $(dir $@)
 	ln -fs $(abspath $<) $@
