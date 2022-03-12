@@ -41,3 +41,4 @@ function cd() {
     builtin cd "$*" && ls
   fi
 }
+. "$HOME/.cargo/env"

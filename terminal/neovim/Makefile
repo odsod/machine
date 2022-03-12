@@ -1,13 +1,9 @@
 .PHONY: install
 install: \
-	add-ppa \
 	install-package \
+	~/.config/nvim/init.vim \
 	~/.local/share/nvim/site/autoload/plug.vim \
 	~/.config/environment.d/10-odsod-desktop-neovim.conf
-
-.PHONY: add-ppa
-add-ppa:
-	@dpkg-query -W neovim >/dev/null || sudo add-apt-repository ppa:neovim-ppa/unstable
 
 .PHONY: install-package
 install-package:
@@ -20,3 +16,7 @@ install-package:
 ~/.config/environment.d/10-odsod-desktop-neovim.conf:
 	mkdir -p $(dir $@)
 	echo EDITOR=vim > $@
+
+~/.config/nvim/init.vim:
+	mkdir -p $(dir $@)
+	echo ln -fs $(pwd)/init.vim $@

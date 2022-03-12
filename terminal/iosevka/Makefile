@@ -1,4 +1,4 @@
-iosevka_version := 10.3.0
+iosevka_version := 15.0.2
 iosevka_releases_url := https://github.com/be5invis/Iosevka/releases/download/v$(iosevka_version)
 
 .PHONY: install
@@ -6,9 +6,10 @@ install: \
 	.build/ttf-iosevka-$(iosevka_version)/iosevka-regular.ttf \
 	.build/ttf-iosevka-fixed-$(iosevka_version)/iosevka-fixed-regular.ttf \
 	.build/ttf-iosevka-term-$(iosevka_version)/iosevka-term-regular.ttf
-	ln -fs ~/.local/share/fonts/iosevka .build/ttf-iosevka-$(iosevka_version)
-	ln -fs ~/.local/share/fonts/iosevka-fixed .build/ttf-iosevka-fixed-$(iosevka_version)
-	ln -fs ~/.local/share/fonts/iosevka-term .build/ttf-iosevka-term-$(iosevka_version)
+	mkdir -p ~/.local/share/fonts
+	ln -fs $(abspath .build/ttf-iosevka-$(iosevka_version)) ~/.local/share/fonts/iosevka 
+	ln -fs $(abspath .build/ttf-iosevka-fixed-$(iosevka_version)) ~/.local/share/fonts/iosevka-fixed 
+	ln -fs $(abspath .build/ttf-iosevka-term-$(iosevka_version)) ~/.local/share/fonts/iosevka-term 
 	fc-cache -vf
 
 %.zip:
