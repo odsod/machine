@@ -1,6 +1,7 @@
 .PHONY: install
 install: \
 	install-package \
+	install-deps \
 	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
 	/usr/local/bin/odsod-kwin-dbus-service.py
 
@@ -10,7 +11,7 @@ install-package:
 
 .PHONY: install-deps
 install-deps:
-	sudo pip install PySide2
+	sudo apt install pyside2-tools
 
 .PHONY: upgrade-package
 upgrade-package:
