@@ -17,6 +17,6 @@ install-package:
 	mkdir -p $(dir $@)
 	echo EDITOR=vim > $@
 
-~/.config/nvim/init.vim:
+~/.config/nvim/init.vim: init.vim
 	mkdir -p $(dir $@)
-	echo ln -fs $(pwd)/init.vim $@
+	ln -fs $(abspath $<) $@
