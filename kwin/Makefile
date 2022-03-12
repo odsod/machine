@@ -11,7 +11,7 @@ install-package:
 
 .PHONY: install-deps
 install-deps:
-	sudo apt install pyside2-tools
+	sudo apt install python3-pyside2.qtgui
 
 .PHONY: upgrade-package
 upgrade-package:
