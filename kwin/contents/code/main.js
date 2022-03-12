@@ -182,7 +182,7 @@ const shortcuts = [
     key: "Meta+L",
     kind: "app",
     command: ["systemsettings5"],
-    resourceName: "systemsettings5",
+    resourceName: "systemsettings",
   },
 
   {
