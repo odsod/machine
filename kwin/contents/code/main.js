@@ -192,6 +192,14 @@ const shortcuts = [
     command: ["zoom"],
     resourceName: "zoom",
   },
+
+  {
+    actionId: ["kwin", "[odsod] emojis", "KWin", ""],
+    key: "Meta+,",
+    kind: "app",
+    command: ["ibus-ui-emojier-plasma"],
+    resourceName: "ibus-ui-emojier-plasma",
+  },
 ];
 
 function registerAppShortcut(shortcut) {
