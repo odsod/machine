@@ -83,12 +83,10 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
-    resourceClassIncludes: "calendar.google.com",
+    resourceName: "calendar.google.com",
   },
 
   {
@@ -103,13 +101,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
-      "--password-store=basic",
-    ],
-    resourceClass: "google-chrome",
+    command: ["google-chrome", "--password-store=basic"],
+    resourceName: "google-chrome",
   },
 
   {
@@ -126,12 +119,10 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://notion.so",
     ],
-    resourceClassIncludes: "notion.so",
+    resourceName: "notion.so",
   },
 
   {
@@ -140,12 +131,10 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
-    resourceClassIncludes: "mail.google.com",
+    resourceName: "mail.google.com",
   },
 
   {
@@ -154,12 +143,10 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
-    resourceClassIncludes: "meet.google.com",
+    resourceName: "meet.google.com",
   },
 
   {
@@ -168,12 +155,10 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://einride.slack.com",
     ],
-    resourceClassIncludes: "einride.slack.com",
+    resourceName: "einride.slack.com",
   },
 
   {
@@ -230,10 +215,6 @@ function registerAppShortcut(shortcut) {
           return client.resourceName.toString() === shortcut.resourceName;
         } else if (shortcut.resourceClass) {
           return client.resourceClass.toString() === shortcut.resourceClass;
-        } else if (shortcut.resourceClassIncludes) {
-          return client.resourceClass
-            .toString()
-            .includes(shortcut.resourceClassIncludes);
         } else {
           return false;
         }
@@ -278,10 +259,6 @@ function registerCommandShortcut(shortcut) {
     }
   );
 }
-
-workspace.clientList().forEach(function (client) {
-  log(client.resourceName, client.resourceClass);
-});
 
 shortcuts.forEach(function (shortcut) {
   switch (shortcut.kind) {
