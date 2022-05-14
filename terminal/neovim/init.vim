@@ -125,7 +125,6 @@ let g:ale_fixers = {
 \   'javascript': ['eslint', 'prettier'],
 \   'python': ['black'],
 \   'json': ['prettier'],
-\   'markdown': ['prettier'],
 \   'sh': ['shfmt'],
 \   'go': ['goimports'],
 \   'cpp': ['clang-format'],
