@@ -1,13 +1,7 @@
 .PHONY: install
 install: \
-	install-deps \
 	~/.config/plasma-workspace/env/ssh-agent-startup.sh \
 	~/.config/plasma-workspace/shutdown/ssh-agent-shutdown.sh
-
-.PHONY: install-deps
-install-deps:
-	sudo add-apt-repository ppa:kubuntu-ppa/backports
-	sudo apt upgrade
 
 ~/.config/plasma-workspace/env/ssh-agent-startup.sh: ssh-agent-startup.sh
 	mkdir -p $(dir $@)
