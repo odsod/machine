@@ -93,8 +93,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] terminal", "KWin", ""],
     key: "Meta+U",
     kind: "app",
-    command: ["alacrittymux", "terminal"],
-    resourceClass: "terminal",
+    command: ["konsole"],
+    resourceClass: "org.kde.konsole",
   },
 
   {
@@ -269,6 +269,10 @@ shortcuts.forEach(function (shortcut) {
       registerCommandShortcut(shortcut);
       break;
   }
+});
+
+workspace.clientList().forEach(function (client) {
+  log(client.resourceName, client.resourceClass);
 });
 
 callDBus(

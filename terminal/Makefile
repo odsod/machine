@@ -1,7 +1,7 @@
 .PHONY: install
 install: \
 	install-deps \
-	install-alacritty \
+	install-konsole \
 	install-bash \
 	install-iosevka \
 	install-neovim \
@@ -11,9 +11,9 @@ install: \
 install-deps:
 	sudo apt install ripgrep fd-find
 
-.PHONY: install-alacritty
+.PHONY: install-konsole
 install-tmux:
-	make -C alacritty
+	make -C konsole
 
 .PHONY: install-bash
 install-bash:
