@@ -41,4 +41,11 @@ function cd() {
     builtin cd "$*" && ls
   fi
 }
-. "$HOME/.cargo/env"
+
+if [[ -f ~/.cargo/env ]]; then
+  source ~/.cargo/env
+fi
+
+if [[ -f ~/.bashrc.local ]]; then
+  source ~/.bashrc.local
+fi
