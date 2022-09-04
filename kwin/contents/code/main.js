@@ -200,6 +200,14 @@ const shortcuts = [
     command: ["ibus-ui-emojier-plasma"],
     resourceName: "ibus-ui-emojier-plasma",
   },
+
+  {
+    actionId: ["kwin", "[odsod] explorer", "KWin", ""],
+    key: "Meta+E",
+    kind: "app",
+    command: ["dolphin"],
+    resourceName: "dolphin",
+  },
 ];
 
 function registerAppShortcut(shortcut) {
