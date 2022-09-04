@@ -2,5 +2,8 @@
 install: \
 	~/.gitconfig
 
+.PHONY: ~/.gitconfig
 ~/.gitconfig: gitconfig
-	ln -fs $(abspath $<) $@
+	$(info [git] symlinking $@)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@

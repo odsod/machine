@@ -1,27 +1,36 @@
 .PHONY: install
 install: \
+	install-packages \
 	~/.bashrc \
 	~/.inputrc \
 	~/.local/bin/print-bash-colors \
-	~/.config/bash/prompt.bash \
-	install-packages
+	~/.config/bash/prompt.bash
 
 .PHONY: install-packages
 install-packages:
-	sudo apt install direnv
+	$(info [bash] installing packages)
+	@sudo apt install -y direnv >/dev/null 2>&1
 
+.PHONY: ~/.bashrc
 ~/.bashrc: bashrc
-	mkdir -p $(dir $@)
-	ln -fs $(abspath $<) $@
+	$(info [bash] symlinking $@)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.inputrc
 ~/.inputrc: inputrc
-	mkdir -p $(dir $@)
-	ln -fs $(abspath $<) $@
+	$(info [bash] symlinking $@)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.local/bin/print-bash-colors
 ~/.local/bin/print-bash-colors: print-bash-colors
-	mkdir -p $(dir $@)
-	ln -fs $(abspath $<) $@
+	$(info [bash] symlinking $@)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.config/bash/prompt.bash
 ~/.config/bash/prompt.bash: prompt.bash
-	mkdir -p $(dir $@)
-	ln -fs $(abspath $<) $@
+	$(info [bash] symlinking $@)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@

@@ -1,11 +1,26 @@
-.PHONY: install-deps
-install-deps:
-	sudo apt install keepassxc
+.PHONY: install
+install: \
+	install-packages \
+	install-bash \
+	install-ibm-plex \
+	install-dropbox \
+	install-kde \
+	install-git \
+	install-iosevka \
+	install-keyboard \
+	install-konsole \
+	install-tmux \
+	install-neovim
 
-.PHONY: dbus-install
-dbus-install:
-	make -C dbus install
+.PHONY: install-packages
+install-packages:
+	$(info [desktop] installing packages)
+	@sudo apt install -y \
+		keepassxc \
+		wl-clipboard \
+		ripgrep \
+		fd-find \
+	 >/dev/null 2>&1
 
-.PHONY: kwin-install
-kwin-install:
-	make -C kwin install
+install-%:
+	@make -sC $(subst install-,,$@)
