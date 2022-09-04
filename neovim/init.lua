@@ -1,3 +1,5 @@
+vim.api.nvim_exec(
+[[
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'arcticicestudio/nord-vim'
 Plug 'itchyny/lightline.vim'
@@ -20,32 +22,28 @@ call plug#end()
 
 filetype plugin indent on
 
-" Disable mouse integration
-set mouse=
-
 colorscheme nord
-
 let g:lightline = {'colorscheme': 'nord'}
+]], false)
 
-" Config
-set cursorline
-set expandtab
-set hidden
-set hlsearch
-set ignorecase
-set nobackup
-set nowritebackup
-set number
-set shiftwidth=2
-set shortmess=atI
-set smartcase
-set smartindent
-set tabstop=2
-set title
-set wildignorecase
-set wildmode=list:longest,full
-set completeopt-=preview
+vim.opt.mouse = ''
+vim.opt.cursorline = true
+vim.opt.expandtab = true
+vim.opt.hidden = true
+vim.opt.hlsearch = true
+vim.opt.ignorecase = true
+vim.opt.number = true
+vim.opt.shiftwidth = 2
+vim.opt.smartcase = true
+vim.opt.smartindent = true
+vim.opt.tabstop = 2
+vim.opt.title = true
+vim.opt.wildignorecase = true
+vim.opt.wildmode = 'list:longest,full'
+vim.opt.shortmess = 'atI'
 
+vim.api.nvim_exec(
+[[
 " Keymaps
 set timeoutlen=400
 nnoremap <C-n> <cmd>Telescope find_files<cr>
@@ -132,3 +130,4 @@ let g:ale_fixers = {
 \}
 let g:ale_fix_on_save = 1
 let g:ale_go_golangci_lint_options = ''
+]], false)

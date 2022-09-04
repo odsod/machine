@@ -1,7 +1,7 @@
 .PHONY: install
 install: \
 	install-packages \
-	~/.config/nvim/init.vim \
+	~/.config/nvim/init.lua \
 	~/.local/share/nvim/site/autoload/plug.vim \
 	~/.config/environment.d/10-odsod-desktop-neovim.conf
 
@@ -21,8 +21,8 @@ install-packages:
 	@mkdir -p $(dir $@)
 	@echo EDITOR=vim > $@
 
-.PHONY: ~/.config/nvim/init.vim
-~/.config/nvim/init.vim: init.vim
+.PHONY: ~/.config/nvim/init.lua
+~/.config/nvim/init.lua: init.lua
 	$(info [neovim] symlinking $@)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
