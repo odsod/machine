@@ -2,7 +2,7 @@
 install: \
 	install-packages \
 	install-bash \
-	install-ibm-plex \
+	install-inter \
 	install-dropbox \
 	install-kde \
 	install-git \
