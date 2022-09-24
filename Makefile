@@ -3,6 +3,7 @@ install: \
 	install-packages \
 	install-bash \
 	install-inter \
+	install-inter-display \
 	install-dropbox \
 	install-kde \
 	install-git \
