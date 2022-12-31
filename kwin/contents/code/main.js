@@ -208,6 +208,30 @@ const shortcuts = [
     command: ["dolphin"],
     resourceName: "dolphin",
   },
+
+  {
+    actionId: ["kwin", "[odsod] Work", "KWin", ""],
+    key: "Meta+Y",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://miro.com/app/board/uXjVP44PoOM=/",
+    ],
+    resourceName: "miro.com__app_board_uxjvp44poom=",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] ChatGPT", "KWin", ""],
+    key: "Meta+F",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://chat.openai.com/",
+    ],
+    resourceName: "chat.openai.com",
+  },
 ];
 
 function registerAppShortcut(shortcut) {
