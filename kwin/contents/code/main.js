@@ -83,10 +83,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
-    resourceName: "calendar.google.com",
+    resourceClassIncludes: "calendar.google.com",
   },
 
   {
@@ -101,8 +103,13 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",
-    command: ["google-chrome", "--password-store=basic"],
-    resourceName: "google-chrome",
+    command: [
+      "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
+      "--password-store=basic",
+    ],
+    resourceClass: "google-chrome",
   },
 
   {
@@ -119,10 +126,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://notion.so",
     ],
-    resourceName: "notion.so",
+    resourceClassIncludes: "notion.so",
   },
 
   {
@@ -131,10 +140,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
-    resourceName: "mail.google.com",
+    resourceClassIncludes: "mail.google.com",
   },
 
   {
@@ -143,10 +154,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
-    resourceName: "meet.google.com",
+    resourceClassIncludes: "meet.google.com",
   },
 
   {
@@ -155,10 +168,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://einride.slack.com",
     ],
-    resourceName: "einride.slack.com",
+    resourceClassIncludes: "einride.slack.com",
   },
 
   {
@@ -215,10 +230,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://miro.com/app/board/uXjVP44PoOM=/",
     ],
-    resourceName: "miro.com__app_board_uxjvp44poom=",
+    resourceClassIncludes: "miro.com__app_board_uxjvp44poom=",
   },
 
   {
@@ -227,10 +244,12 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
       "--password-store=basic",
       "--app=https://chat.openai.com/",
     ],
-    resourceName: "chat.openai.com",
+    resourceClassIncludes: "chat.openai.com",
   },
 ];
 
@@ -247,6 +266,10 @@ function registerAppShortcut(shortcut) {
           return client.resourceName.toString() === shortcut.resourceName;
         } else if (shortcut.resourceClass) {
           return client.resourceClass.toString() === shortcut.resourceClass;
+        } else if (shortcut.resourceClassIncludes) {
+          return client.resourceClass
+            .toString()
+            .includes(shortcut.resourceClassIncludes);
         } else {
           return false;
         }
@@ -291,6 +314,10 @@ function registerCommandShortcut(shortcut) {
     }
   );
 }
+
+workspace.clientList().forEach(function (client) {
+  log(client.resourceName, client.resourceClass);
+});
 
 shortcuts.forEach(function (shortcut) {
   switch (shortcut.kind) {
