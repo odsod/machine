@@ -1,0 +1,15 @@
+{
+    "workbench.colorTheme": "Nord",
+    "workbench.startupEditor": "none",
+    "go.toolsManagement.autoUpdate": true,
+    "gopls": {
+        "ui.semanticTokens": true,
+        "formatting.gofumpt": true
+    },
+    "editor.fontFamily": "Iosevka, 'monospace', monospace",
+    "editor.fontSize": 14,
+    "editor.fontLigatures": false,
+    "window.menuBarVisibility": "visible",
+    "telemetry.telemetryLevel": "off",
+    "terminal.integrated.sendKeybindingsToShell": true
+}
