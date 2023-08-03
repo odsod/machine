@@ -1,27 +1,22 @@
-inter_version := 3.19
+inter_version := 4.0-beta9h
 inter_archive_url := https://github.com/rsms/inter/releases/download/v$(inter_version)/Inter-$(inter_version).zip
 
 .PHONY: install
-install: \
-	~/.local/share/fonts/inter \
-	update-font-cache
+install: ~/.local/share/fonts/inter.ttc
 
-.PHONY: ~/.local/share/fonts/inter
-~/.local/share/fonts/inter: .build/$(inter_version)/LICENSE.txt
-	$(info [inter] symlinking $@)
-	@mkdir -p $(dir $@)
-	@ln -fsT "$(abspath $(dir $<))/Inter Desktop" $@
+.PHONY: ~/.local/share/fonts/inter.ttc
+~/.local/share/fonts/inter.ttc: build/$(inter_version)/Inter.ttc
+	$(info [inter] installing...)
+	@mkdir -p ~/.local/share/fonts
+	@ln -fs $(abspath $<) $@
+	@fc-cache -vf >/dev/null
 
-.build/$(inter_version)/archive.zip:
-	$(info [inter] downloading archive)
-	@curl $(inter_archive_url) --create-dirs -Lo $@
-
-.build/$(inter_version)/LICENSE.txt: .build/$(inter_version)/archive.zip
-	$(info [inter] unzipping $<)
+build/$(inter_version)/Inter.ttc: build/$(inter_version)/Inter.zip
+	$(info [inter] unzipping $<...)
 	@unzip $< -d $(dir $@)
 	@touch $@
 
-.PHONY: update-font-cache
-update-font-cache: ~/.local/share/fonts/inter
-	$(info [inter] updating font cache)
-	@fc-cache -vf >/dev/null
+build/$(inter_version)/Inter.zip:
+	$(info [inter] downloading...)
+	@curl $(inter_archive_url) --create-dirs -Lo $@
+	@touch $@
