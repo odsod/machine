@@ -225,7 +225,7 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] Work", "KWin", ""],
+    actionId: ["kwin", "[odsod] work", "KWin", ""],
     key: "Meta+Y",
     kind: "app",
     command: [
@@ -235,11 +235,11 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://miro.com/app/board/uXjVP44PoOM=/",
     ],
-    resourceClassIncludes: "miro.com__app_board_uxjvp44poom=",
+    resourceClassIncludes: "uXjVP44PoOM=",
   },
 
   {
-    actionId: ["kwin", "[odsod] ChatGPT", "KWin", ""],
+    actionId: ["kwin", "[odsod] chatgpt", "KWin", ""],
     key: "Meta+F",
     kind: "app",
     command: [
@@ -250,6 +250,28 @@ const shortcuts = [
       "--app=https://chat.openai.com/",
     ],
     resourceClassIncludes: "chat.openai.com",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] code", "KWin", ""],
+    key: "Meta+/",
+    kind: "app",
+    command: [
+      "code",
+    ],
+    resourceName: "code",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] debug", "KWin", ""],
+    key: "Meta+;",
+    kind: "callback",
+    callback: function () {
+      log("printing debug output")
+      workspace.clientList().forEach(function (client) {
+        log(client.resourceName, client.resourceClass);
+      });
+    }
   },
 ];
 
@@ -290,9 +312,9 @@ function registerAppShortcut(shortcut) {
         "/",
         "io.github.odsod.kwin.Service",
         "run_shortcut",
-        JSON.stringify(shortcut)
+        JSON.stringify(shortcut),
       );
-    }
+    },
   );
 }
 
@@ -309,15 +331,24 @@ function registerCommandShortcut(shortcut) {
         "/",
         "io.github.odsod.kwin.Service",
         "run_shortcut",
-        JSON.stringify(shortcut)
+        JSON.stringify(shortcut),
       );
-    }
+    },
   );
 }
 
-workspace.clientList().forEach(function (client) {
-  log(client.resourceName, client.resourceClass);
-});
+function registerCallbackShortcut(shortcut) {
+  log("registering callback shortcut", JSON.stringify(shortcut.actionId));
+  registerShortcut(
+    shortcut.actionId[1],
+    shortcut.actionId[3],
+    shortcut.key,
+    function () {
+      log("handling callback shortcut", JSON.stringify(shortcut.actionId));
+      shortcut.callback();
+    },
+  );
+}
 
 shortcuts.forEach(function (shortcut) {
   switch (shortcut.kind) {
@@ -327,11 +358,10 @@ shortcuts.forEach(function (shortcut) {
     case "command":
       registerCommandShortcut(shortcut);
       break;
+    case "callback":
+      registerCallbackShortcut(shortcut);
+      break;
   }
-});
-
-workspace.clientList().forEach(function (client) {
-  log(client.resourceName, client.resourceClass);
 });
 
 callDBus(
@@ -342,5 +372,5 @@ callDBus(
   JSON.stringify(shortcuts),
   function () {
     log("shortcuts configured");
-  }
+  },
 );
