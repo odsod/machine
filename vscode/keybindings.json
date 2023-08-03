@@ -24,5 +24,38 @@
   {
     "key": "ctrl+h ctrl+m",
     "command": "workbench.action.toggleMenuBar"
+  },
+  {
+    "key": "ctrl+h ctrl+l",
+    "command": "workbench.action.openSettingsJson"
+  },
+  {
+    "key": "ctrl+c ctrl+h",
+    "command": "editor.action.triggerParameterHints",
+    "when": "editorHasSignatureHelpProvider && editorTextFocus"
+  },
+  {
+    "key": "ctrl+c ctrl+d",
+    "command": "editor.action.revealDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !isInEmbeddedEditor"
+  },
+  {
+    "key": "ctrl+c ctrl+p",
+    "command": "editor.action.peekDefinition",
+    "when": "editorHasDefinitionProvider && editorTextFocus && !inReferenceSearchEditor && !isInEmbeddedEditor"
+  },
+  {
+    "key": "ctrl+c ctrl+r",
+    "command": "editor.action.rename",
+    "when": "editorHasRenameProvider && editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+g ctrl+i",
+    "command": "go.impl.cursor"
+  },
+  {
+    "key": "ctrl+c ctrl+e",
+    "command": "editor.action.marker.nextInFiles",
+    "when": "editorFocus"
   }
 ]

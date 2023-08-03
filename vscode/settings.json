@@ -6,16 +6,20 @@
         "ui.semanticTokens": true,
         "formatting.gofumpt": true
     },
-    "editor.fontFamily": "Iosevka, 'monospace', monospace",
-    "editor.fontSize": 14,
+    "editor.fontFamily": "Iosevka",
+    "editor.fontSize": 15,
+    "editor.fontWeight": 400,
     "editor.fontLigatures": false,
     "telemetry.telemetryLevel": "off",
     "terminal.integrated.sendKeybindingsToShell": true,
+    "terminal.integrated.fontSize": 15,
+    "terminal.integrated.fontFamily": "Iosevka",
+    "terminal.integrated.fontWeight": 400,
+    "terminal.integrated.fontWeightBold": 700,
     "vim.enableNeovim": true,
     "files.insertFinalNewline": true,
     "files.trimTrailingWhitespace": true,
     "editor.formatOnSave": true,
     "explorer.confirmDelete": false,
-    "explorer.confirmDragAndDrop": false,
-    "window.menuBarVisibility": "toggle"
+    "explorer.confirmDragAndDrop": false
 }
