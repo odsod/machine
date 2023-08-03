@@ -30,3 +30,10 @@ develop-package:
 
 /usr/local/bin/odsod-kwin-dbus-service.py: odsod-kwin-dbus-service.py
 	sudo cp -f $< $@
+
+.PHONY: tail-dbus
+tail-dbus:
+	@tail -f ~/.local/share/sddm/wayland-session.log
+
+.PHONY: tail-kwin
+	@journalctl -f
