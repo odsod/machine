@@ -9,7 +9,13 @@
     "editor.fontFamily": "Iosevka, 'monospace', monospace",
     "editor.fontSize": 14,
     "editor.fontLigatures": false,
-    "window.menuBarVisibility": "visible",
     "telemetry.telemetryLevel": "off",
-    "terminal.integrated.sendKeybindingsToShell": true
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "vim.enableNeovim": true,
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnSave": true,
+    "explorer.confirmDelete": false,
+    "explorer.confirmDragAndDrop": false,
+    "window.menuBarVisibility": "toggle"
 }
