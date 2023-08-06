@@ -36,4 +36,5 @@ tail-dbus:
 	@tail -f ~/.local/share/sddm/wayland-session.log
 
 .PHONY: tail-kwin
+tail-kwin:
 	@journalctl -f

@@ -253,12 +253,24 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] jira", "KWin", ""],
+    key: "Meta+I",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--enable-features=UseOzonePlatform",
+      "--ozone-platform=wayland",
+      "--password-store=basic",
+      "--app=https://einride.atlassian.net/jira",
+    ],
+    resourceClassIncludes: "einride.atlassian.net__jira",
+  },
+
+  {
     actionId: ["kwin", "[odsod] code", "KWin", ""],
     key: "Meta+/",
     kind: "app",
-    command: [
-      "code",
-    ],
+    command: ["code"],
     resourceName: "code",
   },
 
@@ -267,11 +279,11 @@ const shortcuts = [
     key: "Meta+;",
     kind: "callback",
     callback: function () {
-      log("printing debug output")
+      log("printing debug output");
       workspace.clientList().forEach(function (client) {
         log(client.resourceName, client.resourceClass);
       });
-    }
+    },
   },
 ];
 
