@@ -1,22 +1,11 @@
 .PHONY: install
 install: \
 	install-packages \
-	install-bash \
-	install-dropbox \
-	install-git \
-	install-inter \
-	install-interception \
-	install-iosevka \
-	install-keyboard \
-	install-konsole \
-	install-kwin \
-	install-neovim \
-	install-tmux \
-	install-vscode
+	install-modules
 
 .PHONY: install-packages
 install-packages:
-	$(info [desktop] installing packages...)
+	$(info [machine] installing packages...)
 	@sudo apt install -y \
 		git \
 		curl \
@@ -27,5 +16,7 @@ install-packages:
 		fd-find \
 	 >/dev/null 2>&1
 
-install-%:
-	@make -sC $(subst install-,,$@)
+.PHONY: install-modules
+install-modules:
+	$(info [machine] installing modules...)
+	@find . -mindepth 2 -maxdepth 2 -name Makefile | xargs dirname | xargs -n1 make -C

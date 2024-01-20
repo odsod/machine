@@ -1,6 +1,6 @@
-# Desktop
+# Machine
 
-My desktop environment, with extensions on KDE.
+My machine.
 
 ## Manual setup steps
 
