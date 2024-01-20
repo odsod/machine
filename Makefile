@@ -2,21 +2,24 @@
 install: \
 	install-packages \
 	install-bash \
-	install-inter \
-	install-inter-display \
 	install-dropbox \
 	install-git \
+	install-inter \
+	install-interception \
 	install-iosevka \
 	install-keyboard \
 	install-konsole \
+	install-kwin \
 	install-neovim \
 	install-tmux \
 	install-vscode
 
 .PHONY: install-packages
 install-packages:
-	$(info [desktop] installing packages)
+	$(info [desktop] installing packages...)
 	@sudo apt install -y \
+		git \
+		curl \
 		keepassxc \
 		wl-clipboard \
 		ripgrep \

@@ -1,4 +1,4 @@
-inter_version := 4.0-beta9h
+inter_version := 4.0
 inter_archive_url := https://github.com/rsms/inter/releases/download/v$(inter_version)/Inter-$(inter_version).zip
 
 .PHONY: install
