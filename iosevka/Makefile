@@ -1,5 +1,5 @@
-iosevka_version := 25.1.1
-iosevka_archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(iosevka_version)/super-ttc-iosevka-$(iosevka_version).zip
+iosevka_version := 28.0.5
+iosevka_archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(iosevka_version)/PkgTTC-Iosevka-$(iosevka_version).zip
 
 .PHONY: install
 install: ~/.local/share/fonts/iosevka.ttc
