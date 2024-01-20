@@ -275,6 +275,14 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] obsidian", "KWin", ""],
+    key: "Meta+V",
+    kind: "app",
+    command: ["obsidian"],
+    resourceName: "obsidian",
+  },
+
+  {
     actionId: ["kwin", "[odsod] debug", "KWin", ""],
     key: "Meta+;",
     kind: "callback",
