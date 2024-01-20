@@ -8,3 +8,4 @@ My desktop environment, with extensions on KDE.
 [ ] Set All Fonts
 [ ] Set KWin script
 [ ] Set Plasma keyboard layout
+[ ] Apply Plasma settings to SDDM
