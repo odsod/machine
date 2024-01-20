@@ -10,3 +10,4 @@ My desktop environment, with extensions on KDE.
 [ ] Set Plasma keyboard layout
 [ ] Apply Plasma settings to SDDM
 [ ] Unpin all task manager items
+[ ] Region and language settings
