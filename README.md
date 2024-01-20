@@ -9,3 +9,4 @@ My desktop environment, with extensions on KDE.
 [ ] Set KWin script
 [ ] Set Plasma keyboard layout
 [ ] Apply Plasma settings to SDDM
+[ ] Unpin all task manager items
