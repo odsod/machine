@@ -212,8 +212,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] emojis", "KWin", ""],
     key: "Meta+,",
     kind: "app",
-    command: ["ibus-ui-emojier-plasma"],
-    resourceName: "ibus-ui-emojier-plasma",
+    command: ["plasma-emojier"],
+    resourceName: "plasma-emojier",
   },
 
   {
@@ -233,9 +233,9 @@ const shortcuts = [
       "--enable-features=UseOzonePlatform",
       "--ozone-platform=wayland",
       "--password-store=basic",
-      "--app=https://miro.com/app/board/uXjVP44PoOM=/",
+      "--app=https://miro.com/app/",
     ],
-    resourceClassIncludes: "uXjVP44PoOM=",
+    resourceClassIncludes: "miro.com",
   },
 
   {
