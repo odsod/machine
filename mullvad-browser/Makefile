@@ -2,9 +2,6 @@ name := mullvad-browser
 version := 13.0.7
 archive_url := https://github.com/mullvad/mullvad-browser/releases/download/$(version)/mullvad-browser-linux-x86_64-$(version).tar.xz
 
-.PHONY: install
-install: ~/.local/bin/mullvadbrowser
-
 .PHONY: ~/.local/bin/mullvadbrowser
 ~/.local/bin/mullvadbrowser: build/$(version)/mullvad-browser/Browser/mullvadbrowser.real
 	$(info [$(name)] symlinking $@)
