@@ -1,25 +1,25 @@
 {
-    "workbench.colorTheme": "Nord",
-    "workbench.startupEditor": "none",
-    "go.toolsManagement.autoUpdate": true,
-    "gopls": {
-        "ui.semanticTokens": true,
-        "formatting.gofumpt": true
-    },
-    "editor.fontFamily": "Iosevka",
-    "editor.fontSize": 15,
-    "editor.fontWeight": 400,
-    "editor.fontLigatures": false,
-    "telemetry.telemetryLevel": "off",
-    "terminal.integrated.sendKeybindingsToShell": true,
-    "terminal.integrated.fontSize": 15,
-    "terminal.integrated.fontFamily": "Iosevka",
-    "terminal.integrated.fontWeight": 400,
-    "terminal.integrated.fontWeightBold": 700,
-    "vim.enableNeovim": true,
-    "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true,
-    "editor.formatOnSave": true,
-    "explorer.confirmDelete": false,
-    "explorer.confirmDragAndDrop": false
+  "workbench.colorTheme": "Nord",
+  "workbench.startupEditor": "none",
+  "go.toolsManagement.autoUpdate": true,
+  "gopls": {
+    "ui.semanticTokens": true,
+    "formatting.gofumpt": true
+  },
+  "editor.fontFamily": "Iosevka",
+  "editor.fontSize": 15,
+  "editor.fontWeight": 400,
+  "editor.fontLigatures": false,
+  "telemetry.telemetryLevel": "off",
+  "terminal.integrated.sendKeybindingsToShell": true,
+  "terminal.integrated.fontSize": 15,
+  "terminal.integrated.fontFamily": "Iosevka",
+  "terminal.integrated.fontWeight": 400,
+  "terminal.integrated.fontWeightBold": 700,
+  "vim.enableNeovim": true,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "editor.formatOnSave": true,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false
 }
