@@ -18,10 +18,10 @@ install: \
 
 .PHONY: install-extensions
 install-extensions:
-	@code --install-extension arcticicestudio.nord-visual-studio-code
-	@code --install-extension be5invis.toml
-	@code --install-extension golang.go
-	@code --install-extension ms-python.python
-	@code --install-extension ms-python.vscode-pylance
-	@code --install-extension vscodevim.vim
-	@code --install-extension zxh404.vscode-proto3
+	@code --install-extension --force arcticicestudio.nord-visual-studio-code
+	@code --install-extension --force be5invis.toml
+	@code --install-extension --force golang.go
+	@code --install-extension --force ms-python.python
+	@code --install-extension --force ms-python.vscode-pylance
+	@code --install-extension --force vscodevim.vim
+	@code --install-extension --force zxh404.vscode-proto3
