@@ -5,13 +5,13 @@ install: \
 	install-inter \
 	install-inter-display \
 	install-dropbox \
-	install-kde \
 	install-git \
 	install-iosevka \
 	install-keyboard \
 	install-konsole \
+	install-neovim \
 	install-tmux \
-	install-neovim
+	install-vscode
 
 .PHONY: install-packages
 install-packages:
