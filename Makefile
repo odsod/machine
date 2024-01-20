@@ -20,6 +20,7 @@ install-packages:
 	@sudo apt install -y \
 		git \
 		curl \
+		qbittorrent \
 		keepassxc \
 		wl-clipboard \
 		ripgrep \
