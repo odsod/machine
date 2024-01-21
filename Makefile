@@ -1,3 +1,5 @@
+name := machine
+
 .PHONY: install
 install: \
 	install-packages \
@@ -5,8 +7,8 @@ install: \
 
 .PHONY: install-packages
 install-packages:
-	$(info [machine] installing packages...)
-	@sudo apt install -y \
+	$(info [$(name)] Installing packages...)
+	@sudo apt-get install -y \
 		git \
 		curl \
 		qbittorrent \
@@ -14,9 +16,9 @@ install-packages:
 		wl-clipboard \
 		ripgrep \
 		fd-find \
-	 >/dev/null 2>&1
+		| sed -e "s/^/[${name}:$@] /"
 
 .PHONY: install-modules
 install-modules:
-	$(info [machine] installing modules...)
+	$(info [$(name)] Installing modules...)
 	@find . -mindepth 2 -maxdepth 2 -name Makefile | xargs dirname | xargs -n1 make -C
