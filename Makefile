@@ -2,8 +2,14 @@ name := machine
 
 .PHONY: install
 install: \
+	~/.profile \
 	install-packages \
 	install-modules
+
+.PHONY: ~/.profile
+~/.profile: profile
+	$(info [$(name)] symlinking $@...)
+	@ln -fsT $(abspath $<) $@
 
 .PHONY: install-packages
 install-packages:
