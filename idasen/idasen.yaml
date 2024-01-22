@@ -1,0 +1,6 @@
+# https://newam.github.io/idasen/index.html#configuration
+mac_address: C8:42:EF:4A:28:C5
+positions:
+  sit: 0.85
+  stand: 0.98
+  chill: 0.62
