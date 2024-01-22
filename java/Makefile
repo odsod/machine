@@ -7,7 +7,7 @@ all: install-packages $(environment)
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo apt-get install -y openjdk-22-jdk | sed -e "s/^/[${name}:$@] /"
+	@sudo apt-get install -y openjdk-22-jdk | sed -e "s/^/[$(name):$@] /"
 
 .PHONY: $(environment)
 $(environment): environment.conf
