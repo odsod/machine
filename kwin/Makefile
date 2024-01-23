@@ -1,9 +1,15 @@
 .PHONY: install
 install: \
-	install-package \
 	install-deps \
+	install-package \
+	enable-package \
 	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
 	/usr/local/bin/odsod-kwin-dbus-service.py
+
+.PHONY: enable-package
+enable-package:
+	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled false
+	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled true
 
 .PHONY: install-package
 install-package:
