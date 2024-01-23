@@ -1,0 +1,21 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "odsod"
+            }
+        ],
+        "Description": "odsod's desktop plugin",
+        "EnabledByDefault": true,
+        "Icon": "window-duplicate",
+        "Id": "odsod",
+        "License": "MIT",
+        "Name": "odsod",
+        "ServiceTypes": [
+            "KWin/Script"
+        ],
+        "Version": "1"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}
