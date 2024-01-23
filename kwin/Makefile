@@ -7,29 +7,21 @@ install: \
 
 .PHONY: install-package
 install-package:
-	kpackagetool5 -i .
+	@kpackagetool5 -l | tail +2 | grep -q odsod && kpackagetool5 -u . || kpackagetool5 -i .
 
 .PHONY: install-deps
 install-deps:
-	sudo apt install python3-pyside2.qtgui
-
-.PHONY: upgrade-package
-upgrade-package:
-	kpackagetool5 -u .
-
-.PHONY: uninstall-package
-uninstall-package:
-	kpackagetool5 -r .
+	@sudo apt-get install -y python3-pyside2.qtgui
 
 .PHONY: develop-package
 develop-package:
-	qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.showInteractiveKWinConsole
+	@qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.showInteractiveKWinConsole
 
 /usr/share/dbus-1/services/io.github.odsod.kwin.service: io.github.odsod.kwin.service
-	sudo cp -f $< $@
+	@sudo cp -f $< $@
 
 /usr/local/bin/odsod-kwin-dbus-service.py: odsod-kwin-dbus-service.py
-	sudo cp -f $< $@
+	@sudo cp -f $< $@
 
 .PHONY: tail-dbus
 tail-dbus:
