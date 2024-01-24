@@ -18,12 +18,25 @@ install-packages:
 		apt-transport-https \
 		ca-certificates \
 		curl \
+		curl \
+		dos2unix \
+		dstat \
+		entr \
 		fd-find \
+		filezilla \
 		git \
 		gnupg \
+		htop \
+		iftop \
+		jq \
 		keepassxc \
+		moreutils \
+		ncdu \
+		net-tools \
+		ngrep \
 		qbittorrent \
 		ripgrep \
+		wine-stable \
 		wl-clipboard \
 		| sed -e "s/^/[${name}:$@] /"
 
