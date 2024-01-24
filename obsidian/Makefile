@@ -1,14 +1,16 @@
-obsidian_version := 1.5.3
-obsidian_deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(obsidian_version)/obsidian_$(obsidian_version)_amd64.deb
+name := obsidian
+version := 1.5.3
+deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/$(version)_amd64.deb
 
 .PHONY: install
 install: install-package
 
 .PHONY: install-package
-install-package: build/$(obsidian_version)/obsidian.deb
+install-package: build/$(version)/package.deb
+	$(info [$(name)] Installing package...)
 	@sudo dpkg -i $<
 
-build/$(obsidian_version)/obsidian.deb:
-	$(info [obsidian] downloading deb...)
-	@curl $(obsidian_deb_url) --create-dirs -Lo $@
+build/$(version)/package.deb:
+	$(info [$(name)] Downloading package...)
+	@curl $(deb_url) --create-dirs -Lo $@
 	@touch $@
