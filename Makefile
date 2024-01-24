@@ -15,13 +15,16 @@ install: \
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo apt-get install -y \
-		git \
+		apt-transport-https \
+		ca-certificates \
 		curl \
-		qbittorrent \
-		keepassxc \
-		wl-clipboard \
-		ripgrep \
 		fd-find \
+		git \
+		gnupg \
+		keepassxc \
+		qbittorrent \
+		ripgrep \
+		wl-clipboard \
 		| sed -e "s/^/[${name}:$@] /"
 
 .PHONY: install-modules
