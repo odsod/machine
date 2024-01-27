@@ -7,17 +7,17 @@ symlink := ~/.local/bin/$(name)
 
 .PHONY: $(symlink)
 $(symlink): $(cmd)
-	$(info [$(name)] symlinking $@...)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 $(cmd): $(archive)
-	$(info [$(name)] extracting $(archive)...)
+	$(info [$(name)] Extracting $(archive)...)
 	@tar -C $(dir $<) -xf $<
 	@touch $@
 	@chmod +x $@
 
 $(archive):
-	$(info [$(name)] downloading $(archive_url)...)
+	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
