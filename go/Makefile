@@ -12,13 +12,13 @@ all: $(symlink) $(environment)
 
 .PHONY: $(environment)
 $(environment): environment.conf
-	$(info [$(name)] symlinking $@...)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: $(symlink)
 $(symlink): $(gopath)
-	$(info [$(name)] symlinking $@...)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
@@ -26,12 +26,12 @@ $(symlink): $(gopath)
 $(gopath): $(cmd)
 
 $(cmd): $(archive)
-	$(info [$(name)] extracting $(archive)...)
+	$(info [$(name)] Extracting $(archive)...)
 	@tar -C $(dir $<) -xf $<
 	@touch $@
 	@chmod +x $@
 
 $(archive):
-	$(info [$(name)] downloading $(archive_url)...)
+	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
