@@ -4,17 +4,17 @@ archive_url := https://github.com/mullvad/mullvad-browser/releases/download/$(ve
 
 .PHONY: ~/.local/bin/mullvadbrowser
 ~/.local/bin/mullvadbrowser: build/$(version)/mullvad-browser/Browser/mullvadbrowser.real
-	$(info [$(name)] symlinking $@)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 build/$(version)/mullvad-browser/Browser/mullvadbrowser.real: build/$(version)/archive.tar.xz
-	$(info [$(name)] extracting package...)
+	$(info [$(name)] Extracting archive...)
 	@tar -C $(dir $<) -xf $<
 	@touch $@
 	@chmod +x $@
 
 build/$(version)/archive.tar.xz:
-	$(info [$(name)] downloading archive...)
+	$(info [$(name)] Downloading archive...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
