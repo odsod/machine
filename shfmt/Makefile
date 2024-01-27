@@ -6,12 +6,12 @@ symlink := ~/.local/bin/$(name)
 
 .PHONY: $(symlink)
 $(symlink): $(cmd)
-	$(info [$(name)] symlinking $@...)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 $(cmd):
-	$(info [$(name)] downloading $(cmd_url)...)
+	$(info [$(name)] Downloading $(cmd_url)...)
 	@curl $(cmd_url) --create-dirs -Lo $@
 	@touch $@
 	@chmod +x $@
