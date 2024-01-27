@@ -1,3 +1,5 @@
+name := konsole
+
 .PHONY: install
 install: \
 	~/.local/share/konsole/nord.colorscheme \
@@ -5,12 +7,12 @@ install: \
 
 .PHONY: ~/.local/share/konsole/nord.colorscheme
 ~/.local/share/konsole/nord.colorscheme: nord.colorscheme
-	$(info [konsole] symlinking $@)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: ~/.local/share/konsole/odsod.profile
 ~/.local/share/konsole/odsod.profile: odsod.profile
-	$(info [konsole] symlinking $@)
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
