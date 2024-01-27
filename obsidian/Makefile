@@ -2,9 +2,6 @@ name := obsidian
 version := 1.5.3
 deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/$(version)_amd64.deb
 
-.PHONY: install
-install: install-package
-
 .PHONY: install-package
 install-package: build/$(version)/package.deb
 	$(info [$(name)] Installing package...)
