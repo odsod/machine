@@ -25,6 +25,7 @@ install-packages:
 		fd-find \
 		filezilla \
 		git \
+		git-lfs \
 		gnupg \
 		htop \
 		iftop \
