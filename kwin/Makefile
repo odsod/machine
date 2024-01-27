@@ -15,12 +15,15 @@ enable-plugin:
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing Plasma package...)
-	@kpackagetool5 -l | tail +2 | grep -q odsod && kpackagetool5 -u . || kpackagetool5 -i .
+	@kpackagetool5 -l | tail +2 | grep -q odsod && kpackagetool5 -u . || kpackagetool5 -i . \
+		| sed -e "s/^/[$(name):$@] /"
 
 .PHONY: install-deps
 install-deps:
 	$(info [$(name)] Installing deps...)
-	@sudo apt-get install -y python3-pyside2.qtgui
+	@sudo apt-get install -y \
+		python3-pyside2.qtgui \
+		| sed -e "s/^/[$(name):$@] /"
 
 .PHONY: develop-package
 develop-package:
