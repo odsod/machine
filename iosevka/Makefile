@@ -1,22 +1,20 @@
-iosevka_version := 28.0.5
-iosevka_archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(iosevka_version)/PkgTTC-Iosevka-$(iosevka_version).zip
-
-.PHONY: install
-install: ~/.local/share/fonts/iosevka
+name := iosevka
+version := 28.0.5
+archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-Iosevka-$(version).zip
 
 .PHONY: ~/.local/share/fonts/iosevka
-~/.local/share/fonts/iosevka: build/$(iosevka_version)/Iosevka-Regular.ttc
-	$(info [iosevka] installing...)
+~/.local/share/fonts/iosevka: build/$(version)/Iosevka-Regular.ttc
+	$(info [$(name)] Installing fonts...)
 	@mkdir -p ~/.local/share/fonts
 	@ln -fs $(abspath $(dir $<)) $@
 	@fc-cache -vf >/dev/null
 
-build/$(iosevka_version)/Iosevka-Regular.ttc: build/$(iosevka_version)/iosevka.zip
-	$(info [iosevka] unzipping...)
+build/$(version)/Iosevka-Regular.ttc: build/$(version)/iosevka.zip
+	$(info [$(name)] Unzipping...)
 	@unzip -d $(dir $@) $<
 	@touch $@
 
-build/$(iosevka_version)/iosevka.zip:
-	$(info [iosevka] downloading archive...)
-	@curl $(iosevka_archive_url) --create-dirs -Lo $@
+build/$(version)/iosevka.zip:
+	$(info [$(name)] Downloading archive...)
+	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
