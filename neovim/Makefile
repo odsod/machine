@@ -9,15 +9,15 @@ all: \
 	~/.local/bin/vi \
 	~/.config/nvim/init.lua \
 	~/.local/share/nvim/site/autoload/plug.vim \
-	~/.config/environment.d/10-odsod-desktop-neovim.conf
+	~/.config/environment.d/10-$(name).conf
 
 ~/.local/share/nvim/site/autoload/plug.vim:
 	$(info [$(name)] Installing $@...)
 	@mkdir -p $(dir $@)
 	@curl -o $@ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-.PHONY: ~/.config/environment.d/10-odsod-desktop-neovim.conf
-~/.config/environment.d/10-odsod-desktop-neovim.conf:
+.PHONY: ~/.config/environment.d/10-$(name).conf
+~/.config/environment.d/10-$(name).conf:
 	$(info [$(name)] Writing $@...)
 	@mkdir -p $(dir $@)
 	@echo EDITOR=vim > $@

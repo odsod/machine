@@ -5,7 +5,7 @@ archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/apache-maven-$(version)/bin/mvn
 maven_home := build/$(version)/apache-maven-$(version)
 symlink := ~/.local/share/odsod/machine/$(name)
-environment := ~/.config/environment.d/10-odsod-machine-$(name).conf
+environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
 all: $(symlink) $(environment)

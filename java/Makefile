@@ -1,5 +1,5 @@
 name := java
-environment := ~/.config/environment.d/10-odsod-machine-$(name).conf
+environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
 all: install-packages $(environment)

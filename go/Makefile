@@ -5,7 +5,7 @@ archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/go/bin/$(name)
 gopath := build/$(version)/go
 symlink := ~/.local/share/odsod/machine/go
-environment := ~/.config/environment.d/10-odsod-machine-$(name).conf
+environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
 all: $(symlink) $(environment)
