@@ -1,22 +1,20 @@
-inter_version := 4.0
-inter_archive_url := https://github.com/rsms/inter/releases/download/v$(inter_version)/Inter-$(inter_version).zip
-
-.PHONY: install
-install: ~/.local/share/fonts/inter.ttc
+name := inter
+version := 4.0
+archive_url := https://github.com/rsms/inter/releases/download/v$(version)/Inter-$(version).zip
 
 .PHONY: ~/.local/share/fonts/inter.ttc
-~/.local/share/fonts/inter.ttc: build/$(inter_version)/Inter.ttc
-	$(info [inter] installing...)
+~/.local/share/fonts/inter.ttc: build/$(version)/Inter.ttc
+	$(info [$(name)] Installing...)
 	@mkdir -p ~/.local/share/fonts
 	@ln -fs $(abspath $<) $@
 	@fc-cache -vf >/dev/null
 
-build/$(inter_version)/Inter.ttc: build/$(inter_version)/Inter.zip
-	$(info [inter] unzipping $<...)
+build/$(version)/Inter.ttc: build/$(version)/archive.zip
+	$(info [$(name)] Unzipping $<...)
 	@unzip $< -d $(dir $@)
 	@touch $@
 
-build/$(inter_version)/Inter.zip:
-	$(info [inter] downloading...)
-	@curl $(inter_archive_url) --create-dirs -Lo $@
+build/$(version)/archive.zip:
+	$(info [$(name)] Downloading $(archive_url)...)
+	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
