@@ -16,16 +16,16 @@ $(service_symlink): $(service)
 
 .PHONY: install-package
 install-package: /etc/apt/sources.list.d/syncthing.list
-	$(info [$(name)] installing package...)
+	$(info [$(name)] Installing package...)
 	@sudo apt-get install syncthing | sed -e "s/^/[$(name):$@] /"
 
 /etc/apt/sources.list.d/syncthing.list: syncthing.list /etc/apt/keyrings/syncthing-archive-keyring.gpg
-	$(info [$(name)] adding APT sources...)
+	$(info [$(name)] Adding APT sources...)
 	@sudo ln -fsT $(abspath $<) $@
 	@sudo apt update
 
 /etc/apt/keyrings/syncthing-archive-keyring.gpg:
-	$(info [$(name)] fetching GPG key...)
+	$(info [$(name)] Fetching GPG key...)
 	@sudo mkdir -p $(dir $@)
 	@sudo curl -L -o $@ $(gpg_key_url)
 	@sudo touch $@
