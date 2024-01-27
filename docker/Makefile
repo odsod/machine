@@ -11,7 +11,7 @@ configure-group:
 	@sudo usermod -aG docker $(user)
 
 .PHONY: install-packages
-install-packages:
+install-packages: /etc/apt/sources.list.d/docker.list
 	$(info [$(name)] Installing packages...)
 	@sudo apt-get install -y \
 		docker-ce \
