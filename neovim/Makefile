@@ -1,6 +1,7 @@
 name := neovim
 version := 0.9.5
 appimage_url := https://github.com/neovim/neovim/releases/download/v$(version)/nvim.appimage
+environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
 all: \
@@ -16,11 +17,11 @@ all: \
 	@mkdir -p $(dir $@)
 	@curl -o $@ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-.PHONY: ~/.config/environment.d/10-$(name).conf
-~/.config/environment.d/10-$(name).conf:
-	$(info [$(name)] Writing $@...)
+.PHONY: $(environment)
+$(environment): environment.conf
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@echo EDITOR=vim > $@
+	@ln -fsT $(abspath $<) $@
 
 .PHONY: ~/.config/nvim/init.lua
 ~/.config/nvim/init.lua: init.lua
