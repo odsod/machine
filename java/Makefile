@@ -1,4 +1,5 @@
 name := java
+version := 21
 environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
@@ -8,7 +9,7 @@ all: install-packages $(environment)
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo apt-get install -y \
-		openjdk-21-jdk \
+		openjdk-$(version)-jdk \
 		| sed -e "s/^/[$(name):$@] /"
 
 .PHONY: $(environment)
