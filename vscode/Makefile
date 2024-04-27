@@ -27,4 +27,4 @@ install-extensions:
 	@code --install-extension --force ms-python.python
 	@code --install-extension --force ms-python.vscode-pylance
 	@code --install-extension --force vscodevim.vim
-	@code --install-extension --force zxh404.vscode-proto3
+	@code --install-extension --force bufbuild.vscode-buf
