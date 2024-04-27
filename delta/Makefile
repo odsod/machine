@@ -1,5 +1,5 @@
 name := delta
-version := 0.16.5
+version := 0.17.0
 archive_url := https://github.com/dandavison/delta/releases/download/$(version)/delta-$(version)-x86_64-unknown-linux-gnu.tar.gz
 archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/delta-$(version)-x86_64-unknown-linux-gnu/$(name)
