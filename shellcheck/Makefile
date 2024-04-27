@@ -1,5 +1,5 @@
 name := shellcheck
-version := 0.9.0
+version := 0.10.0
 archive_url := https://github.com/koalaman/shellcheck/releases/download/v$(version)/shellcheck-v$(version).linux.x86_64.tar.xz
 archive := build/$(version)/archive.tar.xz
 cmd := build/$(version)/shellcheck-v$(version)/$(name)
