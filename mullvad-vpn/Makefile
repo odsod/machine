@@ -1,5 +1,5 @@
 name := mullvad-vpn
-version := 2023.6
+version := 2024.1
 deb_url := https://github.com/mullvad/mullvadvpn-app/releases/download/$(version)/MullvadVPN-$(version)_amd64.deb
 
 .PHONY: install-package
