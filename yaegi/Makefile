@@ -1,5 +1,5 @@
 name := yaegi
-version := 0.15.0
+version := 0.16.1
 archive_url := https://github.com/traefik/yaegi/releases/download/v$(version)/yaegi_v$(version)_linux_amd64.tar.gz
 archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/yaegi
