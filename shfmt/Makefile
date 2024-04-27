@@ -1,5 +1,5 @@
 name := shfmt
-version := 3.7.0
+version := 3.8.0
 cmd_url := https://github.com/mvdan/sh/releases/download/v3.7.0/shfmt_v3.7.0_linux_amd64
 cmd := build/$(version)/$(name)
 symlink := ~/.local/bin/$(name)
