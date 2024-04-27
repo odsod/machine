@@ -1,6 +1,6 @@
 name := obsidian
-version := 1.5.3
-deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/$(version)_amd64.deb
+version := 1.5.11
+deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/obsidian_$(version)_amd64.deb
 
 .PHONY: install-package
 install-package: build/$(version)/package.deb
