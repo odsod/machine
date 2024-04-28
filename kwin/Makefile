@@ -6,12 +6,14 @@ install: \
 	install-package \
 	enable-plugin \
 	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
-	/usr/local/bin/odsod-kwin-dbus-service.py
+	/usr/local/bin/odsod-kwin-dbus-service.py \
+	~/.config/kwinrulesrc
 
 .PHONY: enable-plugin
 enable-plugin:
 	$(info [$(name)] Enabling Plasma plugin...)
 	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled false
+	@sleep 1
 	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled true
 
 .PHONY: install-package
@@ -49,3 +51,9 @@ tail-dbus: ~/.local/share/sddm/wayland-session.log
 tail-kwin:
 	$(info [$(name)] Tailing KWin log...)
 	@journalctl -f
+
+.PHONY: ~/.config/kwinrulesrc
+~/.config/kwinrulesrc: kwinrulesrc
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@

@@ -1,7 +1,0 @@
-[Disable Window Decorations]
-Description=Disable Window Decorations
-noborder=true
-noborderrule=2
-wmclass=.*
-wmclasscomplete=true
-wmclassmatch=3
