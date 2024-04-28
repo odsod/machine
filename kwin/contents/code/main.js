@@ -87,7 +87,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
-    resourceClassIncludes: "calendar.google.com",
+    resourceName: "calendar.google.com",
   },
 
   {
@@ -107,7 +107,7 @@ const shortcuts = [
       "--enable-features=Vulkan",
       "--password-store=basic",
     ],
-    resourceClass: "google-chrome",
+    resourceName: "google-chrome",
   },
 
   {
@@ -128,7 +128,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://notion.so",
     ],
-    resourceClassIncludes: "notion.so",
+    resourceName: "notion.so",
   },
 
   {
@@ -141,7 +141,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
-    resourceClassIncludes: "mail.google.com",
+    resourceName: "mail.google.com",
   },
 
   {
@@ -154,7 +154,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
-    resourceClassIncludes: "meet.google.com",
+    resourceName: "meet.google.com",
   },
 
   {
@@ -167,7 +167,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://einride.slack.com",
     ],
-    resourceClassIncludes: "einride.slack.com",
+    resourceName: "einride.slack.com",
   },
 
   {
@@ -228,7 +228,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://miro.com/app/",
     ],
-    resourceClassIncludes: "miro.com",
+    resourceName: "miro.com__app",
   },
 
   {
@@ -241,7 +241,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://chat.openai.com/",
     ],
-    resourceClassIncludes: "chat.openai.com",
+    resourceName: "chat.openai.com",
   },
 
   {
@@ -254,7 +254,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://einride.atlassian.net/jira",
     ],
-    resourceClassIncludes: "einride.atlassian.net__jira",
+    resourceName: "einride.atlassian.net__jira",
   },
 
   {
@@ -280,7 +280,7 @@ const shortcuts = [
     callback: function () {
       log("printing debug output");
       workspace.clientList().forEach(function (client) {
-        log(client.resourceName, client.resourceClass);
+        log("resourceName[", client.resourceName, "]", "resourceClass[", client.resourceClass, "]");
       });
     },
   },

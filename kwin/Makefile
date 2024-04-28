@@ -1,3 +1,5 @@
+name := kwin
+
 .PHONY: install
 install: \
 	install-deps \
