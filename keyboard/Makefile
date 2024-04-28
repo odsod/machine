@@ -1,5 +1,8 @@
 name := keyboard
 
+.PHONY: install
+install: /usr/share/X11/xkb/symbols/odsod install-evdev-rules
+
 .PHONY: install-evdev-rules
 install-evdev-rules: /usr/share/X11/xkb/rules/evdev.xml
 	$(info [$(name)] Installing evdev rules...)

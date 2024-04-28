@@ -1,9 +1,9 @@
 default partial alphanumeric_keys modifier_keys
-xkb_symbols "custom" {
+xkb_symbols "odsod" {
   include "level3(ralt_switch)"
   include "ctrl(nocaps)"
 
-  name[Group1]= "odsod";
+  name[Group1]= "odsod's keyboard layout";
 
   key <AE01> { [ 1       , Aring      , aring      , none ] };
   key <AE02> { [ 2       , Adiaeresis , adiaeresis , none ] };
