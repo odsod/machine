@@ -83,8 +83,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
@@ -105,8 +104,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
     ],
     resourceClass: "google-chrome",
@@ -126,8 +124,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://notion.so",
     ],
@@ -140,8 +137,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
@@ -154,8 +150,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
@@ -168,8 +163,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://einride.slack.com",
     ],
@@ -230,8 +224,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://miro.com/app/",
     ],
@@ -244,8 +237,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://chat.openai.com/",
     ],
@@ -258,8 +250,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=UseOzonePlatform",
-      "--ozone-platform=wayland",
+      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://einride.atlassian.net/jira",
     ],
