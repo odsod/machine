@@ -1,9 +1,17 @@
 [$Version]
 update_info=kwinrules.upd:replace-placement-string-to-enum,kwinrules.upd:use-virtual-desktop-ids
 
+[1]
+Description=Hide window decorations
+noborder=true
+noborderrule=2
+wmclass=.*
+wmclasscomplete=true
+wmclassmatch=3
+
 [General]
 count=1
-rules=fff76fae-ebaf-41bf-abd8-96b4ef21e07f
+rules=1
 
 [fff76fae-ebaf-41bf-abd8-96b4ef21e07f]
 Description=Hide window decorations
