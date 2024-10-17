@@ -1,5 +1,5 @@
 name := neovim
-version := 0.9.5
+version := 0.10.0
 appimage_url := https://github.com/neovim/neovim/releases/download/v$(version)/nvim.appimage
 environment := ~/.config/environment.d/10-$(name).conf
 
