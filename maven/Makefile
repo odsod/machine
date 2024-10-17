@@ -1,5 +1,5 @@
 name := maven
-version := 3.9.6
+version := 3.9.9
 archive_url := https://dlcdn.apache.org/maven/maven-3/$(version)/binaries/apache-maven-$(version)-bin.tar.gz
 archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/apache-maven-$(version)/bin/mvn
