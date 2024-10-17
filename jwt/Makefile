@@ -1,5 +1,5 @@
 name := jwt
-version := 6.0.0
+version := 6.1.1
 archive_url := https://github.com/mike-engel/jwt-cli/releases/download/$(version)/jwt-linux.tar.gz
 
 .PHONY: ~/.local/bin/$(name)
