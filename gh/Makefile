@@ -1,5 +1,5 @@
 name := gh
-version := 2.48.0
+version := 2.59.0
 archive_url := https://github.com/cli/cli/releases/download/v$(version)/gh_$(version)_linux_amd64.tar.gz
 archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/gh_$(version)_linux_amd64/bin/gh
