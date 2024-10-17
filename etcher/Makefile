@@ -1,5 +1,5 @@
 name := etcher
-version := 1.18.11
+version := 1.19.21
 appimage_url := https://github.com/balena-io/etcher/releases/download/v$(version)/balenaEtcher-$(version)-x64.AppImage
 
 .PHONY: ~/.local/bin/$(name)
