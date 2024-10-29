@@ -102,12 +102,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--enable-features=Vulkan",
-      "--password-store=basic",
-    ],
-    resourceName: "google-chrome",
+    command: ["firefox"],
+    resourceName: "firefox-bin",
   },
 
   {
