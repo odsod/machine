@@ -6,13 +6,10 @@ install-packages: /etc/apt/sources.list.d/mozilla.list /etc/apt/preferences.d/mo
 	@sudo apt-get install -y firefox \
 		| sed -e "s/^/[$(name):$@] /"
 
-/etc/apt/preferences.d/mozilla:
-	$(info [$(name)] Prioritizing packages...)
-	@echo '
-	Package: *
-	Pin: origin packages.mozilla.org
-	Pin-Priority: 1000
-	' | sudo tee $@
+/etc/apt/preferences.d/mozilla: preferences
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@sudo ln -fsT $(abspath $<) $@
 
 /etc/apt/sources.list.d/mozilla.list: /etc/apt/keyrings/packages.mozilla.org.asc
 	$(info [$(name)] Adding APT sources list...)
