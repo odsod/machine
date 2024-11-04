@@ -18,12 +18,9 @@ install-packages:
 		apt-transport-https \
 		ca-certificates \
 		curl \
-		curl \
 		dos2unix \
 		dstat \
-		entr \
 		fd-find \
-		filezilla \
 		git \
 		git-lfs \
 		gnupg \
