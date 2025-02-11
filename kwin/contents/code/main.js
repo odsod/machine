@@ -283,10 +283,18 @@ const shortcuts = [
 
   {
     actionId: ["kwin", "[odsod] mullvad-browser", "KWin", ""],
-    key: "Meta+q",
+    key: "Meta+b",
     kind: "app",
     command: ["mullvadbrowser"],
     resourceClass: "mullvad browser",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] qbittorrent", "KWin", ""],
+    key: "Meta+q",
+    kind: "app",
+    command: ["qbittorrent"],
+    resourceName: "qbittorrent",
   },
 ];
 
