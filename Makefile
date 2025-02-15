@@ -20,7 +20,6 @@ install-packages:
 		curl \
 		dos2unix \
 		dstat \
-		fd-find \
 		git \
 		git-lfs \
 		gnupg \
