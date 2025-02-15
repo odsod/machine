@@ -1,5 +1,5 @@
 name := go
-version := 1.23.2
+version := 1.24.0
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 archive := build/$(version)/archive.tar.gz
 cmd := build/$(version)/go/bin/$(name)
