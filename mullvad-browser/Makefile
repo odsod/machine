@@ -1,5 +1,5 @@
 name := mullvad-browser
-version := 14.0.3
+version := 14.0.5
 archive_url := https://github.com/mullvad/mullvad-browser/releases/download/$(version)/mullvad-browser-linux-x86_64-$(version).tar.xz
 
 .PHONY: ~/.local/bin/mullvadbrowser
