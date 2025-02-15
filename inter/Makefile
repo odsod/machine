@@ -1,5 +1,5 @@
 name := inter
-version := 4.0
+version := 4.1
 archive_url := https://github.com/rsms/inter/releases/download/v$(version)/Inter-$(version).zip
 
 .PHONY: ~/.local/share/fonts/inter.ttc
