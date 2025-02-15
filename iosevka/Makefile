@@ -1,5 +1,5 @@
 name := iosevka
-version := 31.9.1
+version := 32.5.0
 archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-Iosevka-$(version).zip
 
 .PHONY: ~/.local/share/fonts/iosevka
