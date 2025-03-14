@@ -9,7 +9,7 @@ install: \
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo apt install -y tmux >/dev/null 2>&1
+	@sudo dnf install -y tmux >/dev/null 2>&1
 
 .PHONY: ~/.config/tmux/tmux.conf
 ~/.config/tmux/tmux.conf: tmux.conf

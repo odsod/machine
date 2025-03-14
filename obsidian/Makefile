@@ -1,13 +1,15 @@
 name := obsidian
-version := 1.8.4
-deb_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/obsidian_$(version)_amd64.deb
+version := 1.8.9
+appimage_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/Obsidian-$(version).AppImage
 
-.PHONY: install-package
-install-package: build/$(version)/package.deb
-	$(info [$(name)] Installing package...)
-	@sudo dpkg -i $<
+.PHONY: ~/.local/bin/obsidian
+~/.local/bin/obsidian: build/$(version)/app.AppImage
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
-build/$(version)/package.deb:
-	$(info [$(name)] Downloading package...)
-	@curl $(deb_url) --create-dirs -Lo $@
+build/$(version)/app.AppImage:
+	$(info [$(name)] Downloading AppImage...)
+	@curl $(appimage_url) --create-dirs -Lo $@
 	@touch $@
+	@chmod +x $@

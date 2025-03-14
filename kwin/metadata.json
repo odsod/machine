@@ -1,21 +1,14 @@
 {
     "KPlugin": {
-        "Authors": [
-            {
-                "Name": "odsod"
-            }
-        ],
-        "Description": "odsod's desktop plugin",
-        "EnabledByDefault": true,
-        "Icon": "window-duplicate",
-        "Id": "odsod",
-        "License": "MIT",
         "Name": "odsod",
-        "ServiceTypes": [
-            "KWin/Script"
-        ],
-        "Version": "1"
+        "Description": "odsod's window manager",
+        "Icon": "window-duplicate",
+        "Authors": [{"Name": "odsod"}],
+        "Id": "odsod",
+        "Version": "1.0",
+        "License": "MIT"
     },
     "X-Plasma-API": "javascript",
-    "X-Plasma-MainScript": "code/main.js"
+    "X-Plasma-MainScript": "code/main.js",
+    "KPackageStructure": "KWin/Script"
 }

@@ -6,8 +6,7 @@ install: \
 	install-package \
 	enable-plugin \
 	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
-	/usr/local/bin/odsod-kwin-dbus-service.py \
-	~/.config/kwinrulesrc
+	/usr/local/bin/odsod-kwin-dbus-service.py
 
 .PHONY: enable-plugin
 enable-plugin:
@@ -19,15 +18,17 @@ enable-plugin:
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing Plasma package...)
-	@kpackagetool5 -l | tail +2 | grep -q odsod && kpackagetool5 -u . || kpackagetool5 -i . \
-		| sed -e "s/^/[$(name):$@] /"
+	@kpackagetool6 --type=KWin/Script --install .
+
+.PHONY: uninstall-package
+uninstall-package:
+	$(info [$(name)] Uninstalling Plasma package...)
+	@kpackagetool6 --type=KWin/Script --remove odsod
 
 .PHONY: install-deps
 install-deps:
 	$(info [$(name)] Installing deps...)
-	@sudo apt-get install -y \
-		python3-pyside2.qtgui \
-		| sed -e "s/^/[$(name):$@] /"
+	@sudo dnf install -y python3-pyside6
 
 .PHONY: develop-package
 develop-package:
@@ -51,9 +52,3 @@ tail-dbus: ~/.local/share/sddm/wayland-session.log
 tail-kwin:
 	$(info [$(name)] Tailing KWin log...)
 	@journalctl -f
-
-.PHONY: ~/.config/kwinrulesrc
-~/.config/kwinrulesrc: kwinrulesrc
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@

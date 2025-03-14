@@ -1,37 +1,34 @@
 name := go
-version := 1.24.0
+version := 1.24.1
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
-archive := build/$(version)/archive.tar.gz
-cmd := build/$(version)/go/bin/$(name)
-gopath := build/$(version)/go
-symlink := ~/.local/share/odsod/machine/go
-environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
-all: $(symlink) $(environment)
+all: \
+	~/.local/share/odsod/machine/go \
+	~/.config/environment.d/10-$(name).conf
 
-.PHONY: $(environment)
-$(environment): environment.conf
+.PHONY: ~/.config/environment.d/10-$(name).conf
+~/.config/environment.d/10-$(name).conf: environment.conf
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: $(symlink)
-$(symlink): $(gopath)
+.PHONY: ~/.local/share/odsod/machine/go
+~/.local/share/odsod/machine/go: build/$(version)/go
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: $(gopath)
-$(gopath): $(cmd)
+.PHONY: build/$(version)/go
+build/$(version)/go: build/$(version)/go/bin/$(name)
 
-$(cmd): $(archive)
-	$(info [$(name)] Extracting $(archive)...)
+build/$(version)/go/bin/$(name): build/$(version)/archive.tar.gz
+	$(info [$(name)] Extracting $<...)
 	@tar -C $(dir $<) -xf $<
 	@touch $@
 	@chmod +x $@
 
-$(archive):
+build/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@

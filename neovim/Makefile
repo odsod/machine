@@ -1,16 +1,25 @@
 name := neovim
-version := 0.10.0
-appimage_url := https://github.com/neovim/neovim/releases/download/v$(version)/nvim.appimage
 environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: all
 all: \
-	~/.local/bin/nvim \
-	~/.local/bin/vim \
-	~/.local/bin/vi \
+	install-packages \
+	update-alternatives \
 	~/.config/nvim/init.lua \
 	~/.local/share/nvim/site/autoload/plug.vim \
 	~/.config/environment.d/10-$(name).conf
+
+.PHONY: update-alternatives
+update-alternatives:
+	@sudo update-alternatives --install /usr/bin/vim vim $(shell which nvim) 10
+	@sudo update-alternatives --install /usr/bin/vi vi $(shell which nvim) 10
+	@sudo update-alternatives --config vim
+	@sudo update-alternatives --config vi
+
+.PHONY: install-packages
+install-packages:
+	$(info [$(name)] Installing packages...)
+	@sudo dnf install neovim >/dev/null 2>&1
 
 ~/.local/share/nvim/site/autoload/plug.vim:
 	$(info [$(name)] Installing $@...)
@@ -28,27 +37,3 @@ $(environment): environment.conf
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.local/bin/nvim
-~/.local/bin/nvim: build/$(version)/nvim.appimage
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.local/bin/vim
-~/.local/bin/vim: build/$(version)/nvim.appimage
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.local/bin/vi
-~/.local/bin/vi: build/$(version)/nvim.appimage
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-build/$(version)/nvim.appimage:
-	$(info [$(name)] Downloading...)
-	@curl $(appimage_url) --create-dirs -Lo $@
-	@touch $@
-	@chmod +x $@

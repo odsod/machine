@@ -1,6 +1,7 @@
-name := zoom
-version := 6.3.11.7212
-package_url := https://zoom.us/client/$(version)/zoom_x86_64.rpm
+name := slack
+version := 4.41.105
+build := 4.41.105-0.1.el8
+package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm
 
 .PHONY: install-package
 install-package: build/$(version)/package.rpm

@@ -2,40 +2,47 @@ name := machine
 
 .PHONY: install
 install: \
-	~/.profile \
+	~/.config/plasma-workspace/env/profile.sh \
 	install-packages \
 	install-modules
 
-.PHONY: ~/.profile
-~/.profile: profile
-	$(info [$(name)] symlinking $@...)
+.PHONY: ~/.config/plasma-workspace/env/profile.sh
+~/.config/plasma-workspace/env/profile.sh: profile
+	$(info [$(name)] Symlinking $@...)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: enable-flathub
+enable-flathub: install-packages
+	$(info [$(name)] Enabling Flathub...)
+	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo apt-get install -y \
-		apt-transport-https \
+	@sudo dnf install
 		ca-certificates \
 		curl \
+		dnf5-plugins \
 		dos2unix \
-		dstat \
+		fd-find \
+		fedora-workstation-repositories \
+		firefox \
+		flatpak \
 		git \
-		git-lfs \
-		gnupg \
+		git-delta \
 		htop \
 		iftop \
 		jq \
 		keepassxc \
-		moreutils \
 		ncdu \
-		net-tools \
 		ngrep \
+		nodejs \
+		python3-pip \
+		python3-virtualenv \
 		qbittorrent \
 		ripgrep \
-		wine-stable \
 		wl-clipboard \
-		| sed -e "s/^/[${name}:$@] /"
+		-y -q
 
 .PHONY: install-modules
 install-modules:

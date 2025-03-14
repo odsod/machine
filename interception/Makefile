@@ -12,7 +12,7 @@ all: \
 .PHONY: install-deps
 install-deps:
 	$(info [$(name)] Installing deps...)
-	@sudo apt install -y cmake clang libyaml-cpp-dev libevdev-dev libudev-dev
+	@sudo dnf install -y make automake gcc gcc-c++ cmake libevdev-devel systemd-devel yaml-cpp-devel boost-devel
 
 /etc/systemd/system/udevmon.service: udevmon.service
 	$(info [$(name)] Installing $@...)

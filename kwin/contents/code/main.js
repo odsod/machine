@@ -1,7 +1,3 @@
-function log(...args) {
-  console.log("odsod/kwin:", ...args);
-}
-
 const shortcuts = [
   {
     actionId: ["kwin", "Window Close", "KWin", "Close Window"],
@@ -16,56 +12,31 @@ const shortcuts = [
   },
 
   {
-    actionId: [
-      "kwin",
-      "Window Quick Tile Bottom",
-      "KWin",
-      "Quick Tile Window to the Bottom",
-    ],
+    actionId: ["kwin", "Window Quick Tile Bottom", "KWin", "Quick Tile Window to the Bottom"],
     kind: "builtin",
     key: "Meta+j",
   },
 
   {
-    actionId: [
-      "kwin",
-      "Window Quick Tile Top",
-      "KWin",
-      "Quick Tile Window to the Top",
-    ],
+    actionId: ["kwin", "Window Quick Tile Top", "KWin", "Quick Tile Window to the Top"],
     kind: "builtin",
     key: "Meta+k",
   },
 
   {
-    actionId: [
-      "kwin",
-      "Window Quick Tile Left",
-      "KWin",
-      "Quick Tile Window to the Left",
-    ],
+    actionId: ["kwin", "Window Quick Tile Left", "KWin", "Quick Tile Window to the Left"],
     kind: "builtin",
     key: "Meta+a",
   },
 
   {
-    actionId: [
-      "kwin",
-      "Window Quick Tile Right",
-      "KWin",
-      "Quick Tile Window to the Right",
-    ],
+    actionId: ["kwin", "Window Quick Tile Right", "KWin", "Quick Tile Window to the Right"],
     kind: "builtin",
     key: "Meta+o",
   },
 
   {
-    actionId: [
-      "kwin",
-      "ExposeAll",
-      "KWin",
-      "Toggle Present Windows (All desktops)",
-    ],
+    actionId: ["kwin", "ExposeAll", "KWin", "Toggle Present Windows (All desktops)"],
     kind: "builtin",
     key: "Meta+'",
   },
@@ -94,8 +65,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] terminal", "KWin", ""],
     key: "Meta+U",
     kind: "app",
-    command: ["konsole"],
-    resourceClass: "org.kde.konsole",
+    command: ["ghostty"],
+    resourceClass: "com.mitchellh.ghostty",
   },
 
   {
@@ -103,7 +74,7 @@ const shortcuts = [
     key: "Meta+H",
     kind: "app",
     command: ["firefox"],
-    resourceName: "firefox-bin",
+    resourceClass: "org.mozilla.firefox",
   },
 
   {
@@ -111,7 +82,7 @@ const shortcuts = [
     key: "Meta+T",
     kind: "app",
     command: ["keepassxc"],
-    resourceName: "keepassxc",
+    resourceClass: "org.keepassxc.KeePassXC",
   },
 
   {
@@ -157,13 +128,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] slack", "KWin", ""],
     key: "Meta+S",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--enable-features=Vulkan",
-      "--password-store=basic",
-      "--app=https://einride.slack.com",
-    ],
-    resourceName: "einride.slack.com",
+    command: ["slack"],
+    resourceClass: "Slack",
   },
 
   {
@@ -171,14 +137,14 @@ const shortcuts = [
     key: "Meta+D",
     kind: "app",
     command: ["spectacle"],
-    resourceName: "spectacle",
+    resourceClass: "org.kde.spectacle",
   },
 
   {
     actionId: ["kwin", "[odsod] spotify", "KWin", ""],
     key: "Meta+.",
     kind: "app",
-    command: ["spotify"],
+    command: ["flatpak run com.spotify.Client"],
     resourceName: "spotify",
   },
 
@@ -186,8 +152,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] settings", "KWin", ""],
     key: "Meta+L",
     kind: "app",
-    command: ["systemsettings5"],
-    resourceName: "systemsettings",
+    command: ["systemsettings"],
+    resourceClass: "systemsettings",
   },
 
   {
@@ -215,19 +181,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] work", "KWin", ""],
-    key: "Meta+Y",
-    kind: "app",
-    command: [
-      "google-chrome",
-      "--enable-features=Vulkan",
-      "--password-store=basic",
-      "--app=https://miro.com/app/",
-    ],
-    resourceName: "miro.com__app",
-  },
-
-  {
     actionId: ["kwin", "[odsod] chatgpt", "KWin", ""],
     key: "Meta+F",
     kind: "app",
@@ -238,19 +191,6 @@ const shortcuts = [
       "--app=https://chat.openai.com/",
     ],
     resourceName: "chat.openai.com",
-  },
-
-  {
-    actionId: ["kwin", "[odsod] jira", "KWin", ""],
-    key: "Meta+I",
-    kind: "app",
-    command: [
-      "google-chrome",
-      "--enable-features=Vulkan",
-      "--password-store=basic",
-      "--app=https://einride.atlassian.net/jira",
-    ],
-    resourceName: "einride.atlassian.net__jira",
   },
 
   {
@@ -275,8 +215,8 @@ const shortcuts = [
     kind: "callback",
     callback: function () {
       log("printing debug output");
-      workspace.clientList().forEach(function (client) {
-        log("resourceName[", client.resourceName, "]", "resourceClass[", client.resourceClass, "]");
+      workspace.stackingOrder.forEach(function (window) {
+        log("resourceName[", window.resourceName, "]", "resourceClass[", window.resourceClass, "]");
       });
     },
   },
@@ -285,7 +225,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] mullvad-browser", "KWin", ""],
     key: "Meta+b",
     kind: "app",
-    command: ["mullvadbrowser"],
+    command: ["mullvad-browser"],
     resourceClass: "mullvad browser",
   },
 
@@ -306,30 +246,32 @@ function registerAppShortcut(shortcut) {
     shortcut.key,
     function () {
       log("handling app shortcut", JSON.stringify(shortcut));
-      const client = workspace.clientList().find(function (client) {
+      const window = workspace.stackingOrder.find(function (window) {
         if (shortcut.resourceName) {
-          return client.resourceName.toString() === shortcut.resourceName;
+          return window.resourceName.toString() === shortcut.resourceName;
         } else if (shortcut.resourceClass) {
-          return client.resourceClass.toString() === shortcut.resourceClass;
+          return window.resourceClass.toString() === shortcut.resourceClass;
         } else if (shortcut.resourceClassIncludes) {
-          return client.resourceClass
+          return window.resourceClass
             .toString()
             .includes(shortcut.resourceClassIncludes);
         } else {
           return false;
         }
       });
-      if (client) {
-        if (client.minimized) {
-          client.minimized = false;
-          workspace.activeClient = client;
-        } else if (workspace.activeClient != client) {
-          workspace.activeClient = client;
+      if (window) {
+        if (window.minimized) {
+          window.minimized = false;
+          workspace.activeWindow = window;
+        } else if (workspace.activeWindow != window) {
+          workspace.activeWindow = window;
         } else {
-          client.minimized = true;
+          window.minimized = true;
         }
+        log("early return");
         return;
       }
+      log("starting");
       callDBus(
         "io.github.odsod.kwin",
         "/",
@@ -370,6 +312,17 @@ function registerCallbackShortcut(shortcut) {
       log("handling callback shortcut", JSON.stringify(shortcut.actionId));
       shortcut.callback();
     },
+  );
+}
+
+function log(...args) {
+  print("odsod/kwin:", ...args);
+  callDBus(
+    "io.github.odsod.kwin",
+    "/",
+    "io.github.odsod.kwin.Service",
+    "log",
+    JSON.stringify(args)
   );
 }
 

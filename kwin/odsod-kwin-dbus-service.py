@@ -7,7 +7,7 @@ import json
 import subprocess
 import syslog
 from gi.repository import GLib
-from PySide2.QtGui import QKeySequence
+from PySide6.QtGui import QKeySequence
 
 
 class Service(dbus.service.Object):
@@ -40,6 +40,10 @@ class Service(dbus.service.Object):
         subprocess.Popen(shortcut["command"])
 
     @dbus.service.method("io.github.odsod.kwin.Service", in_signature="s")
+    def log(self, payload):
+        syslog.syslog("log: " + payload)
+
+    @dbus.service.method("io.github.odsod.kwin.Service", in_signature="s")
     def configure_shortcuts(self, payload):
         shortcuts = json.loads(payload)
         syslog.syslog("configure_shortcuts: " + str(shortcuts))
@@ -57,7 +61,7 @@ class Service(dbus.service.Object):
         syslog.syslog("starting shortcut configuration")
         for shortcut in shortcuts:
             syslog.syslog("looking up keycode: " + str(shortcut))
-            keycode = QKeySequence.fromString(shortcut["key"])[0]
+            keycode = QKeySequence.fromString(shortcut["key"])[0].toCombined()
             syslog.syslog("got keycode: " + str(keycode))
             existing_action_id = self._kglobalaccel.action(keycode)
             if len(existing_action_id) > 0:
