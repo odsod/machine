@@ -1,6 +1,27 @@
 theme = nord
 window-padding-y = 8
 window-padding-x = 8
+window-padding-color = background
 window-decoration = none
+window-theme = ghostty
 font-family = Iosevka
+window-title-font-family = Iosevka
 confirm-close-surface = false
+mouse-hide-while-typing = true
+scrollback-limit = 1000000
+cursor-style = block
+window-save-state = always
+
+keybind = ctrl+u>ctrl+w=new_tab
+keybind = ctrl+u>ctrl+h=goto_split:left
+keybind = ctrl+u>ctrl+j=goto_split:bottom
+keybind = ctrl+u>ctrl+k=goto_split:top
+keybind = ctrl+u>ctrl+l=goto_split:right
+keybind = ctrl+u>ctrl+s=new_split:down
+keybind = ctrl+u>ctrl+v=new_split:right
+keybind = ctrl+u>ctrl+i=toggle_split_zoom
+keybind = ctrl+u>ctrl+n=next_tab
+keybind = ctrl+u>ctrl+b=previous_tab
+keybind = ctrl+u>ctrl+r=reload_config
+keybind = ctrl+u>ctrl+d=write_scrollback_file:open
+keybind = ctrl+u>ctrl+y=write_screen_file:open
