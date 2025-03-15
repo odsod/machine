@@ -316,7 +316,6 @@ function registerCallbackShortcut(shortcut) {
 }
 
 function log(...args) {
-  print("odsod/kwin:", ...args);
   callDBus(
     "io.github.odsod.kwin",
     "/",
