@@ -194,16 +194,15 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] chatgpt", "KWin", ""],
+    actionId: ["kwin", "[odsod] chrome", "KWin", ""],
     key: "Meta+F",
     kind: "app",
     command: [
       "google-chrome",
       "--enable-features=Vulkan",
       "--password-store=basic",
-      "--app=https://chat.openai.com/",
     ],
-    resourceName: "chat.openai.com",
+    resourceName: "google-chrome",
   },
 
   {
