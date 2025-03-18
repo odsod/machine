@@ -2,19 +2,21 @@ name := machine
 
 .PHONY: install
 install: \
-	~/.config/plasma-workspace/env/profile.sh \
+	~/.config/plasma-workspace/env/environment.d.sh \
+	~/.config/environment.d/00-machine.conf \
 	install-packages \
+	enable-flathub \
 	install-modules
 
-.PHONY: ~/.config/plasma-workspace/env/profile.sh
-~/.config/plasma-workspace/env/profile.sh: profile
+.PHONY: ~/.config/plasma-workspace/env/environment.d.sh
+~/.config/plasma-workspace/env/environment.d.sh: environment.d.sh
 	$(info [$(name)] Symlinking $@...)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: enable-flathub
-enable-flathub: install-packages
-	$(info [$(name)] Enabling Flathub...)
-	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+.PHONY: ~/.config/environment.d/00-machine.conf
+~/.config/environment.d/00-machine.conf: environment.conf
+	$(info [$(name)] Symlinking $@...)
+	@ln -fsT $(abspath $<) $@
 
 .PHONY: install-packages
 install-packages:
@@ -43,6 +45,11 @@ install-packages:
 		ripgrep \
 		wl-clipboard \
 		-y -q
+
+.PHONY: enable-flathub
+enable-flathub: install-packages
+	$(info [$(name)] Enabling Flathub...)
+	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 .PHONY: install-modules
 install-modules:
