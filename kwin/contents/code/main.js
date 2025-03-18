@@ -197,8 +197,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] code", "KWin", ""],
     key: "Meta+/",
     kind: "app",
-    command: ["code"],
-    resourceName: "code",
+    command: ["cursor"],
+    resourceName: "cursor",
   },
 
   {
