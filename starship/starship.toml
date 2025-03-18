@@ -1,12 +1,13 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = '''$directory$git_branch$git_status
+format = '''$directory$git_branch$git_status$direnv$gcloud$golang$nodejs$python$terraform
 $character'''
 
 add_newline = true
 
 [character]
 success_symbol = '[\$](white)'
+error_symbol = '[\$](red)'
 
 [directory]
 truncation_length = 0
@@ -14,8 +15,27 @@ truncate_to_repo = false
 truncation_symbol = '.../'
 style = 'yellow'
 
+[direnv]
+format = '\[[$rc_path]($style)\]'
+
+[gcloud]
+format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
+detect_env_vars = ['GOOGLE_CLOUD_PROJECT']
+
 [git_branch]
 format = '\[[$symbol$branch]($style)\]'
 
 [git_status]
 format = '\[[$all_status$ahead_behind]($style)\]'
+
+[golang]
+format = '\[[$symbol($version)]($style)\]'
+
+[nodejs]
+format = '\[[$symbol($version)]($style)\]'
+
+[python]
+format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+
+[terraform]
+format = '\[[$symbol$workspace]($style)\]'
