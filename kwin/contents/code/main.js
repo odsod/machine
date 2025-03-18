@@ -99,6 +99,19 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] linear", "KWin", ""],
+    key: "Meta+I",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--enable-features=Vulkan",
+      "--password-store=basic",
+      "--app=https://linear.app",
+    ],
+    resourceName: "linear.app",
+  },
+
+  {
     actionId: ["kwin", "[odsod] mail", "KWin", ""],
     key: "Meta+G",
     kind: "app",
