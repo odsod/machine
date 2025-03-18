@@ -23,10 +23,11 @@ format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
 detect_env_vars = ['GOOGLE_CLOUD_PROJECT']
 
 [git_branch]
-format = '\[[$symbol$branch]($style)\]'
+format = '\[[$branch]($style)'
+style = 'blue'
 
 [git_status]
-format = '\[[$all_status$ahead_behind]($style)\]'
+format = '[$all_status$ahead_behind]($style)\]'
 
 [golang]
 format = '\[[$symbol($version)]($style)\]'
