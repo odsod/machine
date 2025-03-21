@@ -3,7 +3,7 @@ name := ghostty
 .PHONY: install-packages
 install-packages: ~/.config/ghostty/config
 	$(info [$(name)] Installing packages...)
-	@sudo dnf copr enable -y pgdev/ghostty
+	@sudo dnf install -y --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
 	@sudo dnf install -y ghostty
 
 .PHONY: ~/.config/ghostty/config
