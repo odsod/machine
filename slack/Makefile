@@ -6,7 +6,7 @@ package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(ver
 .PHONY: install-package
 install-package: build/$(version)/package.rpm
 	$(info [$(name)] Installing package...)
-	@sudo dnf install $<
+	@sudo dnf install -y $<
 
 build/$(version)/package.rpm:
 	$(info [$(name)] Downloading package...)
