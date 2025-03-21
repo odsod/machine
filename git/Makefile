@@ -9,4 +9,4 @@ name := git
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing...)
-	@sudo dnf install -y git git-delta >/dev/null 2>&1
+	@sudo dnf install -y git git-delta
