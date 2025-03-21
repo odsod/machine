@@ -11,11 +11,13 @@ install: \
 .PHONY: ~/.config/plasma-workspace/env/environment.d.sh
 ~/.config/plasma-workspace/env/environment.d.sh: environment.d.sh
 	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: ~/.config/environment.d/00-machine.conf
 ~/.config/environment.d/00-machine.conf: environment.conf
 	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: install-packages
