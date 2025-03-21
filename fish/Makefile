@@ -8,7 +8,7 @@ change-shell: install-package
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing package...)
-	@sudo dnf install -y fish >/dev/null 2>&1
+	@sudo dnf install -y fish
 
 .PHONY: ~/.config/fish/config.fish
 ~/.config/fish/config.fish: config.fish
