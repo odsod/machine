@@ -23,7 +23,7 @@ install: \
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo dnf install
+	@sudo dnf install \
 		ca-certificates \
 		curl \
 		dnf5-plugins \
