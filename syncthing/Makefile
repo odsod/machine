@@ -9,4 +9,4 @@ name := syncthing
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing package...)
-	@sudo dnf install syncthing
+	@sudo dnf install -y syncthing
