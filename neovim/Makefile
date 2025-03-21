@@ -19,7 +19,7 @@ update-alternatives:
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo dnf install neovim >/dev/null 2>&1
+	@sudo dnf install -y neovim
 
 ~/.local/share/nvim/site/autoload/plug.vim:
 	$(info [$(name)] Installing $@...)
