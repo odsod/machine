@@ -5,6 +5,7 @@ install: \
 	install-deps \
 	install-package \
 	enable-plugin \
+	~/.config/kwinrulesrc \
 	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
 	/usr/local/bin/odsod-kwin-dbus-service.py
 
@@ -34,6 +35,12 @@ install-deps:
 develop-package:
 	$(info [$(name)] Developing package...)
 	@qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.showInteractiveKWinConsole
+
+.PHONY: ~/.config/kwinrulesrc
+~/.config/kwinrulesrc: kwinrulesrc
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
 /usr/share/dbus-1/services/io.github.odsod.kwin.service: io.github.odsod.kwin.service
 	$(info [$(name)] Copying $@...)

@@ -1,0 +1,27 @@
+[8d8622f4-5ed2-4a98-904b-ff4a7aa43101]
+Description=Spotify (No titlebar and frame)
+noborder=true
+noborderrule=2
+wmclass=open.spotify.com Google-chrome
+wmclasscomplete=true
+wmclassmatch=1
+
+[9d3e6e5d-479c-4db1-860a-c888e5ee0972]
+Description=Cursor (No titlebar and frame)
+noborder=true
+noborderrule=2
+wmclass=cursor Cursor
+wmclasscomplete=true
+wmclassmatch=1
+
+[General]
+count=3
+rules=f8f4e1c8-5890-47e6-9c21-ffbfb65e86c8,9d3e6e5d-479c-4db1-860a-c888e5ee0972,8d8622f4-5ed2-4a98-904b-ff4a7aa43101
+
+[f8f4e1c8-5890-47e6-9c21-ffbfb65e86c8]
+Description=Linear (No titlebar and frame)
+noborder=true
+noborderrule=2
+wmclass=linear.app Google-chrome
+wmclasscomplete=true
+wmclassmatch=1
