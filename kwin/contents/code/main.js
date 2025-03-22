@@ -157,8 +157,13 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] spotify", "KWin", ""],
     key: "Meta+.",
     kind: "app",
-    command: ["flatpak run com.spotify.Client"],
-    resourceName: "spotify",
+    command: [
+      "google-chrome",
+      "--enable-features=Vulkan",
+      "--password-store=basic",
+      "--app=https://open.spotify.com",
+    ],
+    resourceName: "open.spotify.com",
   },
 
   {
