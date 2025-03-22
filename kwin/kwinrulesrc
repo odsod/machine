@@ -15,8 +15,16 @@ wmclasscomplete=true
 wmclassmatch=1
 
 [General]
-count=3
-rules=f8f4e1c8-5890-47e6-9c21-ffbfb65e86c8,9d3e6e5d-479c-4db1-860a-c888e5ee0972,8d8622f4-5ed2-4a98-904b-ff4a7aa43101
+count=4
+rules=f8f4e1c8-5890-47e6-9c21-ffbfb65e86c8,9d3e6e5d-479c-4db1-860a-c888e5ee0972,8d8622f4-5ed2-4a98-904b-ff4a7aa43101,e10024ec-1098-4aa1-b31c-6c08f09a56e3
+
+[e10024ec-1098-4aa1-b31c-6c08f09a56e3]
+Description=Slack (No titlebar and frame)
+noborder=true
+noborderrule=2
+wmclass=slack Slack
+wmclasscomplete=true
+wmclassmatch=1
 
 [f8f4e1c8-5890-47e6-9c21-ffbfb65e86c8]
 Description=Linear (No titlebar and frame)
