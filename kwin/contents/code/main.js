@@ -238,7 +238,7 @@ const shortcuts = [
     key: "Meta+b",
     kind: "app",
     command: ["mullvad-browser"],
-    resourceClass: "mullvad browser",
+    resourceClass: "Mullvad Browser",
   },
 
   {
