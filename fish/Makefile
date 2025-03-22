@@ -6,7 +6,7 @@ change-shell: install-package
 	@chsh -s $(shell which fish)
 
 .PHONY: install-package
-install-package:
+install-package: ~/.config/fish/config.fish
 	$(info [$(name)] Installing package...)
 	@sudo dnf install -y fish
 
