@@ -113,7 +113,7 @@ const shortcuts = [
 
   {
     actionId: ["kwin", "[odsod] mail", "KWin", ""],
-    key: "Meta+G",
+    key: "Meta+F",
     kind: "app",
     command: [
       "google-chrome",
@@ -195,7 +195,7 @@ const shortcuts = [
 
   {
     actionId: ["kwin", "[odsod] chrome", "KWin", ""],
-    key: "Meta+F",
+    key: "Meta+G",
     kind: "app",
     command: [
       "google-chrome",
