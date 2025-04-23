@@ -1,5 +1,5 @@
 name := cursor
-appimage_url := https://downloader.cursor.sh/linux/appImage/x64
+appimage_url := https://downloads.cursor.com/production/ec408037b24566b11e6132c58bbe6ad27046eb91/linux/x64/Cursor-0.49.4-x86_64.AppImage
 
 .PHONY: ~/.local/bin/cursor
 ~/.local/bin/cursor: build/cursor.AppImage
@@ -14,4 +14,3 @@ build/cursor.AppImage:
 	@curl -D build/headers.txt $(appimage_url) --create-dirs -Lo $@
 	@touch $@
 	@chmod +x $@
-	@grep filename build/headers.txt
