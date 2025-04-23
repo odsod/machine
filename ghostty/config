@@ -5,6 +5,7 @@ window-padding-color = background
 window-decoration = none
 window-theme = ghostty
 font-family = Iosevka
+font-feature = -calt, -liga, -dlig
 window-title-font-family = Iosevka
 confirm-close-surface = false
 mouse-hide-while-typing = true
