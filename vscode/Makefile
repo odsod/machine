@@ -29,6 +29,7 @@ install-extensions:
 	@code --install-extension vscodevim.vim --force
 	@code --install-extension bufbuild.vscode-buf --force
 	@code --install-extension bierner.markdown-mermaid --force
+	@code --install-extension redhat.vscode-yaml --force
 
 .PHONY: install-package
 install-package: /etc/yum.repos.d/vscode.repo
