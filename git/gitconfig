@@ -76,3 +76,5 @@
 	helper = !/usr/bin/gh auth git-credential
 [http]
 	cookiefile = /home/odsod/.gitcookies
+[init]
+	defaultBranch = main
