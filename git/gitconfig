@@ -32,6 +32,9 @@
 [rebase]
   autosquash = true
 
+[init]
+  defaultBranch = main
+
 [mergetool]
   prompt = false
   keepBackup = false
@@ -58,8 +61,8 @@
   ic = commit --allow-empty --message='chore: initial commit'
 
   # Resetting
-  rom = !git fetch origin master && git checkout master && git reset --hard origin/master
-  rum = !git fetch upstream master && git checkout master && git reset --hard upstream/master && git push -f origin master
+  rom = !git fetch origin main && git checkout main && git reset --hard origin/main
+  rum = !git fetch upstream main && git checkout main && git reset --hard upstream/main && git push -f origin main
 
   # Pushing
   po = !git push origin "$(git rev-parse --abbrev-ref HEAD)"
