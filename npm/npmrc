@@ -1,0 +1,2 @@
+prefix=${HOME}/.local/share/npm
+python=/usr/bin/python
