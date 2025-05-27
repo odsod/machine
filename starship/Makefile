@@ -1,5 +1,5 @@
 name := starship
-version := 1.22.1
+version := 1.23.0
 archive_url := https://github.com/starship/starship/releases/download/v$(version)/starship-x86_64-unknown-linux-gnu.tar.gz
 
 .PHONY: ~/.config/starship.toml
