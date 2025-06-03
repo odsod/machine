@@ -24,6 +24,7 @@ install: \
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install \
+		asciinema \
 		ca-certificates \
 		curl \
 		dnf5-plugins \
