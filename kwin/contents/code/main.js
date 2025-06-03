@@ -54,7 +54,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
@@ -91,7 +90,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://notion.so",
     ],
@@ -104,7 +102,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://linear.app",
     ],
@@ -117,7 +114,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
@@ -130,7 +126,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
@@ -159,7 +154,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
       "--app=https://open.spotify.com",
     ],
@@ -204,7 +198,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--enable-features=Vulkan",
       "--password-store=basic",
     ],
     resourceName: "google-chrome",
