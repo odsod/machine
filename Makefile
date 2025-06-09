@@ -44,6 +44,7 @@ install-packages:
 		nodejs \
 		python3-pip \
 		python3-virtualenv \
+		python3-devel \
 		qbittorrent \
 		ripgrep \
 		wl-clipboard \
