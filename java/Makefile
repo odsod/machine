@@ -5,7 +5,7 @@ environment := ~/.config/environment.d/10-$(name).conf
 .PHONY: install-packages
 install-packages: $(environment)
 	$(info [$(name)] Installing packages...)
-	@sudo dnf install -y java-$(version)-openjdk
+	@sudo dnf install -y java-$(version)-openjdk-devel maven
 
 .PHONY: $(environment)
 $(environment): environment.conf
