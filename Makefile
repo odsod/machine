@@ -42,9 +42,10 @@ install-packages:
 		ncdu \
 		ngrep \
 		nodejs \
+		python3-devel \
 		python3-pip \
 		python3-virtualenv \
-		python3-devel \
+		python3.12 \
 		qbittorrent \
 		ripgrep \
 		wl-clipboard \
