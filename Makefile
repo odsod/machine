@@ -49,6 +49,7 @@ install-packages:
 		git-delta \
 		htop \
 		iftop \
+		intel-media-driver \
 		jq \
 		keepassxc \
 		ncdu \
