@@ -4,6 +4,8 @@ name := machine
 install: \
 	~/.config/plasma-workspace/env/environment.d.sh \
 	~/.config/environment.d/00-machine.conf \
+	enable-rpfusion-free \
+	enable-rpfusion-nonfree \
 	install-packages \
 	enable-flathub \
 	install-modules
@@ -19,6 +21,16 @@ install: \
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: enable-rpmfusion-free
+enable-rpmfusion-free:
+	$(info [$(name)] Enabling RPM Fusion free repository...)
+	@sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(shell rpm -E %fedora).noarch.rpm
+
+.PHONY: enable-rpmfusion-nonfree
+enable-rpmfusion-nonfree:
+	$(info [$(name)] Enabling RPM Fusion nonfree repository...)
+	@sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(shell rpm -E %fedora).noarch.rpm
 
 .PHONY: install-packages
 install-packages:
