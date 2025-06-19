@@ -1,5 +1,5 @@
 name := cursor
-appimage_url := https://downloads.cursor.com/production/ec408037b24566b11e6132c58bbe6ad27046eb91/linux/x64/Cursor-0.49.4-x86_64.AppImage
+appimage_url := https://downloads.cursor.com/production/979ba33804ac150108481c14e0b5cb970bda3266/linux/x64/Cursor-1.1.3-x86_64.AppImage
 
 .PHONY: ~/.local/bin/cursor
 ~/.local/bin/cursor: build/cursor.AppImage
