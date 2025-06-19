@@ -33,7 +33,7 @@ enable-rpmfusion-nonfree:
 	@sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(shell rpm -E %fedora).noarch.rpm
 
 .PHONY: install-packages
-install-packages:
+install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install \
 		asciinema \
@@ -63,6 +63,12 @@ install-packages:
 		ripgrep \
 		wl-clipboard \
 		-y -q
+
+.PHONY: install-amd-hardware-codecs
+install-amd-hardware-codecs:
+	$(info [$(name)] Installing AMD hardware codecs...)
+	@sudo dnf swap mesa-va-drivers mesa-va-drivers-freeworld
+	@sudo dnf swap mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
 
 .PHONY: enable-flathub
 enable-flathub: install-packages
