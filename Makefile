@@ -45,6 +45,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 		fedora-workstation-repositories \
 		firefox \
 		flatpak \
+		gifsicle \
 		git \
 		git-delta \
 		htop \
@@ -61,7 +62,9 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 		python3.12 \
 		qbittorrent \
 		ripgrep \
+		unrar \
 		wl-clipboard \
+		yt-dlp \
 		-y -q
 
 .PHONY: install-amd-hardware-codecs
