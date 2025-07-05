@@ -4,6 +4,9 @@ if status is-interactive
     starship init fish | source
 end
 
+# Hostname-specific history
+set -x fish_history (string replace -a '-' '_' (hostname))
+
 # Colorscheme: Nord
 set -U fish_color_normal normal
 set -U fish_color_command 88c0d0
