@@ -85,18 +85,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] notion", "KWin", ""],
-    key: "Meta+N",
-    kind: "app",
-    command: [
-      "google-chrome",
-      "--password-store=basic",
-      "--app=https://notion.so",
-    ],
-    resourceName: "notion.so",
-  },
-
-  {
     actionId: ["kwin", "[odsod] linear", "KWin", ""],
     key: "Meta+I",
     kind: "app",
