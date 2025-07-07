@@ -220,6 +220,18 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] discord", "KWin", ""],
+    key: "Meta+Y",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--password-store=basic",
+      "--app=https://discord.com",
+    ],
+    resourceName: "discord.com",
+  },
+
+  {
     actionId: ["kwin", "[odsod] debug", "KWin", ""],
     key: "Meta+;",
     kind: "callback",
