@@ -21,5 +21,8 @@
   "files.trimTrailingWhitespace": true,
   "editor.formatOnSave": true,
   "explorer.confirmDelete": false,
-  "explorer.confirmDragAndDrop": false
+  "explorer.confirmDragAndDrop": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
