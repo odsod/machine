@@ -57,7 +57,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
-    resourceName: "calendar.google.com",
+    resourceClassIncludes: "calendar.google.com",
   },
 
   {
@@ -93,7 +93,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://linear.app",
     ],
-    resourceName: "linear.app",
+    resourceClassIncludes: "linear.app",
   },
 
   {
@@ -105,7 +105,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://mail.google.com",
     ],
-    resourceName: "mail.google.com",
+    resourceClassIncludes: "mail.google.com",
   },
 
   {
@@ -117,7 +117,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://meet.google.com",
     ],
-    resourceName: "meet.google.com",
+    resourceClassIncludes: "meet.google.com",
   },
 
   {
@@ -145,7 +145,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://open.spotify.com",
     ],
-    resourceName: "open.spotify.com",
+    resourceClassIncludes: "open.spotify.com",
   },
 
   {
@@ -188,7 +188,7 @@ const shortcuts = [
       "google-chrome",
       "--password-store=basic",
     ],
-    resourceName: "google-chrome",
+    resourceClass: "google-chrome",
   },
 
   {
@@ -216,7 +216,7 @@ const shortcuts = [
       "--password-store=basic",
       "--app=https://discord.com",
     ],
-    resourceName: "discord.com",
+    resourceClassIncludes: "discord.com",
   },
 
   {
