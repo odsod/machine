@@ -7,7 +7,7 @@ install: \
 	enable-rpfusion-free \
 	enable-rpfusion-nonfree \
 	install-packages \
-	enable-flathub \
+	install-flatpak-packages \
 	install-modules
 
 .PHONY: ~/.config/plasma-workspace/env/environment.d.sh
@@ -78,6 +78,12 @@ install-amd-hardware-codecs:
 enable-flathub: install-packages
 	$(info [$(name)] Enabling Flathub...)
 	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+.PHONY: install-flatpak-packages
+install-flatpak-packages: enable-flathub
+	$(info [$(name)] Installing Flatpak packages...)
+	@flatpak install flathub \
+		com.spotify.Client
 
 .PHONY: install-modules
 install-modules:

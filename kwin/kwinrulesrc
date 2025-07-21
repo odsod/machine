@@ -10,7 +10,7 @@ wmclassmatch=1
 Description=Spotify (No titlebar and frame)
 noborder=true
 noborderrule=2
-wmclass=open.spotify.com Google-chrome
+wmclass=spotify Spotify
 wmclasscomplete=true
 wmclassmatch=1
 

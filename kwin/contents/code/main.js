@@ -141,11 +141,11 @@ const shortcuts = [
     key: "Meta+.",
     kind: "app",
     command: [
-      "google-chrome",
-      "--password-store=basic",
-      "--app=https://open.spotify.com",
+      "flatpak",
+      "run",
+      "com.spotify.Client",
     ],
-    resourceClassIncludes: "open.spotify.com",
+    resourceClass: "Spotify",
   },
 
   {
