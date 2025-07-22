@@ -63,6 +63,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 		qbittorrent \
 		ripgrep \
 		simple-scan \
+		ttyd \
 		unrar \
 		wl-clipboard \
 		yt-dlp \
