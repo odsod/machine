@@ -64,6 +64,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 		simple-scan \
 		ttyd \
 		unrar \
+		uv \
 		wl-clipboard \
 		yt-dlp \
 		-y -q
