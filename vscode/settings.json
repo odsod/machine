@@ -2,6 +2,7 @@
   "workbench.colorTheme": "Nord",
   "workbench.startupEditor": "none",
   "go.toolsManagement.autoUpdate": true,
+  "go.buildTags": "mage",
   "gopls": {
     "ui.semanticTokens": true,
     "formatting.gofumpt": true
