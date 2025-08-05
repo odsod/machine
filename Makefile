@@ -61,6 +61,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
 		python3.12 \
 		qbittorrent \
 		ripgrep \
+		ruff \
 		simple-scan \
 		ttyd \
 		unrar \

@@ -31,6 +31,7 @@ install-extensions:
 	@code --install-extension bierner.markdown-mermaid --force
 	@code --install-extension redhat.vscode-yaml --force
 	@code --install-extension esbenp.prettier-vscode --force
+	@code --install-extension charliermarsh.ruff --force
 
 .PHONY: install-package
 install-package: /etc/yum.repos.d/vscode.repo
