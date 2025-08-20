@@ -39,8 +39,8 @@
   prompt = false
   keepBackup = false
 
-[url "git@github.com:waydatatech/"]
-  insteadOf = https://github.com/waydatatech/
+[url "git@github.com:way-platform/"]
+  insteadOf = https://github.com/way-platform/
 
 [alias]
   # Status
