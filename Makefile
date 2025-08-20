@@ -85,7 +85,8 @@ enable-flathub: install-packages
 install-flatpak-packages: enable-flathub
 	$(info [$(name)] Installing Flatpak packages...)
 	@flatpak install flathub \
-		com.spotify.Client
+		com.spotify.Client \
+		org.soapui.SoapUI
 
 .PHONY: install-modules
 install-modules:
