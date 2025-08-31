@@ -8,6 +8,25 @@
     "diagnostics": false,
     "metrics": false
   },
+  "languages": {
+    "Python": {
+      "language_servers": ["ty", "ruff"],
+      "format_on_save": "on",
+      "formatter": [
+        {
+          "code_actions": {
+            "source.organizeImports.ruff": true,
+            "source.fixAll.ruff": true
+          }
+        },
+        {
+          "language_server": {
+            "name": "ruff"
+          }
+        }
+      ]
+    }
+  },
   "lsp": {
     "gopls": {
       "initialization_options": {
@@ -20,6 +39,15 @@
         "arguments": ["beta", "lsp"]
       }
     }
+  },
+  "auto_install_extensions": {
+    "html": true,
+    "dockerfile": true,
+    "nord": true,
+    "ruff": true,
+    "toml": true,
+    "java": true,
+    "sql": true
   },
   "vim_mode": true,
   "ui_font_size": 16,
