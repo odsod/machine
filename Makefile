@@ -33,7 +33,7 @@ enable-rpmfusion-nonfree:
 	@sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(shell rpm -E %fedora).noarch.rpm
 
 .PHONY: install-packages
-install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree
+install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree enable-terra
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install \
 		ca-certificates \
@@ -76,9 +76,15 @@ install-amd-hardware-codecs:
 	@sudo dnf swap mesa-va-drivers mesa-va-drivers-freeworld
 	@sudo dnf swap mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
 
+.PHONY: enable-terra
+enable-terra:
+	$(info [$(name)] Enabling Terra repository...)
+	@sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release || true
+	@sudo dnf config-manager setopt terra\*.priority=100
+
 .PHONY: enable-flathub
 enable-flathub: install-packages
-	$(info [$(name)] Enabling Flathub...)
+	$(info [$(name)] Enabling Flathub repository...)
 	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 .PHONY: install-flatpak-packages
