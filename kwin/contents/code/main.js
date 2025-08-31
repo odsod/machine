@@ -195,8 +195,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] code", "KWin", ""],
     key: "Meta+/",
     kind: "app",
-    command: ["cursor"],
-    resourceName: "cursor",
+    command: ["zed"],
+    resourceClass: "dev.zed.Zed",
   },
 
   {
