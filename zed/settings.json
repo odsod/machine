@@ -9,6 +9,11 @@
     "metrics": false
   },
   "lsp": {
+    "gopls": {
+      "initialization_options": {
+        "buildFlags": ["-tags=mage"]
+      }
+    },
     "protobuf-language-server": {
       "binary": {
         "path": "buf",
