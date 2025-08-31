@@ -48,7 +48,8 @@
     "ruff": true,
     "toml": true,
     "java": true,
-    "sql": true
+    "sql": true,
+    "proto": true
   },
   "vim_mode": true,
   "ui_font_size": 16,
