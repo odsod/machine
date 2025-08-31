@@ -1,4 +1,5 @@
 {
+  "base_keymap": "VSCode",
   "buffer_font_features": {
     "calt": 0
   },
