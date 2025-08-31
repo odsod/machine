@@ -157,11 +157,11 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] zoom", "KWin", ""],
+    actionId: ["kwin", "[odsod] zed", "KWin", ""],
     key: "Meta+Z",
     kind: "app",
-    command: ["zoom"],
-    resourceName: "zoom",
+    command: ["zed"],
+    resourceClass: "dev.zed.Zed",
   },
 
   {
