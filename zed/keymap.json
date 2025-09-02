@@ -40,5 +40,17 @@
     "bindings": {
       "ctrl-u ctrl-h": "editor::ToggleFocus"
     }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-u ctrl-p": "file_finder::Toggle"
+    }
+  },
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-p": null
+    }
   }
 ]
