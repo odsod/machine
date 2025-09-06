@@ -1,33 +1,41 @@
 [
   {
-    "key": "ctrl+h ctrl+t",
+    "key": "ctrl+u ctrl+t",
     "command": "workbench.action.terminal.focus",
     "when": "!terminalFocus"
   },
   {
-    "key": "ctrl+h ctrl+t",
+    "key": "ctrl+u ctrl+t",
     "command": "workbench.action.focusActiveEditorGroup",
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+h ctrl+f",
-    "command": "workbench.action.openGlobalKeybindings"
+    "key": "ctrl+u ctrl+f",
+    "command": "workbench.view.explorer"
   },
   {
-    "key": "ctrl+h ctrl+p",
+    "key": "ctrl+u ctrl+p",
     "command": "workbench.action.quickOpen"
   },
   {
-    "key": "ctrl+h ctrl+y",
-    "command": "workbench.action.openGlobalKeybindingsFile"
+    "key": "ctrl+u ctrl+u",
+    "command": "workbench.action.showCommands"
   },
   {
-    "key": "ctrl+h ctrl+m",
-    "command": "workbench.action.toggleMenuBar"
+    "key": "ctrl+u ctrl+g",
+    "command": "workbench.view.scm"
   },
   {
-    "key": "ctrl+h ctrl+l",
-    "command": "workbench.action.openSettingsJson"
+    "key": "ctrl+u ctrl+h",
+    "command": "workbench.action.focusActiveEditorGroup"
+  },
+  {
+    "key": "ctrl+u ctrl+o",
+    "command": "outline.focus"
+  },
+  {
+    "key": "ctrl+u ctrl+l",
+    "command": "aichat.newchataction"
   },
   {
     "key": "ctrl+c ctrl+h",
@@ -57,5 +65,9 @@
     "key": "ctrl+c ctrl+e",
     "command": "editor.action.marker.nextInFiles",
     "when": "editorFocus"
+  },
+  {
+    "key": "ctrl+p",
+    "command": "-workbench.action.quickOpen"
   }
 ]

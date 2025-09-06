@@ -13,6 +13,12 @@ appimage_url := https://downloads.cursor.com/production/af58d92614edb1f72bdd7566
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.config/Cursor/User/keybindings.json
+~/.config/Cursor/User/keybindings.json: ../vscode/keybindings.json
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
 .PHONY: build/cursor.AppImage
 build/cursor.AppImage:
 	$(info [$(name)] Downloading AppImage...)
