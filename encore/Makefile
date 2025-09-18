@@ -1,5 +1,5 @@
 name := encore
-version := 1.49.3
+version := 1.50.0
 archive_url := https://d2f391esomvqpi.cloudfront.net/encore-$(version)-linux_amd64.tar.gz
 
 .PHONY: all
