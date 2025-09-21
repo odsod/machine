@@ -47,6 +47,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree enable-terra
 		gifsicle \
 		git \
 		git-delta \
+		hexyl \
 		htop \
 		iftop \
 		intel-media-driver \
