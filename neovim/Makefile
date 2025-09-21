@@ -11,6 +11,8 @@ all: \
 
 .PHONY: update-alternatives
 update-alternatives:
+	@sudo rm /usr/bin/vim
+	@sudo rm /usr/bin/vi
 	@sudo update-alternatives --install /usr/bin/vim vim $(shell which nvim) 10
 	@sudo update-alternatives --install /usr/bin/vi vi $(shell which nvim) 10
 	@sudo update-alternatives --set vim /usr/bin/nvim
