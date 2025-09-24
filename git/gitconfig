@@ -3,7 +3,7 @@
   email = odsod@users.noreply.github.com
 
 [core]
-  editor = vim
+  editor = nvim
   pager = delta
   log = delta
   reflog = delta
@@ -26,7 +26,7 @@
   ui = true
 
 [merge]
-  tool = vimdiff
+  tool = nvim -d
   conflictstyle = diff3
 
 [rebase]
