@@ -1,6 +1,22 @@
 {
-  "selectedAuthType": "vertex-ai",
   "context": {
-    "fileName": ["AGENTS.md", "README.md"]
+    "fileName": ["AGENTS.md", "README.md"],
+    "fileFiltering": {
+      "respectGitIgnore": false
+    }
+  },
+
+  "security": {
+    "auth": {
+      "selectedType": "vertex-ai"
+    }
+  },
+
+  "privacy": {
+    "usageStatisticsEnabled": false
+  },
+
+  "ui": {
+    "hideBanner": true
   }
 }
