@@ -1,11 +1,12 @@
 name := cursor
-appimage_url := https://downloads.cursor.com/production/af58d92614edb1f72bdd756615d131bf8dfa5299/linux/x64/Cursor-1.4.5-x86_64.AppImage
+version := 1.7
+rpm_url := https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/$(version)
 
-.PHONY: ~/.local/bin/cursor
-~/.local/bin/cursor: build/cursor.AppImage ~/.config/Cursor/User/settings.json
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
+.PHONY: all
+all: \
+	install-rpm \
+	~/.config/Cursor/User/settings.json \
+	~/.config/Cursor/User/keybindings.json
 
 .PHONY: ~/.config/Cursor/User/settings.json
 ~/.config/Cursor/User/settings.json: ../vscode/settings.json
@@ -19,10 +20,14 @@ appimage_url := https://downloads.cursor.com/production/af58d92614edb1f72bdd7566
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: build/cursor.AppImage
-build/cursor.AppImage:
-	$(info [$(name)] Downloading AppImage...)
+.PHONY: install-rpm
+install-rpm: build/$(version)/cursor.rpm
+	$(info [$(name)] Installing $@...)
+	@sudo dnf install $<
+
+.PHONY: build/$(version)/cursor.rpm
+build/$(version)/cursor.rpm:
+	$(info [$(name)] Downloading RPM...)
 	@mkdir -p build
-	@curl -D build/headers.txt $(appimage_url) --create-dirs -Lo $@
+	@curl -D build/headers.txt $(rpm_url) --create-dirs -Lo $@
 	@touch $@
-	@chmod +x $@
