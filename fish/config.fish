@@ -1,3 +1,10 @@
+if test "$PAGER" = "head -n 10000 | cat" -o "$COMPOSER_NO_INTERACTION" = "1"
+    return
+end
+
+alias vim="nvim"
+alias vi="nvim"
+
 set fish_greeting
 
 if status is-interactive
