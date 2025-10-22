@@ -32,6 +32,7 @@ install-extensions:
 	@code --install-extension redhat.vscode-yaml --force
 	@code --install-extension esbenp.prettier-vscode --force
 	@code --install-extension charliermarsh.ruff --force
+	@code --install-extension oxc.oxc-vscode --force
 
 .PHONY: install-package
 install-package: /etc/yum.repos.d/vscode.repo
