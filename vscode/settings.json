@@ -49,4 +49,6 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "oxc.oxc-vscode"
   }
+  "cursor.cpp.disabledLanguages": ["plaintext"],
+  "editor.minimap.enabled": true
 }
