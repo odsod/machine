@@ -1,0 +1,14 @@
+"$schema" = "https://jj-vcs.github.io/jj/latest/config-schema.json"
+
+[user]
+name = "Oscar Söderlund"
+email = "odsod@noreply.users.github.com"
+
+[templates]
+git_push_bookmark = '"odsod/push-" ++ change_id.short()'
+
+[aliases]
+rebase-all = ["rebase", "-s", "(::trunk())+ & mutable()", "-d", "trunk()"]
+
+[ui]
+editor = ["nvim"]
