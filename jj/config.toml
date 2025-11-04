@@ -12,3 +12,4 @@ rebase-all = ["rebase", "-s", "(::trunk())+ & mutable()", "-d", "trunk()"]
 
 [ui]
 editor = ["nvim"]
+default-command = ["log", "--reversed"]
