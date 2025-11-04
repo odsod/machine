@@ -1,4 +1,5 @@
 {
+  "icon_theme": "Zed (Default)",
   "base_keymap": "VSCode",
   "telemetry": {
     "diagnostics": false,
@@ -9,12 +10,8 @@
       "language_servers": ["ty", "ruff"],
       "format_on_save": "on",
       "formatter": [
-        {
-          "code_actions": {
-            "source.organizeImports.ruff": true,
-            "source.fixAll.ruff": true
-          }
-        },
+        { "code_action": "source.organizeImports.ruff" },
+        { "code_action": "source.fixAll.ruff" },
         {
           "language_server": {
             "name": "ruff"
@@ -53,9 +50,9 @@
     "calt": 0
   },
   "buffer_font_family": "Iosevka",
-  "buffer_font_weight": 500,
+  "buffer_font_weight": 400,
   "ui_font_family": "Inter Display",
-  "ui_font_weight": 500,
+  "ui_font_weight": 400,
   "theme": {
     "mode": "dark",
     "light": "Alabaster",
