@@ -220,6 +220,14 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] yaak", "KWin", ""],
+    key: "Meta+X",
+    kind: "app",
+    command: ["yaak"],
+    resourceClass: "yaak-app",
+  },
+
+  {
     actionId: ["kwin", "[odsod] debug", "KWin", ""],
     key: "Meta+;",
     kind: "callback",
