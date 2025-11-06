@@ -3,7 +3,7 @@ name := ghostty
 .PHONY: install-packages
 install-packages: ~/.config/ghostty/config
 	$(info [$(name)] Installing packages...)
-	@dnf copr enable scottames/ghostty
+	@sudo dnf copr enable scottames/ghostty
 	@sudo dnf install -y ghostty
 
 .PHONY: ~/.config/ghostty/config
