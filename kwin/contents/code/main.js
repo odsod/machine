@@ -223,7 +223,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] yaak", "KWin", ""],
     key: "Meta+X",
     kind: "app",
-    command: ["yaak"],
+    command: ["yaak-app"],
     resourceClass: "yaak-app",
   },
 
