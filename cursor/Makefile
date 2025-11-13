@@ -1,6 +1,6 @@
 name := cursor
-version := 1.7
-rpm_url := https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/$(version)
+version := 2.0.64
+rpm_url := https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 
 .PHONY: all
 all: \
