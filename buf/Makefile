@@ -1,5 +1,5 @@
 name := buf
-version := 1.59.0
+version := 1.60.0
 archive_url := https://github.com/bufbuild/buf/releases/download/v$(version)/buf-Linux-x86_64.tar.gz
 
 .PHONY: ~/.local/bin/$(name)
