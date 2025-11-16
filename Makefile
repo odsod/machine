@@ -56,6 +56,7 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree enable-terra
 		ncdu \
 		ngrep \
 		nodejs \
+		pdftk \
 		python3-devel \
 		python3-pip \
 		python3-virtualenv \
