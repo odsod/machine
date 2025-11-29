@@ -1,5 +1,5 @@
 name := fx
-version := 39.1.0
+version := 39.2.0
 bin_url := https://github.com/antonmedv/fx/releases/download/$(version)/fx_linux_amd64
 
 .PHONY: ~/.local/bin/fx
