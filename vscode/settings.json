@@ -48,7 +48,9 @@
   "[typescriptreact]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "editor.minimap.enabled": true,
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
-  "cursor.cpp.disabledLanguages": ["plaintext"],
-  "editor.minimap.enabled": true
 }
