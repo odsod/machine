@@ -1,5 +1,5 @@
 name := go
-version := 1.25.4
+version := 1.25.5
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 
 .PHONY: all
