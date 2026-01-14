@@ -1,4 +1,7 @@
 {
+  "session": {
+    "trust_all_worktrees": true
+  },
   "icon_theme": "Zed (Default)",
   "base_keymap": "VSCode",
   "telemetry": {

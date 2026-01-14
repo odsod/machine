@@ -20,7 +20,7 @@
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-u ctrl-u": "command_palette::Toggle"
+      "ctrl-u ctrl-u": "file_finder::Toggle"
     }
   },
   {
@@ -44,7 +44,7 @@
   {
     "context": "Workspace",
     "bindings": {
-      "ctrl-u ctrl-p": "file_finder::Toggle"
+      "ctrl-u ctrl-p": "command_palette::Toggle"
     }
   },
   {
