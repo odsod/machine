@@ -1,5 +1,5 @@
 name := jj
-version := 0.35.0
+version := 0.37.0
 archive_url := https://github.com/jj-vcs/jj/releases/download/v$(version)/jj-v$(version)-x86_64-unknown-linux-musl.tar.gz
 
 .PHONY: ~/.local/bin/$(name)
