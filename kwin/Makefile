@@ -6,20 +6,20 @@ install: \
 	install-package \
 	enable-plugin \
 	~/.config/kwinrulesrc \
-	/usr/share/dbus-1/services/io.github.odsod.kwin.service \
-	/usr/local/bin/odsod-kwin-dbus-service.py
+	~/.local/share/dbus-1/services/io.github.odsod.kwin.service \
+	~/.local/bin/odsod-kwin-dbus-service.py
 
 .PHONY: enable-plugin
 enable-plugin:
 	$(info [$(name)] Enabling Plasma plugin...)
-	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled false
+	@kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled false
 	@sleep 1
-	@kwriteconfig5 --file kwinrc --group Plugins --key odsodEnabled true
+	@kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled true
 
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing Plasma package...)
-	@kpackagetool6 --type=KWin/Script --upgrade .
+	@kpackagetool6 --type=KWin/Script --install . 2>/dev/null || kpackagetool6 --type=KWin/Script --upgrade .
 
 .PHONY: uninstall-package
 uninstall-package:
@@ -42,13 +42,15 @@ develop-package:
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-/usr/share/dbus-1/services/io.github.odsod.kwin.service: io.github.odsod.kwin.service
+~/.local/share/dbus-1/services/io.github.odsod.kwin.service: io.github.odsod.kwin.service
 	$(info [$(name)] Copying $@...)
-	@sudo cp -f $< $@
+	@mkdir -p $(dir $@)
+	@cp -f $< $@
 
-/usr/local/bin/odsod-kwin-dbus-service.py: odsod-kwin-dbus-service.py
+~/.local/bin/odsod-kwin-dbus-service.py: odsod-kwin-dbus-service.py
 	$(info [$(name)] Copying $@...)
-	@sudo cp -f $< $@
+	@mkdir -p $(dir $@)
+	@cp -f $< $@
 
 .PHONY: tail-dbus
 tail-dbus: ~/.local/share/sddm/wayland-session.log
