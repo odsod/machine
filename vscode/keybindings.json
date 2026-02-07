@@ -14,11 +14,11 @@
     "command": "workbench.view.explorer"
   },
   {
-    "key": "ctrl+u ctrl+p",
+    "key": "ctrl+u ctrl+u",
     "command": "workbench.action.quickOpen"
   },
   {
-    "key": "ctrl+u ctrl+u",
+    "key": "ctrl+u ctrl+p",
     "command": "workbench.action.showCommands"
   },
   {
