@@ -1,5 +1,5 @@
 name := soap-ui
-version := 5.9.0
+version := 5.9.1
 archive_url := https://dl.eviware.com/soapuios/$(version)/SoapUI-$(version)-linux-bin.tar.gz
 
 .PHONY: ~/.local/bin/$(name)
