@@ -1,74 +1,35 @@
 # Agent Instructions
 
-This repository automates the setup of a developer environment. It uses GNU Make to manage dependencies and installation logic.
+## Principles
+- **Minimalism**: Standard solutions > Custom scripts.
+- **Simplicity**: Idempotent, readable Makefiles.
 
-## Repository Structure
+## Structure
+- **Root Makefile**: Orchestrator (`make install`).
+- **Subdirs**: Tool-specific logic.
+    - **Config**: Symlink to location required by tool (often `~/.config/<tool>/`).
+    - **Binaries**: Symlink/Install to `~/.local/bin/`.
+    - **Resources**: Download/Extract to `~/.local/share/odsod/machine/<tool>/`. **Do not** use `build/` in the repo.
+    - **Environment**: `~/.config/environment.d/*.conf`.
 
-- **Root Makefile**: Entry point. Installs system packages (dnf, flatpak) and iterates through subdirectories to install modular tools.
-- **Tool Directories**: (e.g., `go/`, `buf/`) Contain specific Makefiles for downloading and installing individual tools.
+## Package Management
+- **Preference**: RPM > Flatpak > Manual.
+- **Repos**: Terra > COPR > RPM Fusion.
 
-## Version Management
+## Workflow: Updates
+1. **Discover**: GitHub Releases / APIs (e.g. `api2.cursor.sh`).
+2. **Validate**: `curl -I <url>`.
+3. **Apply**: Update `version` in `Makefile`. No trailing whitespace.
+4. **Verify**: `make -C <dir>` then `<tool> --version`.
+5. **Commit**: `feat(<dir>): bump to v<version>`.
 
-We rely on agents to keep tool versions up-to-date.
-
-### How to Update a Tool
-
-1.  **Check for Updates**:
-    - Open the tool's `Makefile`.
-    - Look for the `version` variable.
-    - Use the URL in the comment next to the version (e.g., `# https://github.com/.../releases`) to check for a newer version.
-    - *If the URL is missing, please find the official release page and add it as a comment for future reference.*
-
-2.  **Apply the Update**:
-    - Change the `version` value to the new version number.
-    - Ensure the `archive_url` will construct a valid download link.
-
-3.  **Verify**:
-    - Run the make command for that directory to verify the download works: `make -C <tool_directory>`.
-
-4.  **Commit**:
-    - **One commit per tool**.
-    - **Format**: `feat(<directory_name>): bump to v<new_version>`
-    - **Example**: `feat(buf): bump to v1.65.0`
-
-## Autonomous Update Workflow
-
-When tasked with updating tools, follow this advanced workflow:
-
-1.  **Discovery**:
-    - **GitHub**: Check the `/releases` page for the latest tag.
-    - **APIs**: Some tools have JSON APIs for releases (e.g., `encore` uses `https://encore.dev/api/releases`).
-    - **Install Scripts**: If the discovery method is unclear, inspect the tool's official `install.sh` or download page to find hidden API endpoints or redirect patterns (e.g., `cursor` uses `api2.cursor.sh`).
-    - **Documentation**: Always add a `# Discovery: <url>` or similar comment in the `Makefile` if you find a new way to check for versions.
-
-2.  **Asset Validation**:
-    - Before applying an update, use `curl -I <download_url>` to ensure the file exists.
-    - *Warning*: Sometimes GitHub tags exist before the assets (RPMs, Binaries) are finished uploading. Do not bump the version until the specific asset for our architecture is available.
-
-3.  **Applying the Change**:
-    - Update the `version` variable.
-    - **Clean Variables**: Ensure there is no trailing whitespace in the `version` variable. Place comments on the line *above* the variable if needed.
-
-4.  **Verification**:
-    - Run `make -C <tool_directory>` to verify the download and installation.
-    - If the tool is already in the `PATH` or symlinked, run `<tool> --version` to confirm the binary is functional and reports the correct version.
-
-## Conventions
-
-- **Idempotency**: Makefiles should be idempotent.
-- **Isolation**: Tools should ideally be installed into `~/.local/` or `build/` directories within the repo, avoiding global system changes where possible (except for the root system package installation).
+## Commit Attribution
+- Follow Conventional Commits.
+- **Short Headings**: Keep headings concise. Use the body for details if needed.
+- **Template**: `feat(scope): description`.
 
 ## Maintaining This File
+- **Format**: Headers + bullets - No paragraphs.
+- **Style**: Concise, direct, action-oriented. No filler or pleasantries.
+- **Commit Format**: `docs: update AGENTS.md`. Use `git commit --amend` for small tweaks.
 
-- **Updates**: When repository conventions change (e.g., new folder structure, new build system), update this file immediately.
-- **Structure**:
-    - Use clear, hierarchical Markdown headers.
-    - Provide actionable, step-by-step instructions for common tasks (like version bumps).
-    - Include specific examples for commit messages and file paths.
-- **Writing Style**:
-    - **Concise & Direct**: Use a professional, direct tone suitable for a CLI environment. Avoid conversational filler.
-    - **Action-Oriented**: Focus on "how-to" and clear requirements.
-    - **Precision**: Use exact file paths and variable names when providing instructions.
-- **Goal**: Keep this file as the source of truth for autonomous agents.
-- **Commit Format**: `docs: update AGENTS.md`
-    - **Amending**: If you make small tweaks immediately after a commit, use `git commit --amend` to update the previous commit rather than creating a chain of small "fix" commits.
