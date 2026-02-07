@@ -1,5 +1,5 @@
 name := obsidian
-version := 1.11.5
+version := 1.11.7
 appimage_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/Obsidian-$(version).AppImage
 
 .PHONY: ~/.local/bin/obsidian
