@@ -2,18 +2,20 @@ name := machine
 
 .PHONY: install
 install: \
-	~/.config/environment.d/odsod-machine.conf \
+	~/.profile \
+	~/.config/plasma-workspace/env/odsod-machine.sh \
 	install-packages \
 	install-flatpak-packages \
 	install-modules
 
-.PHONY: reload-env
-reload-env:
-	$(info [$(name)] Reloading systemd user environment...)
-	@systemctl --user daemon-reload
 
-.PHONY: ~/.config/environment.d/odsod-machine.conf
-~/.config/environment.d/odsod-machine.conf: environment.conf
+.PHONY: ~/.profile
+~/.profile: env.sh
+	$(info [$(name)] Symlinking $@...)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/plasma-workspace/env/odsod-machine.sh
+~/.config/plasma-workspace/env/odsod-machine.sh: env.sh
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

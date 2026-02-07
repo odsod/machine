@@ -12,7 +12,12 @@
     - **Binaries**: Symlink/Install to `~/.local/bin/`.
     - **Resources**: Download/Extract to `~/.local/share/odsod/machine/data/<tool>/<version>/`.
         - Symlink active version to `~/.local/share/odsod/machine/<tool>` if needed.
-    - **Environment**: `~/.config/environment.d/*.conf`.
+- **Environment**: `env.sh` (POSIX sh).
+    - **Role**: Source of Truth for all environment variables and PATH.
+    - **Install**: Symlinked to `~/.profile` and `~/.config/plasma-workspace/env/odsod-machine.sh` by Root Makefile.
+
+## Development
+- **Efficiency**: Iterating on configs should not trigger a full `make`. Use specific targets.
 
 ## Package Management
 - **Preference**: RPM > Flatpak > Manual.
@@ -51,4 +56,3 @@
 - **Format**: Headers + bullets - No paragraphs.
 - **Style**: Concise, direct, action-oriented. No filler or pleasantries.
 - **Commit Format**: `docs: update AGENTS.md`. Use `git commit --amend` for small tweaks.
-
