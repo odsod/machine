@@ -2,13 +2,18 @@ name := machine
 
 .PHONY: install
 install: \
-	~/.config/environment.d/00-machine.conf \
+	~/.config/environment.d/odsod-machine.conf \
 	install-packages \
 	install-flatpak-packages \
 	install-modules
 
-.PHONY: ~/.config/environment.d/00-machine.conf
-~/.config/environment.d/00-machine.conf: environment.conf
+.PHONY: reload-env
+reload-env:
+	$(info [$(name)] Reloading systemd user environment...)
+	@systemctl --user daemon-reload
+
+.PHONY: ~/.config/environment.d/odsod-machine.conf
+~/.config/environment.d/odsod-machine.conf: environment.conf
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
