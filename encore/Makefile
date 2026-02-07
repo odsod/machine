@@ -6,14 +6,7 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
 all: \
-	~/.local/share/odsod/machine/encore \
-	~/.config/environment.d/10-$(name).conf
-
-.PHONY: ~/.config/environment.d/10-$(name).conf
-~/.config/environment.d/10-$(name).conf: environment.conf
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
+	~/.local/share/odsod/machine/encore
 
 .PHONY: ~/.local/share/odsod/machine/encore
 ~/.local/share/odsod/machine/encore: $(data_dir)/$(version)/bin/$(name)

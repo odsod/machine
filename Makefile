@@ -3,8 +3,8 @@ name := machine
 .PHONY: install
 install: \
 	~/.config/environment.d/00-machine.conf \
-	enable-rpfusion-free \
-	enable-rpfusion-nonfree \
+	enable-rpmfusion-free \
+	enable-rpmfusion-nonfree \
 	install-packages \
 	install-flatpak-packages \
 	install-modules

@@ -5,14 +5,7 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
 all: \
-	~/.local/share/odsod/machine/go \
-	~/.config/environment.d/10-$(name).conf
-
-.PHONY: ~/.config/environment.d/10-$(name).conf
-~/.config/environment.d/10-$(name).conf: environment.conf
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
+	~/.local/share/odsod/machine/go
 
 .PHONY: ~/.local/share/odsod/machine/go
 ~/.local/share/odsod/machine/go: $(data_dir)/$(version)/go
