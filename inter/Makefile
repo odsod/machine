@@ -1,20 +1,21 @@
 name := inter
 version := 4.1
 archive_url := https://github.com/rsms/inter/releases/download/v$(version)/Inter-$(version).zip
+data_dir := $(HOME)/.local/share/odsod/machine/$(name)
 
 .PHONY: ~/.local/share/fonts/inter.ttc
-~/.local/share/fonts/inter.ttc: build/$(version)/Inter.ttc
+~/.local/share/fonts/inter.ttc: $(data_dir)/$(version)/Inter.ttc
 	$(info [$(name)] Installing...)
 	@mkdir -p ~/.local/share/fonts
 	@ln -fs $(abspath $<) $@
 	@fc-cache -vf >/dev/null
 
-build/$(version)/Inter.ttc: build/$(version)/archive.zip
+$(data_dir)/$(version)/Inter.ttc: $(data_dir)/$(version)/archive.zip
 	$(info [$(name)] Unzipping $<...)
 	@unzip $< -d $(dir $@)
 	@touch $@
 
-build/$(version)/archive.zip:
+$(data_dir)/$(version)/archive.zip:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@

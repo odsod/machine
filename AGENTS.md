@@ -3,13 +3,15 @@
 ## Principles
 - **Minimalism**: Standard solutions > Custom scripts.
 - **Simplicity**: Idempotent, readable Makefiles.
+- **Automation**: All commands MUST be non-interactive (e.g., `dnf install -y`).
 
 ## Structure
 - **Root Makefile**: Orchestrator (`make install`).
 - **Subdirs**: Tool-specific logic.
     - **Config**: Symlink to location required by tool (often `~/.config/<tool>/`).
     - **Binaries**: Symlink/Install to `~/.local/bin/`.
-    - **Resources**: Download/Extract to `~/.local/share/odsod/machine/<tool>/`. **Do not** use `build/` in the repo.
+    - **Resources**: Download/Extract to `~/.local/share/odsod/machine/data/<tool>/<version>/`.
+        - Symlink active version to `~/.local/share/odsod/machine/<tool>` if needed.
     - **Environment**: `~/.config/environment.d/*.conf`.
 
 ## Package Management

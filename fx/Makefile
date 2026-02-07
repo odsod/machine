@@ -2,14 +2,15 @@ name := fx
 # https://github.com/antonmedv/fx/releases
 version := 39.2.0
 bin_url := https://github.com/antonmedv/fx/releases/download/$(version)/fx_linux_amd64
+data_dir := $(HOME)/.local/share/odsod/machine/$(name)
 
 .PHONY: ~/.local/bin/fx
-~/.local/bin/fx: build/$(version)/fx
+~/.local/bin/fx: $(data_dir)/$(version)/fx
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-build/$(version)/fx:
+$(data_dir)/$(version)/fx:
 	$(info [$(name)] Downloading binary...)
 	@curl $(bin_url) --create-dirs -Lo $@
 	@touch $@

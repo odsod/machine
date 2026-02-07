@@ -9,4 +9,4 @@ name := starship
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing package $@...)
-	@sudo dnf install starship
+	@sudo dnf install -y starship

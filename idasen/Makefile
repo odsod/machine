@@ -1,8 +1,9 @@
 name := idasen
 version := 0.12.0
-venv_dir := build/$(version)/venv
-venv_pip := build/$(version)/venv/bin/pip
-cmd := build/$(version)/venv/bin/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+venv_dir := $(data_dir)/$(version)/venv
+venv_pip := $(venv_dir)/bin/pip
+cmd := $(venv_dir)/bin/$(name)
 cmd_symlink := ~/.local/bin/$(name)
 config := idasen.yaml
 config_symlink := ~/.config/idasen/$(config)
@@ -29,4 +30,5 @@ $(cmd): $(venv_pip)
 
 $(venv_pip):
 	$(info [$(name)] Initializing virtualenv...)
+	@mkdir -p $(dir $@)
 	@python3 -m venv $(venv_dir)
