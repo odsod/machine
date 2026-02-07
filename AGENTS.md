@@ -17,11 +17,28 @@
 - **Repos**: Terra > COPR > RPM Fusion.
 
 ## Workflow: Updates
-1. **Discover**: GitHub Releases / APIs (e.g. `api2.cursor.sh`).
-2. **Validate**: `curl -I <url>`.
-3. **Apply**: Update `version` in `Makefile`. No trailing whitespace.
-4. **Verify**: `make -C <dir>` then `<tool> --version`.
-5. **Commit**: `feat(<dir>): bump to v<version>`.
+
+**Trigger**: "Let's bump versions" -> Agents must check ALL tools.
+
+
+
+1.  **Discover**:
+
+    - Check `# Discovery: <url>` in Makefile. **Mandatory** to add if missing.
+
+    - Check GitHub Releases, APIs (e.g., `api2.cursor.sh`), or `install.sh`.
+
+2.  **Validate**: `curl -I <url>` to ensure assets exist.
+
+3.  **Apply**: Update `version` in `Makefile`. No trailing whitespace.
+
+4.  **Verify**: `make -C <dir>` then `<tool> --version`.
+
+5.  **Commit**: `feat(<dir>): bump to v<version>`.
+
+    - **Optional**: Include release notes/changelog link in body if easily fetchable.
+
+
 
 ## Commit Attribution
 - Follow Conventional Commits.

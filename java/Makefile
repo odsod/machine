@@ -1,5 +1,6 @@
 name := java
-version := 21
+# Policy: Track the latest LTS version available in Fedora repos.
+version := 25
 environment := ~/.config/environment.d/10-$(name).conf
 
 .PHONY: install-packages
