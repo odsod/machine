@@ -1,6 +1,7 @@
 name := cursor
-version := 2.0.64
-rpm_url := https://downloads.cursor.com/production/25412918da7e74b2686b25d62da1f01cfcd27683/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
+# Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/2.4
+version := 2.4.30
+rpm_url := https://downloads.cursor.com/production/0f8217a84adf66daf250228a3ebf0da631d3c9b5/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 
 .PHONY: all
 all: \
