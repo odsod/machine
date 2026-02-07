@@ -19,7 +19,7 @@ enable-plugin:
 .PHONY: install-package
 install-package:
 	$(info [$(name)] Installing Plasma package...)
-	@kpackagetool6 --type=KWin/Script --install .
+	@kpackagetool6 --type=KWin/Script --upgrade .
 
 .PHONY: uninstall-package
 uninstall-package:

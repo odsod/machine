@@ -14,5 +14,6 @@ install-packages: ~/.config/ghostty/config ~/.config/ghostty/themes
 .PHONY: ~/.config/ghostty/themes
 ~/.config/ghostty/themes: themes
 	$(info [$(name)] Symlinking $@...)
+	@rm -rf $@
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

@@ -3,7 +3,9 @@ name := fish
 .PHONY: change-shell
 change-shell: install-package
 	$(info [$(name)] Changing login shell...)
-	@chsh -s $(shell which fish)
+	@if [ "$$SHELL" != "$$(which fish)" ]; then \
+		chsh -s $$(which fish); \
+	fi
 
 .PHONY: install-package
 install-package: ~/.config/fish/config.fish

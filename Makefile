@@ -3,8 +3,6 @@ name := machine
 .PHONY: install
 install: \
 	~/.config/environment.d/00-machine.conf \
-	enable-rpmfusion-free \
-	enable-rpmfusion-nonfree \
 	install-packages \
 	install-flatpak-packages \
 	install-modules
@@ -15,18 +13,8 @@ install: \
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: enable-rpmfusion-free
-enable-rpmfusion-free:
-	$(info [$(name)] Enabling RPM Fusion free repository...)
-	@sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(shell rpm -E %fedora).noarch.rpm
-
-.PHONY: enable-rpmfusion-nonfree
-enable-rpmfusion-nonfree:
-	$(info [$(name)] Enabling RPM Fusion nonfree repository...)
-	@sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(shell rpm -E %fedora).noarch.rpm
-
 .PHONY: install-packages
-install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree enable-terra
+install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install \
 		ca-certificates \
@@ -65,29 +53,16 @@ install-packages: enable-rpmfusion-free enable-rpmfusion-nonfree enable-terra
 		yt-dlp \
 		-y -q
 
-.PHONY: install-amd-hardware-codecs
-install-amd-hardware-codecs:
-	$(info [$(name)] Installing AMD hardware codecs...)
-	@sudo dnf swap mesa-va-drivers mesa-va-drivers-freeworld
-	@sudo dnf swap mesa-vdpau-drivers mesa-vdpau-drivers-freeworld
-
-.PHONY: enable-terra
-enable-terra:
-	$(info [$(name)] Enabling Terra repository...)
-	@sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release || true
-	@sudo dnf config-manager setopt terra\*.priority=100
-
 .PHONY: enable-flathub
 enable-flathub: install-packages
 	$(info [$(name)] Enabling Flathub repository...)
-	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
 
 .PHONY: install-flatpak-packages
 install-flatpak-packages: enable-flathub
 	$(info [$(name)] Installing Flatpak packages...)
 	@flatpak install flathub \
-		com.spotify.Client \
-		org.soapui.SoapUI
+		com.spotify.Client
 
 .PHONY: install-modules
 install-modules:
