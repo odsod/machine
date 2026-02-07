@@ -1,6 +1,7 @@
 name := slack
-version := 4.41.105
-build := 4.41.105-0.1.el8
+# Discovery: https://slack.com/release-notes/linux
+version := 4.47.69
+build := 4.47.69-0.1.el8
 package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm
 
 .PHONY: install-package
