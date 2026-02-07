@@ -94,6 +94,7 @@ const shortcuts = [
       "--app=https://linear.app",
     ],
     resourceClassIncludes: "linear.app",
+    noBorder: true,
   },
 
   {
@@ -126,6 +127,7 @@ const shortcuts = [
     kind: "app",
     command: ["slack"],
     resourceClass: "Slack",
+    noBorder: true,
   },
 
   {
@@ -146,6 +148,7 @@ const shortcuts = [
       "com.spotify.Client",
     ],
     resourceClass: "Spotify",
+    noBorder: true,
   },
 
   {
@@ -197,6 +200,7 @@ const shortcuts = [
     kind: "app",
     command: ["cursor"],
     resourceName: "cursor",
+    noBorder: true,
   },
 
   {
@@ -217,6 +221,7 @@ const shortcuts = [
       "--app=https://discord.com",
     ],
     resourceClassIncludes: "discord.com",
+    noBorder: true,
   },
 
   {
@@ -256,80 +261,32 @@ const shortcuts = [
   },
 ];
 
-function registerAppShortcut(shortcut) {
-  log("registering app shortcut", JSON.stringify(shortcut));
-  registerShortcut(
-    shortcut.actionId[1],
-    shortcut.actionId[3],
-    shortcut.key,
-    function () {
-      log("handling app shortcut", JSON.stringify(shortcut));
-      const window = workspace.stackingOrder.find(function (window) {
-        if (shortcut.resourceName) {
-          return window.resourceName.toString() === shortcut.resourceName;
-        } else if (shortcut.resourceClass) {
-          return window.resourceClass.toString() === shortcut.resourceClass;
-        } else if (shortcut.resourceClassIncludes) {
-          return window.resourceClass
-            .toString()
-            .includes(shortcut.resourceClassIncludes);
-        } else {
-          return false;
-        }
-      });
-      if (window) {
-        if (window.minimized) {
-          window.minimized = false;
-          workspace.activeWindow = window;
-        } else if (workspace.activeWindow != window) {
-          workspace.activeWindow = window;
-        } else {
-          window.minimized = true;
-        }
-        log("early return");
-        return;
-      }
-      log("starting");
-      callDBus(
-        "io.github.odsod.kwin",
-        "/",
-        "io.github.odsod.kwin.Service",
-        "run_shortcut",
-        JSON.stringify(shortcut),
-      );
-    },
-  );
+function matchesShortcut(window, shortcut) {
+  if (shortcut.resourceName) {
+    return window.resourceName.toString() === shortcut.resourceName;
+  } else if (shortcut.resourceClass) {
+    return window.resourceClass.toString() === shortcut.resourceClass;
+  } else if (shortcut.resourceClassIncludes) {
+    return window.resourceClass
+      .toString()
+      .includes(shortcut.resourceClassIncludes);
+  }
+  return false;
 }
 
-function registerCommandShortcut(shortcut) {
-  log("registering command shortcut", JSON.stringify(shortcut));
-  registerShortcut(
-    shortcut.actionId[1],
-    shortcut.actionId[3],
-    shortcut.key,
-    function () {
-      log("handling command shortcut", JSON.stringify(shortcut));
-      callDBus(
-        "io.github.odsod.kwin",
-        "/",
-        "io.github.odsod.kwin.Service",
-        "run_shortcut",
-        JSON.stringify(shortcut),
-      );
-    },
-  );
+function findWindow(shortcut) {
+  return workspace.stackingOrder.find(function (window) {
+    return matchesShortcut(window, shortcut);
+  });
 }
 
-function registerCallbackShortcut(shortcut) {
-  log("registering callback shortcut", JSON.stringify(shortcut.actionId));
-  registerShortcut(
-    shortcut.actionId[1],
-    shortcut.actionId[3],
-    shortcut.key,
-    function () {
-      log("handling callback shortcut", JSON.stringify(shortcut.actionId));
-      shortcut.callback();
-    },
+function runCommand(shortcut) {
+  callDBus(
+    "io.github.odsod.kwin",
+    "/",
+    "io.github.odsod.kwin.Service",
+    "run_shortcut",
+    JSON.stringify(shortcut),
   );
 }
 
@@ -344,17 +301,37 @@ function log(...args) {
 }
 
 shortcuts.forEach(function (shortcut) {
-  switch (shortcut.kind) {
-    case "app":
-      registerAppShortcut(shortcut);
-      break;
-    case "command":
-      registerCommandShortcut(shortcut);
-      break;
-    case "callback":
-      registerCallbackShortcut(shortcut);
-      break;
+  if (shortcut.kind === "builtin") {
+    return;
   }
+  log("registering shortcut", shortcut.actionId[1]);
+  registerShortcut(
+    shortcut.actionId[1],
+    shortcut.actionId[3],
+    shortcut.key,
+    function () {
+      log("handling shortcut", shortcut.actionId[1]);
+      if (shortcut.kind === "callback") {
+        shortcut.callback();
+        return;
+      }
+      if (shortcut.kind === "app") {
+        var window = findWindow(shortcut);
+        if (window) {
+          if (window.minimized) {
+            window.minimized = false;
+            workspace.activeWindow = window;
+          } else if (workspace.activeWindow != window) {
+            workspace.activeWindow = window;
+          } else {
+            window.minimized = true;
+          }
+          return;
+        }
+      }
+      runCommand(shortcut);
+    },
+  );
 });
 
 callDBus(
@@ -367,3 +344,14 @@ callDBus(
     log("shortcuts configured");
   },
 );
+
+function applyNoBorder(window) {
+  shortcuts.forEach(function (shortcut) {
+    if (shortcut.noBorder && matchesShortcut(window, shortcut)) {
+      window.noBorder = true;
+    }
+  });
+}
+
+workspace.stackingOrder.forEach(applyNoBorder);
+workspace.windowAdded.connect(applyNoBorder);
