@@ -1,5 +1,6 @@
 name := jetbrains-toolbox
-version := 2.6.2.41321
+# Discovery: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
+version := 3.2.0.65851
 archive_url := https://download.jetbrains.com/toolbox/jetbrains-toolbox-$(version).tar.gz
 
 .PHONY: ~/.local/bin/jetbrains-toolbox
