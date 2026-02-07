@@ -1,5 +1,5 @@
 name := yaak
-version := 2026.1.0
+version := 2026.1.2
 package_url := https://github.com/mountain-loop/yaak/releases/download/v$(version)/yaak-$(version)-1.x86_64.rpm
 
 .PHONY: install-package
