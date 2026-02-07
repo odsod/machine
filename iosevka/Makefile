@@ -1,7 +1,7 @@
 name := iosevka
 version := 34.1.0
 archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-IosevkaSS08-$(version).zip
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/share/fonts/iosevka
 ~/.local/share/fonts/iosevka: $(data_dir)/$(version)/IosevkaSS08-Regular.ttc

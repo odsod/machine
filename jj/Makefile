@@ -1,7 +1,7 @@
 name := jj
 version := 0.38.0
 archive_url := https://github.com/jj-vcs/jj/releases/download/v$(version)/jj-v$(version)-x86_64-unknown-linux-musl.tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(version)/jj ~/.config/jj/config.toml

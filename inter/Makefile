@@ -1,7 +1,7 @@
 name := inter
 version := 4.1
 archive_url := https://github.com/rsms/inter/releases/download/v$(version)/Inter-$(version).zip
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/share/fonts/inter.ttc
 ~/.local/share/fonts/inter.ttc: $(data_dir)/$(version)/Inter.ttc

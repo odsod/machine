@@ -2,7 +2,7 @@ name := buf
 # https://github.com/bufbuild/buf/releases
 version := 1.65.0
 archive_url := https://github.com/bufbuild/buf/releases/download/v$(version)/buf-Linux-x86_64.tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(version)/buf/bin/buf

@@ -1,7 +1,7 @@
 name := yaegi
 version := 0.16.1
 archive_url := https://github.com/traefik/yaegi/releases/download/v$(version)/yaegi_v$(version)_linux_amd64.tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(version)/$(name)

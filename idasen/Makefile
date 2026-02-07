@@ -1,6 +1,6 @@
 name := idasen
 version := 0.12.0
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 venv_dir := $(data_dir)/$(version)/venv
 venv_pip := $(venv_dir)/bin/pip
 cmd := $(venv_dir)/bin/$(name)

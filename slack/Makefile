@@ -3,7 +3,7 @@ name := slack
 version := 4.47.69
 build := 4.47.69-0.1.el8
 package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: install-package
 install-package: $(data_dir)/$(version)/package.rpm

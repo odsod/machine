@@ -1,7 +1,7 @@
 name := soap-ui
 version := 5.9.1
 archive_url := https://dl.eviware.com/soapuios/$(version)/SoapUI-$(version)-linux-bin.tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(version)/SoapUI-$(version)/bin/soapui.sh

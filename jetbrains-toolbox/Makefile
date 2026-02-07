@@ -2,7 +2,7 @@ name := jetbrains-toolbox
 # Discovery: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
 version := 3.2.0.65851
 archive_url := https://download.jetbrains.com/toolbox/jetbrains-toolbox-$(version).tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/jetbrains-toolbox
 ~/.local/bin/jetbrains-toolbox: $(data_dir)/$(version)/jetbrains-toolbox-$(version)/jetbrains-toolbox

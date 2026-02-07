@@ -1,7 +1,7 @@
 name := jwt-cli
 version := 6.2.0
 archive_url := https://github.com/mike-engel/jwt-cli/releases/download/$(version)/jwt-linux.tar.gz
-data_dir := $(HOME)/.local/share/odsod/machine/$(name)
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/jwt
 ~/.local/bin/jwt: $(data_dir)/$(version)/jwt
