@@ -31,6 +31,28 @@ We rely on agents to keep tool versions up-to-date.
     - **Format**: `feat(<directory_name>): bump to v<new_version>`
     - **Example**: `feat(buf): bump to v1.65.0`
 
+## Autonomous Update Workflow
+
+When tasked with updating tools, follow this advanced workflow:
+
+1.  **Discovery**:
+    - **GitHub**: Check the `/releases` page for the latest tag.
+    - **APIs**: Some tools have JSON APIs for releases (e.g., `encore` uses `https://encore.dev/api/releases`).
+    - **Install Scripts**: If the discovery method is unclear, inspect the tool's official `install.sh` or download page to find hidden API endpoints or redirect patterns (e.g., `cursor` uses `api2.cursor.sh`).
+    - **Documentation**: Always add a `# Discovery: <url>` or similar comment in the `Makefile` if you find a new way to check for versions.
+
+2.  **Asset Validation**:
+    - Before applying an update, use `curl -I <download_url>` to ensure the file exists.
+    - *Warning*: Sometimes GitHub tags exist before the assets (RPMs, Binaries) are finished uploading. Do not bump the version until the specific asset for our architecture is available.
+
+3.  **Applying the Change**:
+    - Update the `version` variable.
+    - **Clean Variables**: Ensure there is no trailing whitespace in the `version` variable. Place comments on the line *above* the variable if needed.
+
+4.  **Verification**:
+    - Run `make -C <tool_directory>` to verify the download and installation.
+    - If the tool is already in the `PATH` or symlinked, run `<tool> --version` to confirm the binary is functional and reports the correct version.
+
 ## Conventions
 
 - **Idempotency**: Makefiles should be idempotent.
