@@ -1,42 +1,60 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = '''$directory$git_branch$git_status$direnv$gcloud$golang$nodejs$python$terraform
+format = '''$directory$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$docker_context$cmd_duration
 $character'''
 
 add_newline = true
 
 [character]
-success_symbol = '[\$](white)'
-error_symbol = '[\$](red)'
+success_symbol = '[\$](#D8DEE9)'
+error_symbol = '[\$](#BF616A)'
 
 [directory]
 truncation_length = 0
 truncate_to_repo = false
 truncation_symbol = '.../'
-style = 'yellow'
+style = '#EBCB8B'
+
+[cmd_duration]
+format = '\[[took $duration]($style)\]'
+style = '#EBCB8B'
 
 [direnv]
 format = '\[[$rc_path]($style)\]'
+style = '#D08770'
 
-[gcloud]
-format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
-detect_env_vars = ['GOOGLE_CLOUD_PROJECT']
+[docker_context]
+format = '\[[$symbol$context]($style)\]'
+style = '#88C0D0'
 
 [git_branch]
-format = '\[[$branch]($style)'
-style = 'blue'
+format = '\[[$symbol$branch]($style)'
+style = '#81A1C1'
 
 [git_status]
 format = '[$all_status$ahead_behind]($style)\]'
+style = '#BF616A'
 
 [golang]
 format = '\[[$symbol($version)]($style)\]'
+style = '#88C0D0'
+
+[java]
+format = '\[[$symbol($version)]($style)\]'
+style = '#BF616A'
 
 [nodejs]
 format = '\[[$symbol($version)]($style)\]'
+style = '#EBCB8B'
 
 [python]
 format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+style = '#A3BE8C'
+
+[rust]
+format = '\[[$symbol($version)]($style)\]'
+style = '#D08770'
 
 [terraform]
 format = '\[[$symbol$workspace]($style)\]'
+style = '#B48EAD'
