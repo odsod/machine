@@ -2,19 +2,12 @@ name := machine
 
 .PHONY: install
 install: \
-	~/.config/plasma-workspace/env/environment.d.sh \
 	~/.config/environment.d/00-machine.conf \
 	enable-rpfusion-free \
 	enable-rpfusion-nonfree \
 	install-packages \
 	install-flatpak-packages \
 	install-modules
-
-.PHONY: ~/.config/plasma-workspace/env/environment.d.sh
-~/.config/plasma-workspace/env/environment.d.sh: environment.d.sh
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
 
 .PHONY: ~/.config/environment.d/00-machine.conf
 ~/.config/environment.d/00-machine.conf: environment.conf
