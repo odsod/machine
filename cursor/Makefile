@@ -27,7 +27,6 @@ install-rpm: $(data_dir)/$(version)/cursor.rpm
 	$(info [$(name)] Installing $@...)
 	@sudo dnf install -y $<
 
-.PHONY: $(data_dir)/$(version)/cursor.rpm
 $(data_dir)/$(version)/cursor.rpm:
 	$(info [$(name)] Downloading RPM...)
 	@mkdir -p $(dir $@)

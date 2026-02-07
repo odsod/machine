@@ -53,13 +53,8 @@ install-packages:
 		yt-dlp \
 		-y -q
 
-.PHONY: enable-flathub
-enable-flathub: install-packages
-	$(info [$(name)] Enabling Flathub repository...)
-	@flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
-
 .PHONY: install-flatpak-packages
-install-flatpak-packages: enable-flathub
+install-flatpak-packages:
 	$(info [$(name)] Installing Flatpak packages...)
 	@flatpak install flathub \
 		com.spotify.Client
