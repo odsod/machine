@@ -1,9 +1,9 @@
 name := iosevka
-version := 34.0.0
-archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-Iosevka-$(version).zip
+version := 34.1.0
+archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-IosevkaSS08-$(version).zip
 
 .PHONY: ~/.local/share/fonts/iosevka
-~/.local/share/fonts/iosevka: build/$(version)/Iosevka-Regular.ttc
+~/.local/share/fonts/iosevka: build/$(version)/IosevkaSS08-Regular.ttc
 	$(info [$(name)] Installing fonts...)
 	@mkdir -p ~/.local/share/fonts
 	@ln -fs $(abspath $(dir $<)) $@
