@@ -44,7 +44,7 @@
 
 ## Commit Attribution
 - Follow Conventional Commits.
-- **Short Headings**: Keep headings concise. Use the body for details if needed.
+- **Short Headings**: Max 50 chars. Use body for details.
 - **Template**: `feat(scope): description`.
 
 ## Maintaining This File
