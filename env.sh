@@ -29,7 +29,7 @@ export PATH="$JAVA_HOME/bin:$PATH"
 export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
 
 # neovim
-export EDITOR="vim"
+export EDITOR="nvim"
 
 # npm
 export PATH="$HOME/.local/share/npm/bin:$PATH"
