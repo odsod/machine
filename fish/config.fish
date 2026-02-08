@@ -7,16 +7,6 @@ if not status is-interactive
     return
 end
 
-abbr -a vim nvim
-abbr -a vi nvim
-abbr -a cat bat
-abbr -a find fd
-
-fish_vi_key_bindings
-
-starship init fish | source
-fzf --fish | source
-
 # VS Code / Cursor Shell Integration
 if test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
     set -l bin code
@@ -29,6 +19,19 @@ if test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
         test -f "$integration"; and source "$integration"
     end
 end
+
+abbr -a vim nvim
+abbr -a vi nvim
+abbr -a cat bat
+abbr -a find fd
+
+# Enable Vi mode (Only in standalone terminals)
+if not test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
+    fish_vi_key_bindings
+end
+
+starship init fish | source
+fzf --fish | source
 
 # --- Helpers ---
 
@@ -56,7 +59,12 @@ function _fzf_jump_dir --argument-names root prompt mode
     set -l target (fd $opts | fzf --prompt="$prompt> ")
     if test -n "$target"
         cd "$root/$target"
-        set fish_bind_mode insert
+        # Only switch to insert mode if Vi bindings are active
+        if functions -q fish_vi_key_bindings
+             if not test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
+                set fish_bind_mode insert
+            end
+        end
         commandline -f repaint
     end
 end
@@ -66,6 +74,7 @@ function fish_user_key_bindings
 
     # Ctrl-f: Find File (Smart Base) - CLEAN
     bind \cf '_fzf_search_files clean'
+    # Bind for Insert mode only if Vi bindings are active
     bind -M insert \cf '_fzf_search_files clean'
 
     # Alt-f: Find File (Smart Base) - ALL (Hidden + No Ignore)
@@ -73,6 +82,7 @@ function fish_user_key_bindings
     bind -M insert \ef '_fzf_search_files all'
 
     # --- Normal Mode Bindings ---
+    # These will only be effective if default/command mode is accessible (i.e. Vi mode)
 
     # u: Up Directory
     bind -M default u 'cd ..; commandline -f repaint'
