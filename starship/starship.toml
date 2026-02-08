@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = '''$directory$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$docker_context$cmd_duration
+format = '''$directory$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$gcloud$docker_context$cmd_duration
 $character'''
 
 add_newline = true
@@ -72,3 +72,8 @@ style = '#D08770'
 symbol = ""
 format = '\[[$symbol $workspace]($style)\]'
 style = '#B48EAD'
+
+[gcloud]
+symbol = "󱇶 "
+format = '\[[$symbol $project]($style)\]'
+style = '#81A1C1'
