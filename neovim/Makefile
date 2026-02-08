@@ -4,8 +4,7 @@ name := neovim
 all: \
 	install-packages \
 	update-alternatives \
-	~/.config/nvim/init.lua \
-	~/.local/share/nvim/site/autoload/plug.vim
+	~/.config/nvim/init.lua
 
 .PHONY: update-alternatives
 update-alternatives:
@@ -20,11 +19,6 @@ update-alternatives:
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y neovim
-
-~/.local/share/nvim/site/autoload/plug.vim:
-	$(info [$(name)] Installing $@...)
-	@mkdir -p $(dir $@)
-	@curl -o $@ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 .PHONY: ~/.config/nvim/init.lua
 ~/.config/nvim/init.lua: init.lua
