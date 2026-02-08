@@ -70,20 +70,20 @@ function fish_user_key_bindings
     # p: Project Directory Jump (Clean)
     bind -M default p '
         set -l root (git rev-parse --show-toplevel 2>/dev/null); or set root "."
-        _fzf_jump_dir $root "Project CD" clean
+        _fzf_jump_dir $root "Project" clean
     '
 
     # P: Project Directory Jump (All)
     bind -M default P '
         set -l root (git rev-parse --show-toplevel 2>/dev/null); or set root "."
-        _fzf_jump_dir $root "Project ALL" all
+        _fzf_jump_dir $root "Project" all
     '
 
     # c: Code Directory Jump (Clean)
-    bind -M default c "_fzf_jump_dir $HOME/Code 'Code CD' clean"
+    bind -M default c "_fzf_jump_dir $HOME/Code 'Code' clean"
 
     # C: Code Directory Jump (All)
-    bind -M default C "_fzf_jump_dir $HOME/Code 'Code ALL' all"
+    bind -M default C "_fzf_jump_dir $HOME/Code 'Code' all"
 end
 
 # Colorscheme: Nord
