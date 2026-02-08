@@ -2,7 +2,7 @@
 
 [user]
 name = "Oscar Söderlund"
-email = "odsod@noreply.users.github.com"
+email = "odsod@users.noreply.github.com"
 
 [templates]
 git_push_bookmark = '"odsod/push-" ++ change_id.short()'
@@ -10,7 +10,15 @@ git_push_bookmark = '"odsod/push-" ++ change_id.short()'
 [aliases]
 rebase-all = ["rebase", "-s", "(::trunk())+ & mutable()", "-d", "trunk()"]
 pr = ["util", "exec", "--", "bash", "-c", "jj git push -c @ && gh pr create --head \"odsod/push-$(jj log --no-graph -r @ -T 'change_id.short()')\" --fill"]
+delta = ["diff", "--config", "ui.diff-formatter=\":git\"", "--config", "ui.pager=\"delta\""]
 
 [ui]
 editor = ["nvim"]
 default-command = ["log", "--reversed"]
+show-diff-on-description-edit = true
+pager = "delta"
+diff-formatter = "difft"
+
+[merge-tools.difft]
+program = "difft"
+diff-args = ["--color=always", "$left", "$right"]

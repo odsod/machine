@@ -26,6 +26,7 @@ install-packages:
 	@sudo dnf install \
 		ca-certificates \
 		curl \
+		difftastic \
 		dnf5-plugins \
 		dos2unix \
 		fd-find \
