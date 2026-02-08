@@ -12,11 +12,16 @@ abbr -a vi nvim
 abbr -a cat bat
 abbr -a find fd
 
-# Enable Vi mode
 fish_vi_key_bindings
 
 starship init fish | source
 fzf --fish | source
+
+# Cursor Shell Integration
+if test "$TERM_PROGRAM" = "cursor"; and type -q cursor
+    set -l cursor_integration (cursor --locate-shell-integration-path fish)
+    test -f "$cursor_integration"; and source "$cursor_integration"
+end
 
 # --- Helpers ---
 
@@ -48,8 +53,6 @@ function _fzf_jump_dir --argument-names root prompt mode
         commandline -f repaint
     end
 end
-
-# --- Bindings ---
 
 function fish_user_key_bindings
     fzf_key_bindings
