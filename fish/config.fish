@@ -17,10 +17,17 @@ fish_vi_key_bindings
 starship init fish | source
 fzf --fish | source
 
-# Cursor Shell Integration
-if test "$TERM_PROGRAM" = "cursor"; and type -q cursor
-    set -l cursor_integration (cursor --locate-shell-integration-path fish)
-    test -f "$cursor_integration"; and source "$cursor_integration"
+# VS Code / Cursor Shell Integration
+if test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
+    set -l bin code
+    if test "$TERM_PROGRAM" = "cursor"
+        set bin cursor
+    end
+
+    if type -q $bin
+        set -l integration ($bin --locate-shell-integration-path fish)
+        test -f "$integration"; and source "$integration"
+    end
 end
 
 # --- Helpers ---
