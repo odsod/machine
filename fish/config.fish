@@ -8,15 +8,13 @@ if not status is-interactive
 end
 
 # VS Code / Cursor Shell Integration
-if test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
-    set -l bin code
-    if test "$TERM_PROGRAM" = "cursor"
-        set bin cursor
-    end
-
-    if type -q $bin
-        set -l integration ($bin --locate-shell-integration-path fish)
-        test -f "$integration"; and source "$integration"
+if test "$TERM_PROGRAM" = "vscode"
+    for bin in cursor code
+        if type -q $bin
+            set -l integration ($bin --locate-shell-integration-path fish)
+            test -f "$integration"; and source "$integration"
+            break
+        end
     end
 end
 
@@ -26,7 +24,7 @@ abbr -a cat bat
 abbr -a find fd
 
 # Enable Vi mode (Only in standalone terminals)
-if not test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
+if not test "$TERM_PROGRAM" = "vscode"
     fish_vi_key_bindings
 end
 
@@ -61,7 +59,7 @@ function _fzf_jump_dir --argument-names root prompt mode
         cd "$root/$target"
         # Only switch to insert mode if Vi bindings are active
         if functions -q fish_vi_key_bindings
-             if not test "$TERM_PROGRAM" = "vscode" -o "$TERM_PROGRAM" = "cursor"
+             if not test "$TERM_PROGRAM" = "vscode"
                 set fish_bind_mode insert
             end
         end
