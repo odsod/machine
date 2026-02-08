@@ -13,7 +13,11 @@ if test "$TERM_PROGRAM" = "vscode"
         set -l integration (code --locate-shell-integration-path fish)
         test -f "$integration"; and source "$integration"
     end
-    return
+    
+    # Exit early only for Agent sessions
+    if set -q CURSOR_AGENT
+        return
+    end
 end
 
 abbr -a vim nvim
