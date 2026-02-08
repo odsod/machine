@@ -49,7 +49,7 @@
 
 ## Commit Attribution
 - Follow Conventional Commits.
-- **Short Headings**: Max 50 chars. Use body for details.
+- **CRITICAL**: Header MUST be <= 50 chars. Verify before committing.
 - **Template**: `feat(scope): description`.
 
 ## Maintaining This File
