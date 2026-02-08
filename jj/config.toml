@@ -2,7 +2,7 @@
 
 [user]
 name = "Oscar Söderlund"
-email = "odsod@noreply.users.github.com"
+email = "odsod@users.noreply.github.com"
 
 [templates]
 git_push_bookmark = '"odsod/push-" ++ change_id.short()'
