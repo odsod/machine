@@ -63,6 +63,7 @@ function fish_user_key_bindings
         set -l target (fd --type d --base-directory "$root" --strip-cwd-prefix --exclude .git | fzf --prompt="Project CD> ")
         if test -n "$target"
             cd "$root/$target"
+            set fish_bind_mode insert
             commandline -f repaint
         end
     '
@@ -77,6 +78,7 @@ function fish_user_key_bindings
         set -l target (fd --type d --base-directory "$root" --strip-cwd-prefix --hidden --no-ignore --exclude .git | fzf --prompt="Project ALL> ")
         if test -n "$target"
             cd "$root/$target"
+            set fish_bind_mode insert
             commandline -f repaint
         end
     '
@@ -86,6 +88,7 @@ function fish_user_key_bindings
         set -l target (fd --type d --base-directory $HOME/Code --strip-cwd-prefix --exclude .git | fzf --prompt="Code CD> ")
         if test -n "$target"
             cd "$HOME/Code/$target"
+            set fish_bind_mode insert
             commandline -f repaint
         end
     '
@@ -95,6 +98,7 @@ function fish_user_key_bindings
         set -l target (fd --type d --base-directory $HOME/Code --strip-cwd-prefix --hidden --no-ignore --exclude .git | fzf --prompt="Code ALL> ")
         if test -n "$target"
             cd "$HOME/Code/$target"
+            set fish_bind_mode insert
             commandline -f repaint
         end
     '
