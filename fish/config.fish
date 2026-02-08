@@ -9,12 +9,9 @@ end
 
 # VS Code / Cursor Shell Integration
 if test "$TERM_PROGRAM" = "vscode"
-    for bin in cursor code
-        if type -q $bin
-            set -l integration ($bin --locate-shell-integration-path fish)
-            test -f "$integration"; and source "$integration"
-            break
-        end
+    if type -q code
+        set -l integration (code --locate-shell-integration-path fish)
+        test -f "$integration"; and source "$integration"
     end
 end
 
