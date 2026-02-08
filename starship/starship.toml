@@ -34,11 +34,13 @@ format = '\[[$rc_path]($style)\]'
 style = '#D08770'
 
 [docker_context]
-format = '\[[$symbol$context]($style)\]'
+symbol = ""
+format = '\[[$symbol $context]($style)\]'
 style = '#88C0D0'
 
 [git_branch]
-format = '\[[$symbol$branch]($style)'
+symbol = ""
+format = '\[[$symbol $branch]($style)'
 style = '#81A1C1'
 
 [git_status]
@@ -46,25 +48,31 @@ format = '[$all_status$ahead_behind]($style)\]'
 style = '#BF616A'
 
 [golang]
-format = '\[[$symbol($version)]($style)\]'
+symbol = ""
+format = '\[[$symbol ($version)]($style)\]'
 style = '#88C0D0'
 
 [java]
-format = '\[[$symbol($version)]($style)\]'
+symbol = ""
+format = '\[[$symbol ($version)]($style)\]'
 style = '#BF616A'
 
 [nodejs]
-format = '\[[$symbol($version)]($style)\]'
+symbol = ""
+format = '\[[$symbol ($version)]($style)\]'
 style = '#EBCB8B'
 
 [python]
-format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+symbol = ""
+format = '\[[$symbol ${pyenv_prefix}($version)(\($virtualenv\))]($style)\]'
 style = '#A3BE8C'
 
 [rust]
-format = '\[[$symbol($version)]($style)\]'
+symbol = ""
+format = '\[[$symbol ($version)]($style)\]'
 style = '#D08770'
 
 [terraform]
-format = '\[[$symbol$workspace]($style)\]'
+symbol = ""
+format = '\[[$symbol $workspace]($style)\]'
 style = '#B48EAD'
