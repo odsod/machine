@@ -1,132 +1,147 @@
-vim.api.nvim_exec(
-[[
-call plug#begin('~/.local/share/nvim/plugged')
-Plug 'arcticicestudio/nord-vim'
-Plug 'itchyny/lightline.vim'
-Plug 'scrooloose/nerdcommenter'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-abolish'
-Plug 'Valloric/ListToggle'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'godlygeek/tabular'
-Plug 'bufbuild/vim-buf'
-Plug 'neovim/nvim-lspconfig'
-Plug 'dense-analysis/ale'
-Plug 'sheerun/vim-polyglot'
-" Telescope
-Plug 'nvim-lua/popup.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-call plug#end()
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({ "git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath })
+end
+vim.opt.rtp:prepend(lazypath)
 
-filetype plugin indent on
+-- Leader key
+vim.g.mapleader = " "
 
-colorscheme nord
-let g:lightline = {'colorscheme': 'nord'}
-]], false)
+require("lazy").setup({
+  -- Theme: Nord
+  {
+    "shaunsingh/nord.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.g.nord_italic = false
+      vim.g.nord_bold = false
+      require("nord").set()
+    end,
+  },
 
-vim.opt.mouse = ''
-vim.opt.cursorline = true
-vim.opt.expandtab = true
-vim.opt.hidden = true
-vim.opt.hlsearch = true
-vim.opt.ignorecase = true
-vim.opt.number = true
-vim.opt.shiftwidth = 2
-vim.opt.smartcase = true
-vim.opt.smartindent = true
-vim.opt.tabstop = 2
-vim.opt.title = true
-vim.opt.wildignorecase = true
-vim.opt.wildmode = 'list:longest,full'
-vim.opt.shortmess = 'atI'
+  -- UI & Tools
+  { "nvim-lualine/lualine.nvim", opts = { options = { theme = "nord", icons_enabled = false } } },
+  { "nvim-tree/nvim-tree.lua", opts = { view = { width = 30 }, renderer = { group_empty = true, icons = { show = { file = false, folder = false, folder_arrow = true, git = false } } } } },
+  { "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
+  { "tpope/vim-fugitive" },
+  { "numToStr/Comment.nvim", opts = {} },
+  { "lewis6991/gitsigns.nvim", opts = {} },
 
-vim.api.nvim_exec(
-[[
-" Keymaps
-set timeoutlen=400
-nnoremap <C-n> <cmd>Telescope find_files<cr>
-nnoremap <C-g> <cmd>Telescope live_grep<cr>
+  -- Treesitter: Better syntax highlighting
+  {
+    "nvim-treesitter/nvim-treesitter",
+    tag = "v0.9.2",
+    build = ":TSUpdate",
+    opts = {
+      ensure_installed = { "go", "python", "lua", "bash", "json", "yaml", "markdown" },
+      highlight = { enable = true },
+      indent = { enable = true },
+    },
+    config = function(_, opts)
+      require("nvim-treesitter.configs").setup(opts)
+    end,
+  },
 
-nmap <silent> <C-h> :wincmd h<CR>
-nmap <silent> <C-k> :wincmd k<CR>
-nmap <silent> <C-j> :wincmd j<CR>
-nmap <silent> <C-l> :wincmd l<CR>
+  -- LSP: Language Support
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/nvim-cmp",
+      "hrsh7th/cmp-nvim-lsp",
+    },
+    config = function()
+      require("mason").setup()
+      local lspconfig = require("lspconfig")
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-" Leader keymaps
-nnoremap <Space> <Nop>
-let mapleader = ' '
-" Leader: Top row
-let g:lt_quickfix_list_toggle_map = '<Leader>f'
-" Leader: Home row
-nnoremap <Leader>a :wqa<CR>
-nnoremap <Leader>i gg=G<C-O><C-O>
-nnoremap <Leader>t :NERDTreeToggle<CR>
-nnoremap <Leader>n :nohlsearch<CR>
-" Leader: Bottom row
-nnoremap <Leader>q :q<CR>
-nnoremap <Leader>w :w<CR>
-nnoremap <Leader>z :qa!<CR>
-" Leader: U
-nnoremap <Leader>ut :TableFormat<CR>
+      -- Setup 'ty' (Astral Python Type Checker)
+      if not require("lspconfig.configs").ty then
+        require("lspconfig.configs").ty = {
+          default_config = {
+            cmd = { "ty", "server" },
+            filetypes = { "python" },
+            root_dir = lspconfig.util.root_pattern("pyproject.toml", ".git"),
+          },
+        }
+      end
+      lspconfig.ty.setup({ capabilities = capabilities })
 
-" Autocommands
-augroup filetype_python
-  autocmd!
-  autocmd FileType python set tabstop=4 expandtab shiftwidth=4 softtabstop=4
-augroup END
+      -- Setup other servers via Mason
+      require("mason-lspconfig").setup({
+        ensure_installed = { "gopls", "ts_ls", "bashls", "lua_ls" },
+        handlers = {
+          function(server)
+            lspconfig[server].setup({ capabilities = capabilities })
+          end,
+          ["lua_ls"] = function()
+            lspconfig.lua_ls.setup({
+              capabilities = capabilities,
+              settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+            })
+          end,
+        },
+      })
 
-augroup filetype_conf
-  autocmd!
-  autocmd FileType conf set tabstop=2 expandtab shiftwidth=2 softtabstop=2
-augroup END
+      -- Autocompletion
+      local cmp = require("cmp")
+      cmp.setup({
+        mapping = cmp.mapping.preset.insert({
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping.select_next_item(),
+          ["<S-Tab>"] = cmp.mapping.select_prev_item(),
+        }),
+        sources = cmp.config.sources({ { name = "nvim_lsp" } }, { { name = "buffer" } }),
+      })
+    end,
+  },
 
-" Tag manipulation
-augroup xml
-  autocmd!
-  autocmd FileType html,xml,javascript.jsx inoremap <buffer> <C-t> <ESC>viw"tyea><ESC>bi<<ESC>lela</<ESC>"tpa><ESC>T>i
-  autocmd FileType html,xml,javascript.jsx inoremap <buffer> <C-n> <CR><CR><ESC>ka<Tab>
-augroup END
+  -- Formatting on Save
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        lua = { "stylua" },
+        python = { "isort", "black" },
+        javascript = { "prettier" },
+        go = { "goimports", "gofmt" },
+      },
+      format_on_save = { timeout_ms = 500, lsp_fallback = true },
+    },
+  },
+})
 
-" Markdown
-let g:vim_markdown_folding_disabled=1
-let g:vim_markdown_frontmatter=1
-augroup filetype_markdown
-  autocmd!
-  autocmd FileType markdown setlocal textwidth=80
-augroup END
+-- --- General Settings ---
+local opt = vim.opt
+opt.cursorline = true
+opt.expandtab = true
+opt.hidden = true
+opt.ignorecase = true
+opt.number = true
+opt.shiftwidth = 2
+opt.smartcase = true
+opt.tabstop = 2
+opt.title = true
+opt.wildmode = "list:longest,full"
+opt.shortmess = "atI"
+opt.mouse = ""
 
-" Go
-let g:go_fmt_command='goimports'
-let g:go_auto_type_info = 1
+-- --- Keymaps ---
+local map = vim.keymap.set
+map("n", "<C-h>", "<C-w>h")
+map("n", "<C-j>", "<C-w>j")
+map("n", "<C-k>", "<C-w>k")
+map("n", "<C-l>", "<C-w>l")
+map("n", "<C-n>", "<cmd>Telescope find_files<cr>")
+map("n", "<C-g>", "<cmd>Telescope live_grep<cr>")
 
-" NERDTree
-let g:NERDTreeMinimalUI=1
-let g:NERDTreeDirArrows=0
-let NERDTreeShowHidden=1
-let NERDTreeIgnore = []
-
-" Ale
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_linters_explicit = 1
-let g:ale_completion_enabled = 0
-let g:ale_linters = {
-\   'sh': ['shellcheck'],
-\   'go': ['golangci-lint'],
-\   'proto': ['buf-check-lint'],
-\}
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint', 'prettier'],
-\   'python': ['black'],
-\   'json': ['prettier'],
-\   'sh': ['shfmt'],
-\   'go': ['goimports'],
-\   'cpp': ['clang-format'],
-\   'haskell': ['hfmt'],
-\   'yaml': ['prettier'],
-\   'yaml.ansible': ['prettier'],
-\}
-let g:ale_fix_on_save = 1
-let g:ale_go_golangci_lint_options = ''
-]], false)
+map("n", "<leader>t", "<cmd>NvimTreeToggle<cr>")
+map("n", "<leader>w", ":w<CR>")
+map("n", "<leader>q", ":q<CR>")
+map("n", "<leader>a", ":wqa<CR>")
+map("n", "<leader>n", ":nohlsearch<CR>")
+map("n", "<leader>z", ":qa!<CR>")
+map("n", "<leader>i", "gg=G<C-O><C-O>")
