@@ -1,4 +1,5 @@
 name := idasen
+# Discovery: https://pypi.org/pypi/idasen/json
 version := 0.12.0
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 venv_dir := $(data_dir)/$(version)/venv

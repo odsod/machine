@@ -1,4 +1,5 @@
 name := yaak
+# Discovery: https://github.com/mountain-loop/yaak/releases/latest
 version := 2026.1.2
 package_url := https://github.com/mountain-loop/yaak/releases/download/v$(version)/yaak-$(version)-1.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

@@ -1,5 +1,5 @@
 name := cursor
-# Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/2.4
+# Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
 version := 2.4.30
 rpm_url := https://downloads.cursor.com/production/0f8217a84adf66daf250228a3ebf0da631d3c9b5/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

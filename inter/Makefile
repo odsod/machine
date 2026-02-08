@@ -1,4 +1,5 @@
 name := inter
+# Discovery: https://github.com/rsms/inter/releases/latest
 version := 4.1
 archive_url := https://github.com/rsms/inter/releases/download/v$(version)/Inter-$(version).zip
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

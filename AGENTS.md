@@ -27,21 +27,21 @@
 
 **Trigger**: "Let's bump versions" -> Agents must check ALL tools.
 
+1.  **Identify Candidates**:
+    - Search for `version :=` to find tools managed by version variables.
 
-
-1.  **Discover**:
-
+2.  **Discover**:
     - Check `# Discovery: <url>` in Makefile. **Mandatory** to add if missing.
+    - **Quality**: URL must be future-proof (e.g., `latest` endpoints, releases pages). Avoid hardcoded version paths in discovery URLs unless unavoidable.
+    - Check GitHub Releases, APIs, or project downloads pages.
 
-    - Check GitHub Releases, APIs (e.g., `api2.cursor.sh`), or `install.sh`.
+3.  **Validate**: `curl -I <url>` to ensure assets exist before editing Makefile.
 
-2.  **Validate**: `curl -I <url>` to ensure assets exist.
+4.  **Apply**: Update `version` in `Makefile`. No trailing whitespace.
 
-3.  **Apply**: Update `version` in `Makefile`. No trailing whitespace.
+5.  **Verify**: `make -C <dir>` then `<tool> --version`.
 
-4.  **Verify**: `make -C <dir>` then `<tool> --version`.
-
-5.  **Commit**: `feat(<dir>): bump to v<version>`.
+6.  **Commit**: `feat(<dir>): bump to v<version>`.
 
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 

@@ -1,5 +1,5 @@
 name := buf
-# https://github.com/bufbuild/buf/releases
+# Discovery: https://github.com/bufbuild/buf/releases/latest
 version := 1.65.0
 archive_url := https://github.com/bufbuild/buf/releases/download/v$(version)/buf-Linux-x86_64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

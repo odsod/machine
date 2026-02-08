@@ -1,5 +1,5 @@
 name := fx
-# https://github.com/antonmedv/fx/releases
+# Discovery: https://github.com/antonmedv/fx/releases/latest
 version := 39.2.0
 bin_url := https://github.com/antonmedv/fx/releases/download/$(version)/fx_linux_amd64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

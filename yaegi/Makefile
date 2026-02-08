@@ -1,4 +1,5 @@
 name := yaegi
+# Discovery: https://github.com/traefik/yaegi/releases/latest
 version := 0.16.1
 archive_url := https://github.com/traefik/yaegi/releases/download/v$(version)/yaegi_v$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
