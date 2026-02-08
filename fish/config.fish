@@ -13,6 +13,7 @@ if test "$TERM_PROGRAM" = "vscode"
         set -l integration (code --locate-shell-integration-path fish)
         test -f "$integration"; and source "$integration"
     end
+    return
 end
 
 abbr -a vim nvim
@@ -20,10 +21,8 @@ abbr -a vi nvim
 abbr -a cat bat
 abbr -a find fd
 
-# Enable Vi mode (Only in standalone terminals)
-if not test "$TERM_PROGRAM" = "vscode"
-    fish_vi_key_bindings
-end
+# Enable Vi mode
+fish_vi_key_bindings
 
 starship init fish | source
 fzf --fish | source
@@ -56,9 +55,7 @@ function _fzf_jump_dir --argument-names root prompt mode
         cd "$root/$target"
         # Only switch to insert mode if Vi bindings are active
         if functions -q fish_vi_key_bindings
-             if not test "$TERM_PROGRAM" = "vscode"
-                set fish_bind_mode insert
-            end
+            set fish_bind_mode insert
         end
         commandline -f repaint
     end
