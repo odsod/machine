@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = '''$directory${custom.jj}$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$docker_context$cmd_duration
+format = '''$directory$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$docker_context$cmd_duration
 $character'''
 
 add_newline = true
@@ -19,11 +19,7 @@ truncate_to_repo = false
 truncation_symbol = '.../'
 style = '#EBCB8B'
 
-[custom.jj]
-command = "jj log -r @ -n 1 --no-graph -T 'if(immutable, \" \", \"✎ \") ++ change_id.shortest() ++ if(conflict, \" \") ++ if(bookmarks, \"  \" ++ bookmarks.map(|bm| bm.name()).join(\", \"))'"
-when = "jj root"
-style = "#81A1C1"
-format = '\[[$output]($style)\]'
+
 
 [cmd_duration]
 format = '\[[took $duration]($style)\]'
