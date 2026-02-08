@@ -1,30 +1,51 @@
+# Theme & Window
 theme = Nord
-window-padding-y = 8
-window-padding-x = 8
-window-padding-color = background
-window-decoration = none
 window-theme = ghostty
-font-family = Iosevka SS08
-font-feature = -calt, -liga, -dlig
-font-size = 11
-window-title-font-family = Iosevka
-confirm-close-surface = false
-mouse-hide-while-typing = true
-scrollback-limit = 100000000
-cursor-style = block
-mouse-hide-while-typing = true
+window-decoration = none
 window-save-state = always
+confirm-close-surface = false
+window-padding-x = 8
+window-padding-y = 8
+window-padding-color = background
+unfocused-split-opacity = 0.85
+resize-overlay = always
 
-keybind = ctrl+u>ctrl+w=new_tab
+# Font
+font-family = Iosevka SS08
+font-size = 11
+font-feature = -calt, -liga, -dlig
+window-title-font-family = Iosevka SS08
+
+# Mouse & Cursor
+cursor-style = block
+cursor-click-to-move = true
+mouse-hide-while-typing = true
+copy-on-select = true
+focus-follows-mouse = true
+
+# Terminal & Integration
+scrollback-limit = 100000000
+shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo
+
+# Keybindings - Splits (Navigation)
 keybind = ctrl+u>ctrl+h=goto_split:left
 keybind = ctrl+u>ctrl+j=goto_split:bottom
 keybind = ctrl+u>ctrl+k=goto_split:top
 keybind = ctrl+u>ctrl+l=goto_split:right
+
+# Keybindings - Splits (Management)
 keybind = ctrl+u>ctrl+s=new_split:down
 keybind = ctrl+u>ctrl+v=new_split:right
 keybind = ctrl+u>ctrl+i=toggle_split_zoom
+keybind = ctrl+u>ctrl+e=equalize_splits
+
+# Keybindings - Tabs
+keybind = ctrl+u>ctrl+w=new_tab
 keybind = ctrl+u>ctrl+n=next_tab
 keybind = ctrl+u>ctrl+b=previous_tab
+
+# Keybindings - System & Utilities
+keybind = ctrl+u>ctrl+p=toggle_command_palette
 keybind = ctrl+u>ctrl+r=reload_config
 keybind = ctrl+u>ctrl+d=write_scrollback_file:open
 keybind = ctrl+u>ctrl+y=write_screen_file:open
