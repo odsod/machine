@@ -24,6 +24,7 @@ install: \
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install \
+		bat \
 		ca-certificates \
 		curl \
 		difftastic \
@@ -33,6 +34,7 @@ install-packages:
 		fedora-workstation-repositories \
 		firefox \
 		flatpak \
+		fzf \
 		gifsicle \
 		git \
 		git-delta \
@@ -40,12 +42,15 @@ install-packages:
 		htop \
 		iftop \
 		intel-media-driver \
+		java-25-openjdk-devel \
 		jq \
 		keepassxc \
+		maven \
 		ncdu \
 		ngrep \
 		nodejs \
 		pdftk \
+		pnpm \
 		python3-devel \
 		python3-pip \
 		python3-virtualenv \
