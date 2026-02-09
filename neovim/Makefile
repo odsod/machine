@@ -4,7 +4,13 @@ name := neovim
 all: \
 	install-packages \
 	update-alternatives \
-	~/.config/nvim/init.lua
+	~/.config/nvim/init.lua \
+	install-plugins
+
+.PHONY: install-plugins
+install-plugins: ~/.config/nvim/init.lua
+	$(info [$(name)] Installing plugins...)
+	@nvim --headless "+Lazy! sync" +qa
 
 .PHONY: update-alternatives
 update-alternatives:
