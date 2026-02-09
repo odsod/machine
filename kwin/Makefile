@@ -4,8 +4,15 @@ name := kwin
 install: \
 	install-package \
 	enable-plugin \
+	configure \
 	~/.local/share/dbus-1/services/io.github.odsod.kwin.service \
 	~/.local/bin/odsod-kwin-dbus-service.py
+
+.PHONY: configure
+configure:
+	$(info [$(name)] Configuring KWin...)
+	@kwriteconfig6 --file kwinrc --group Windows --key FocusPolicy FocusFollowsMouse
+	@qdbus org.kde.KWin /KWin reconfigure
 
 .PHONY: enable-plugin
 enable-plugin:
