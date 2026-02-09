@@ -21,10 +21,31 @@ require("lazy").setup({
     end,
   },
 
+  -- Neovim Development
+  {
+    "folke/lazydev.nvim",
+    lazy = false, -- Load immediately to ensure environment is ready for LSP
+    opts = {
+      library = {
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+      },
+    },
+  },
+
   -- UI & Tools
-  { "nvim-lualine/lualine.nvim", opts = { options = { theme = "nord", icons_enabled = false } } },
+  { "nvim-lualine/lualine.nvim", opts = { options = { theme = "auto", icons_enabled = false } } },
   { "nvim-tree/nvim-tree.lua", opts = { view = { width = 30 }, renderer = { group_empty = true, icons = { show = { file = false, folder = false, folder_arrow = true, git = false } } } } },
-  { "nvim-telescope/telescope.nvim", branch = "0.1.x", dependencies = { "nvim-lua/plenary.nvim" } },
+  {
+    "nvim-telescope/telescope.nvim",
+    version = "*",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+    },
+    config = function()
+      require("telescope").load_extension("fzf")
+    end,
+  },
   { "tpope/vim-fugitive" },
   { "numToStr/Comment.nvim", opts = {} },
   { "lewis6991/gitsigns.nvim", opts = {} },
@@ -77,12 +98,6 @@ require("lazy").setup({
           function(server)
             lspconfig[server].setup({ capabilities = capabilities })
           end,
-          ["lua_ls"] = function()
-            lspconfig.lua_ls.setup({
-              capabilities = capabilities,
-              settings = { Lua = { diagnostics = { globals = { "vim" } } } },
-            })
-          end,
         },
       })
 
@@ -94,7 +109,10 @@ require("lazy").setup({
           ["<Tab>"] = cmp.mapping.select_next_item(),
           ["<S-Tab>"] = cmp.mapping.select_prev_item(),
         }),
-        sources = cmp.config.sources({ { name = "nvim_lsp" } }, { { name = "buffer" } }),
+        sources = cmp.config.sources({
+          { name = "lazydev", group_index = 0 },
+          { name = "nvim_lsp" },
+        }, { { name = "buffer" } }),
       })
     end,
   },
