@@ -8,7 +8,7 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 ~/.local/share/fonts/inter.ttc: $(data_dir)/$(version)/Inter.ttc
 	$(info [$(name)] Installing...)
 	@mkdir -p ~/.local/share/fonts
-	@ln -fs $(abspath $<) $@
+	@ln -fsT $(abspath $<) $@
 	@fc-cache -vf >/dev/null
 
 $(data_dir)/$(version)/Inter.ttc: $(data_dir)/$(version)/archive.zip
