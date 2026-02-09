@@ -8,10 +8,10 @@
 ## Structure
 - **Root Makefile**: Orchestrator (`make install`).
 - **Subdirs**: Tool-specific logic.
-    - **Config**: Symlink to location required by tool (often `~/.config/<tool>/`).
+    - **Config**: Symlink (`ln -fsT`) to location required by tool (often `~/.config/<tool>/`).
     - **Binaries**: Symlink/Install to `~/.local/bin/`.
     - **Resources**: Download/Extract to `~/.local/share/odsod/machine/data/<tool>/<version>/`.
-        - Symlink active version to `~/.local/share/odsod/machine/<tool>` if needed.
+        - Symlink active version (`ln -fsT`) to `~/.local/share/odsod/machine/<tool>` if needed.
 - **Environment**: `env.sh` (POSIX sh).
     - **Role**: Source of Truth for all environment variables and PATH.
     - **Install**: Symlinked to `~/.profile` and `~/.config/plasma-workspace/env/odsod-machine.sh` by Root Makefile.
