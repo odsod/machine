@@ -8,7 +8,7 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 ~/.local/share/fonts/iosevka: $(data_dir)/$(version)/IosevkaSS08-Regular.ttc
 	$(info [$(name)] Installing fonts...)
 	@mkdir -p ~/.local/share/fonts
-	@ln -fs $(abspath $(dir $<)) $@
+	@ln -fsT $(abspath $(dir $<)) $@
 	@fc-cache -vf >/dev/null
 
 $(data_dir)/$(version)/IosevkaSS08-Regular.ttc: $(data_dir)/$(version)/iosevka.zip
