@@ -53,6 +53,8 @@ function fish_user_key_bindings
     bind -M insert \eb backward-word
     bind -M insert \ck kill-line
     bind -M insert \cd delete-or-exit
+    bind -M insert \cp up-or-search
+    bind -M insert \cn down-or-search
 
     # Vim Normal Mode: Go [Up|Project|Code]
     bind -M default gu 'cd ..; commandline -f repaint'
