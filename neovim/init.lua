@@ -34,7 +34,22 @@ require("lazy").setup({
 
   -- UI & Tools
   { "nvim-lualine/lualine.nvim", opts = { options = { theme = "auto", icons_enabled = false } } },
-  { "nvim-tree/nvim-tree.lua", opts = { view = { width = 30 }, renderer = { group_empty = true, icons = { show = { file = false, folder = false, folder_arrow = true, git = false } } } } },
+  {
+    "nvim-tree/nvim-tree.lua",
+    opts = {
+      filesystem_watchers = {
+        ignore_dirs = {
+          "node_modules",
+          ".git",
+        },
+      },
+      view = { width = 30 },
+      renderer = {
+        group_empty = true,
+        icons = { show = { file = false, folder = false, folder_arrow = true, git = false } },
+      },
+    },
+  },
   {
     "nvim-telescope/telescope.nvim",
     version = "*",
