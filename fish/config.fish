@@ -48,6 +48,7 @@ function fish_user_key_bindings
     bind -M insert \ca beginning-of-line
     bind -M insert \ce end-of-line
     bind -M insert \cf forward-char
+    bind -M insert \t 'commandline -f accept-autosuggestion; or commandline -f complete' # Smart Tab
     bind -M insert \cb backward-char
     bind -M insert \ef forward-word
     bind -M insert \eb backward-word
@@ -58,6 +59,7 @@ function fish_user_key_bindings
 
     # Vim Normal Mode: Go [Up|Project|Code]
     bind -M default gu 'cd ..; commandline -f repaint'
+    bind -M default gg 'cd (git rev-parse --show-toplevel 2>/dev/null; or echo .); commandline -f repaint'
 
     bind -M default gp 'set -l r (git rev-parse --show-toplevel 2>/dev/null); or set r "."; _fzf_jump_dir $r "Project" clean'
     bind -M default gP 'set -l r (git rev-parse --show-toplevel 2>/dev/null); or set r "."; _fzf_jump_dir $r "Project" all'
