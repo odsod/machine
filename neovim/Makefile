@@ -24,7 +24,7 @@ update-alternatives:
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
-	@sudo dnf install -y neovim gcc-c++
+	@sudo dnf install -y neovim gcc-c++ tree-sitter-cli
 
 .PHONY: ~/.config/nvim/init.lua
 ~/.config/nvim/init.lua: init.lua
