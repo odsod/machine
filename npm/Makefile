@@ -4,6 +4,7 @@ name := npm
 install-packages: ~/.npmrc
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y nodejs-npm
+	@sudo sed -i '/^python=/d' /etc/npmrc
 
 .PHONY: ~/.npmrc
 ~/.npmrc: npmrc
