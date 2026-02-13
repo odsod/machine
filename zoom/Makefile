@@ -1,6 +1,6 @@
 name := zoom
 # Discovery: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0061222
-version := 6.7.2.6498
+version := 6.7.5.6891
 package_url := https://zoom.us/client/$(version)/zoom_x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
