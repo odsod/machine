@@ -1,6 +1,6 @@
 name := go
 # Discovery: https://go.dev/VERSION?m=text
-version := 1.25.7
+version := 1.26.0
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
