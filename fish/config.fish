@@ -10,8 +10,6 @@ abbr -a cat bat
 abbr -a find fd
 
 fish_vi_key_bindings
-starship init fish | source
-fzf --fish | source
 fish_config theme choose Nord
 
 function _fzf_search_files --argument-names mode
@@ -48,7 +46,7 @@ function fish_user_key_bindings
     bind -M insert \ca beginning-of-line
     bind -M insert \ce end-of-line
     bind -M insert \cf forward-char
-    bind -M insert \t 'commandline -f accept-autosuggestion; or commandline -f complete' # Smart Tab
+    bind -M insert \t 'commandline -f complete' # Tab for completion only (Use Ctrl-f/Right Arrow for autosuggestion)
     bind -M insert \cb backward-char
     bind -M insert \ef forward-word
     bind -M insert \eb backward-word
