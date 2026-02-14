@@ -1,0 +1,10 @@
+# UV Configuration
+# https://docs.astral.sh/uv/configuration/
+
+# Python Management
+python-downloads = "automatic"
+python-preference = "managed"
+
+# Package Management
+link-mode = "symlink"
+

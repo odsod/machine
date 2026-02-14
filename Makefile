@@ -61,7 +61,6 @@ install-packages:
 		simple-scan \
 		ttyd \
 		unrar \
-		uv \
 		wl-clipboard \
 		yt-dlp \
 		-y -q
