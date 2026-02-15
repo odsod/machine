@@ -5,7 +5,7 @@
   "go.buildTags": "mage",
   "gopls": {
     "ui.semanticTokens": true,
-    "formatting.gofumpt": true
+    "formatting.gofumpt": true,
   },
   "editor.fontFamily": "Iosevka SS08, 'IosevkaTerm Nerd Font'",
   "editor.fontSize": 15,
@@ -27,30 +27,31 @@
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit"
+      "source.organizeImports": "explicit",
     },
-    "editor.defaultFormatter": "charliermarsh.ruff"
+    "editor.defaultFormatter": "charliermarsh.ruff",
   },
   "notebook.formatOnSave.enabled": true,
   "notebook.codeActionsOnSave": {
     "notebook.source.fixAll": "explicit",
-    "notebook.source.organizeImports": "explicit"
+    "notebook.source.organizeImports": "explicit",
   },
   "cursor.cpp.disabledLanguages": ["plaintext"],
   "oxc.fmt.experimental": true,
   "[javascript]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "[typescript]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "[typescriptreact]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "editor.minimap.enabled": true,
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+  },
+  "python.defaultInterpreterPath": "/bin/python",
 }
