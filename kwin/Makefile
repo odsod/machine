@@ -12,7 +12,7 @@ install: \
 configure:
 	$(info [$(name)] Configuring KWin...)
 	@kwriteconfig6 --file kwinrc --group Windows --key FocusPolicy FocusFollowsMouse
-	@qdbus org.kde.KWin /KWin reconfigure
+	@qdbus-qt6 org.kde.KWin /KWin reconfigure
 
 .PHONY: enable-plugin
 enable-plugin:
@@ -34,7 +34,7 @@ uninstall-package:
 .PHONY: develop-package
 develop-package:
 	$(info [$(name)] Developing package...)
-	@qdbus org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.showInteractiveKWinConsole
+	@qdbus-qt6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.showInteractiveKWinConsole
 
 ~/.local/share/dbus-1/services/io.github.odsod.kwin.service: io.github.odsod.kwin.service
 	$(info [$(name)] Symlinking $@...)
