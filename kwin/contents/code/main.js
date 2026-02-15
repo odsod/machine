@@ -236,9 +236,9 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] debug", "KWin", ""],
     key: "Meta+;",
     kind: "callback",
-    callback: function () {
+    callback: function() {
       log("printing debug output");
-      workspace.stackingOrder.forEach(function (window) {
+      workspace.stackingOrder.forEach(function(window) {
         log("resourceName[", window.resourceName, "]", "resourceClass[", window.resourceClass, "]");
       });
     },
@@ -259,6 +259,36 @@ const shortcuts = [
     command: ["qbittorrent"],
     resourceName: "qbittorrent",
   },
+
+  {
+    actionId: ["kwin", "[odsod] agent-browser (personal)", "KWin", ""],
+    key: "Meta+P",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--user-data-dir=/home/odsod/Code/github.com/odsod/browser-agents/profiles/personal_profile_data",
+      "--disable-extensions",
+      "--remote-debugging-port=9222",
+      "--class=AgentBrowserPersonal",
+      "about:blank",
+    ],
+    resourceClass: "AgentBrowserPersonal",
+  },
+
+  {
+    actionId: ["kwin", "[odsod] agent-browser (work)", "KWin", ""],
+    key: "Meta+W",
+    kind: "app",
+    command: [
+      "google-chrome",
+      "--user-data-dir=/home/odsod/Code/github.com/odsod/browser-agents/profiles/work_profile_data",
+      "--disable-extensions",
+      "--remote-debugging-port=9223",
+      "--class=AgentBrowserWork",
+      "about:blank",
+    ],
+    resourceClass: "AgentBrowserWork",
+  },
 ];
 
 function matchesShortcut(window, shortcut) {
@@ -275,7 +305,7 @@ function matchesShortcut(window, shortcut) {
 }
 
 function findWindow(shortcut) {
-  return workspace.stackingOrder.find(function (window) {
+  return workspace.stackingOrder.find(function(window) {
     return matchesShortcut(window, shortcut);
   });
 }
@@ -300,7 +330,7 @@ function log(...args) {
   );
 }
 
-shortcuts.forEach(function (shortcut) {
+shortcuts.forEach(function(shortcut) {
   if (shortcut.kind === "builtin") {
     return;
   }
@@ -309,7 +339,7 @@ shortcuts.forEach(function (shortcut) {
     shortcut.actionId[1],
     shortcut.actionId[3],
     shortcut.key,
-    function () {
+    function() {
       log("handling shortcut", shortcut.actionId[1]);
       if (shortcut.kind === "callback") {
         shortcut.callback();
@@ -340,13 +370,13 @@ callDBus(
   "io.github.odsod.kwin.Service",
   "configure_shortcuts",
   JSON.stringify(shortcuts),
-  function () {
+  function() {
     log("shortcuts configured");
   },
 );
 
 function applyNoBorder(window) {
-  shortcuts.forEach(function (shortcut) {
+  shortcuts.forEach(function(shortcut) {
     if (shortcut.noBorder && matchesShortcut(window, shortcut)) {
       window.noBorder = true;
     }
