@@ -44,4 +44,4 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ## Gemini Added Memories
 
-- Do not add memories unless specifically instructed by the user.
+- **Do not add memories** to the global GEMINI.md file.
