@@ -2,9 +2,6 @@
 
 [ -n "$ODSOD_MACHINE" ] && return || export ODSOD_MACHINE=1
 
-# machine
-export PATH="$HOME/.local/bin:$PATH"
-
 # bat
 export BAT_THEME="Nord"
 
@@ -58,3 +55,6 @@ export RUSTUP_HOME="$HOME/.rustup"
 export CARGO_HOME="$HOME/.cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
 [ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
+
+# machine
+export PATH="$HOME/.local/bin:$PATH"
