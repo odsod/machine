@@ -48,9 +48,7 @@ install-packages:
 		maven \
 		ncdu \
 		ngrep \
-		nodejs \
 		pdftk \
-		pnpm \
 		python3-devel \
 		python3-pip \
 		python3-virtualenv \
