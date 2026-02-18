@@ -1,6 +1,5 @@
 \set COMP_KEYWORD_CASE upper
 \x auto
-	iming
 \pset null '∅'
 \set HISTFILE ~/.psql_history
 \set HISTSIZE 2000
