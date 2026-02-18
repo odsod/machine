@@ -7,7 +7,9 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 .PHONY: install-package
 install-package: $(data_dir)/$(version)/package.rpm
 	$(info [$(name)] Installing package...)
-	@sudo dnf install -y $<
+	@if ! rpm -q zoom >/dev/null 2>&1; then \
+		sudo dnf install -y $<; \
+	fi
 
 $(data_dir)/$(version)/package.rpm:
 	$(info [$(name)] Downloading package...)
