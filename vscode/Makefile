@@ -37,7 +37,9 @@ install-extensions:
 .PHONY: install-package
 install-package: /etc/yum.repos.d/vscode.repo
 	$(info [$(name)] Installing package...)
-	@sudo dnf install -y code
+	@if ! rpm -q code >/dev/null 2>&1; then \
+		sudo dnf install -y code; \
+	fi
 
 /etc/yum.repos.d/vscode.repo: vscode.repo
 	$(info [$(name)] Installing repo...)
