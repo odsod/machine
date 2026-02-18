@@ -20,6 +20,14 @@ Omit these:
 - Explanations of why (just say what)
 - Long prose paragraphs
 
+## Way Best Practices
+
+When working in a repo in the https://github.com/way-platform organization:
+
+- Install relevant skills from github.com/way-platform/skills (e.g. Go, Magefile)
+- Ensure alignment with current language-specific best practices (e.g. Go skill)
+- Ensure build scripts follow latest best practices (e.g. Magefile skill)
+
 ## Version Control
 
 **CRITICAL:** Never interact with remote repositories. Ask the user.
