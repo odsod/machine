@@ -24,7 +24,6 @@
 - **Repos**: Terra > COPR > RPM Fusion.
 
 ## Workflow: Updates
-
 **Trigger**: "Let's bump versions" -> Agents must check ALL tools.
 
 1.  **Identify Candidates**:
@@ -45,12 +44,16 @@
 
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 
-
-
-## Commit Attribution
+## Commit style
 - Follow Conventional Commits.
 - **CRITICAL**: Header MUST be <= 50 chars. Verify before committing.
 - **Template**: `feat(scope): description`.
+
+## jj migration
+- The user is in the process of migrating to jj. 
+- Do all vcs operations using jj
+- Provide explanations of your jj operations and workflows to the user
+- Do not push to the remote repo, leave this to the user
 
 ## Maintaining This File
 - **Format**: Headers + bullets - No paragraphs.
