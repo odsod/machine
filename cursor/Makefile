@@ -25,7 +25,9 @@ all: \
 .PHONY: install-rpm
 install-rpm: $(data_dir)/$(version)/cursor.rpm
 	$(info [$(name)] Installing $@...)
-	@sudo dnf install -y $<
+	@if ! rpm -q cursor >/dev/null 2>&1; then \
+		sudo dnf install -y $<; \
+	fi
 
 $(data_dir)/$(version)/cursor.rpm:
 	$(info [$(name)] Downloading RPM...)
