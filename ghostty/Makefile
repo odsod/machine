@@ -1,12 +1,18 @@
 name := ghostty
 
 .PHONY: install-packages
-install-packages: ~/.config/ghostty/config ~/.config/ghostty/themes
+install-packages: ~/.config/ghostty/config ~/.config/ghostty/themes ~/.config/ghostty/ghostty-tmux.sh
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y ghostty
 
 .PHONY: ~/.config/ghostty/config
 ~/.config/ghostty/config: config
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/ghostty/ghostty-tmux.sh
+~/.config/ghostty/ghostty-tmux.sh: ghostty-tmux.sh
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

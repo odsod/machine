@@ -1,0 +1,56 @@
+name := tmux
+version := 3.6a
+
+data_dir := $(HOME)/.local/share/odsod/machine/data/tmux/$(version)
+src_dir := $(data_dir)/src
+tarball := $(data_dir)/tmux-$(version).tar.gz
+tmux_bin := $(data_dir)/bin/tmux
+
+# Discovery: https://api.github.com/repos/tmux/tmux/releases/latest
+
+.PHONY: install
+install: \
+	install-packages \
+	$(tmux_bin) \
+	~/.local/bin/tmux \
+	~/.config/tmux/tmux.conf \
+	~/.local/bin/print-tmux-colors
+
+.PHONY: install-packages
+install-packages:
+	$(info [$(name)] Installing packages...)
+	@sudo dnf install -y gcc make libevent-devel ncurses-devel bison >/dev/null 2>&1
+	@sudo dnf remove -y tmux >/dev/null 2>&1
+
+$(tarball):
+	$(info [$(name)] Downloading $(version)...)
+	@mkdir -p $(dir $@)
+	@curl -sL https://github.com/tmux/tmux/releases/download/$(version)/tmux-$(version).tar.gz -o $@
+
+$(src_dir)/configure: $(tarball)
+	$(info [$(name)] Extracting $(version)...)
+	@mkdir -p $(src_dir)
+	@tar -xzf $< -C $(src_dir) --strip-components=1
+	@touch $@
+
+$(tmux_bin): $(src_dir)/configure
+	$(info [$(name)] Compiling $(version) from source...)
+	@cd $(src_dir) && ./configure --prefix=$(data_dir) >/dev/null 2>&1 && make -j$(nproc) >/dev/null 2>&1 && make install >/dev/null 2>&1
+
+.PHONY: ~/.local/bin/tmux
+~/.local/bin/tmux: $(tmux_bin)
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/tmux/tmux.conf
+~/.config/tmux/tmux.conf: tmux.conf
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/print-tmux-colors
+~/.local/bin/print-tmux-colors: print-tmux-colors
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
