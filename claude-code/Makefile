@@ -5,6 +5,17 @@ version := 2.1.50
 url := https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/$(version)/linux-x64/claude
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
+.PHONY: all
+all: \
+	~/.local/bin/claude \
+	~/.claude/settings.json
+
+.PHONY: ~/.claude/settings.json
+~/.claude/settings.json: settings.json
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
 .PHONY: ~/.local/bin/claude
 ~/.local/bin/claude: $(data_dir)/$(version)/claude
 	$(info [$(name)] Symlinking $@...)
