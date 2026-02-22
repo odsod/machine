@@ -7,7 +7,6 @@ confirm-close-surface = false
 window-padding-x = 8
 window-padding-y = 8
 window-padding-color = background
-unfocused-split-opacity = 0.85
 resize-overlay = always
 
 # Font
@@ -18,14 +17,17 @@ window-title-font-family = Iosevka SS08
 
 # Mouse & Cursor
 cursor-style = block
+cursor-style-blink = true
 cursor-click-to-move = true
 mouse-hide-while-typing = true
 copy-on-select = true
+selection-clear-on-typing = true
 focus-follows-mouse = true
 
 # Terminal & Integration
-command = ~/.config/ghostty/ghostty-tmux.sh
-scrollback-limit = 100000000
+command = direct:/home/odsod/.config/ghostty/ghostty-tmux.sh
+# Handled by tmux
+scrollback-limit = 0
 shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo
 
 # Keybindings
