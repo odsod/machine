@@ -13,6 +13,7 @@ install: \
 	install-packages \
 	$(tmux_bin) \
 	~/.local/bin/tmux \
+	~/.local/share/man/man1/tmux.1 \
 	~/.config/tmux/tmux.conf \
 	~/.local/bin/print-tmux-colors
 
@@ -42,6 +43,12 @@ $(tmux_bin): $(src_dir)/configure
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/share/man/man1/tmux.1
+~/.local/share/man/man1/tmux.1: $(tmux_bin)
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(data_dir)/share/man/man1/tmux.1 $@
 
 .PHONY: ~/.config/tmux/tmux.conf
 ~/.config/tmux/tmux.conf: tmux.conf
