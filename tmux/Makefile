@@ -7,15 +7,19 @@ src_dir := $(data_dir)/src
 tarball := $(data_dir)/tmux-$(version).tar.gz
 tmux_bin := $(data_dir)/bin/tmux
 
-.PHONY: install
+.PHONY: install reload
 install: \
-	install-packages \
-	$(tmux_bin) \
-	~/.local/bin/tmux \
-	~/.local/share/man/man1/tmux.1 \
-	~/.config/tmux/tmux.conf \
-	~/.local/bin/print-tmux-colors
+        install-packages \
+        $(tmux_bin) \
+        ~/.local/bin/tmux \
+        ~/.local/share/man/man1/tmux.1 \
+        ~/.config/tmux/tmux.conf \
+        ~/.local/bin/print-tmux-colors
 
+.PHONY: reload
+reload:
+	$(info [$(name)] Reloading config...)
+	@tmux source-file ~/.config/tmux/tmux.conf
 .PHONY: install-packages
 install-packages:
 	$(info [$(name)] Installing packages...)
