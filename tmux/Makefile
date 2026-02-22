@@ -1,12 +1,11 @@
 name := tmux
+# Discovery: https://api.github.com/repos/tmux/tmux/releases/latest
 version := 3.6a
 
 data_dir := $(HOME)/.local/share/odsod/machine/data/tmux/$(version)
 src_dir := $(data_dir)/src
 tarball := $(data_dir)/tmux-$(version).tar.gz
 tmux_bin := $(data_dir)/bin/tmux
-
-# Discovery: https://api.github.com/repos/tmux/tmux/releases/latest
 
 .PHONY: install
 install: \
