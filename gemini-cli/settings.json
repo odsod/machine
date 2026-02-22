@@ -6,6 +6,33 @@
     }
   },
 
+  "hooks": {
+    "AfterAgent": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "notify-completion",
+            "type": "command",
+            "command": "printf '\\a' > /dev/tty"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "notify-alert",
+            "type": "command",
+            "command": "printf '\\a' > /dev/tty"
+          }
+        ]
+      }
+    ]
+  },
+
   "security": {
     "auth": {
       "selectedType": "vertex-ai"
