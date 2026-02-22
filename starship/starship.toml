@@ -1,6 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-format = '''$directory$git_branch$git_status$direnv$golang$nodejs$python$rust$java$terraform$gcloud$docker_context$cmd_duration
+format = '''$directory${custom.jj}$direnv$golang$nodejs$python$rust$java$terraform$gcloud$docker_context$cmd_duration
 $character'''
 
 add_newline = true
@@ -76,4 +76,11 @@ style = '#B48EAD'
 [gcloud]
 symbol = "󱇶 "
 format = '\[[$symbol $project]($style)\]'
+style = '#81A1C1'
+
+[custom.jj]
+symbol = ""
+command = "jj-starship --no-jj-prefix --no-git-prefix --jj-symbol '' --git-symbol '' | sed 's/\\x1b\\[\\(32\\|35\\|95\\)m/\\x1b\\[34m/g'"
+when = "jj-starship detect"
+format = '\[[$symbol $output]($style)\]'
 style = '#81A1C1'
