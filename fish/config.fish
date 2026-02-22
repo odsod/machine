@@ -10,6 +10,13 @@ abbr -a cat bat
 abbr -a find fd
 
 fish_vi_key_bindings
+
+# Cursor shapes for VI mode
+set -g fish_cursor_default     block      blink
+set -g fish_cursor_insert      line       blink
+set -g fish_cursor_replace_one underscore blink
+set -g fish_cursor_visual      block      blink
+
 fish_config theme choose Nord
 
 function _fzf_search_files --argument-names mode
