@@ -37,6 +37,9 @@ require("lazy").setup({
   {
     "nvim-tree/nvim-tree.lua",
     opts = {
+      filters = {
+        git_ignored = false,
+      },
       filesystem_watchers = {
         ignore_dirs = {
           "node_modules",
