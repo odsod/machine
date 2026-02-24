@@ -6,6 +6,13 @@ email = "odsod@users.noreply.github.com"
 
 [templates]
 git_push_bookmark = '"odsod/push-" ++ change_id.short()'
+draft_commit_description = '''
+concat(
+  builtin_draft_commit_description,
+  "\nJJ: ignore-rest\n",
+  diff.git(),
+)
+'''
 
 [aliases]
 rebase-all = ["rebase", "-s", "(::trunk())+ & mutable()", "-d", "trunk()"]
