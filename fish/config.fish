@@ -8,6 +8,7 @@ abbr -a vim nvim
 abbr -a vi nvim
 abbr -a cat bat
 abbr -a find fd
+abbr -a claude 'claude --dangerously-skip-permissions'
 
 fish_vi_key_bindings
 
