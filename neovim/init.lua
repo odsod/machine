@@ -58,6 +58,15 @@ require("lazy").setup({
       { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
     },
     config = function()
+      require("telescope").setup({
+        defaults = {
+          file_ignore_patterns = { "%.git/", "%.jj/", "node_modules/" },
+        },
+        pickers = {
+          find_files = { no_ignore = true },
+          live_grep = { additional_args = { "--no-ignore" } },
+        },
+      })
       require("telescope").load_extension("fzf")
     end,
   },
