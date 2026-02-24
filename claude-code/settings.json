@@ -1,5 +1,6 @@
 {
   "skipDangerousModePermissionPrompt": true,
+  "respectGitignore": false,
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
   },
