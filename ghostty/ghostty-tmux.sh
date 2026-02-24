@@ -6,7 +6,7 @@ if ! command -v tmux >/dev/null 2>&1; then
 fi
 
 # The default session name
-SESSION="main"
+SESSION="primary"
 
 # Only attach if not already inside tmux
 if [[ -z "$TMUX" ]]; then
