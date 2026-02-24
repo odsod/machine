@@ -55,6 +55,11 @@
 - Provide explanations of your jj operations and workflows to the user
 - Do not push to the remote repo, leave this to the user
 
+## Nested Workspaces
+- **Pattern**: Use ignored nested workspaces for independent inner repos (no submodules).
+- **Setup**: Add directory to `.gitignore`, then `jj git clone <url> <path>`.
+- **Workflow**: `cd` into the nested directory to perform `jj` operations. They are fully independent of the parent workspace.
+
 ## Maintaining This File
 - **Format**: Headers + bullets - No paragraphs.
 - **Style**: Concise, direct, action-oriented. No filler or pleasantries.
