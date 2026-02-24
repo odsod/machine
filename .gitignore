@@ -2,3 +2,4 @@ node_modules/
 build/
 TODO.md
 smug/sessions/
+__pycache__/
