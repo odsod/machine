@@ -4,6 +4,17 @@ version := 0.104.0
 archive_url := https://github.com/openai/codex/releases/download/rust-v$(version)/$(name)-x86_64-unknown-linux-musl.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
+.PHONY: all
+all: \
+	~/.local/bin/$(name) \
+	~/.codex/config.toml
+
+.PHONY: ~/.codex/config.toml
+~/.codex/config.toml: config.toml
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(version)/$(name)
 	$(info [$(name)] Symlinking $@...)
