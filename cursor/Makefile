@@ -1,4 +1,5 @@
 name := cursor
+include ../vscode/extensions.mk
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
 version := 2.5.20
 rpm_url := https://downloads.cursor.com/production/511523af765daeb1fa69500ab0df5b6524424612/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
@@ -7,6 +8,7 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 .PHONY: all
 all: \
 	install-rpm \
+	install-extensions \
 	~/.config/Cursor/User/settings.json \
 	~/.config/Cursor/User/keybindings.json
 
@@ -28,6 +30,13 @@ install-rpm: $(data_dir)/$(version)/cursor.rpm
 	@if ! rpm -q cursor >/dev/null 2>&1; then \
 		sudo dnf install -y $<; \
 	fi
+
+.PHONY: install-extensions
+install-extensions:
+	$(info [$(name)] Installing extensions...)
+	@for ext in $(EDITOR_EXTENSIONS); do \
+		cursor --install-extension $$ext --force; \
+	done
 
 $(data_dir)/$(version)/cursor.rpm:
 	$(info [$(name)] Downloading RPM...)
