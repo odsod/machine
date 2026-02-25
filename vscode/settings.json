@@ -51,7 +51,7 @@
   },
   "editor.minimap.enabled": true,
   "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "python.defaultInterpreterPath": "/bin/python",
 }
