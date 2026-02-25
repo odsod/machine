@@ -14,7 +14,8 @@ install: \
         ~/.local/bin/tmux \
         ~/.local/share/man/man1/tmux.1 \
         ~/.config/tmux/tmux.conf \
-        ~/.local/bin/print-tmux-colors
+        ~/.local/bin/print-tmux-colors \
+        ~/.local/bin/smug-session-picker
 
 .PHONY: reload
 reload:
@@ -61,6 +62,12 @@ $(tmux_bin): $(src_dir)/configure
 
 .PHONY: ~/.local/bin/print-tmux-colors
 ~/.local/bin/print-tmux-colors: print-tmux-colors
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/smug-session-picker
+~/.local/bin/smug-session-picker: smug-session-picker.sh
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
