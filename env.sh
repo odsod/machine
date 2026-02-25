@@ -22,18 +22,18 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window up:3:hidden:wrap --
 export FZF_ALT_C_COMMAND="fd --type d --strip-cwd-prefix --hidden --follow --exclude .git"
 
 # gum
+export GUM_CHOOSE_CURSOR_BACKGROUND="0"
 export GUM_CHOOSE_CURSOR_FOREGROUND="6"
+export GUM_CHOOSE_HEADER_BACKGROUND="0"
 export GUM_CHOOSE_HEADER_FOREGROUND="4"
 export GUM_CHOOSE_ITEM_FOREGROUND="7"
+export GUM_CHOOSE_ITEM_BACKGROUND="0"
+export GUM_CHOOSE_SELECTED_BACKGROUND="0"
 export GUM_CHOOSE_SELECTED_FOREGROUND="2"
-export GUM_CHOOSE_CURSOR_BACKGROUND="0"
-export GUM_CHOOSE_HEADER_BACKGROUND="0"
-export GUM_CHOOSE_SELECTED_BACKGROUND=""
 
 # gemini-cli
 export GOOGLE_CLOUD_PROJECT="way-local-dev"
 export GOOGLE_CLOUD_LOCATION="global"
-export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/application_default_credentials.json"
 
 # go
 export GOROOT="$HOME/.local/share/odsod/machine/go"
