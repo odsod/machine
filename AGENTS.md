@@ -19,6 +19,12 @@
 ## Development
 - **Efficiency**: Iterating on configs should not trigger a full `make`. Use specific targets.
 
+## Home Folder
+- **Source repos**: `~/Code/<full-vcs-root>/<org>/<repo>`
+  - E.g. `~/Code/github.com/odsod/machine`
+- **Worktrees root**: `~/Worktrees/<full-vcs-root>/<org>/<repo>/<branch>`
+  - E.g. `~/Worktrees/github.com/odsod/machine/example-branch`
+
 ## Package Management
 - **Preference**: RPM > Flatpak > Manual.
 - **Repos**: Terra > COPR > RPM Fusion.
