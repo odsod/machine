@@ -21,15 +21,22 @@ export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}' --bind 'ctrl-/:chan
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-/:toggle-preview'"
 export FZF_ALT_C_COMMAND="fd --type d --strip-cwd-prefix --hidden --follow --exclude .git"
 
-# gum
-export GUM_CHOOSE_CURSOR_BACKGROUND="0"
-export GUM_CHOOSE_CURSOR_FOREGROUND="6"
-export GUM_CHOOSE_HEADER_BACKGROUND="0"
-export GUM_CHOOSE_HEADER_FOREGROUND="4"
-export GUM_CHOOSE_ITEM_FOREGROUND="7"
-export GUM_CHOOSE_ITEM_BACKGROUND="0"
-export GUM_CHOOSE_SELECTED_BACKGROUND="0"
-export GUM_CHOOSE_SELECTED_FOREGROUND="2"
+# gum input
+export GUM_INPUT_PROMPT="$ "
+export GUM_INPUT_SHOW_HELP="false"
+export GUM_INPUT_PROMPT_FOREGROUND="7"
+export GUM_INPUT_PLACEHOLDER_FOREGROUND="8"
+export GUM_INPUT_CURSOR_FOREGROUND="7"
+export GUM_INPUT_HEADER_FOREGROUND="3"
+export GUM_INPUT_PADDING="1 2"
+
+# gum choose
+export GUM_CHOOSE_SHOW_HELP="false"
+export GUM_CHOOSE_CURSOR_FOREGROUND="7"
+export GUM_CHOOSE_HEADER_FOREGROUND="3"
+export GUM_CHOOSE_ITEM_FOREGROUND="8"
+export GUM_CHOOSE_SELECTED_FOREGROUND="7"
+export GUM_CHOOSE_PADDING="1 2"
 
 # gemini-cli
 export GOOGLE_CLOUD_PROJECT="way-local-dev"
