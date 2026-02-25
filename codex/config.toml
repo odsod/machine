@@ -1,3 +1,4 @@
 approval_policy = "never"
-sandbox_mode = "workspace-write"
+sandbox_mode = "danger-full-access"
 notify = ["sh", "-lc", "printf '\\a' > /dev/tty"]
+web_search = "live"
