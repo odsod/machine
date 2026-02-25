@@ -1,4 +1,5 @@
 name := vscode
+include extensions.mk
 
 .PHONY: install
 install: \
@@ -22,17 +23,9 @@ install: \
 .PHONY: install-extensions
 install-extensions:
 	$(info [$(name)] Installing extensions...)
-	@code --install-extension arcticicestudio.nord-visual-studio-code --force
-	@code --install-extension be5invis.toml --force
-	@code --install-extension golang.go --force
-	@code --install-extension ms-python.python --force
-	@code --install-extension vscodevim.vim --force
-	@code --install-extension bufbuild.vscode-buf --force
-	@code --install-extension bierner.markdown-mermaid --force
-	@code --install-extension redhat.vscode-yaml --force
-	@code --install-extension esbenp.prettier-vscode --force
-	@code --install-extension charliermarsh.ruff --force
-	@code --install-extension oxc.oxc-vscode --force
+	@for ext in $(EDITOR_EXTENSIONS); do \
+		code --install-extension $$ext --force; \
+	done
 
 .PHONY: install-package
 install-package: /etc/yum.repos.d/vscode.repo
