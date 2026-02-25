@@ -20,6 +20,26 @@ set -g fish_cursor_visual      block      blink
 
 fish_config theme choose Nord
 
+function source_env_sh --argument-names env_file
+    set -q env_file[1]; or set env_file "$HOME/.profile"
+    test -f "$env_file"; or return 1
+
+    for entry in (env -i HOME="$HOME" USER="$USER" PATH="/usr/bin:/bin" sh -c '. "$1" >/dev/null 2>&1; env -0' sh "$env_file" | string split0)
+        set -l parts (string split -m 1 '=' -- $entry)
+        set -l key $parts[1]
+        set -l value $parts[2]
+
+        switch $key
+            case PWD OLDPWD SHLVL _
+                continue
+        end
+
+        set -gx $key $value
+    end
+end
+
+source_env_sh
+
 function _fzf_search_files --argument-names mode
     set -l root (git rev-parse --show-toplevel 2>/dev/null); or set root "."
     set -l cmd "fd --type f --base-directory '$root' --strip-cwd-prefix --exclude .git"
