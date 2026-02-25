@@ -72,4 +72,7 @@ function fish_user_key_bindings
 
     bind -M default gc "_fzf_jump_dir $HOME/Code 'Code' clean"
     bind -M default gC "_fzf_jump_dir $HOME/Code 'Code' all"
+
+    bind -M default gw "_fzf_jump_dir $HOME/Worktrees 'Worktree' clean"
+    bind -M default gW "_fzf_jump_dir $HOME/Worktrees 'Worktree' all"
 end
