@@ -73,3 +73,10 @@ install-flatpak-packages:
 install-modules:
 	$(info [$(name)] Installing modules...)
 	@find . -mindepth 2 -maxdepth 2 -name Makefile | xargs dirname | xargs -n1 make -C
+
+.PHONY: install-sudoers
+install-sudoers:
+	$(info [$(name)] Installing sudoers for odsod...)
+	@printf '%s\n' 'odsod ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/odsod >/dev/null
+	@sudo chmod 0440 /etc/sudoers.d/odsod
+	@sudo visudo -cf /etc/sudoers.d/odsod
