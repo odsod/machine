@@ -147,10 +147,24 @@ require("lazy").setup({
   {
     "stevearc/conform.nvim",
     opts = {
+      formatters = {
+        oxfmt = {
+          command = "oxfmt",
+          args = { "$FILENAME" },
+          stdin = false,
+        },
+      },
       formatters_by_ft = {
         lua = { "stylua" },
         python = { "isort", "black" },
-        javascript = { "prettier" },
+        javascript = { "oxfmt" },
+        javascriptreact = { "oxfmt" },
+        typescript = { "oxfmt" },
+        typescriptreact = { "oxfmt" },
+        mjs = { "oxfmt" },
+        cjs = { "oxfmt" },
+        mts = { "oxfmt" },
+        cts = { "oxfmt" },
         go = { "goimports", "gofmt" },
       },
       format_on_save = { timeout_ms = 500, lsp_fallback = true },
