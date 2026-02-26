@@ -1,6 +1,6 @@
 name := agent-browser
 # Discovery: https://github.com/vercel-labs/agent-browser/releases/latest
-version := 0.13.0
+version := 0.15.0
 url := https://github.com/vercel-labs/agent-browser/releases/download/v$(version)/agent-browser-linux-x64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
