@@ -7,4 +7,4 @@ windows:
   - name: editor
     layout: even-horizontal
     commands:
-      - codex
+      - ${AGENT_CMD}
