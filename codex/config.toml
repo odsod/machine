@@ -3,4 +3,4 @@ sandbox_mode = "danger-full-access"
 notify = ["sh", "-lc", "printf '\\a' > /dev/tty"]
 web_search = "live"
 model = "gpt-5.3-codex"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
