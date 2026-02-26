@@ -23,7 +23,6 @@ install-packages:
 	@sudo dnf install -y \
 		nodejs24 \
 		nodejs24-npm
-	@sudo sed -i '/^python=/d' /etc/npmrc || true
 
 .PHONY: ~/.local/bin/node
 ~/.local/bin/node:
