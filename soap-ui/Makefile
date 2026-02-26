@@ -1,5 +1,5 @@
 name := soap-ui
-# Discovery: https://www.soapui.org/downloads/soapui/open-source/
+# Discovery: https://www.soapui.org/downloads/latest-release/
 version := 5.9.1
 archive_url := https://dl.eviware.com/soapuios/$(version)/SoapUI-$(version)-linux-bin.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
