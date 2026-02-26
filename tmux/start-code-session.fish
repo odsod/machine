@@ -3,7 +3,6 @@
 set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
 command -q fzf; or exit 0
-command -q gum; or exit 0
 command -q smug; or exit 0
 
 set repos
@@ -27,7 +26,7 @@ test (count $repos) -gt 0; or exit 0
 set repo_rel (printf '%s\n' $repos | fzf --prompt='Code> ' --height=100% --reverse)
 or exit 0
 
-set agent_choice (gum choose codex gemini claude)
+set agent_choice (printf '%s\n' codex gemini claude | fzf --prompt='Agent> ' --height=40% --reverse --bind='j:down,k:up')
 or exit 0
 
 set agent_cmd
