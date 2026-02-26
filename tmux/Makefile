@@ -16,7 +16,9 @@ install: \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
         ~/.local/bin/start-worktree-session \
-        ~/.config/smug/worktree.yml
+        ~/.local/bin/start-code-session \
+        ~/.config/smug/worktree.yml \
+        ~/.config/smug/code.yml
 
 .PHONY: reload
 reload:
@@ -75,6 +77,18 @@ $(tmux_bin): $(src_dir)/configure
 
 .PHONY: ~/.config/smug/worktree.yml
 ~/.config/smug/worktree.yml: worktree.yml
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/start-code-session
+~/.local/bin/start-code-session: start-code-session.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/smug/code.yml
+~/.config/smug/code.yml: code.yml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

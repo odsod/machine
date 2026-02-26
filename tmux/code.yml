@@ -1,0 +1,10 @@
+session: ${SESSION_NAME}
+attach: true
+
+root: ~/Code/${REPO_REL}
+
+windows:
+  - name: editor
+    layout: even-horizontal
+    commands:
+      - codex
