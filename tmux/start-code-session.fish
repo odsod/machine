@@ -3,6 +3,7 @@
 set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
 command -q fzf; or exit 0
+command -q gum; or exit 0
 command -q smug; or exit 0
 
 set repos
@@ -23,8 +24,34 @@ end
 set repos (printf '%s\n' $repos | sort -u)
 test (count $repos) -gt 0; or exit 0
 
-set repo_rel (printf '%s\n' $repos | fzf --prompt='Code> ' --height=40% --reverse)
+set repo_rel (printf '%s\n' $repos | fzf --prompt='Code> ' --height=100% --reverse)
 or exit 0
+
+set agent_choice (gum choose codex gemini claude)
+or exit 0
+
+set agent_cmd
+set agent_bin
+switch "$agent_choice"
+    case codex
+        set agent_cmd codex
+        set agent_bin codex
+    case gemini
+        set agent_cmd gemini
+        set agent_bin gemini
+    case claude
+        set agent_cmd "claude --dangerously-skip-permissions"
+        set agent_bin claude
+    case '*'
+        echo "Unknown agent selection: $agent_choice" >&2
+        exit 1
+end
+
+command -q "$agent_bin"
+or begin
+    echo "Selected agent command not found: $agent_bin" >&2
+    exit 1
+end
 
 set repo_parts (string split '/' -- $repo_rel)
 set session_name "$repo_parts[2]/$repo_parts[3]"
@@ -34,5 +61,6 @@ if tmux has-session -t "$session_name" 2>/dev/null
 else
     smug start code -a \
         REPO_REL=$repo_rel \
-        SESSION_NAME=$session_name
+        SESSION_NAME=$session_name \
+        AGENT_CMD=$agent_cmd
 end
