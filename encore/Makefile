@@ -1,6 +1,6 @@
 name := encore
 # Discovery: https://encore.dev/api/releases?target=linux_amd64
-version := 1.54.0
+version := 1.54.2
 archive_url := https://d2f391esomvqpi.cloudfront.net/encore-$(version)-linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
