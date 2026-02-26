@@ -7,17 +7,27 @@ before_start:
   - test -n "${REPO_REL}"
   - test -n "${BRANCH}"
   - test -n "${SESSION_NAME}"
+  - test -n "${AGENT_CMD}"
   - mkdir -p ~/Worktrees/${REPO_REL}
   - git -C ~/Code/${REPO_REL} fetch --prune origin || true
   - |
-    if [ ! -d ~/Worktrees/${REPO_REL}/${BRANCH} ]; then
-      if git -C ~/Code/${REPO_REL} show-ref --verify --quiet refs/heads/${BRANCH}; then
-        git -C ~/Code/${REPO_REL} worktree add ~/Worktrees/${REPO_REL}/${BRANCH} ${BRANCH}
-      elif git -C ~/Code/${REPO_REL} show-ref --verify --quiet refs/remotes/origin/${BRANCH}; then
-        git -C ~/Code/${REPO_REL} worktree add --track -b ${BRANCH} ~/Worktrees/${REPO_REL}/${BRANCH} origin/${BRANCH}
+    REPO=~/Code/${REPO_REL}
+    WORKTREE=~/Worktrees/${REPO_REL}/${BRANCH}
+
+    if [ ! -d "$WORKTREE" ]; then
+      if git -C "$REPO" show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+        git -C "$REPO" worktree add "$WORKTREE" "${BRANCH}"
+      elif git -C "$REPO" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+        git -C "$REPO" worktree add --track -b "${BRANCH}" "$WORKTREE" "origin/${BRANCH}"
       else
-        git -C ~/Code/${REPO_REL} worktree add -b ${BRANCH} ~/Worktrees/${REPO_REL}/${BRANCH} HEAD
+        git -C "$REPO" worktree add -b "${BRANCH}" "$WORKTREE" HEAD
       fi
+    fi
+
+    if git -C "$REPO" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+      git -C "$WORKTREE" checkout -B "${BRANCH}" "origin/${BRANCH}"
+      git -C "$WORKTREE" clean -fd
+      git -C "$WORKTREE" reset --hard "origin/${BRANCH}"
     fi
 
 windows:
@@ -25,4 +35,4 @@ windows:
     root: ~/Worktrees/${REPO_REL}/${BRANCH}
     layout: even-horizontal
     commands:
-      - codex
+      - ${AGENT_CMD}

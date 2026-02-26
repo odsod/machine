@@ -27,7 +27,7 @@ end
 set repos (printf '%s\n' $repos | sort -u)
 test (count $repos) -gt 0; or exit 0
 
-set repo_rel (printf '%s\n' $repos | fzf --prompt='Repo> ' --height=40% --reverse)
+set repo_rel (printf '%s\n' $repos | fzf --prompt='Worktree> ' --height=100% --reverse)
 or exit 0
 
 while true
@@ -40,19 +40,42 @@ while true
     end
 end
 
-set repo_parts (string split '/' -- $repo_rel)
-if test (count $repo_parts) -ge 3
-    set session_name "$repo_parts[2]-$repo_parts[3]"
-else
-    set session_name (string replace -a '/' '-' -- $repo_rel)
+set agent_choice (gum choose codex gemini claude)
+or exit 0
+
+set agent_cmd
+set agent_bin
+switch "$agent_choice"
+    case codex
+        set agent_cmd codex
+        set agent_bin codex
+    case gemini
+        set agent_cmd gemini
+        set agent_bin gemini
+    case claude
+        set agent_cmd "claude --dangerously-skip-permissions"
+        set agent_bin claude
+    case '*'
+        echo "Unknown agent selection: $agent_choice" >&2
+        exit 1
 end
-set branch_slug (string replace -a '/' '-' -- $branch)
-set session_name "$session_name-$branch_slug"
-set session_name (string replace -a -r -- '[^A-Za-z0-9_-]' '-' $session_name)
-set session_name (string replace -a -r -- '--+' '-' $session_name)
-set session_name (string trim -c '-' -- $session_name)
+
+command -q "$agent_bin"
+or begin
+    echo "Selected agent command not found: $agent_bin" >&2
+    exit 1
+end
+
+set repo_parts (string split '/' -- $repo_rel)
+if test (count $repo_parts) -ge 1
+    set repo_name $repo_parts[-1]
+else
+    set repo_name $repo_rel
+end
+set session_name "$repo_name($branch)"
 
 smug start worktree -a \
     REPO_REL=$repo_rel \
     BRANCH=$branch \
-    SESSION_NAME=$session_name
+    SESSION_NAME=$session_name \
+    AGENT_CMD=$agent_cmd
