@@ -4,6 +4,7 @@ include ../vscode/extensions.mk
 version := 2.5.25
 rpm_url := https://downloads.cursor.com/production/7150844152b426ed50d2b68dd6b33b5c5beb73ca/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
+cursor_extensions := $(filter-out be5invis.toml,$(EDITOR_EXTENSIONS))
 
 .PHONY: all
 all: \
@@ -34,7 +35,7 @@ install-rpm: $(data_dir)/$(version)/cursor.rpm
 .PHONY: install-extensions
 install-extensions:
 	$(info [$(name)] Installing extensions...)
-	@for ext in $(EDITOR_EXTENSIONS); do \
+	@for ext in $(cursor_extensions); do \
 		cursor --install-extension $$ext --force; \
 	done
 
