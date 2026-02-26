@@ -3,7 +3,6 @@
 set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
 command -q fzf; or exit 0
-command -q gum; or exit 0
 command -q smug; or exit 0
 command -q git; or exit 0
 
@@ -30,17 +29,23 @@ test (count $repos) -gt 0; or exit 0
 set repo_rel (printf '%s\n' $repos | fzf --prompt='Worktree> ' --height=100% --reverse)
 or exit 0
 
-while true
-    set branch (gum input --header "$repo_rel" --placeholder BRANCH)
-    or exit 0
+set branch_input (git -C "$HOME/Code/$repo_rel" for-each-ref --format='%(refname:short)' refs/heads refs/remotes/origin \
+    | sed -E 's#^origin/##' \
+    | grep -v '^HEAD$' \
+    | sort -u \
+    | fzf --prompt='Branch> ' --height=40% --reverse --bind='j:down,k:up,enter:print-query+accept')
+or exit 0
 
-    set branch (string trim -- $branch)
-    if test -n "$branch"
-        break
+set branch
+for line in $branch_input
+    set line (string trim -- "$line")
+    if test -n "$line"
+        set branch "$line"
     end
 end
+test -n "$branch"; or exit 0
 
-set agent_choice (gum choose codex gemini claude)
+set agent_choice (printf '%s\n' codex gemini claude | fzf --prompt='Agent> ' --height=40% --reverse --bind='j:down,k:up')
 or exit 0
 
 set agent_cmd
