@@ -15,7 +15,8 @@ install: \
         ~/.local/share/man/man1/tmux.1 \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
-        ~/.local/bin/start-session
+        ~/.local/bin/start-worktree-session \
+        ~/.config/smug/worktree.yml
 
 .PHONY: reload
 reload:
@@ -66,8 +67,14 @@ $(tmux_bin): $(src_dir)/configure
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: ~/.local/bin/start-session
-~/.local/bin/start-session: start-session.fish
+.PHONY: ~/.local/bin/start-worktree-session
+~/.local/bin/start-worktree-session: start-worktree-session.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/smug/worktree.yml
+~/.config/smug/worktree.yml: worktree.yml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

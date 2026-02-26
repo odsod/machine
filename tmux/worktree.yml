@@ -1,0 +1,28 @@
+session: ${SESSION_NAME}
+attach: true
+
+root: ~/Code/${REPO_REL}
+
+before_start:
+  - test -n "${REPO_REL}"
+  - test -n "${BRANCH}"
+  - test -n "${SESSION_NAME}"
+  - mkdir -p ~/Worktrees/${REPO_REL}
+  - git -C ~/Code/${REPO_REL} fetch --prune origin || true
+  - |
+    if [ ! -d ~/Worktrees/${REPO_REL}/${BRANCH} ]; then
+      if git -C ~/Code/${REPO_REL} show-ref --verify --quiet refs/heads/${BRANCH}; then
+        git -C ~/Code/${REPO_REL} worktree add ~/Worktrees/${REPO_REL}/${BRANCH} ${BRANCH}
+      elif git -C ~/Code/${REPO_REL} show-ref --verify --quiet refs/remotes/origin/${BRANCH}; then
+        git -C ~/Code/${REPO_REL} worktree add --track -b ${BRANCH} ~/Worktrees/${REPO_REL}/${BRANCH} origin/${BRANCH}
+      else
+        git -C ~/Code/${REPO_REL} worktree add -b ${BRANCH} ~/Worktrees/${REPO_REL}/${BRANCH} HEAD
+      fi
+    fi
+
+windows:
+  - name: editor
+    root: ~/Worktrees/${REPO_REL}/${BRANCH}
+    layout: even-horizontal
+    commands:
+      - codex
