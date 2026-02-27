@@ -5,11 +5,13 @@ workspace_extension_version := 0.0.5
 
 .PHONY: all
 all: \
-	~/.config/gemini/settings.json \
+	~/.gemini/settings.json \
 	~/.local/share/npm/bin/gemini
 
-.PHONY: ~/.config/gemini/settings.json
-~/.config/gemini/settings.json: settings.json
+# Discovery: https://github.com/google-gemini/gemini-cli/issues/1825
+# TODO: Move to ~/.config/gemini/settings.json when XDG support is improved
+.PHONY: ~/.gemini/settings.json
+~/.gemini/settings.json: settings.json
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
