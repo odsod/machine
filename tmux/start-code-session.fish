@@ -53,7 +53,7 @@ or begin
 end
 
 set repo_parts (string split '/' -- $repo_rel)
-set session_name "$repo_parts[2]/$repo_parts[3]"
+set session_name "$repo_parts[-1]"
 
 if tmux has-session -t "$session_name" 2>/dev/null
     tmux switch-client -t "$session_name"
