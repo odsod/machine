@@ -1,11 +1,14 @@
 {
   "context": {
-    "fileName": ["AGENTS.md", "README.md"],
+    "fileName": [
+      "AGENTS.md",
+      "README.md"
+    ],
     "fileFiltering": {
       "respectGitIgnore": false
-    }
+    },
+    "loadMemoryFromIncludeDirectories": true
   },
-
   "hooks": {
     "AfterAgent": [
       {
@@ -32,18 +35,43 @@
       }
     ]
   },
-
   "security": {
     "auth": {
       "selectedType": "vertex-ai"
     }
   },
-
   "privacy": {
     "usageStatisticsEnabled": false
   },
-
   "ui": {
-    "hideBanner": true
+    "hideBanner": true,
+    "accessibility": {
+      "disableLoadingPhrases": true,
+      "enableLoadingPhrases": false
+    },
+    "hideTips": true,
+    "showCitations": true,
+    "showLineNumbers": true,
+    "showMemoryUsage": true,
+    "footer": {
+      "hideModelInfo": false,
+      "hideSandboxStatus": true,
+      "hideContextPercentage": false
+    },
+    "theme": "Default"
+  },
+  "output": {
+    "format": "text"
+  },
+  "general": {
+    "previewFeatures": true,
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "30d",
+      "warningAcknowledged": true
+    }
+  },
+  "experimental": {
+    "plan": true
   }
 }
