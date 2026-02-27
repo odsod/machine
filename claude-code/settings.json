@@ -2,7 +2,8 @@
   "skipDangerousModePermissionPrompt": true,
   "respectGitignore": false,
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "hooks": {
     "Stop": [
