@@ -46,7 +46,6 @@
   "ui": {
     "hideBanner": true,
     "accessibility": {
-      "disableLoadingPhrases": true,
       "enableLoadingPhrases": false
     },
     "hideTips": true,
@@ -64,7 +63,6 @@
     "format": "text"
   },
   "general": {
-    "previewFeatures": true,
     "sessionRetention": {
       "enabled": true,
       "maxAge": "30d",
