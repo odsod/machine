@@ -1,6 +1,6 @@
 name := jetbrains-toolbox
 # Discovery: https://data.services.jetbrains.com/products/releases?code=TBA&latest=true&type=release
-version := 3.2.0.65851
+version := 3.3.0.74186
 archive_url := https://download.jetbrains.com/toolbox/jetbrains-toolbox-$(version).tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
