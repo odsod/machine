@@ -45,6 +45,8 @@
   },
   "ui": {
     "hideBanner": true,
+    "useAlternateBuffer": true,
+    "incrementalRendering": true,
     "accessibility": {
       "enableLoadingPhrases": false
     },
