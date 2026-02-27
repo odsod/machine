@@ -1,38 +1,35 @@
 session: ${SESSION_NAME}
 attach: true
 
-root: ~/Code/${REPO_REL}
+root: ${HOME}/Code/${REPO_REL}
 
 before_start:
   - test -n "${REPO_REL}"
   - test -n "${BRANCH}"
   - test -n "${SESSION_NAME}"
   - test -n "${AGENT_CMD}"
-  - mkdir -p ~/Worktrees/${REPO_REL}
-  - git -C ~/Code/${REPO_REL} fetch --prune origin || true
+  - mkdir -p ${HOME}/Worktrees/${REPO_REL}
+  - git -C ${HOME}/Code/${REPO_REL} fetch --prune origin || true
   - |
-    REPO=~/Code/${REPO_REL}
-    WORKTREE=~/Worktrees/${REPO_REL}/${BRANCH}
-
-    if [ ! -d "$WORKTREE" ]; then
-      if git -C "$REPO" show-ref --verify --quiet "refs/heads/${BRANCH}"; then
-        git -C "$REPO" worktree add "$WORKTREE" "${BRANCH}"
-      elif git -C "$REPO" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
-        git -C "$REPO" worktree add --track -b "${BRANCH}" "$WORKTREE" "origin/${BRANCH}"
+    if ! git -C "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      if git -C "${HOME}/Code/${REPO_REL}" show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+        git -C "${HOME}/Code/${REPO_REL}" worktree add "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" "${BRANCH}"
+      elif git -C "${HOME}/Code/${REPO_REL}" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+        git -C "${HOME}/Code/${REPO_REL}" worktree add --track -b "${BRANCH}" "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" "origin/${BRANCH}"
       else
-        git -C "$REPO" worktree add -b "${BRANCH}" "$WORKTREE" HEAD
+        git -C "${HOME}/Code/${REPO_REL}" worktree add -b "${BRANCH}" "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" HEAD
       fi
     fi
 
-    if git -C "$REPO" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
-      git -C "$WORKTREE" checkout -B "${BRANCH}" "origin/${BRANCH}"
-      git -C "$WORKTREE" clean -fd
-      git -C "$WORKTREE" reset --hard "origin/${BRANCH}"
+    if git -C "${HOME}/Code/${REPO_REL}" show-ref --verify --quiet "refs/remotes/origin/${BRANCH}"; then
+      git -C "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" checkout -B "${BRANCH}" "origin/${BRANCH}"
+      git -C "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" clean -fd
+      git -C "${HOME}/Worktrees/${REPO_REL}/${BRANCH}" reset --hard "origin/${BRANCH}"
     fi
 
 windows:
   - name: editor
-    root: ~/Worktrees/${REPO_REL}/${BRANCH}
+    root: ${HOME}/Worktrees/${REPO_REL}/${BRANCH}
     layout: even-horizontal
     commands:
       - ${AGENT_CMD}

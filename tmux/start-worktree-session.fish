@@ -33,7 +33,7 @@ set branch_input (git -C "$HOME/Code/$repo_rel" for-each-ref --format='%(refname
     | sed -E 's#^origin/##' \
     | grep -v '^HEAD$' \
     | sort -u \
-    | fzf --prompt='Branch> ' --height=40% --reverse --bind='j:down,k:up,enter:print-query+accept')
+    | fzf --prompt='Branch> ' --height=100% --reverse --bind='tab:replace-query,enter:print-query+accept')
 or exit 0
 
 set branch
