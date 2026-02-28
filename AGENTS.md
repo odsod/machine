@@ -67,7 +67,7 @@
 - **Workflow**: `cd` into the nested directory to perform `jj` operations. They are fully independent of the parent workspace.
 
 ### .agents/ (github.com/odsod/agents)
-- **Purpose**: Agent skills (tmux, smug, skill-creator, etc.)
+- **Purpose**: Agent skills (tmux, skill-creator, etc.)
 - **Install**: `make install` clones if `.agents/.jj` is absent.
 - **Update**: `cd .agents && jj git fetch && jj new main`
 

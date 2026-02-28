@@ -3,7 +3,6 @@
 set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
 command -q fzf; or exit 0
-command -q smug; or exit 0
 
 # --- Type selection ---
 
@@ -60,6 +59,22 @@ function select_agent
     end
 end
 
+# --- Session launcher ---
+
+function _launch_session
+    set session_name $argv[1]
+    set session_root $argv[2]
+    set agent_cmd $argv[3]
+
+    if tmux has-session -t $session_name 2>/dev/null
+        tmux switch-client -t $session_name
+    else
+        tmux new-session -d -s $session_name -c $session_root -n editor
+        tmux send-keys -t "$session_name:editor" $agent_cmd Enter
+        tmux switch-client -t $session_name
+    end
+end
+
 # --- Activity ---
 
 if test "$session_type" = Activity
@@ -71,10 +86,10 @@ if test "$session_type" = Activity
 
     set chosen (printf '%s\n' $dirs \
         | fzf --prompt='Activity> ' --height=100% --reverse \
-              --bind='tab:replace-query,enter:print-query+accept')
-    or exit 0
+              --print-query --bind='tab:replace-query')
+    test $status -ne 130; or exit 0
 
-    set dir_name (string trim -- "$chosen")
+    set dir_name (string trim -- $chosen[-1])
     test -n "$dir_name"; or exit 0
 
     set session_root "$HOME/Activities/$dir_name"
@@ -84,14 +99,7 @@ if test "$session_type" = Activity
 
     set session_name "$dir_name"
 
-    if tmux has-session -t "$session_name" 2>/dev/null
-        tmux switch-client -t "$session_name"
-    else
-        smug start activity -a \
-            SESSION_NAME=$session_name \
-            SESSION_ROOT=$session_root \
-            AGENT_CMD=$agent_cmd
-    end
+    _launch_session $session_name $session_root $agent_cmd
     exit 0
 end
 
@@ -106,10 +114,10 @@ if test "$session_type" = Project
 
     set chosen (printf '%s\n' $dirs \
         | fzf --prompt='Project> ' --height=100% --reverse \
-              --bind='tab:replace-query,enter:print-query+accept')
-    or exit 0
+              --print-query --bind='tab:replace-query')
+    test $status -ne 130; or exit 0
 
-    set dir_name (string trim -- "$chosen")
+    set dir_name (string trim -- $chosen[-1])
     test -n "$dir_name"; or exit 0
 
     set session_root "$HOME/Projects/$dir_name"
@@ -119,14 +127,7 @@ if test "$session_type" = Project
 
     set session_name "$dir_name"
 
-    if tmux has-session -t "$session_name" 2>/dev/null
-        tmux switch-client -t "$session_name"
-    else
-        smug start project -a \
-            SESSION_NAME=$session_name \
-            SESSION_ROOT=$session_root \
-            AGENT_CMD=$agent_cmd
-    end
+    _launch_session $session_name $session_root $agent_cmd
     exit 0
 end
 
@@ -144,14 +145,7 @@ if test "$session_type" = Code
     set repo_parts (string split '/' -- $repo_rel)
     set session_name "$repo_parts[-1]"
 
-    if tmux has-session -t "$session_name" 2>/dev/null
-        tmux switch-client -t "$session_name"
-    else
-        smug start code -a \
-            REPO_REL=$repo_rel \
-            SESSION_NAME=$session_name \
-            AGENT_CMD=$agent_cmd
-    end
+    _launch_session $session_name "$HOME/Code/$repo_rel" $agent_cmd
     exit 0
 end
 
@@ -198,8 +192,10 @@ if test "$session_type" = Workspace
     end
 
     set bookmarks (jj -R "$repo_path" bookmark list | sed -n 's/^\([^[:space:]:][^:]*\):.*/\1/p' | sort -u)
-    set bookmark_input (printf '%s\n' $bookmarks | fzf --prompt='Bookmark> ' --height=100% --reverse --bind='tab:replace-query,enter:print-query+accept')
-    or exit 0
+    set bookmark_input (printf '%s\n' $bookmarks \
+        | fzf --prompt='Bookmark> ' --height=100% --reverse \
+              --print-query --bind='tab:replace-query')
+    test $status -ne 130; or exit 0
 
     set bookmark
     for line in $bookmark_input
@@ -271,15 +267,7 @@ if test "$session_type" = Workspace
 
     set session_name "$repo_name($bookmark)"
 
-    if tmux has-session -t "$session_name" 2>/dev/null
-        tmux switch-client -t "$session_name"
-    else
-        smug start workspace -a \
-            REPO_REL=$repo_rel \
-            BOOKMARK=$bookmark \
-            SESSION_NAME=$session_name \
-            AGENT_CMD=$agent_cmd
-    end
+    _launch_session $session_name "$HOME/Workspaces/$repo_rel/$bookmark" $agent_cmd
     exit 0
 end
 
@@ -298,8 +286,9 @@ if test "$session_type" = Worktree
         | sed -E 's#^origin/##' \
         | grep -v '^HEAD$' \
         | sort -u \
-        | fzf --prompt='Branch> ' --height=100% --reverse --bind='tab:replace-query,enter:print-query+accept')
-    or exit 0
+        | fzf --prompt='Branch> ' --height=100% --reverse \
+              --print-query --bind='tab:replace-query')
+    test $status -ne 130; or exit 0
 
     set branch
     for line in $branch_input
@@ -319,11 +308,27 @@ if test "$session_type" = Worktree
         set repo_name $repo_rel
     end
     set session_name "$repo_name($branch)"
+    set worktree_path "$HOME/Worktrees/$repo_rel/$branch"
 
-    smug start worktree -a \
-        REPO_REL=$repo_rel \
-        BRANCH=$branch \
-        SESSION_NAME=$session_name \
-        AGENT_CMD=$agent_cmd
+    mkdir -p "$HOME/Worktrees/$repo_rel"
+    git -C "$HOME/Code/$repo_rel" fetch --prune origin 2>/dev/null; or true
+
+    if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
+        if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/heads/$branch"
+            git -C "$HOME/Code/$repo_rel" worktree add "$worktree_path" "$branch"
+        else if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
+            git -C "$HOME/Code/$repo_rel" worktree add --track -b "$branch" "$worktree_path" "origin/$branch"
+        else
+            git -C "$HOME/Code/$repo_rel" worktree add -b "$branch" "$worktree_path" HEAD
+        end
+    end
+
+    if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
+        git -C "$worktree_path" checkout -B "$branch" "origin/$branch"
+        git -C "$worktree_path" clean -fd
+        git -C "$worktree_path" reset --hard "origin/$branch"
+    end
+
+    _launch_session $session_name $worktree_path $agent_cmd
     exit 0
 end

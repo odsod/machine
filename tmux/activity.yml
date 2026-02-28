@@ -1,8 +1,0 @@
-session: ${SESSION_NAME}
-attach: true
-root: ${SESSION_ROOT}
-windows:
-  - name: editor
-    layout: even-horizontal
-    commands:
-      - ${AGENT_CMD}
