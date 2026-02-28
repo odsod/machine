@@ -15,8 +15,10 @@ install: \
         ~/.local/share/man/man1/tmux.1 \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
+        ~/.local/bin/start-workspace-session \
         ~/.local/bin/start-worktree-session \
         ~/.local/bin/start-code-session \
+        ~/.config/smug/workspace.yml \
         ~/.config/smug/worktree.yml \
         ~/.config/smug/code.yml
 
@@ -69,8 +71,20 @@ $(tmux_bin): $(src_dir)/configure
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.local/bin/start-workspace-session
+~/.local/bin/start-workspace-session: start-workspace-session.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
 .PHONY: ~/.local/bin/start-worktree-session
 ~/.local/bin/start-worktree-session: start-worktree-session.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/smug/workspace.yml
+~/.config/smug/workspace.yml: workspace.yml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
