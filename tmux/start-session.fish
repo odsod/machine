@@ -308,25 +308,59 @@ if test "$session_type" = Worktree
         set repo_name $repo_rel
     end
     set session_name "$repo_name($branch)"
-    set worktree_path "$HOME/Worktrees/$repo_rel/$branch"
+    set expected_worktree_path "$HOME/Worktrees/$repo_rel/$branch"
+    set worktree_path "$expected_worktree_path"
+    set existing_worktree_path (
+        git -C "$HOME/Code/$repo_rel" worktree list --porcelain \
+        | awk -v target="refs/heads/$branch" '
+            $1 == "worktree" { path = $2 }
+            $1 == "branch" && $2 == target { print path; exit }
+        '
+    )
+    if test -n "$existing_worktree_path"
+        set worktree_path "$existing_worktree_path"
+    end
 
     mkdir -p "$HOME/Worktrees/$repo_rel"
     git -C "$HOME/Code/$repo_rel" fetch --prune origin 2>/dev/null; or true
 
     if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
         if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/heads/$branch"
-            git -C "$HOME/Code/$repo_rel" worktree add "$worktree_path" "$branch"
+            git -C "$HOME/Code/$repo_rel" worktree add "$expected_worktree_path" "$branch"
         else if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
-            git -C "$HOME/Code/$repo_rel" worktree add --track -b "$branch" "$worktree_path" "origin/$branch"
+            git -C "$HOME/Code/$repo_rel" worktree add --track -b "$branch" "$expected_worktree_path" "origin/$branch"
         else
-            git -C "$HOME/Code/$repo_rel" worktree add -b "$branch" "$worktree_path" HEAD
+            git -C "$HOME/Code/$repo_rel" worktree add -b "$branch" "$expected_worktree_path" HEAD
+        end
+
+        if not git -C "$expected_worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
+            set existing_worktree_path (
+                git -C "$HOME/Code/$repo_rel" worktree list --porcelain \
+                | awk -v target="refs/heads/$branch" '
+                    $1 == "worktree" { path = $2 }
+                    $1 == "branch" && $2 == target { print path; exit }
+                '
+            )
+            if test -n "$existing_worktree_path"
+                set worktree_path "$existing_worktree_path"
+            else
+                echo "Failed to create/find worktree for branch: $branch" >&2
+                exit 1
+            end
+        else
+            set worktree_path "$expected_worktree_path"
         end
     end
 
-    if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
+    if test "$worktree_path" = "$expected_worktree_path"; and git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
         git -C "$worktree_path" checkout -B "$branch" "origin/$branch"
         git -C "$worktree_path" clean -fd
         git -C "$worktree_path" reset --hard "origin/$branch"
+    end
+
+    if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
+        echo "Resolved path is not a git worktree: $worktree_path" >&2
+        exit 1
     end
 
     _launch_session $session_name $worktree_path $agent_cmd
