@@ -19,6 +19,9 @@ rebase-all = ["rebase", "-s", "(::trunk())+ & mutable()", "-d", "trunk()"]
 pr = ["util", "exec", "--", "bash", "-lc", "jj git push -c @ && pr_url=$(gh pr create --head \"odsod/push-$(jj log --no-graph -r @ -T 'change_id.short()')\" --fill) && xdg-open \"$pr_url\" >/dev/null 2>&1"]
 delta = ["diff", "--config", "ui.diff-formatter=\":git\"", "--config", "ui.pager=\"delta\""]
 
+[revset-aliases]
+upstream_work = "@ | ancestors(remote_bookmarks().., 2) | trunk()"
+
 [revsets]
 log = "::@ | ::trunk()"
 
