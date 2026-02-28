@@ -1,5 +1,5 @@
 set fish_greeting
-set -x fish_history (string replace -a '-' '_' (hostname))
+set -g fish_history (string replace -a '-' '_' (hostname))
 
 status is-interactive; or return
 set -q CURSOR_AGENT; and return
@@ -10,10 +10,7 @@ abbr -a cat bat
 abbr -a find fd
 abbr -a claude 'claude --dangerously-skip-permissions'
 
-# Fish <=4.2 may leave this universal var behind; clear it for deterministic state.
-set --erase --universal fish_key_bindings
 set -g fish_key_bindings fish_vi_key_bindings
-fish_vi_key_bindings
 
 # Cursor shapes for VI mode
 set -g fish_cursor_default block blink
@@ -79,14 +76,12 @@ function source_env_sh --argument-names env_file
     end
 end
 
-source_env_sh
-
 function _fzf_search_files --argument-names mode
     set -l root (git rev-parse --show-toplevel 2>/dev/null); or set root "."
     set -l cmd "fd --type f --base-directory '$root' --strip-cwd-prefix --exclude .git"
     test "$mode" = all; and set cmd "$cmd --hidden --no-ignore"
 
-    set -x FZF_DEFAULT_COMMAND $cmd
+    set -lx FZF_DEFAULT_COMMAND $cmd
     fzf-file-widget
 end
 
