@@ -15,12 +15,7 @@ install: \
         ~/.local/share/man/man1/tmux.1 \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
-        ~/.local/bin/start-session \
-        ~/.config/smug/activity.yml \
-        ~/.config/smug/project.yml \
-        ~/.config/smug/workspace.yml \
-        ~/.config/smug/worktree.yml \
-        ~/.config/smug/code.yml
+        ~/.local/bin/start-session
 
 .PHONY: reload
 reload:
@@ -73,36 +68,6 @@ $(tmux_bin): $(src_dir)/configure
 
 .PHONY: ~/.local/bin/start-session
 ~/.local/bin/start-session: start-session.fish
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.config/smug/activity.yml
-~/.config/smug/activity.yml: activity.yml
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.config/smug/project.yml
-~/.config/smug/project.yml: project.yml
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.config/smug/workspace.yml
-~/.config/smug/workspace.yml: workspace.yml
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.config/smug/worktree.yml
-~/.config/smug/worktree.yml: worktree.yml
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.config/smug/code.yml
-~/.config/smug/code.yml: code.yml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
