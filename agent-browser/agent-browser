@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -eu
+
+export AGENT_BROWSER_HOME="${AGENT_BROWSER_HOME:-$HOME/.local/share/odsod/machine/agent-browser}"
+export AGENT_BROWSER_CONFIG="${AGENT_BROWSER_CONFIG:-$HOME/.config/agent-browser/config.json}"
+
+exec "$HOME/.local/share/odsod/machine/agent-browser/bin/agent-browser-linux-x64" "$@"
