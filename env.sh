@@ -4,6 +4,7 @@
 
 # bat
 export BAT_THEME="Nord"
+export BAT_STYLE="changes,header"
 
 # difftastic
 export DFT_BACKGROUND="dark"
