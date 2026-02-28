@@ -75,6 +75,7 @@ install-agents:
 	$(info [$(name)] Installing agents...)
 	@test -d .agents/.jj || \
 		jj git clone git@github.com:odsod/agents.git .agents
+	@$(MAKE) -C .agents
 
 .PHONY: install-modules
 install-modules:
