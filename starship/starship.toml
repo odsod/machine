@@ -80,7 +80,7 @@ style = '#81A1C1'
 
 [custom.jj]
 symbol = ""
-command = "jj-starship --no-jj-prefix --no-git-prefix --jj-symbol '' --git-symbol '' --no-git-status --no-color"
+command = "jj-starship --no-jj-prefix --no-git-prefix --jj-symbol '' --git-symbol '' --no-git-status --no-jj-name --no-color"
 when = "jj-starship detect"
 format = '\[[$symbol $output]($style)\]'
 style = '#81A1C1'
