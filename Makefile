@@ -6,6 +6,7 @@ install: \
 	~/.config/plasma-workspace/env/odsod-machine.sh \
 	install-packages \
 	install-flatpak-packages \
+	install-agents \
 	install-modules
 
 
@@ -68,6 +69,12 @@ install-flatpak-packages:
 	$(info [$(name)] Installing Flatpak packages...)
 	@flatpak install flathub \
 		com.spotify.Client
+
+.PHONY: install-agents
+install-agents:
+	$(info [$(name)] Installing agents...)
+	@test -d .agents/.jj || \
+		jj git clone git@github.com:odsod/agents.git .agents
 
 .PHONY: install-modules
 install-modules:
