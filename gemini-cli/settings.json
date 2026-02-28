@@ -59,7 +59,8 @@
       "hideSandboxStatus": true,
       "hideContextPercentage": false
     },
-    "theme": "Default"
+    "theme": "Default",
+    "loadingPhrases": "off"
   },
   "output": {
     "format": "text"
