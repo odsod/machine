@@ -3,3 +3,4 @@ build/
 TODO.md
 smug/sessions/
 __pycache__/
+.agents/
