@@ -266,7 +266,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--user-data-dir=/home/odsod/Code/github.com/odsod/browser-agents/profiles/personal_profile_data",
+      "--user-data-dir=/home/odsod/.local/share/odsod/machine/agent-browser/profiles/personal_profile_data",
       "--disable-extensions",
       "--remote-debugging-port=9222",
       "--class=AgentBrowserPersonal",
@@ -281,7 +281,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--user-data-dir=/home/odsod/Code/github.com/odsod/browser-agents/profiles/work_profile_data",
+      "--user-data-dir=/home/odsod/.local/share/odsod/machine/agent-browser/profiles/work_profile_data",
       "--disable-extensions",
       "--remote-debugging-port=9223",
       "--class=AgentBrowserWork",
