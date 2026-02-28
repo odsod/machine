@@ -39,8 +39,8 @@ set --global fish_color_option
 set --global fish_color_param white
 set --global fish_color_quote brgreen
 set --global fish_color_redirection brmagenta --bold
-set --global fish_color_search_match --bold --background=black
-set --global fish_color_selection white --bold --background=black
+set --global fish_color_search_match --bold --reverse
+set --global fish_color_selection white --bold --reverse
 set --global fish_color_status red
 set --global fish_color_user brgreen
 set --global fish_color_valid_path --underline
@@ -48,12 +48,12 @@ set --global fish_pager_color_background
 set --global fish_pager_color_completion brwhite
 set --global fish_pager_color_description bryellow --italics
 set --global fish_pager_color_prefix normal --bold --underline
-set --global fish_pager_color_progress black --background=yellow
+set --global fish_pager_color_progress normal --background=yellow
 set --global fish_pager_color_secondary_background
 set --global fish_pager_color_secondary_completion
 set --global fish_pager_color_secondary_description
 set --global fish_pager_color_secondary_prefix
-set --global fish_pager_color_selected_background --background=black
+set --global fish_pager_color_selected_background --reverse
 set --global fish_pager_color_selected_completion
 set --global fish_pager_color_selected_description
 set --global fish_pager_color_selected_prefix
