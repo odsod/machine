@@ -15,9 +15,9 @@ install: \
         ~/.local/share/man/man1/tmux.1 \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
-        ~/.local/bin/start-workspace-session \
-        ~/.local/bin/start-worktree-session \
-        ~/.local/bin/start-code-session \
+        ~/.local/bin/start-session \
+        ~/.config/smug/activity.yml \
+        ~/.config/smug/project.yml \
         ~/.config/smug/workspace.yml \
         ~/.config/smug/worktree.yml \
         ~/.config/smug/code.yml
@@ -71,14 +71,20 @@ $(tmux_bin): $(src_dir)/configure
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: ~/.local/bin/start-workspace-session
-~/.local/bin/start-workspace-session: start-workspace-session.fish
+.PHONY: ~/.local/bin/start-session
+~/.local/bin/start-session: start-session.fish
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: ~/.local/bin/start-worktree-session
-~/.local/bin/start-worktree-session: start-worktree-session.fish
+.PHONY: ~/.config/smug/activity.yml
+~/.config/smug/activity.yml: activity.yml
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/smug/project.yml
+~/.config/smug/project.yml: project.yml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
@@ -91,12 +97,6 @@ $(tmux_bin): $(src_dir)/configure
 
 .PHONY: ~/.config/smug/worktree.yml
 ~/.config/smug/worktree.yml: worktree.yml
-	$(info [$(name)] Symlinking $@...)
-	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
-
-.PHONY: ~/.local/bin/start-code-session
-~/.local/bin/start-code-session: start-code-session.fish
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
