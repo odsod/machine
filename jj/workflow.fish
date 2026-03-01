@@ -63,7 +63,8 @@ function sub_clean
 
     set -l to_delete
     for b in (jj bookmark list | awk '/^odsod\/push-/{gsub(":", "", $1); print $1}')
-        if test -n (jj log -r "bookmarks(\"$b\") & ::main@origin" --no-graph)
+        set -l merged_hit (jj log -r "bookmarks(\"$b\") & ::main@origin" --no-graph | string collect)
+        if test -n "$merged_hit"
             set -a to_delete "$b"
         end
     end
@@ -127,7 +128,46 @@ function sub_pr_update
     set -l repo (github_repo_from_origin)
     test -n "$repo"; or fail "Could not infer GitHub repo from origin remote."
 
-    set -l head (current_head_bookmark)
+    set -l head
+    if test (count $argv) -gt 1
+        fail "Usage: jj pr-update [head-bookmark]"
+    else if test (count $argv) -eq 1
+        set head "$argv[1]"
+    else
+        set -l candidates
+        for b in (jj bookmark list -T 'self.name() ++ "\n"' | sed '/^$/d' | sort -u)
+            if test "$b" = "main"
+                continue
+            end
+            set -l lineage_hit (jj log -r "bookmarks(\"$b\") & ancestors(@)" --no-graph | string collect)
+            if test -n "$lineage_hit"
+                if not contains -- "$b" $candidates
+                    set -a candidates "$b"
+                end
+            end
+        end
+
+        set -l matched_heads
+        for c in $candidates
+            set -l pr_url (gh pr list --repo "$repo" --state open --head "$c" --json url --jq '.[0].url')
+            if test -n "$pr_url"; and test "$pr_url" != "null"
+                set -a matched_heads "$c"
+            end
+        end
+
+        if test (count $matched_heads) -eq 1
+            set head "$matched_heads[1]"
+        else if test (count $matched_heads) -gt 1
+            echo "Multiple open PR heads match current lineage:"
+            for h in $matched_heads
+                echo "  $h"
+            end
+            fail "Use: jj pr-update <head-bookmark>"
+        else
+            set head (current_head_bookmark)
+        end
+    end
+
     test -n "$head"; or fail "Could not determine PR head bookmark."
 
     set -l pr_number (gh pr list --repo "$repo" --state open --head "$head" --json number --jq '.[0].number')
@@ -154,24 +194,32 @@ if not command -q jj
     fail "jj is required but not found in PATH."
 end
 
-if test (count $argv) -ne 1
+if test (count $argv) -lt 1
     usage
     exit 1
 end
 
-switch "$argv[1]"
+set -l subcmd "$argv[1]"
+set -l subargs $argv[2..-1]
+
+switch "$subcmd"
     case sync
+        test (count $subargs) -eq 0; or fail "Usage: jj sync"
         sub_sync
     case clean
+        test (count $subargs) -eq 0; or fail "Usage: jj clean"
         sub_clean
     case start
+        test (count $subargs) -eq 0; or fail "Usage: jj start"
         sub_start
     case pr-check
+        test (count $subargs) -eq 0; or fail "Usage: jj pr-check"
         sub_pr_check
     case pr
+        test (count $subargs) -eq 0; or fail "Usage: jj pr"
         sub_pr
     case pr-update
-        sub_pr_update
+        sub_pr_update $subargs
     case '*'
         usage
         exit 1

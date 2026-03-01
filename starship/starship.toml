@@ -34,15 +34,6 @@ symbol = ""
 format = '\[[$symbol $context]($style)\]'
 style = '#88C0D0'
 
-[git_branch]
-symbol = ""
-format = '\[[$symbol $branch]($style)'
-style = '#81A1C1'
-
-[git_status]
-format = '[$all_status$ahead_behind]($style)\]'
-style = '#BF616A'
-
 [golang]
 symbol = ""
 format = '\[[$symbol ($version)]($style)\]'
@@ -80,7 +71,7 @@ style = '#81A1C1'
 
 [custom.jj]
 symbol = ""
-command = "jj-starship --no-jj-prefix --no-git-prefix --jj-symbol '' --git-symbol '' --no-git-status --no-jj-name --no-color"
+command = "jj-starship --no-jj-prefix --no-jj-name --no-color"
 when = "jj-starship detect"
 format = '\[[$symbol $output]($style)\]'
 style = '#81A1C1'
