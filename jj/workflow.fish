@@ -13,6 +13,16 @@ end
 function ensure_pr_preflight
     fetch_origin
 
+    set -l at_empty (jj log -r @ --no-graph -T 'if(empty, "1", "0")' | string collect)
+    if test "$at_empty" != "1"
+        set -l has_description (jj log -r @ --no-graph -T 'if(description != "", "1", "0")' | string collect)
+        if test "$has_description" != "1"
+            echo "FAIL: current non-empty commit has no description."
+            echo "Run: jj describe -m \"<summary>\""
+            exit 1
+        end
+    end
+
     set -l divergent (jj log -r 'mutable() & divergent()' --no-graph)
     if test -n "$divergent"
         echo "FAIL: mutable divergent change IDs detected."
@@ -53,25 +63,71 @@ function current_head_bookmark
     echo "odsod/push-"(jj log --no-graph -r @ -T 'change_id.short()')
 end
 
+function commit_is_empty --argument-names rev
+    set -l empty_flag (jj log -r "$rev" --no-graph -T 'if(empty, "1", "0")' | string collect)
+    test "$empty_flag" = "1"
+end
+
+function effective_publish_rev
+    set -l rev "@"
+    while true
+        set -l in_main_lineage (jj log -r "$rev & descendants(main@origin)" --no-graph | string collect)
+        if test -z "$in_main_lineage"
+            fail "Could not determine publish target from current lineage."
+        end
+
+        if not commit_is_empty "$rev"
+            echo "$rev"
+            return 0
+        end
+
+        set -l at_main (jj log -r "$rev & main@origin" --no-graph | string collect)
+        if test -n "$at_main"
+            fail "No non-empty commits to publish between @ and main@origin. Add changes first or run: jj start"
+        end
+
+        set rev "$rev-"
+    end
+end
+
+function current_head_bookmark_for_rev --argument-names rev
+    set -l ws (jj workspace list -T 'if(self.target().current_working_copy(), self.name(), "") ++ "\n"' | sed '/^$/d' | head -n1)
+    if test -n "$ws"; and test "$ws" != "default"
+        set -l at_ws (jj log -r "bookmarks(\"$ws\") & $rev" --no-graph | string collect)
+        if test -n "$at_ws"
+            echo "$ws"
+            return 0
+        end
+    end
+
+    set -l target_change (jj log --no-graph -r "$rev" -T 'change_id.short()' | string collect)
+    echo "odsod/push-$target_change"
+end
+
 function post_publish_new_working_commit
+    if commit_is_empty "@"
+        echo "Already on an empty working commit."
+        return 0
+    end
+
     jj new @ >/dev/null
     or fail "Failed to create follow-up working commit after publish."
     echo "Started new working commit on top of published change."
 end
 
-function ensure_head_at_current --argument-names head
-    set -l head_at_current (jj log -r "bookmarks(\"$head\") & @" --no-graph | string collect)
-    if test -n "$head_at_current"
+function ensure_head_at_target --argument-names head target
+    set -l head_at_target (jj log -r "bookmarks(\"$head\") & $target" --no-graph | string collect)
+    if test -n "$head_at_target"
         return 0
     end
 
-    set -l current_in_head_lineage (jj log -r "@ & descendants(bookmarks(\"$head\"))" --no-graph | string collect)
-    if test -z "$current_in_head_lineage"
-        fail "Current commit is not in lineage of $head. Run: jj new $head or pass correct head."
+    set -l target_in_head_lineage (jj log -r "$target & descendants(bookmarks(\"$head\"))" --no-graph | string collect)
+    if test -z "$target_in_head_lineage"
+        fail "Publish target is not in lineage of $head. Run: jj new $head or pass correct head."
     end
 
-    jj bookmark set "$head" -r @
-    or fail "Failed to move $head to current commit."
+    jj bookmark set "$head" -r "$target"
+    or fail "Failed to move $head to publish target."
 end
 
 function sub_sync
@@ -125,14 +181,18 @@ function sub_pr
     set -l repo (github_repo_from_origin)
     test -n "$repo"; or fail "Could not infer GitHub repo from origin remote."
 
-    set -l head (current_head_bookmark)
+    set -l target (effective_publish_rev)
+    test -n "$target"; or fail "Could not determine publish target revision."
+
+    set -l head (current_head_bookmark_for_rev "$target")
     test -n "$head"; or fail "Could not determine PR head bookmark."
 
     if string match -rq '^odsod/push-' -- "$head"
-        jj git push -c @
-        or fail "Failed to push current change."
+        jj git push -c "$target"
+        or fail "Failed to push publish target."
     else
         jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
+        ensure_head_at_target "$head" "$target"
         jj git push --remote origin --bookmark "$head"
         or fail "Failed to push bookmark $head."
     end
@@ -150,6 +210,9 @@ function sub_pr_update
     set -l repo (github_repo_from_origin)
     test -n "$repo"; or fail "Could not infer GitHub repo from origin remote."
 
+    set -l target (effective_publish_rev)
+    test -n "$target"; or fail "Could not determine publish target revision."
+
     set -l head
     if test (count $argv) -gt 1
         fail "Usage: jj pr-update [head-bookmark]"
@@ -161,7 +224,7 @@ function sub_pr_update
             if test "$b" = "main"
                 continue
             end
-            set -l lineage_hit (jj log -r "bookmarks(\"$b\") & ancestors(@)" --no-graph | string collect)
+            set -l lineage_hit (jj log -r "bookmarks(\"$b\") & ancestors($target)" --no-graph | string collect)
             if test -n "$lineage_hit"
                 if not contains -- "$b" $candidates
                     set -a candidates "$b"
@@ -186,7 +249,7 @@ function sub_pr_update
             end
             fail "Use: jj pr-update <head-bookmark>"
         else
-            set head (current_head_bookmark)
+            set head (current_head_bookmark_for_rev "$target")
         end
     end
 
@@ -198,7 +261,7 @@ function sub_pr_update
     end
 
     jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
-    ensure_head_at_current "$head"
+    ensure_head_at_target "$head" "$target"
     jj git push --remote origin --bookmark "$head"
     or fail "Failed to push bookmark $head."
 
