@@ -35,7 +35,6 @@ install-packages:
 		fedora-workstation-repositories \
 		firefox \
 		flatpak \
-		fzf \
 		gifsicle \
 		git \
 		git-delta \
