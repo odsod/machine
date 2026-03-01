@@ -5,7 +5,7 @@ archive_url := https://github.com/jj-vcs/jj/releases/download/v$(version)/jj-v$(
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: ~/.local/bin/$(name)
-~/.local/bin/$(name): $(data_dir)/$(version)/jj ~/.config/jj/config.toml
+~/.local/bin/$(name): $(data_dir)/$(version)/jj ~/.config/jj/config.toml ~/.local/bin/jj-workflow
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
@@ -15,6 +15,13 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/jj-workflow
+~/.local/bin/jj-workflow: workflow.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+	@chmod +x $@
 
 $(data_dir)/$(version)/jj: $(data_dir)/$(version)/archive.tar.gz
 	$(info [$(name)] Extracting $<...)
