@@ -89,7 +89,7 @@ function _fzf_jump_dir --argument-names root prompt mode
     set -l opts --type d --base-directory $root --strip-cwd-prefix --exclude .git
     test "$mode" = all; and set -a opts --hidden --no-ignore
 
-    set -l target (fd $opts | fzf --prompt="$prompt> ")
+    set -l target (fd $opts | fzf --prompt="$prompt> " --height=100% --reverse)
     if test -n "$target"
         cd "$root/$target"
         functions -q fish_vi_key_bindings; and set fish_bind_mode insert

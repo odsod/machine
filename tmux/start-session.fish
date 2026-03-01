@@ -4,38 +4,115 @@ set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
 command -q fzf; or exit 0
 
-# --- Type selection ---
+# --- Shared fzf helpers ---
 
-set session_type (printf '%s\n' Activity Project Code Workspace Worktree \
-    | fzf --prompt='Session> ' --height=40% --reverse --bind='j:down,k:up')
-or exit 0
+function _fzf_pick_compact --argument-names prompt
+    fzf --prompt="$prompt> " --height=40% --reverse --bind='j:down,k:up'
+end
+
+function _fzf_pick_full --argument-names prompt
+    fzf --prompt="$prompt> " --height=100% --reverse
+end
+
+function _fzf_pick_or_query --argument-names prompt
+    fzf --prompt="$prompt> " --height=100% --reverse \
+        --print-query --bind='tab:replace-query'
+end
+
+function _handle_fzf_status --argument-names status_code prompt
+    switch "$status_code"
+        case 0
+            return 0
+        case 1 130
+            return 1
+        case '*'
+            echo "$prompt picker failed (fzf exit $status_code)" >&2
+            exit 1
+    end
+end
+
+function _last_non_empty_line
+    set -l last
+    for line in $argv
+        set line (string trim -- "$line")
+        if test -n "$line"
+            set last "$line"
+        end
+    end
+    printf '%s\n' "$last"
+end
+
+function _session_name_for --argument-names base suffix
+    if test -n "$suffix"
+        printf '%s(%s)\n' "$base" "$suffix"
+    else
+        printf '%s\n' "$base"
+    end
+end
+
+function _select_or_create_dir --argument-names base_dir prompt
+    set -l dirs
+    for d in "$base_dir"/*/
+        test -d "$d"; or continue
+        set -a dirs (basename "$d")
+    end
+
+    set -l chosen (printf '%s\n' $dirs | _fzf_pick_or_query "$prompt")
+    set -l status_code $status
+    _handle_fzf_status "$status_code" "$prompt"; or return 1
+
+    set -l dir_name (_last_non_empty_line $chosen)
+    test -n "$dir_name"; or return 1
+
+    set -l session_root "$base_dir/$dir_name"
+    mkdir -p "$session_root"
+    or begin
+        echo "Failed to create directory: $session_root" >&2
+        exit 1
+    end
+
+    printf '%s\n' "$session_root"
+end
 
 # --- Repo discovery (shared by Code, Workspace, Worktree) ---
 
 function discover_repos
-    set repos
-    for host_dir in $HOME/Code/*
-        test -d $host_dir; or continue
-        for org_dir in $host_dir/*
-            test -d $org_dir; or continue
-            for repo_dir in $org_dir/*
-                test -d $repo_dir; or continue
-                if test -d $repo_dir/.git; or test -f $repo_dir/.git
-                    set rel (string replace -r "^$HOME/Code/" "" -- $repo_dir)
-                    set -a repos $rel
+    if command -q fd
+        set -l repos
+        for git_path in (fd --hidden --follow --glob '.git' . "$HOME/Code" 2>/dev/null)
+            set -l repo_dir (dirname "$git_path")
+            set -l rel (string replace -r "^$HOME/Code/" "" -- "$repo_dir")
+            if string match -rq '^[^/]+/[^/]+/[^/]+$' -- "$rel"
+                set -a repos "$rel"
+            end
+        end
+        printf '%s\n' $repos | sort -u
+    else
+        set repos
+        for host_dir in $HOME/Code/*
+            test -d $host_dir; or continue
+            for org_dir in $host_dir/*
+                test -d $org_dir; or continue
+                for repo_dir in $org_dir/*
+                    test -d $repo_dir; or continue
+                    if test -d $repo_dir/.git; or test -f $repo_dir/.git
+                        set rel (string replace -r "^$HOME/Code/" "" -- $repo_dir)
+                        set -a repos $rel
+                    end
                 end
             end
         end
+        printf '%s\n' $repos | sort -u
     end
-    printf '%s\n' $repos | sort -u
 end
 
 # --- Agent selection (shared) ---
 
 function select_agent
     set agent_choice (printf '%s\n' codex gemini claude \
-        | fzf --prompt='Agent> ' --height=40% --reverse --bind='j:down,k:up')
-    or return 1
+        | _fzf_pick_compact Agent)
+    set status_code $status
+    _handle_fzf_status "$status_code" Agent; or return 1
 
     switch "$agent_choice"
         case codex
@@ -45,7 +122,7 @@ function select_agent
             set -g agent_cmd gemini
             set -g agent_bin gemini
         case claude
-            set -g agent_cmd "claude --dangerously-skip-permissions"
+            set -g agent_cmd claude --dangerously-skip-permissions
             set -g agent_bin claude
         case '*'
             echo "Unknown agent selection: $agent_choice" >&2
@@ -64,7 +141,6 @@ end
 function _launch_session
     set session_name $argv[1]
     set session_root $argv[2]
-    set agent_cmd $argv[3]
 
     if tmux has-session -t $session_name 2>/dev/null
         tmux switch-client -t $session_name
@@ -75,59 +151,40 @@ function _launch_session
     end
 end
 
+# --- Type selection ---
+
+set session_type (printf '%s\n' Activity Project Code Workspace Worktree \
+    | _fzf_pick_compact Session)
+set status_code $status
+_handle_fzf_status "$status_code" Session; or exit 0
+
 # --- Activity ---
 
 if test "$session_type" = Activity
-    set dirs
-    for d in $HOME/Activities/*/
-        test -d $d; or continue
-        set -a dirs (basename $d)
-    end
-
-    set chosen (printf '%s\n' $dirs \
-        | fzf --prompt='Activity> ' --height=100% --reverse \
-              --print-query --bind='tab:replace-query')
-    test $status -ne 130; or exit 0
-
-    set dir_name (string trim -- $chosen[-1])
-    test -n "$dir_name"; or exit 0
-
-    set session_root "$HOME/Activities/$dir_name"
-    mkdir -p "$session_root"
+    set session_root (_select_or_create_dir "$HOME/Activities" Activity)
+    or exit 0
 
     select_agent; or exit 0
 
-    set session_name "$dir_name"
+    set dir_name (basename "$session_root")
+    set session_name (_session_name_for "$dir_name")
 
-    _launch_session $session_name $session_root $agent_cmd
+    _launch_session $session_name $session_root
     exit 0
 end
 
 # --- Project ---
 
 if test "$session_type" = Project
-    set dirs
-    for d in $HOME/Projects/*/
-        test -d $d; or continue
-        set -a dirs (basename $d)
-    end
-
-    set chosen (printf '%s\n' $dirs \
-        | fzf --prompt='Project> ' --height=100% --reverse \
-              --print-query --bind='tab:replace-query')
-    test $status -ne 130; or exit 0
-
-    set dir_name (string trim -- $chosen[-1])
-    test -n "$dir_name"; or exit 0
-
-    set session_root "$HOME/Projects/$dir_name"
-    mkdir -p "$session_root"
+    set session_root (_select_or_create_dir "$HOME/Projects" Project)
+    or exit 0
 
     select_agent; or exit 0
 
-    set session_name "$dir_name"
+    set dir_name (basename "$session_root")
+    set session_name (_session_name_for "$dir_name")
 
-    _launch_session $session_name $session_root $agent_cmd
+    _launch_session $session_name $session_root
     exit 0
 end
 
@@ -137,15 +194,16 @@ if test "$session_type" = Code
     set repos (discover_repos)
     test (count $repos) -gt 0; or exit 0
 
-    set repo_rel (printf '%s\n' $repos | fzf --prompt='Code> ' --height=100% --reverse)
-    or exit 0
+    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Code)
+    set status_code $status
+    _handle_fzf_status "$status_code" Code; or exit 0
 
     select_agent; or exit 0
 
     set repo_parts (string split '/' -- $repo_rel)
-    set session_name "$repo_parts[-1]"
+    set session_name (_session_name_for "$repo_parts[-1]")
 
-    _launch_session $session_name "$HOME/Code/$repo_rel" $agent_cmd
+    _launch_session $session_name "$HOME/Code/$repo_rel"
     exit 0
 end
 
@@ -157,8 +215,9 @@ if test "$session_type" = Workspace
     set repos (discover_repos)
     test (count $repos) -gt 0; or exit 0
 
-    set repo_rel (printf '%s\n' $repos | fzf --prompt='Workspace> ' --height=100% --reverse)
-    or exit 0
+    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Workspace)
+    set status_code $status
+    _handle_fzf_status "$status_code" Workspace; or exit 0
 
     set repo_path "$HOME/Code/$repo_rel"
     set repo_parts (string split '/' -- $repo_rel)
@@ -192,18 +251,11 @@ if test "$session_type" = Workspace
     end
 
     set bookmarks (jj -R "$repo_path" bookmark list | sed -n 's/^\([^[:space:]:][^:]*\):.*/\1/p' | sort -u)
-    set bookmark_input (printf '%s\n' $bookmarks \
-        | fzf --prompt='Bookmark> ' --height=100% --reverse \
-              --print-query --bind='tab:replace-query')
-    test $status -ne 130; or exit 0
+    set bookmark_input (printf '%s\n' $bookmarks | _fzf_pick_or_query Bookmark)
+    set status_code $status
+    _handle_fzf_status "$status_code" Bookmark; or exit 0
 
-    set bookmark
-    for line in $bookmark_input
-        set line (string trim -- "$line")
-        if test -n "$line"
-            set bookmark "$line"
-        end
-    end
+    set bookmark (_last_non_empty_line $bookmark_input)
     test -n "$bookmark"; or exit 0
 
     if not string match -rq '^[A-Za-z0-9._/-]+$' -- "$bookmark"
@@ -265,9 +317,9 @@ if test "$session_type" = Workspace
 
     select_agent; or exit 0
 
-    set session_name "$repo_name($bookmark)"
+    set session_name (_session_name_for "$repo_name" "$bookmark")
 
-    _launch_session $session_name "$HOME/Workspaces/$repo_rel/$bookmark" $agent_cmd
+    _launch_session $session_name "$HOME/Workspaces/$repo_rel/$bookmark"
     exit 0
 end
 
@@ -279,24 +331,19 @@ if test "$session_type" = Worktree
     set repos (discover_repos)
     test (count $repos) -gt 0; or exit 0
 
-    set repo_rel (printf '%s\n' $repos | fzf --prompt='Worktree> ' --height=100% --reverse)
-    or exit 0
+    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Worktree)
+    set status_code $status
+    _handle_fzf_status "$status_code" Worktree; or exit 0
 
     set branch_input (git -C "$HOME/Code/$repo_rel" for-each-ref --format='%(refname:short)' refs/heads refs/remotes/origin \
         | sed -E 's#^origin/##' \
         | grep -v '^HEAD$' \
         | sort -u \
-        | fzf --prompt='Branch> ' --height=100% --reverse \
-              --print-query --bind='tab:replace-query')
-    test $status -ne 130; or exit 0
+        | _fzf_pick_or_query Branch)
+    set status_code $status
+    _handle_fzf_status "$status_code" Branch; or exit 0
 
-    set branch
-    for line in $branch_input
-        set line (string trim -- "$line")
-        if test -n "$line"
-            set branch "$line"
-        end
-    end
+    set branch (_last_non_empty_line $branch_input)
     test -n "$branch"; or exit 0
 
     select_agent; or exit 0
@@ -307,7 +354,7 @@ if test "$session_type" = Worktree
     else
         set repo_name $repo_rel
     end
-    set session_name "$repo_name($branch)"
+    set session_name (_session_name_for "$repo_name" "$branch")
     set expected_worktree_path "$HOME/Worktrees/$repo_rel/$branch"
     set worktree_path "$expected_worktree_path"
     set existing_worktree_path (
@@ -352,10 +399,18 @@ if test "$session_type" = Worktree
         end
     end
 
-    if test "$worktree_path" = "$expected_worktree_path"; and git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
-        git -C "$worktree_path" checkout -B "$branch" "origin/$branch"
-        git -C "$worktree_path" clean -fd
-        git -C "$worktree_path" reset --hard "origin/$branch"
+    if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
+        if git -C "$worktree_path" show-ref --verify --quiet "refs/heads/$branch"
+            set relation (git -C "$worktree_path" rev-list --left-right --count "$branch...origin/$branch" 2>/dev/null)
+            if test -n "$relation"
+                set counts (string split ' ' -- "$relation")
+                set ahead $counts[1]
+                set behind $counts[2]
+                if test "$ahead" -ne 0 -o "$behind" -ne 0
+                    echo "Worktree differs from origin/$branch (ahead $ahead, behind $behind); leaving as-is." >&2
+                end
+            end
+        end
     end
 
     if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
@@ -363,6 +418,6 @@ if test "$session_type" = Worktree
         exit 1
     end
 
-    _launch_session $session_name $worktree_path $agent_cmd
+    _launch_session $session_name $worktree_path
     exit 0
 end
