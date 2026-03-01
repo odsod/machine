@@ -53,6 +53,27 @@ function current_head_bookmark
     echo "odsod/push-"(jj log --no-graph -r @ -T 'change_id.short()')
 end
 
+function post_publish_new_working_commit
+    jj new @ >/dev/null
+    or fail "Failed to create follow-up working commit after publish."
+    echo "Started new working commit on top of published change."
+end
+
+function ensure_head_at_current --argument-names head
+    set -l head_at_current (jj log -r "bookmarks(\"$head\") & @" --no-graph | string collect)
+    if test -n "$head_at_current"
+        return 0
+    end
+
+    set -l current_in_head_lineage (jj log -r "@ & descendants(bookmarks(\"$head\"))" --no-graph | string collect)
+    if test -z "$current_in_head_lineage"
+        fail "Current commit is not in lineage of $head. Run: jj new $head or pass correct head."
+    end
+
+    jj bookmark set "$head" -r @
+    or fail "Failed to move $head to current commit."
+end
+
 function sub_sync
     fetch_origin
     echo "Synced refs from origin."
@@ -120,6 +141,7 @@ function sub_pr
     or fail "Failed to create PR for $head."
     xdg-open "$pr_url" >/dev/null 2>&1 || true
     echo "$pr_url"
+    post_publish_new_working_commit
 end
 
 function sub_pr_update
@@ -176,6 +198,7 @@ function sub_pr_update
     end
 
     jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
+    ensure_head_at_current "$head"
     jj git push --remote origin --bookmark "$head"
     or fail "Failed to push bookmark $head."
 
@@ -183,6 +206,7 @@ function sub_pr_update
     test -n "$pr_url"; or fail "Could not resolve PR URL for $head."
     xdg-open "$pr_url" >/dev/null 2>&1 || true
     echo "$pr_url"
+    post_publish_new_working_commit
 end
 
 function usage
