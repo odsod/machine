@@ -8,7 +8,15 @@ command -q fzf; or exit 0
 
 function _fail --argument-names msg
     echo "$msg" >&2
+    _trace "FAIL: $msg"
     exit 1
+end
+
+function _trace --argument-names msg
+    if test -n "$START_SESSION_DEBUG"
+        mkdir -p "$HOME/.cache"
+        printf '%s %s\n' (date '+%Y-%m-%d %H:%M:%S') "$msg" >> "$HOME/.cache/start-session.log"
+    end
 end
 
 function _fzf_pick_compact --argument-names prompt
@@ -29,6 +37,22 @@ function _handle_fzf_status --argument-names status_code prompt
         case 0
             return 0
         case 1 130
+            return 1
+        case '*'
+            echo "$prompt picker failed (fzf exit $status_code)" >&2
+            exit 1
+    end
+end
+
+function _handle_pick_or_query_status --argument-names status_code prompt raw_value
+    switch "$status_code"
+        case 0
+            return 0
+        case 1
+            set -l value (_last_non_empty_line $raw_value)
+            test -n "$value"; and return 0
+            return 1
+        case 130
             return 1
         case '*'
             echo "$prompt picker failed (fzf exit $status_code)" >&2
@@ -64,7 +88,7 @@ function _select_or_create_dir --argument-names base_dir prompt
 
     set -l chosen (printf '%s\n' $dirs | _fzf_pick_or_query "$prompt")
     set -l status_code $status
-    _handle_fzf_status "$status_code" "$prompt"; or return 1
+    _handle_pick_or_query_status "$status_code" "$prompt" "$chosen"; or return 1
 
     set -l dir_name (_last_non_empty_line $chosen)
     test -n "$dir_name"; or return 1
@@ -111,101 +135,17 @@ function discover_repos
     end
 end
 
-function _resolve_clone_input --argument-names input
-    set -g _clone_repo_rel ""
-    set -g _clone_url ""
-    set -g _clone_fallback_url ""
-
-    # GitHub shorthand: org/repo
-    set -l shorthand (string match -r --groups-only '^([^/]+)/([^/]+)$' -- "$input")
-    if test (count $shorthand) -eq 2
-        set -l org "$shorthand[1]"
-        set -l repo "$shorthand[2]"
-        set -g _clone_repo_rel "github.com/$org/$repo"
-        set -g _clone_url "git@github.com:$org/$repo.git"
-        set -g _clone_fallback_url "https://github.com/$org/$repo.git"
-        return 0
-    end
-
-    # SCP-style URL: git@host:path/to/repo(.git)
-    set -l scp_parts (string match -r --groups-only '^[^@]+@([^:]+):(.+)$' -- "$input")
-    if test (count $scp_parts) -eq 2
-        set -l host "$scp_parts[1]"
-        set -l path "$scp_parts[2]"
-        set path (string replace -r '^/+|/+$' '' -- "$path")
-        set path (string replace -r '\.git$' '' -- "$path")
-        test -n "$path"; or return 1
-        set -g _clone_repo_rel "$host/$path"
-        set -g _clone_url "$input"
-        return 0
-    end
-
-    # URL with scheme: https://host/path/to/repo(.git), ssh://host/path
-    set -l url_parts (string match -r --groups-only '^[a-zA-Z][a-zA-Z0-9+.-]*://([^/]+)/(.+)$' -- "$input")
-    if test (count $url_parts) -eq 2
-        set -l host "$url_parts[1]"
-        set host (string replace -r '^.*@' '' -- "$host")
-        set -l path "$url_parts[2]"
-        set path (string replace -r '^/+|/+$' '' -- "$path")
-        set path (string replace -r '\.git$' '' -- "$path")
-        test -n "$path"; or return 1
-        set -g _clone_repo_rel "$host/$path"
-        set -g _clone_url "$input"
-        return 0
-    end
-
-    return 1
-end
-
 function _pick_repo_rel --argument-names prompt
     set -l suggestions (discover_repos)
-    set -l picked
-    if test (count $suggestions) -gt 0
-        set picked (printf '%s\n' $suggestions | _fzf_pick_or_query "$prompt")
-    else
-        set picked (printf '\n' | _fzf_pick_or_query "$prompt")
+    if test (count $suggestions) -eq 0
+        echo "No repos found in ~/Code." >&2
+        return 1
     end
-
+    set -l picked (printf '%s\n' $suggestions | _fzf_pick_full "$prompt")
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
-
-    set -l input (_last_non_empty_line $picked)
-    test -n "$input"; or return 1
-
-    if contains -- "$input" $suggestions
-        printf '%s\n' "$input"
-        return 0
-    end
-
-    _resolve_clone_input "$input"
-    or _fail "Unsupported repository format: $input"
-
-    set -l repo_rel "$_clone_repo_rel"
-    set -l clone_url "$_clone_url"
-    set -l fallback_url "$_clone_fallback_url"
-    set -l dest "$HOME/Code/$repo_rel"
-
-    if test -e "$dest"
-        if not test -d "$dest"
-            _fail "Destination exists and is not a directory: $dest"
-        end
-        if not test -d "$dest/.git"; and not test -f "$dest/.git"; and not test -d "$dest/.jj"
-            _fail "Destination exists but is not a Git/JJ repo: $dest"
-        end
-    else
-        mkdir -p (dirname "$dest")
-        or _fail "Failed to create destination parent for $dest"
-        if not jj git clone "$clone_url" "$dest" >/dev/null 2>&1
-            if test -n "$fallback_url"
-                jj git clone "$fallback_url" "$dest" >/dev/null 2>&1
-                or _fail "Failed to clone repository via SSH and HTTPS."
-            else
-                _fail "Failed to clone repository: $clone_url"
-            end
-        end
-    end
-
-    printf '%s\n' "$repo_rel"
+    test -n "$picked"; or return 1
+    printf '%s\n' "$picked"
 end
 
 function _ensure_jj_repo_ready --argument-names repo_path
@@ -339,6 +279,7 @@ end
 if test "$session_type" = Workspace
     command -q jj; or exit 0
 
+    _trace "workspace: begin"
     set repo_rel (_pick_repo_rel Workspace)
     or exit 0
 
@@ -355,10 +296,11 @@ if test "$session_type" = Workspace
 
     set bookmark_input (printf '%s\n' $suggestion_bookmarks | _fzf_pick_or_query Bookmark)
     set status_code $status
-    _handle_fzf_status "$status_code" Bookmark; or exit 0
+    _handle_pick_or_query_status "$status_code" Bookmark "$bookmark_input"; or exit 0
 
     set selected_bookmark (_last_non_empty_line $bookmark_input)
     test -n "$selected_bookmark"; or exit 0
+    _trace "workspace: repo=$repo_rel bookmark_input=$selected_bookmark"
 
     set bookmark "$selected_bookmark"
     set selected_remote_ref ""
@@ -381,31 +323,30 @@ if test "$session_type" = Workspace
     end
 
     if test -d "$workspace_path"
+        _trace "workspace: existing path $workspace_path"
         jj -R "$workspace_path" root >/dev/null 2>&1
         or begin
             echo "Path exists but is not a jj workspace: $workspace_path" >&2
+            _trace "workspace: existing path is not jj workspace"
             echo "Move/remove that directory and retry." >&2
             exit 1
         end
     else
         mkdir -p "$workspace_parent"
-
-        jj -R "$repo_path" git fetch --remote origin >/dev/null 2>&1
         or begin
-            echo "Failed to fetch origin for $repo_path" >&2
+            echo "Failed to create workspace parent: $workspace_parent" >&2
+            _trace "workspace: mkdir failed $workspace_parent"
             exit 1
         end
 
-        jj -R "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
-        or begin
-            echo "Missing main@origin in $repo_path; cannot create workspace base." >&2
-            exit 1
-        end
+        # Refresh remote refs if possible, but do not require network/auth for local workspace creation.
+        jj -R "$repo_path" git fetch --remote origin >/dev/null 2>&1 || true
 
         if test -n "$selected_remote_ref"
             jj -R "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
             or begin
                 echo "Missing remote bookmark $selected_remote_ref in $repo_path." >&2
+                _trace "workspace: missing remote ref $selected_remote_ref"
                 exit 1
             end
             set base_rev "$selected_remote_ref"
@@ -418,29 +359,38 @@ if test "$session_type" = Workspace
                 set base_rev "$bookmark"
             else if test $origin_bookmark_exists -eq 1
                 set base_rev "$bookmark@origin"
-            else
+            else if jj -R "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
                 set base_rev 'main@origin'
+            else if jj -R "$repo_path" log -r 'main' --no-graph --limit 1 >/dev/null 2>&1
+                set base_rev 'main'
+            else
+                set base_rev '@'
             end
         end
+        _trace "workspace: creating with base_rev=$base_rev path=$workspace_path"
 
         jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
 
-        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
+        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path"
         or begin
             echo "Failed to create workspace at $workspace_path" >&2
+            _trace "workspace: workspace add failed"
             exit 1
         end
 
         if test $bookmark_exists -eq 0
-            jj -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
+            jj -R "$workspace_path" bookmark set "$bookmark" -r @
             or begin
                 echo "Failed to create bookmark $bookmark in $workspace_path" >&2
+                _trace "workspace: bookmark set failed for $bookmark"
                 exit 1
             end
         end
     end
 
+    _trace "workspace: selecting agent"
     select_agent; or exit 0
+    _trace "workspace: launching session"
 
     set session_name (_session_name_for "$repo_name" "$bookmark")
 
