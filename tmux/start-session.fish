@@ -6,6 +6,11 @@ command -q fzf; or exit 0
 
 # --- Shared fzf helpers ---
 
+function _fail --argument-names msg
+    echo "$msg" >&2
+    exit 1
+end
+
 function _fzf_pick_compact --argument-names prompt
     fzf --prompt="$prompt> " --height=40% --reverse --bind='j:down,k:up'
 end
@@ -16,7 +21,7 @@ end
 
 function _fzf_pick_or_query --argument-names prompt
     fzf --prompt="$prompt> " --height=100% --reverse \
-        --print-query --bind='tab:replace-query'
+        --print-query --bind='tab:replace-query,enter:replace-query+print-query+accept'
 end
 
 function _handle_fzf_status --argument-names status_code prompt
@@ -74,7 +79,7 @@ function _select_or_create_dir --argument-names base_dir prompt
     printf '%s\n' "$session_root"
 end
 
-# --- Repo discovery (shared by Code, Workspace, Worktree) ---
+# --- Repo discovery (shared by Code, Workspace) ---
 
 function discover_repos
     if command -q fd
@@ -104,6 +109,123 @@ function discover_repos
         end
         printf '%s\n' $repos | sort -u
     end
+end
+
+function _resolve_clone_input --argument-names input
+    set -g _clone_repo_rel ""
+    set -g _clone_url ""
+    set -g _clone_fallback_url ""
+
+    # GitHub shorthand: org/repo
+    set -l shorthand (string match -r --groups-only '^([^/]+)/([^/]+)$' -- "$input")
+    if test (count $shorthand) -eq 2
+        set -l org "$shorthand[1]"
+        set -l repo "$shorthand[2]"
+        set -g _clone_repo_rel "github.com/$org/$repo"
+        set -g _clone_url "git@github.com:$org/$repo.git"
+        set -g _clone_fallback_url "https://github.com/$org/$repo.git"
+        return 0
+    end
+
+    # SCP-style URL: git@host:path/to/repo(.git)
+    set -l scp_parts (string match -r --groups-only '^[^@]+@([^:]+):(.+)$' -- "$input")
+    if test (count $scp_parts) -eq 2
+        set -l host "$scp_parts[1]"
+        set -l path "$scp_parts[2]"
+        set path (string replace -r '^/+|/+$' '' -- "$path")
+        set path (string replace -r '\.git$' '' -- "$path")
+        test -n "$path"; or return 1
+        set -g _clone_repo_rel "$host/$path"
+        set -g _clone_url "$input"
+        return 0
+    end
+
+    # URL with scheme: https://host/path/to/repo(.git), ssh://host/path
+    set -l url_parts (string match -r --groups-only '^[a-zA-Z][a-zA-Z0-9+.-]*://([^/]+)/(.+)$' -- "$input")
+    if test (count $url_parts) -eq 2
+        set -l host "$url_parts[1]"
+        set host (string replace -r '^.*@' '' -- "$host")
+        set -l path "$url_parts[2]"
+        set path (string replace -r '^/+|/+$' '' -- "$path")
+        set path (string replace -r '\.git$' '' -- "$path")
+        test -n "$path"; or return 1
+        set -g _clone_repo_rel "$host/$path"
+        set -g _clone_url "$input"
+        return 0
+    end
+
+    return 1
+end
+
+function _pick_repo_rel --argument-names prompt
+    set -l suggestions (discover_repos)
+    set -l picked
+    if test (count $suggestions) -gt 0
+        set picked (printf '%s\n' $suggestions | _fzf_pick_or_query "$prompt")
+    else
+        set picked (printf '\n' | _fzf_pick_or_query "$prompt")
+    end
+
+    set -l status_code $status
+    _handle_fzf_status "$status_code" "$prompt"; or return 1
+
+    set -l input (_last_non_empty_line $picked)
+    test -n "$input"; or return 1
+
+    if contains -- "$input" $suggestions
+        printf '%s\n' "$input"
+        return 0
+    end
+
+    _resolve_clone_input "$input"
+    or _fail "Unsupported repository format: $input"
+
+    set -l repo_rel "$_clone_repo_rel"
+    set -l clone_url "$_clone_url"
+    set -l fallback_url "$_clone_fallback_url"
+    set -l dest "$HOME/Code/$repo_rel"
+
+    if test -e "$dest"
+        if not test -d "$dest"
+            _fail "Destination exists and is not a directory: $dest"
+        end
+        if not test -d "$dest/.git"; and not test -f "$dest/.git"; and not test -d "$dest/.jj"
+            _fail "Destination exists but is not a Git/JJ repo: $dest"
+        end
+    else
+        mkdir -p (dirname "$dest")
+        or _fail "Failed to create destination parent for $dest"
+        if not jj git clone "$clone_url" "$dest" >/dev/null 2>&1
+            if test -n "$fallback_url"
+                jj git clone "$fallback_url" "$dest" >/dev/null 2>&1
+                or _fail "Failed to clone repository via SSH and HTTPS."
+            else
+                _fail "Failed to clone repository: $clone_url"
+            end
+        end
+    end
+
+    printf '%s\n' "$repo_rel"
+end
+
+function _ensure_jj_repo_ready --argument-names repo_path
+    if not test -d "$repo_path/.jj"
+        jj git init --colocate "$repo_path" >/dev/null 2>&1
+        or _fail "Failed to initialize jj in $repo_path"
+    end
+
+    set -l colocation_status (jj -R "$repo_path" git colocation status 2>&1)
+    or _fail "$colocation_status"
+    if not string match -rq "currently colocated" -- "$colocation_status"
+        jj -R "$repo_path" git colocation enable >/dev/null 2>&1
+        or _fail "Failed to enable jj/git colocation in $repo_path"
+    end
+
+    jj -R "$repo_path" git import >/dev/null 2>&1
+    or _fail "Failed to import git refs into jj for $repo_path"
+
+    jj -R "$repo_path" git fetch --remote origin --branch main >/dev/null 2>&1
+    or _fail "Failed to fetch origin/main for $repo_path"
 end
 
 # --- Agent selection (shared) ---
@@ -153,7 +275,7 @@ end
 
 # --- Type selection ---
 
-set session_type (printf '%s\n' Activity Project Code Workspace Worktree \
+set session_type (printf '%s\n' Activity Project Code Workspace \
     | _fzf_pick_compact Session)
 set status_code $status
 _handle_fzf_status "$status_code" Session; or exit 0
@@ -191,19 +313,24 @@ end
 # --- Code ---
 
 if test "$session_type" = Code
-    set repos (discover_repos)
-    test (count $repos) -gt 0; or exit 0
-
-    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Code)
-    set status_code $status
-    _handle_fzf_status "$status_code" Code; or exit 0
+    set repo_rel (_pick_repo_rel Code)
+    or exit 0
 
     select_agent; or exit 0
+
+    command -q jj
+    or begin
+        echo "jj is required for Code sessions: not found in PATH." >&2
+        exit 1
+    end
+
+    set repo_path "$HOME/Code/$repo_rel"
+    _ensure_jj_repo_ready "$repo_path"
 
     set repo_parts (string split '/' -- $repo_rel)
     set session_name (_session_name_for "$repo_parts[-1]")
 
-    _launch_session $session_name "$HOME/Code/$repo_rel"
+    _launch_session $session_name "$repo_path"
     exit 0
 end
 
@@ -212,61 +339,44 @@ end
 if test "$session_type" = Workspace
     command -q jj; or exit 0
 
-    set repos (discover_repos)
-    test (count $repos) -gt 0; or exit 0
-
-    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Workspace)
-    set status_code $status
-    _handle_fzf_status "$status_code" Workspace; or exit 0
+    set repo_rel (_pick_repo_rel Workspace)
+    or exit 0
 
     set repo_path "$HOME/Code/$repo_rel"
     set repo_parts (string split '/' -- $repo_rel)
     set repo_name $repo_parts[-1]
+    _ensure_jj_repo_ready "$repo_path"
 
-    if not test -d "$repo_path/.jj"
-        jj git init --colocate "$repo_path"
-        or begin
-            echo "Failed to initialize jj in $repo_path" >&2
-            exit 1
-        end
-    end
+    set local_bookmarks (jj -R "$repo_path" bookmark list -T 'self.name() ++ "\n"' | sed '/^$/d' | sort -u)
+    set remote_bookmarks (jj -R "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' \
+        | sed '/^$/d' \
+        | sort -u)
+    set suggestion_bookmarks (printf '%s\n' $local_bookmarks $remote_bookmarks | sed '/^$/d' | sort -u)
 
-    set colocation_status (jj -R "$repo_path" git colocation status 2>&1)
-    or begin
-        echo "$colocation_status" >&2
-        exit 1
-    end
-    if not string match -rq "currently colocated" -- "$colocation_status"
-        jj -R "$repo_path" git colocation enable
-        or begin
-            echo "Failed to enable jj/git colocation in $repo_path" >&2
-            exit 1
-        end
-    end
-
-    jj -R "$repo_path" git import >/dev/null
-    or begin
-        echo "Failed to import git refs into jj for $repo_path" >&2
-        exit 1
-    end
-
-    set bookmarks (jj -R "$repo_path" bookmark list | sed -n 's/^\([^[:space:]:][^:]*\):.*/\1/p' | sort -u)
-    set bookmark_input (printf '%s\n' $bookmarks | _fzf_pick_or_query Bookmark)
+    set bookmark_input (printf '%s\n' $suggestion_bookmarks | _fzf_pick_or_query Bookmark)
     set status_code $status
     _handle_fzf_status "$status_code" Bookmark; or exit 0
 
-    set bookmark (_last_non_empty_line $bookmark_input)
-    test -n "$bookmark"; or exit 0
+    set selected_bookmark (_last_non_empty_line $bookmark_input)
+    test -n "$selected_bookmark"; or exit 0
+
+    set bookmark "$selected_bookmark"
+    set selected_remote_ref ""
+    set selected_remote_parts (string match -r --groups-only '^(.+)@origin$' -- "$selected_bookmark")
+    if test (count $selected_remote_parts) -eq 1
+        set bookmark "$selected_remote_parts[1]"
+        set selected_remote_ref "$selected_bookmark"
+    end
 
     if not string match -rq '^[A-Za-z0-9._/-]+$' -- "$bookmark"
-        echo "Invalid bookmark name: $bookmark" >&2
+        echo "Invalid bookmark name: $selected_bookmark" >&2
         exit 1
     end
 
     set workspace_path "$HOME/Workspaces/$repo_rel/$bookmark"
     set workspace_parent (dirname "$workspace_path")
     set bookmark_exists 0
-    if contains -- "$bookmark" $bookmarks
+    if contains -- "$bookmark" $local_bookmarks
         set bookmark_exists 1
     end
 
@@ -280,9 +390,9 @@ if test "$session_type" = Workspace
     else
         mkdir -p "$workspace_parent"
 
-        jj -R "$repo_path" git fetch --remote origin --branch main
+        jj -R "$repo_path" git fetch --remote origin >/dev/null 2>&1
         or begin
-            echo "Failed to fetch origin/main for $repo_path" >&2
+            echo "Failed to fetch origin for $repo_path" >&2
             exit 1
         end
 
@@ -292,22 +402,37 @@ if test "$session_type" = Workspace
             exit 1
         end
 
-        if test $bookmark_exists -eq 1
-            set base_rev "$bookmark"
+        if test -n "$selected_remote_ref"
+            jj -R "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
+            or begin
+                echo "Missing remote bookmark $selected_remote_ref in $repo_path." >&2
+                exit 1
+            end
+            set base_rev "$selected_remote_ref"
         else
-            set base_rev 'main@origin'
+            set origin_bookmark_exists 0
+            jj -R "$repo_path" log -r "$bookmark@origin" --no-graph --limit 1 >/dev/null 2>&1
+            and set origin_bookmark_exists 1
+
+            if test $bookmark_exists -eq 1
+                set base_rev "$bookmark"
+            else if test $origin_bookmark_exists -eq 1
+                set base_rev "$bookmark@origin"
+            else
+                set base_rev 'main@origin'
+            end
         end
 
         jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
 
-        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path"
+        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
         or begin
             echo "Failed to create workspace at $workspace_path" >&2
             exit 1
         end
 
         if test $bookmark_exists -eq 0
-            jj -R "$workspace_path" bookmark set "$bookmark" -r @
+            jj -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
             or begin
                 echo "Failed to create bookmark $bookmark in $workspace_path" >&2
                 exit 1
@@ -320,104 +445,5 @@ if test "$session_type" = Workspace
     set session_name (_session_name_for "$repo_name" "$bookmark")
 
     _launch_session $session_name "$HOME/Workspaces/$repo_rel/$bookmark"
-    exit 0
-end
-
-# --- Worktree ---
-
-if test "$session_type" = Worktree
-    command -q git; or exit 0
-
-    set repos (discover_repos)
-    test (count $repos) -gt 0; or exit 0
-
-    set repo_rel (printf '%s\n' $repos | _fzf_pick_full Worktree)
-    set status_code $status
-    _handle_fzf_status "$status_code" Worktree; or exit 0
-
-    set branch_input (git -C "$HOME/Code/$repo_rel" for-each-ref --format='%(refname:short)' refs/heads refs/remotes/origin \
-        | sed -E 's#^origin/##' \
-        | grep -v '^HEAD$' \
-        | sort -u \
-        | _fzf_pick_or_query Branch)
-    set status_code $status
-    _handle_fzf_status "$status_code" Branch; or exit 0
-
-    set branch (_last_non_empty_line $branch_input)
-    test -n "$branch"; or exit 0
-
-    select_agent; or exit 0
-
-    set repo_parts (string split '/' -- $repo_rel)
-    if test (count $repo_parts) -ge 1
-        set repo_name $repo_parts[-1]
-    else
-        set repo_name $repo_rel
-    end
-    set session_name (_session_name_for "$repo_name" "$branch")
-    set expected_worktree_path "$HOME/Worktrees/$repo_rel/$branch"
-    set worktree_path "$expected_worktree_path"
-    set existing_worktree_path (
-        git -C "$HOME/Code/$repo_rel" worktree list --porcelain \
-        | awk -v target="refs/heads/$branch" '
-            $1 == "worktree" { path = $2 }
-            $1 == "branch" && $2 == target { print path; exit }
-        '
-    )
-    if test -n "$existing_worktree_path"
-        set worktree_path "$existing_worktree_path"
-    end
-
-    mkdir -p "$HOME/Worktrees/$repo_rel"
-    git -C "$HOME/Code/$repo_rel" fetch --prune origin 2>/dev/null; or true
-
-    if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
-        if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/heads/$branch"
-            git -C "$HOME/Code/$repo_rel" worktree add "$expected_worktree_path" "$branch"
-        else if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
-            git -C "$HOME/Code/$repo_rel" worktree add --track -b "$branch" "$expected_worktree_path" "origin/$branch"
-        else
-            git -C "$HOME/Code/$repo_rel" worktree add -b "$branch" "$expected_worktree_path" HEAD
-        end
-
-        if not git -C "$expected_worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
-            set existing_worktree_path (
-                git -C "$HOME/Code/$repo_rel" worktree list --porcelain \
-                | awk -v target="refs/heads/$branch" '
-                    $1 == "worktree" { path = $2 }
-                    $1 == "branch" && $2 == target { print path; exit }
-                '
-            )
-            if test -n "$existing_worktree_path"
-                set worktree_path "$existing_worktree_path"
-            else
-                echo "Failed to create/find worktree for branch: $branch" >&2
-                exit 1
-            end
-        else
-            set worktree_path "$expected_worktree_path"
-        end
-    end
-
-    if git -C "$HOME/Code/$repo_rel" show-ref --verify --quiet "refs/remotes/origin/$branch"
-        if git -C "$worktree_path" show-ref --verify --quiet "refs/heads/$branch"
-            set relation (git -C "$worktree_path" rev-list --left-right --count "$branch...origin/$branch" 2>/dev/null)
-            if test -n "$relation"
-                set counts (string split ' ' -- "$relation")
-                set ahead $counts[1]
-                set behind $counts[2]
-                if test "$ahead" -ne 0 -o "$behind" -ne 0
-                    echo "Worktree differs from origin/$branch (ahead $ahead, behind $behind); leaving as-is." >&2
-                end
-            end
-        end
-    end
-
-    if not git -C "$worktree_path" rev-parse --is-inside-work-tree >/dev/null 2>&1
-        echo "Resolved path is not a git worktree: $worktree_path" >&2
-        exit 1
-    end
-
-    _launch_session $session_name $worktree_path
     exit 0
 end
