@@ -223,7 +223,7 @@ end
 
 # --- Type selection ---
 
-set session_type (printf '%s\n' Activity Project Code Workspace \
+set session_type (printf '%s\n' Workspace Code Activity Project \
     | _fzf_pick_compact Session)
 set status_code $status
 _handle_fzf_status "$status_code" Session; or exit 0
