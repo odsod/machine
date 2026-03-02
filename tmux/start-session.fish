@@ -196,7 +196,7 @@ function select_agent
             set -g agent_cmd gemini
             set -g agent_bin gemini
         case claude
-            set -g agent_cmd claude --dangerously-skip-permissions
+            set -g agent_cmd claude
             set -g agent_bin claude
         case '*'
             echo "Unknown agent selection: $agent_choice" >&2
