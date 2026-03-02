@@ -29,7 +29,7 @@ end
 
 function _fzf_pick_or_query --argument-names prompt
     fzf --prompt="$prompt> " --height=100% --reverse \
-        --print-query --bind='tab:replace-query,enter:replace-query+print-query+accept'
+        --print-query --bind='tab:replace-query,enter:print-query+accept'
 end
 
 function _handle_fzf_status --argument-names status_code prompt
@@ -49,7 +49,7 @@ function _handle_pick_or_query_status --argument-names status_code prompt raw_va
         case 0
             return 0
         case 1
-            set -l value (_last_non_empty_line $raw_value)
+            set -l value (_first_non_empty_line $raw_value)
             test -n "$value"; and return 0
             return 1
         case 130
@@ -60,15 +60,15 @@ function _handle_pick_or_query_status --argument-names status_code prompt raw_va
     end
 end
 
-function _last_non_empty_line
-    set -l last
+function _first_non_empty_line
     for line in $argv
         set line (string trim -- "$line")
         if test -n "$line"
-            set last "$line"
+            printf '%s\n' "$line"
+            return 0
         end
     end
-    printf '%s\n' "$last"
+    return 1
 end
 
 function _status_show --argument-names msg
@@ -98,7 +98,7 @@ function _select_or_create_dir --argument-names base_dir prompt
     set -l status_code $status
     _handle_pick_or_query_status "$status_code" "$prompt" "$chosen"; or return 1
 
-    set -l dir_name (_last_non_empty_line $chosen)
+    set -l dir_name (_first_non_empty_line $chosen)
     test -n "$dir_name"; or return 1
 
     set -l session_root "$base_dir/$dir_name"
@@ -315,7 +315,7 @@ if test "$session_type" = Workspace
     set status_code $status
     _handle_pick_or_query_status "$status_code" Bookmark "$bookmark_input"; or exit 0
 
-    set selected_bookmark (_last_non_empty_line $bookmark_input)
+    set selected_bookmark (_first_non_empty_line $bookmark_input)
     test -n "$selected_bookmark"; or exit 0
     _trace "workspace: repo=$repo_rel bookmark_input=$selected_bookmark"
 
