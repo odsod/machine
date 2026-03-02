@@ -323,7 +323,19 @@ if test "$session_type" = Workspace
         exit 1
     end
 
-    set workspace_path "$HOME/Workspaces/$repo_rel/$bookmark"
+    set desired_workspace_path "$HOME/Workspaces/$repo_rel/$bookmark"
+    set workspace_path "$desired_workspace_path"
+    set existing_workspace_path (jj -R "$repo_path" workspace root --name "$bookmark" 2>/dev/null)
+    if test $status -eq 0
+        if test -n "$existing_workspace_path"
+            if test -d "$existing_workspace_path"
+                set workspace_path "$existing_workspace_path"
+            else
+                jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
+            end
+        end
+    end
+
     set workspace_parent (dirname "$workspace_path")
     set bookmark_exists 0
     if contains -- "$bookmark" $local_bookmarks
@@ -367,10 +379,10 @@ if test "$session_type" = Workspace
             jj -R "$repo_path" log -r "$bookmark@origin" --no-graph --limit 1 >/dev/null 2>&1
             and set origin_bookmark_exists 1
 
-            if test $bookmark_exists -eq 1
-                set base_rev "$bookmark"
-            else if test $origin_bookmark_exists -eq 1
+            if test $origin_bookmark_exists -eq 1
                 set base_rev "$bookmark@origin"
+            else if test $bookmark_exists -eq 1
+                set base_rev "$bookmark"
             else if jj -R "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
                 set base_rev 'main@origin'
             else if jj -R "$repo_path" log -r 'main' --no-graph --limit 1 >/dev/null 2>&1
@@ -409,6 +421,6 @@ if test "$session_type" = Workspace
 
     set session_name (_session_name_for "$repo_name" "$bookmark")
 
-    _launch_session $session_name "$HOME/Workspaces/$repo_rel/$bookmark"
+    _launch_session $session_name "$workspace_path"
     exit 0
 end
