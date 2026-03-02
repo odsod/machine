@@ -406,7 +406,17 @@ if test "$session_type" = Workspace
 
         _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
 
-        _jj_repo "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
+        # workspace add updates the default working copy and fails if it is stale.
+        jj -R "$repo_path" workspace update-stale >/dev/null 2>&1
+        or begin
+            _status_clear
+            echo "Failed to refresh stale workspace in $repo_path" >&2
+            _trace "workspace: workspace update-stale failed"
+            exit 1
+        end
+
+        # workspace add must update a working copy; do not use --ignore-working-copy here.
+        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
         or begin
             _status_clear
             echo "Failed to create workspace at $workspace_path" >&2
