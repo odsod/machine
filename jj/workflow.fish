@@ -104,6 +104,25 @@ function current_head_bookmark_for_rev --argument-names rev
     echo "odsod/push-$target_change"
 end
 
+function pr_title_for_rev --argument-names rev default_title
+    set -l description (jj log -r "$rev" --no-graph -T 'description' | string collect)
+    set -l lines (string split \n -- "$description")
+    set -l title (string trim -- "$lines[1]")
+    if test -n "$title"
+        echo "$title"
+    else
+        echo "$default_title"
+    end
+end
+
+function pr_body_for_rev --argument-names rev
+    set -l description (jj log -r "$rev" --no-graph -T 'description' | string collect)
+    set -l lines (string split \n -- "$description")
+    if test (count $lines) -gt 1
+        string join \n -- $lines[2..-1] | string trim
+    end
+end
+
 function post_publish_new_working_commit
     if commit_is_empty "@"
         echo "Already on an empty working commit."
@@ -186,6 +205,8 @@ function sub_pr
 
     set -l head (current_head_bookmark_for_rev "$target")
     test -n "$head"; or fail "Could not determine PR head bookmark."
+    set -l pr_title (pr_title_for_rev "$target" "chore: update $head")
+    set -l pr_body (pr_body_for_rev "$target")
 
     if string match -rq '^odsod/push-' -- "$head"
         jj git push -c "$target"
@@ -197,7 +218,7 @@ function sub_pr
         or fail "Failed to push bookmark $head."
     end
 
-    set -l pr_url (gh pr create --repo "$repo" --head "$head" --fill)
+    set -l pr_url (gh pr create --repo "$repo" --head "$head" --title "$pr_title" --body "$pr_body")
     or fail "Failed to create PR for $head."
     xdg-open "$pr_url" >/dev/null 2>&1 || true
     echo "$pr_url"
