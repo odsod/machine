@@ -108,7 +108,7 @@ end
 function discover_repos
     if command -q fd
         set -l repos
-        for git_path in (fd --hidden --follow --glob '.git' . "$HOME/Code" 2>/dev/null)
+        for git_path in (fd --hidden --follow --glob '.git' --search-path "$HOME/Code" 2>/dev/null)
             set -l repo_dir (dirname "$git_path")
             set -l rel (string replace -r "^$HOME/Code/" "" -- "$repo_dir")
             if string match -rq '^[^/]+/[^/]+/[^/]+$' -- "$rel"
