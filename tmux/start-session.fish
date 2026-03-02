@@ -71,6 +71,14 @@ function _last_non_empty_line
     printf '%s\n' "$last"
 end
 
+function _status_show --argument-names msg
+    printf '\r\033[2K%s' "$msg"
+end
+
+function _status_clear
+    printf '\r\033[2K'
+end
+
 function _session_name_for --argument-names base suffix
     if test -n "$suffix"
         printf '%s(%s)\n' "$base" "$suffix"
@@ -321,11 +329,13 @@ if test "$session_type" = Workspace
     if contains -- "$bookmark" $local_bookmarks
         set bookmark_exists 1
     end
+    _status_show "Setting up worktree..."
 
     if test -d "$workspace_path"
         _trace "workspace: existing path $workspace_path"
         jj -R "$workspace_path" root >/dev/null 2>&1
         or begin
+            _status_clear
             echo "Path exists but is not a jj workspace: $workspace_path" >&2
             _trace "workspace: existing path is not jj workspace"
             echo "Move/remove that directory and retry." >&2
@@ -334,6 +344,7 @@ if test "$session_type" = Workspace
     else
         mkdir -p "$workspace_parent"
         or begin
+            _status_clear
             echo "Failed to create workspace parent: $workspace_parent" >&2
             _trace "workspace: mkdir failed $workspace_parent"
             exit 1
@@ -345,6 +356,7 @@ if test "$session_type" = Workspace
         if test -n "$selected_remote_ref"
             jj -R "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
             or begin
+                _status_clear
                 echo "Missing remote bookmark $selected_remote_ref in $repo_path." >&2
                 _trace "workspace: missing remote ref $selected_remote_ref"
                 exit 1
@@ -371,16 +383,18 @@ if test "$session_type" = Workspace
 
         jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
 
-        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path"
+        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
         or begin
+            _status_clear
             echo "Failed to create workspace at $workspace_path" >&2
             _trace "workspace: workspace add failed"
             exit 1
         end
 
         if test $bookmark_exists -eq 0
-            jj -R "$workspace_path" bookmark set "$bookmark" -r @
+            jj -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
             or begin
+                _status_clear
                 echo "Failed to create bookmark $bookmark in $workspace_path" >&2
                 _trace "workspace: bookmark set failed for $bookmark"
                 exit 1
@@ -388,6 +402,7 @@ if test "$session_type" = Workspace
         end
     end
 
+    _status_clear
     _trace "workspace: selecting agent"
     select_agent; or exit 0
     _trace "workspace: launching session"
