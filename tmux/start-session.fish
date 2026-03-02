@@ -300,13 +300,18 @@ if test "$session_type" = Workspace
     set repo_name $repo_parts[-1]
     _ensure_jj_repo_ready "$repo_path"
 
-    set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' | sed '/^$/d' | sort -u)
-    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' \
+    set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' 2>/dev/null | sed '/^$/d' | sort -u)
+    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' 2>/dev/null \
         | sed '/^$/d' \
         | sort -u)
     set suggestion_bookmarks (printf '%s\n' $local_bookmarks $remote_bookmarks | sed '/^$/d' | sort -u)
 
-    set bookmark_input (printf '%s\n' $suggestion_bookmarks | _fzf_pick_or_query Bookmark)
+    set bookmark_input ""
+    if test (count $suggestion_bookmarks) -gt 0
+        set bookmark_input (printf '%s\n' $suggestion_bookmarks | _fzf_pick_or_query Bookmark)
+    else
+        set bookmark_input (printf '\n' | _fzf_pick_or_query Bookmark)
+    end
     set status_code $status
     _handle_pick_or_query_status "$status_code" Bookmark "$bookmark_input"; or exit 0
 
