@@ -156,23 +156,27 @@ function _pick_repo_rel --argument-names prompt
     printf '%s\n' "$picked"
 end
 
+function _jj_repo --argument-names repo_path
+    jj --ignore-working-copy -R "$repo_path" $argv[2..-1]
+end
+
 function _ensure_jj_repo_ready --argument-names repo_path
     if not test -d "$repo_path/.jj"
         jj git init --colocate "$repo_path" >/dev/null 2>&1
         or _fail "Failed to initialize jj in $repo_path"
     end
 
-    set -l colocation_status (jj -R "$repo_path" git colocation status 2>&1)
+    set -l colocation_status (_jj_repo "$repo_path" git colocation status 2>&1)
     or _fail "$colocation_status"
     if not string match -rq "currently colocated" -- "$colocation_status"
-        jj -R "$repo_path" git colocation enable >/dev/null 2>&1
+        _jj_repo "$repo_path" git colocation enable >/dev/null 2>&1
         or _fail "Failed to enable jj/git colocation in $repo_path"
     end
 
-    jj -R "$repo_path" git import >/dev/null 2>&1
+    _jj_repo "$repo_path" git import >/dev/null 2>&1
     or _fail "Failed to import git refs into jj for $repo_path"
 
-    jj -R "$repo_path" git fetch --remote origin --branch main >/dev/null 2>&1
+    _jj_repo "$repo_path" git fetch --remote origin --branch main >/dev/null 2>&1
     or _fail "Failed to fetch origin/main for $repo_path"
 end
 
@@ -296,8 +300,8 @@ if test "$session_type" = Workspace
     set repo_name $repo_parts[-1]
     _ensure_jj_repo_ready "$repo_path"
 
-    set local_bookmarks (jj -R "$repo_path" bookmark list -T 'self.name() ++ "\n"' | sed '/^$/d' | sort -u)
-    set remote_bookmarks (jj -R "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' \
+    set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' | sed '/^$/d' | sort -u)
+    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' \
         | sed '/^$/d' \
         | sort -u)
     set suggestion_bookmarks (printf '%s\n' $local_bookmarks $remote_bookmarks | sed '/^$/d' | sort -u)
@@ -325,13 +329,13 @@ if test "$session_type" = Workspace
 
     set desired_workspace_path "$HOME/Workspaces/$repo_rel/$bookmark"
     set workspace_path "$desired_workspace_path"
-    set existing_workspace_path (jj -R "$repo_path" workspace root --name "$bookmark" 2>/dev/null)
+    set existing_workspace_path (_jj_repo "$repo_path" workspace root --name "$bookmark" 2>/dev/null)
     if test $status -eq 0
         if test -n "$existing_workspace_path"
             if test -d "$existing_workspace_path"
                 set workspace_path "$existing_workspace_path"
             else
-                jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
+                _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
             end
         end
     end
@@ -345,7 +349,7 @@ if test "$session_type" = Workspace
 
     if test -d "$workspace_path"
         _trace "workspace: existing path $workspace_path"
-        jj -R "$workspace_path" root >/dev/null 2>&1
+        jj --ignore-working-copy -R "$workspace_path" root >/dev/null 2>&1
         or begin
             _status_clear
             echo "Path exists but is not a jj workspace: $workspace_path" >&2
@@ -363,10 +367,10 @@ if test "$session_type" = Workspace
         end
 
         # Refresh remote refs if possible, but do not require network/auth for local workspace creation.
-        jj -R "$repo_path" git fetch --remote origin >/dev/null 2>&1 || true
+        _jj_repo "$repo_path" git fetch --remote origin >/dev/null 2>&1 || true
 
         if test -n "$selected_remote_ref"
-            jj -R "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
+            _jj_repo "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
             or begin
                 _status_clear
                 echo "Missing remote bookmark $selected_remote_ref in $repo_path." >&2
@@ -376,16 +380,16 @@ if test "$session_type" = Workspace
             set base_rev "$selected_remote_ref"
         else
             set origin_bookmark_exists 0
-            jj -R "$repo_path" log -r "$bookmark@origin" --no-graph --limit 1 >/dev/null 2>&1
+            _jj_repo "$repo_path" log -r "$bookmark@origin" --no-graph --limit 1 >/dev/null 2>&1
             and set origin_bookmark_exists 1
 
             if test $origin_bookmark_exists -eq 1
                 set base_rev "$bookmark@origin"
             else if test $bookmark_exists -eq 1
                 set base_rev "$bookmark"
-            else if jj -R "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
+            else if _jj_repo "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
                 set base_rev 'main@origin'
-            else if jj -R "$repo_path" log -r 'main' --no-graph --limit 1 >/dev/null 2>&1
+            else if _jj_repo "$repo_path" log -r 'main' --no-graph --limit 1 >/dev/null 2>&1
                 set base_rev 'main'
             else
                 set base_rev '@'
@@ -393,9 +397,9 @@ if test "$session_type" = Workspace
         end
         _trace "workspace: creating with base_rev=$base_rev path=$workspace_path"
 
-        jj -R "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
+        _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
 
-        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
+        _jj_repo "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
         or begin
             _status_clear
             echo "Failed to create workspace at $workspace_path" >&2
@@ -404,7 +408,7 @@ if test "$session_type" = Workspace
         end
 
         if test $bookmark_exists -eq 0
-            jj -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
+            jj --ignore-working-copy -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
             or begin
                 _status_clear
                 echo "Failed to create bookmark $bookmark in $workspace_path" >&2
