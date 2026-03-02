@@ -215,13 +215,15 @@ end
 function _launch_session
     set session_name $argv[1]
     set session_root $argv[2]
+    set target_session "=$session_name"
 
-    if tmux has-session -t $session_name 2>/dev/null
-        tmux switch-client -t $session_name
+    if tmux has-session -t "$target_session" 2>/dev/null
+        tmux switch-client -t "$target_session"
     else
         tmux new-session -d -s $session_name -c $session_root -n editor
-        tmux send-keys -t "$session_name:editor" $agent_cmd Enter
-        tmux switch-client -t $session_name
+        tmux send-keys -l -t "$target_session:editor" -- "$agent_cmd"
+        tmux send-keys -t "$target_session:editor" Enter
+        tmux switch-client -t "$target_session"
     end
 end
 
