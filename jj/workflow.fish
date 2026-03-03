@@ -293,9 +293,54 @@ function sub_pr_update
     post_publish_new_working_commit
 end
 
+function sub_end
+    set -l workspace_name (jj workspace list \
+        -T 'if(self.target().current_working_copy(), self.name(), "") ++ "\n"' \
+        | sed '/^$/d' | head -n1)
+    test -n "$workspace_name"
+        or fail "Could not determine current workspace name."
+
+    if test "$workspace_name" = "default"
+        fail "Cannot close the default workspace."
+    end
+
+    set -l workspace_root (jj workspace root)
+    test -n "$workspace_root"
+        or fail "Could not determine workspace root."
+
+    set -l repo_name (basename (dirname "$workspace_root"))
+    set -l session_name "$repo_name($workspace_name)"
+
+    echo "Closing workspace: $workspace_name"
+    echo "  Session:  $session_name"
+    echo "  Path:     $workspace_root"
+
+    jj bookmark delete "$workspace_name" 2>/dev/null
+        or echo "Note: bookmark '$workspace_name' not found or already deleted."
+
+    jj workspace forget "$workspace_name"
+        or fail "Failed to forget workspace '$workspace_name'."
+
+    if set -q TMUX
+        tmux switch-client -l 2>/dev/null
+            or tmux switch-client -t \
+                (tmux list-sessions -F '#{session_name}' 2>/dev/null \
+                    | grep -v "^$session_name\$" | head -n1) 2>/dev/null
+            or true
+    end
+
+    rm -rf "$workspace_root"
+        or fail "Failed to remove workspace directory: $workspace_root"
+
+    tmux kill-session -t "=$session_name" 2>/dev/null
+        or true
+
+    echo "Done."
+end
+
 function usage
     echo "Usage: jj-workflow <subcommand>"
-    echo "Subcommands: sync clean start pr-check pr pr-update"
+    echo "Subcommands: sync clean start pr-check pr pr-update end"
 end
 
 if not command -q jj
@@ -328,6 +373,9 @@ switch "$subcmd"
         sub_pr
     case pr-update
         sub_pr_update $subargs
+    case end
+        test (count $subargs) -eq 0; or fail "Usage: jj end"
+        sub_end
     case '*'
         usage
         exit 1
