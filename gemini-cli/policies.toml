@@ -1,0 +1,5 @@
+[[rule]]
+toolName = "save_memory"
+decision = "deny"
+priority = 100
+deny_message = "Tool is disabled by policy."
