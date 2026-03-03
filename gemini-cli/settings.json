@@ -7,7 +7,7 @@
     "fileFiltering": {
       "respectGitIgnore": false
     },
-    "loadMemoryFromIncludeDirectories": true
+    "loadMemoryFromIncludeDirectories": false
   },
   "hooks": {
     "AfterAgent": [
@@ -76,7 +76,10 @@
     }
   },
   "tools": {
-    "sandbox": false
+    "sandbox": false,
+    "exclude": [
+      "save_memory"
+    ]
   },
   "experimental": {
     "plan": true
