@@ -28,6 +28,7 @@ $(package_dir)/dist/daemon.js: $(version_dir)/$(name)-$(version).tgz
 	$(info [$(name)] Extracting $<...)
 	@tar -C $(version_dir) -xzf $<
 	@chmod +x $(package_dir)/bin/agent-browser-linux-x64
+	@touch $@
 
 $(version_dir)/$(name)-$(version).tgz:
 	$(info [$(name)] Downloading $(url)...)
