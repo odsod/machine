@@ -76,10 +76,7 @@
     }
   },
   "tools": {
-    "sandbox": false,
-    "exclude": [
-      "save_memory"
-    ]
+    "sandbox": false
   },
   "experimental": {
     "plan": true
