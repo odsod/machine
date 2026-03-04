@@ -40,6 +40,14 @@ upstream_work = "@ | ancestors(remote_bookmarks().., 2) | trunk()"
 # Default view: current work + your bookmarked branches + latest upstream main context.
 log = "present(@ | ancestors(@, 4) | (bookmarks() & mine()) | main@origin | descendants(main@origin, 4))"
 
+[signing]
+backend = "ssh"
+behavior = "drop"
+key = "~/.ssh/id_rsa.pub"
+
+[git]
+sign-on-push = true
+
 [ui]
 editor = ["nvim"]
 default-command = ["log"]
