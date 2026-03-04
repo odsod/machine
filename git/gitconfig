@@ -1,6 +1,13 @@
 [user]
   name = Oscar Söderlund
   email = odsod@users.noreply.github.com
+  signingkey = ~/.ssh/id_rsa.pub
+
+[gpg]
+  format = ssh
+
+[commit]
+  gpgsign = true
 
 [core]
   editor = nvim
