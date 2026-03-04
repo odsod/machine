@@ -2,11 +2,27 @@ name := go
 # Discovery: https://go.dev/VERSION?m=text
 version := 1.26.0
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
+
+# Discovery: https://github.com/golang/tools/releases (tags: gopls/v*)
+gopls_version := v0.21.1
+# Discovery: https://github.com/dominikh/go-tools/releases
+staticcheck_version := 2026.1
+# Discovery: https://github.com/mvdan/gofumpt/releases
+gofumpt_version := v0.9.2
+
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
 all: \
-	~/.local/share/odsod/machine/go
+	~/.local/share/odsod/machine/go \
+	tools
+
+.PHONY: tools
+tools: ~/.local/share/odsod/machine/go
+	$(info [$(name)] Installing tools...)
+	@~/.local/share/odsod/machine/go/bin/go install golang.org/x/tools/gopls@$(gopls_version)
+	@~/.local/share/odsod/machine/go/bin/go install honnef.co/go/tools/cmd/staticcheck@$(staticcheck_version)
+	@~/.local/share/odsod/machine/go/bin/go install mvdan.cc/gofumpt@$(gofumpt_version)
 
 .PHONY: ~/.local/share/odsod/machine/go
 ~/.local/share/odsod/machine/go: $(data_dir)/$(version)/go
