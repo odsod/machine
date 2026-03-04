@@ -95,35 +95,64 @@ require("lazy").setup({
   {
     "neovim/nvim-lspconfig",
     dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
       "hrsh7th/nvim-cmp",
       "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-      require("mason").setup()
-      local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- Setup 'ty' (Astral Python Type Checker)
-      if not require("lspconfig.configs").ty then
-        require("lspconfig.configs").ty = {
-          default_config = {
-            cmd = { "ty", "server" },
-            filetypes = { "python" },
-            root_dir = lspconfig.util.root_pattern("pyproject.toml", ".git"),
-          },
-        }
-      end
-      lspconfig.ty.setup({ capabilities = capabilities })
+      vim.lsp.config["ty"] = {
+        cmd = { "ty", "server" },
+        filetypes = { "python" },
+        root_dir = vim.fs.root(0, { "pyproject.toml", ".git" }),
+      }
+      vim.lsp.enable("ty", { capabilities = capabilities })
 
-      -- Setup other servers via Mason
-      require("mason-lspconfig").setup({
-        ensure_installed = { "gopls", "ts_ls", "bashls", "lua_ls" },
-        handlers = {
-          function(server)
-            lspconfig[server].setup({ capabilities = capabilities })
-          end,
+      -- Setup ruff
+      vim.lsp.enable("ruff", { capabilities = capabilities })
+
+      -- Setup oxlint
+      vim.lsp.config["oxlint"] = {
+        cmd = { "oxlint", "--lsp" },
+        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+        root_dir = vim.fs.root(0, { "package.json", ".git" }),
+      }
+      vim.lsp.enable("oxlint", { capabilities = capabilities })
+
+      -- Setup vtsls
+      vim.lsp.enable("vtsls", { capabilities = capabilities })
+
+      -- Setup bashls
+      vim.lsp.enable("bashls", { capabilities = capabilities })
+
+      -- Setup lua_ls
+      vim.lsp.enable("lua_ls", { capabilities = capabilities })
+
+      -- Setup gopls
+      vim.lsp.enable("gopls", {
+        capabilities = capabilities,
+        settings = {
+          gopls = {
+            gofumpt = true,
+            staticcheck = true,
+            usePlaceholders = true,
+            analyses = {
+              nilness = true,
+              unusedparams = true,
+              unusedwrite = true,
+              useany = true,
+            },
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+            },
+          },
         },
       })
 
@@ -156,7 +185,8 @@ require("lazy").setup({
       },
       formatters_by_ft = {
         lua = { "stylua" },
-        python = { "isort", "black" },
+        sh = { "shfmt" },
+        bash = { "shfmt" },
         javascript = { "oxfmt" },
         javascriptreact = { "oxfmt" },
         typescript = { "oxfmt" },
@@ -165,7 +195,6 @@ require("lazy").setup({
         cjs = { "oxfmt" },
         mts = { "oxfmt" },
         cts = { "oxfmt" },
-        go = { "goimports", "gofmt" },
       },
       format_on_save = { timeout_ms = 500, lsp_fallback = true },
     },
@@ -203,3 +232,21 @@ map("n", "<leader>a", ":wqa<CR>")
 map("n", "<leader>n", ":nohlsearch<CR>")
 map("n", "<leader>z", ":qa!<CR>")
 map("n", "<leader>i", "gg=G<C-O><C-O>")
+
+-- --- Autocommands ---
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.go", "*.py", "*.ts", "*.tsx", "*.js", "*.jsx" },
+  callback = function()
+    local params = vim.lsp.util.make_range_params()
+    params.context = {only = {"source.organizeImports"}}
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+    for cid, res in pairs(result or {}) do
+      for _, r in pairs(res.result or {}) do
+        if r.edit then
+          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+        end
+      end
+    end
+  end
+})
