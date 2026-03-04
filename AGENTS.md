@@ -33,21 +33,23 @@
 **Trigger**: "Let's bump versions" -> Agents must check ALL tools.
 
 1.  **Identify Candidates**:
-    - Search for `version :=` to find tools managed by version variables.
+    - Search for `version :=` (or variations like `gopls_version :=`) to find all tools managed by version variables.
 
 2.  **Discover**:
-    - Check `# Discovery: <url>` in Makefile. **Mandatory** to add if missing.
+    - Check `# Discovery: <url>` comment above each version variable. **Mandatory** to add if missing.
     - **Quality**: URL must be future-proof (e.g., `latest` endpoints, releases pages). Avoid hardcoded version paths in discovery URLs unless unavoidable.
     - Check GitHub Releases, APIs, or project downloads pages.
 
-3.  **Validate**: `curl -I <url>` to ensure assets exist before editing Makefile.
+3.  **Validate**:
+    - For archive-based tools: `curl -I <url>` to ensure assets exist.
+    - For `go install` tools: Ensure the version string is valid for the module.
 
-4.  **Apply**: Update `version` in `Makefile`. No trailing whitespace.
+4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
 
 5.  **Verify**: `make -C <dir>` then `<tool> --version`.
 
-6.  **Commit**: `feat(<dir>): bump to v<version>`.
-
+6.  **Commit**: `feat(<dir>): bump versions`.
+    - List specific tool bumps in the commit body.
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 
 ## Commit style
