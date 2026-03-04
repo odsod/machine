@@ -55,7 +55,6 @@ install-packages:
 		python3.12 \
 		qbittorrent \
 		ripgrep \
-		ruff \
 		simple-scan \
 		ttyd \
 		unrar \
