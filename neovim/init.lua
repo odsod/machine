@@ -44,6 +44,7 @@ require("lazy").setup({
         ignore_dirs = {
           "node_modules",
           ".git",
+          ".jj",
         },
       },
       view = { width = 30 },
@@ -73,9 +74,7 @@ require("lazy").setup({
       require("telescope").load_extension("fzf")
     end,
   },
-  { "tpope/vim-fugitive" },
   { "numToStr/Comment.nvim", opts = {} },
-  { "lewis6991/gitsigns.nvim", opts = {} },
 
   -- Treesitter: Better syntax highlighting
   {
@@ -101,37 +100,24 @@ require("lazy").setup({
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-      -- Setup 'ty' (Astral Python Type Checker)
-      vim.lsp.config["ty"] = {
-        cmd = { "ty", "server" },
-        filetypes = { "python" },
-        root_dir = vim.fs.root(0, { "pyproject.toml", ".git" }),
-      }
-      vim.lsp.enable("ty", { capabilities = capabilities })
-
-      -- Setup ruff
-      vim.lsp.enable("ruff", { capabilities = capabilities })
-
-      -- Setup oxlint
-      vim.lsp.config["oxlint"] = {
-        cmd = { "oxlint", "--lsp" },
-        filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
-        root_dir = vim.fs.root(0, { "package.json", ".git" }),
-      }
-      vim.lsp.enable("oxlint", { capabilities = capabilities })
-
-      -- Setup vtsls
-      vim.lsp.enable("vtsls", { capabilities = capabilities })
-
-      -- Setup bashls
-      vim.lsp.enable("bashls", { capabilities = capabilities })
-
-      -- Setup lua_ls
-      vim.lsp.enable("lua_ls", { capabilities = capabilities })
-
-      -- Setup gopls
-      vim.lsp.enable("gopls", {
+      -- Apply capabilities globally to all LSP servers
+      vim.lsp.config("*", {
         capabilities = capabilities,
+        root_markers = { ".jj", ".git" },
+      })
+
+      -- Adjust root markers for 'ty'
+      vim.lsp.config("ty", {
+        root_markers = { "pyproject.toml", ".jj", ".git" },
+      })
+
+      -- Adjust root markers for oxlint to trigger without an .oxlintrc.json
+      vim.lsp.config("oxlint", {
+        root_markers = { "package.json", ".jj", ".git" },
+      })
+
+      -- Setup gopls settings
+      vim.lsp.config("gopls", {
         settings = {
           gopls = {
             gofumpt = true,
@@ -155,6 +141,9 @@ require("lazy").setup({
           },
         },
       })
+
+      -- Enable all servers
+      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "lua_ls", "gopls" })
 
       -- Autocompletion
       local cmp = require("cmp")
