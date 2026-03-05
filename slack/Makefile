@@ -3,6 +3,7 @@ name := slack
 # Discovery (rpm): no stable public endpoint for exact RPM build suffix.
 # Update `version` and `build` manually, then validate:
 # curl -I https://downloads.slack-edge.com/desktop-releases/linux/x64/<version>/slack-<build>.x86_64.rpm
+# Discovery (version): https://slack.com/release-notes/linux/rss
 version := 4.47.69
 build := 4.47.69-0.1.el8
 package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm

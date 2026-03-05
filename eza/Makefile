@@ -1,6 +1,6 @@
 name := eza
-version := 0.23.4
 # Discovery: https://github.com/eza-community/eza/releases/latest
+version := 0.23.4
 url := https://github.com/eza-community/eza/releases/download/v$(version)/eza_x86_64-unknown-linux-gnu.tar.gz
 
 bin_dir := $(HOME)/.local/bin

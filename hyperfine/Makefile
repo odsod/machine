@@ -1,6 +1,6 @@
 name := hyperfine
-version := 1.20.0
 # Discovery: https://github.com/sharkdp/hyperfine/releases/latest
+version := 1.20.0
 url := https://github.com/sharkdp/hyperfine/releases/download/v$(version)/hyperfine-v$(version)-x86_64-unknown-linux-gnu.tar.gz
 
 bin_dir := $(HOME)/.local/bin
