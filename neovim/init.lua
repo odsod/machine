@@ -116,6 +116,17 @@ require("lazy").setup({
         root_markers = { "package.json", ".jj", ".git" },
       })
 
+      -- markdown-oxide recommends enabling dynamic watched-files registration
+      vim.lsp.config("markdown_oxide", {
+        capabilities = vim.tbl_deep_extend("force", capabilities, {
+          workspace = {
+            didChangeWatchedFiles = {
+              dynamicRegistration = true,
+            },
+          },
+        }),
+      })
+
       -- Setup gopls settings
       vim.lsp.config("gopls", {
         settings = {
@@ -143,7 +154,7 @@ require("lazy").setup({
       })
 
       -- Enable all servers
-      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "lua_ls", "gopls" })
+      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "lua_ls", "gopls", "markdown_oxide" })
 
       -- Autocompletion
       local cmp = require("cmp")
