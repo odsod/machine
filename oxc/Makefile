@@ -1,9 +1,11 @@
 name := oxc
 # Discovery: https://github.com/oxc-project/oxc/releases/latest
 # Structure: shared release_tag for downloads, per-tool versions for local paths.
-release_tag := apps_v1.50.0
-oxfmt_version := 0.35.0
-oxlint_version := 1.50.0
+release_tag := apps_v1.51.0
+# Discovery: https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true
+oxfmt_version := 0.36.0
+# Discovery: https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true
+oxlint_version := 1.51.0
 
 oxfmt_archive := oxfmt-x86_64-unknown-linux-gnu.tar.gz
 oxfmt_extracted_binary := oxfmt-x86_64-unknown-linux-gnu

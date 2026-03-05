@@ -1,6 +1,6 @@
 name := jj
 # Discovery: https://github.com/jj-vcs/jj/releases/latest
-version := 0.38.0
+version := 0.39.0
 archive_url := https://github.com/jj-vcs/jj/releases/download/v$(version)/jj-v$(version)-x86_64-unknown-linux-musl.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
