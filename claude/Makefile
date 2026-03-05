@@ -1,4 +1,4 @@
-name := claude-code
+name := claude
 # Discovery: https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/latest
 version := 2.1.69
 # Reference: https://claude.ai/install.sh

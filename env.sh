@@ -22,7 +22,7 @@ export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}' --bind 'ctrl-/:chan
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-/:toggle-preview'"
 export FZF_ALT_C_COMMAND="fd --type d --strip-cwd-prefix --hidden --follow --exclude .git"
 
-# gemini-cli
+# gemini
 export GOOGLE_CLOUD_PROJECT="way-local-dev"
 export GOOGLE_CLOUD_LOCATION="global"
 
