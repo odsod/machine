@@ -1,4 +1,4 @@
-name := gemini-cli
+name := gemini
 
 # Discovery: https://github.com/gemini-cli-extensions/workspace/releases
 workspace_extension_version := 0.0.5
@@ -25,7 +25,8 @@ all: \
 	@ln -fsT $(abspath $<) $@
 
 ~/.local/share/npm/bin/gemini:
-	@npm install -g @google/gemini-cli
+	@$(MAKE) -C ../nodejs ~/.local/bin/npm
+	@~/.local/bin/npm install -g @google/gemini-cli
 
 .PHONY: workspace-extension
 workspace-extension: ~/.local/share/npm/bin/gemini
