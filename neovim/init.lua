@@ -93,12 +93,8 @@ require("lazy").setup({
   -- LSP: Language Support
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "hrsh7th/nvim-cmp",
-      "hrsh7th/cmp-nvim-lsp",
-    },
     config = function()
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
 
       -- Apply capabilities globally to all LSP servers
       vim.lsp.config("*", {
@@ -124,6 +120,13 @@ require("lazy").setup({
       -- Prefer jj repos for fish-lsp root detection
       vim.lsp.config("fish_lsp", {
         root_markers = { "config.fish", ".jj", ".git" },
+      })
+
+      -- Prefer buf.yaml first, while still supporting jj-only repositories
+      vim.lsp.config("buf_ls", {
+        cmd = { "buf", "lsp", "serve" },
+        filetypes = { "proto" },
+        root_markers = { "buf.yaml", ".jj", ".git" },
       })
 
       -- markdown-oxide recommends enabling dynamic watched-files registration
@@ -164,50 +167,66 @@ require("lazy").setup({
       })
 
       -- Enable all servers
-      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide" })
+      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide", "buf_ls", "oxfmt" })
 
-      -- Autocompletion
-      local cmp = require("cmp")
-      cmp.setup({
-        mapping = cmp.mapping.preset.insert({
-          ["<CR>"] = cmp.mapping.confirm({ select = true }),
-          ["<Tab>"] = cmp.mapping.select_next_item(),
-          ["<S-Tab>"] = cmp.mapping.select_prev_item(),
-        }),
-        sources = cmp.config.sources({
-          { name = "lazydev", group_index = 0 },
-          { name = "nvim_lsp" },
-        }, { { name = "buffer" } }),
+      -- Vanilla LSP UX: keymaps, completion, and format-on-save.
+      local lsp_attach_group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true })
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = lsp_attach_group,
+        callback = function(args)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if not client then
+            return
+          end
+
+          vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = args.buf, desc = "Go to definition" })
+
+          if client:supports_method("textDocument/formatting") and not vim.b[args.buf].lsp_format_on_save then
+            vim.b[args.buf].lsp_format_on_save = true
+            vim.api.nvim_create_autocmd("BufWritePre", {
+              buffer = args.buf,
+              callback = function()
+                local ft = vim.bo[args.buf].filetype
+                local use_oxfmt = ({
+                  javascript = true,
+                  javascriptreact = true,
+                  typescript = true,
+                  typescriptreact = true,
+                  toml = true,
+                  json = true,
+                  jsonc = true,
+                  json5 = true,
+                  yaml = true,
+                  html = true,
+                  vue = true,
+                  handlebars = true,
+                  css = true,
+                  scss = true,
+                  less = true,
+                  graphql = true,
+                  markdown = true,
+                })[ft]
+
+                vim.lsp.buf.format({
+                  bufnr = args.buf,
+                  filter = function(format_client)
+                    if use_oxfmt then
+                      return format_client.name == "oxfmt"
+                    end
+                    return true
+                  end,
+                })
+              end,
+            })
+          end
+
+          if client:supports_method("textDocument/completion") then
+            vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+            vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { buffer = args.buf, desc = "Manual completion" })
+          end
+        end,
       })
     end,
-  },
-
-  -- Formatting on Save
-  {
-    "stevearc/conform.nvim",
-    opts = {
-      formatters = {
-        oxfmt = {
-          command = "oxfmt",
-          args = { "$FILENAME" },
-          stdin = false,
-        },
-      },
-      formatters_by_ft = {
-        lua = { "stylua" },
-        sh = { "shfmt" },
-        bash = { "shfmt" },
-        javascript = { "oxfmt" },
-        javascriptreact = { "oxfmt" },
-        typescript = { "oxfmt" },
-        typescriptreact = { "oxfmt" },
-        mjs = { "oxfmt" },
-        cjs = { "oxfmt" },
-        mts = { "oxfmt" },
-        cts = { "oxfmt" },
-      },
-      format_on_save = { timeout_ms = 500, lsp_fallback = true },
-    },
   },
 })
 
