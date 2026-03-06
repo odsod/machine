@@ -116,6 +116,11 @@ require("lazy").setup({
         root_markers = { "package.json", ".jj", ".git" },
       })
 
+      -- Allow yaml-language-server to detect project roots in jj repos
+      vim.lsp.config("yamlls", {
+        root_markers = { ".jj", ".git" },
+      })
+
       -- markdown-oxide recommends enabling dynamic watched-files registration
       vim.lsp.config("markdown_oxide", {
         capabilities = vim.tbl_deep_extend("force", capabilities, {
@@ -154,7 +159,7 @@ require("lazy").setup({
       })
 
       -- Enable all servers
-      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "lua_ls", "gopls", "markdown_oxide" })
+      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "lua_ls", "gopls", "yamlls", "markdown_oxide" })
 
       -- Autocompletion
       local cmp = require("cmp")
