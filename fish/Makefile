@@ -1,17 +1,23 @@
 name := fish
 # Discovery: https://github.com/fish-shell/fish-shell/releases/latest
 version := 4.5.0
+fish_lsp_name := fish-lsp
+# Discovery: https://github.com/ndonfris/fish-lsp/releases/latest
+fish_lsp_version := 1.1.3
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 version_dir := $(data_dir)/$(version)
 archive := $(version_dir)/$(name)-$(version)-linux-x86_64.tar.xz
 archive_url := https://github.com/fish-shell/fish-shell/releases/download/$(version)/$(name)-$(version)-linux-x86_64.tar.xz
 fish_bin := $(version_dir)/$(name)
 system_fish := /usr/local/bin/$(name)
+fish_lsp_url := https://github.com/ndonfris/fish-lsp/releases/download/v$(fish_lsp_version)/$(fish_lsp_name).standalone
+fish_lsp_bin := $(data_dir)/$(fish_lsp_name)/$(fish_lsp_version)/$(fish_lsp_name)
 
 .PHONY: install
 install: \
 	$(fish_bin) \
 	~/.local/bin/fish \
+	~/.local/bin/$(fish_lsp_name) \
 	$(system_fish) \
 	ensure-shell-registered \
 	~/.config/fish/config.fish \
@@ -54,6 +60,17 @@ $(fish_bin): $(archive)
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/$(fish_lsp_name)
+~/.local/bin/$(fish_lsp_name): $(fish_lsp_bin)
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+$(fish_lsp_bin):
+	$(info [$(name)] Downloading $(fish_lsp_url)...)
+	@curl -L $(fish_lsp_url) --create-dirs -o $@
+	@chmod +x $@
 
 .PHONY: $(system_fish)
 $(system_fish): $(fish_bin)
