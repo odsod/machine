@@ -6,10 +6,15 @@ typescript_version := 5.9.3
 vtsls_version := 0.3.0
 
 .PHONY: all
-all: tools
+all: install
 
-.PHONY: tools
-tools:
-	$(info [$(name)] Installing tools...)
-	@npm install -g typescript@$(typescript_version)
-	@npm install -g @vtsls/language-server@$(vtsls_version)
+.PHONY: install
+install:
+	@$(MAKE) -C ../nodejs ~/.local/bin/npm
+	@$(MAKE) npm-packages
+
+.PHONY: npm-packages
+npm-packages:
+	$(info [$(name)] Installing npm packages...)
+	@~/.local/bin/npm install -g typescript@$(typescript_version)
+	@~/.local/bin/npm install -g @vtsls/language-server@$(vtsls_version)

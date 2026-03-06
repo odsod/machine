@@ -19,6 +19,11 @@
 ## Development
 - **Efficiency**: Iterating on configs should not trigger a full `make`. Use specific targets.
 
+## Module Dependencies
+- **Default**: Keep modules independent.
+- **Convention**: Express dependencies only in consumer modules with explicit calls (e.g. `$(MAKE) -C ../nodejs ~/.local/bin/npm`).
+- **Avoid**: Central dependency graphs and root ordering lists.
+
 ## Home Folder
 - **Source repos**: `~/Code/<full-vcs-root>/<org>/<repo>`
   - E.g. `~/Code/github.com/odsod/machine`

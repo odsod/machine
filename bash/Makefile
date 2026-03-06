@@ -16,14 +16,15 @@ shfmt_url := https://github.com/mvdan/sh/releases/download/$(shfmt_version)/$(sh
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
-all: tools \
+all: npm-packages \
 	~/.local/bin/shellcheck \
 	~/.local/bin/shfmt
 
-.PHONY: tools
-tools:
+.PHONY: npm-packages
+npm-packages:
 	$(info [$(name)] Installing bash-language-server...)
-	@npm install -g bash-language-server@$(bashls_version)
+	@$(MAKE) -C ../nodejs ~/.local/bin/npm
+	@~/.local/bin/npm install -g bash-language-server@$(bashls_version)
 
 .PHONY: ~/.local/bin/shellcheck
 ~/.local/bin/shellcheck: $(data_dir)/shellcheck/$(shellcheck_version)/shellcheck
