@@ -81,7 +81,7 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = { "go", "python", "lua", "bash", "json", "yaml", "markdown" },
+      ensure_installed = { "go", "python", "lua", "bash", "json", "yaml", "markdown", "proto" },
       highlight = { enable = true },
       indent = { enable = true },
     },
@@ -153,21 +153,12 @@ require("lazy").setup({
               unusedwrite = true,
               useany = true,
             },
-            hints = {
-              assignVariableTypes = true,
-              compositeLiteralFields = true,
-              compositeLiteralTypes = true,
-              constantValues = true,
-              functionTypeParameters = true,
-              parameterNames = true,
-              rangeVariableTypes = true,
-            },
           },
         },
       })
 
       -- Enable all servers
-      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide", "buf_ls", "oxfmt" })
+      vim.lsp.enable({ "ty", "ruff", "oxlint", "vtsls", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide", "buf_ls" })
 
       -- Vanilla LSP UX: keymaps, completion, and format-on-save.
       local lsp_attach_group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true })
@@ -186,36 +177,7 @@ require("lazy").setup({
             vim.api.nvim_create_autocmd("BufWritePre", {
               buffer = args.buf,
               callback = function()
-                local ft = vim.bo[args.buf].filetype
-                local use_oxfmt = ({
-                  javascript = true,
-                  javascriptreact = true,
-                  typescript = true,
-                  typescriptreact = true,
-                  toml = true,
-                  json = true,
-                  jsonc = true,
-                  json5 = true,
-                  yaml = true,
-                  html = true,
-                  vue = true,
-                  handlebars = true,
-                  css = true,
-                  scss = true,
-                  less = true,
-                  graphql = true,
-                  markdown = true,
-                })[ft]
-
-                vim.lsp.buf.format({
-                  bufnr = args.buf,
-                  filter = function(format_client)
-                    if use_oxfmt then
-                      return format_client.name == "oxfmt"
-                    end
-                    return true
-                  end,
-                })
+                vim.lsp.buf.format({ bufnr = args.buf })
               end,
             })
           end
@@ -224,10 +186,17 @@ require("lazy").setup({
             vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
             vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { buffer = args.buf, desc = "Manual completion" })
           end
+
         end,
       })
     end,
   },
+})
+
+-- --- Diagnostics ---
+vim.diagnostic.config({
+  virtual_lines = { current_line = true },
+  virtual_text = false,
 })
 
 -- --- General Settings ---
@@ -244,6 +213,7 @@ opt.title = true
 opt.wildmode = "list:longest,full"
 opt.shortmess = "atI"
 opt.mouse = ""
+opt.autoread = true
 
 -- --- Keymaps ---
 local map = vim.keymap.set
@@ -263,19 +233,25 @@ map("n", "<leader>z", ":qa!<CR>")
 map("n", "<leader>i", "gg=G<C-O><C-O>")
 
 -- --- Autocommands ---
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  callback = function() vim.cmd("checktime") end,
+})
+
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = { "*.go", "*.py", "*.ts", "*.tsx", "*.js", "*.jsx" },
   callback = function()
-    local params = vim.lsp.util.make_range_params()
-    params.context = {only = {"source.organizeImports"}}
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
-    for cid, res in pairs(result or {}) do
-      for _, r in pairs(res.result or {}) do
-        if r.edit then
-          local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
-          vim.lsp.util.apply_workspace_edit(r.edit, enc)
+    local clients = vim.lsp.get_clients({ bufnr = 0, method = "textDocument/codeAction" })
+    for _, client in ipairs(clients) do
+      local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
+      params.context = { only = { "source.organizeImports" }, diagnostics = {} }
+      local result = client:request_sync("textDocument/codeAction", params, 1000, 0)
+      for _, action in ipairs((result and result.result) or {}) do
+        if action.edit then
+          vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+        elseif action.command then
+          client:exec_command(action.command)
         end
       end
     end
-  end
+  end,
 })
