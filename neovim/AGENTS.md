@@ -21,12 +21,13 @@
 
 ## Directory Layout
 - `init.lua`
-  - bootstraps lazy.nvim
-  - loads `odsod.*` modules
+  - bootstrap + top-level module loading
 - `lua/odsod/plugins.lua`
-  - plugin specs and plugin config wiring
+  - plugin specs + plugin wiring
 - `lua/odsod/lsp.lua`
-  - LSP defaults, server enable list, LspAttach save actions
+  - LSP defaults + server enable list + LspAttach hooks
+- `lua/odsod/lsp/save_actions.lua`
+  - format/import actions on save, filtered by filetype/client
 - `lua/odsod/core/options.lua`
   - editor options
 - `lua/odsod/core/keymaps.lua`
@@ -35,6 +36,8 @@
   - non-LSP autocmds
 - `lua/odsod/core/diagnostics.lua`
   - diagnostic rendering policy
+- `lua/odsod/ui/fzf.lua`
+  - `fzf-lua` setup + color/highlight contract
 - `lua/odsod/ui/statusline.lua`
   - native statusline implementation
 - `lsp/*.lua`
@@ -60,6 +63,7 @@
 - Add new logic in `lua/odsod/*`
 - Add language-specific behavior in `lsp/*`
 - Keep save-time actions deterministic by filetype/client filter
+- Keep picker theme config centralized in `lua/odsod/ui/fzf.lua`
 
 ## Commands
 - Install/symlink/plugins:
