@@ -4,11 +4,11 @@ name := neovim
 all: \
 	install-packages \
 	update-alternatives \
-	~/.config/nvim/init.lua \
+	~/.config/nvim \
 	install-plugins
 
 .PHONY: install-plugins
-install-plugins: ~/.config/nvim/init.lua
+install-plugins: ~/.config/nvim
 	$(info [$(name)] Installing plugins...)
 	@nvim --headless "+Lazy! sync" +qa
 
@@ -26,8 +26,9 @@ install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y neovim gcc-c++ tree-sitter-cli
 
-.PHONY: ~/.config/nvim/init.lua
-~/.config/nvim/init.lua: init.lua
+.PHONY: ~/.config/nvim
+~/.config/nvim:
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@ln -fsT $(abspath $<) $@
+	@rm -rf $@
+	@ln -fsT $(abspath .) $@
