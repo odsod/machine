@@ -16,6 +16,18 @@ local formatter_owner_by_filetype = {
   javascriptreact = "oxfmt",
   typescript = "oxfmt",
   typescriptreact = "oxfmt",
+  markdown = "oxfmt",
+  json = "oxfmt",
+  jsonc = "oxfmt",
+  yaml = "oxfmt",
+  toml = "oxfmt",
+  css = "oxfmt",
+  scss = "oxfmt",
+  less = "oxfmt",
+  html = "oxfmt",
+  vue = "oxfmt",
+  graphql = "oxfmt",
+  handlebars = "oxfmt",
 }
 
 function M.setup(bufnr)
