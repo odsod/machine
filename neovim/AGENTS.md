@@ -1,17 +1,20 @@
 # Neovim Agent Guide
 
 ## Scope
+
 - Path: `neovim/`
 - Runtime target: `~/.config/nvim`
 - Source of truth: this directory
 
 ## Strategy
+
 - Native Neovim 0.11+ first
 - Minimal plugin surface
 - Split by concern, not by tool novelty
 - Prefer built-ins over plugins when behavior is equivalent
 
 ## Full Mount Symlink
+
 - Make target: `~/.config/nvim`
 - Behavior: remove existing target and symlink `neovim/` as a whole
 - Rationale:
@@ -20,6 +23,7 @@
   - repo layout and runtime layout stay identical
 
 ## Directory Layout
+
 - `init.lua`
   - bootstrap + top-level module loading
 - `lua/odsod/plugins.lua`
@@ -44,6 +48,7 @@
   - per-server configs, decoupled by language/server
 
 ## Module Naming
+
 - Namespace: `odsod`
 - Require pattern:
   - `require("odsod.core.options")`
@@ -51,6 +56,7 @@
 - Constraint: avoid top-level generic modules like `config` or `plugins`
 
 ## LSP Rules
+
 - Global defaults via `vim.lsp.config("*", ...)`
 - Server activation via `vim.lsp.enable({ ... })`
 - Per-server overrides in `lsp/<server>.lua`
@@ -59,6 +65,7 @@
   - `.git`
 
 ## Editing Rules
+
 - Keep `init.lua` thin
 - Add new logic in `lua/odsod/*`
 - Add language-specific behavior in `lsp/*`
@@ -66,20 +73,27 @@
 - Keep picker theme config centralized in `lua/odsod/ui/fzf.lua`
 
 ## Commands
+
 - Install/symlink/plugins:
+
 ```sh
 make -C neovim
 ```
+
 - Sync plugins only:
+
 ```sh
 make -C neovim install-plugins
 ```
+
 - Startup validation:
+
 ```sh
 nvim --headless '+qa'
 ```
 
 ## Skills
+
 - Neovim changes: use `neovim` skill
   - `.agents/skills/neovim/SKILL.md`
 - CLAUDE/GEMINI memory maintenance: use `claude-md-improver` skill
