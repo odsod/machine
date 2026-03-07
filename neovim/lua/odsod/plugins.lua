@@ -47,23 +47,9 @@ function M.setup()
       },
     },
     {
-      "nvim-telescope/telescope.nvim",
-      version = "*",
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-        { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-      },
+      "ibhagwan/fzf-lua",
       config = function()
-        require("telescope").setup({
-          defaults = {
-            file_ignore_patterns = { "%.git/", "%.jj/", "node_modules/" },
-          },
-          pickers = {
-            find_files = { no_ignore = true },
-            live_grep = { additional_args = { "--no-ignore" } },
-          },
-        })
-        require("telescope").load_extension("fzf")
+        require("odsod.ui.fzf").setup()
       end,
     },
     { "numToStr/Comment.nvim", opts = {} },
