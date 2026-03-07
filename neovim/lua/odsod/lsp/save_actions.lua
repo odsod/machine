@@ -3,10 +3,6 @@ local M = {}
 local import_action_by_filetype = {
   go = "source.organizeImports",
   python = "source.organizeImports.ruff",
-  javascript = "source.organizeImports",
-  javascriptreact = "source.organizeImports",
-  typescript = "source.organizeImports",
-  typescriptreact = "source.organizeImports",
 }
 
 local formatter_owner_by_filetype = {
