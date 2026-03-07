@@ -11,6 +11,7 @@ function M.setup()
         vim.g.nord_italic = false
         vim.g.nord_bold = false
         require("nord").set()
+        vim.api.nvim_set_hl(0, "LspInlayHint", { link = "Comment" })
       end,
     },
 
