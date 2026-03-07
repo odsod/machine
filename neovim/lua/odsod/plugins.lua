@@ -14,17 +14,6 @@ function M.setup()
       end,
     },
 
-    -- Neovim Development
-    {
-      "folke/lazydev.nvim",
-      lazy = false,
-      opts = {
-        library = {
-          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-        },
-      },
-    },
-
     -- UI & Tools
     {
       "nvim-tree/nvim-tree.lua",
