@@ -6,7 +6,7 @@ lua_ls_archive := lua-language-server-$(lua_ls_version)-linux-x64.tar.gz
 lua_ls_url := https://github.com/LuaLS/lua-language-server/releases/download/$(lua_ls_version)/$(lua_ls_archive)
 
 # Discovery: https://github.com/JohnnyMorganz/StyLua/releases/latest
-stylua_version := v2.3.1
+stylua_version := v2.4.0
 stylua_archive := stylua-linux-x86_64.zip
 stylua_url := https://github.com/JohnnyMorganz/StyLua/releases/download/$(stylua_version)/$(stylua_archive)
 
