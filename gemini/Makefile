@@ -1,7 +1,5 @@
 name := gemini
 
-# Discovery: https://github.com/gemini-cli-extensions/workspace/releases
-workspace_extension_version := 0.0.5
 
 .PHONY: all
 all: \
@@ -28,18 +26,3 @@ all: \
 	@$(MAKE) -C ../nodejs ~/.local/bin/npm
 	@~/.local/bin/npm install -g @google/gemini-cli
 
-.PHONY: workspace-extension
-workspace-extension: ~/.local/share/npm/bin/gemini
-	$(info [$(name)] Installing workspace extension v$(workspace_extension_version)...)
-	@mkdir -p $(HOME)/Code/github.com/gemini-cli-extensions
-	@test -d $(HOME)/Code/github.com/gemini-cli-extensions/workspace || \
-		git clone https://github.com/gemini-cli-extensions/workspace \
-		$(HOME)/Code/github.com/gemini-cli-extensions/workspace
-	@cd $(HOME)/Code/github.com/gemini-cli-extensions/workspace && \
-		git fetch --tags && \
-		git checkout v$(workspace_extension_version) && \
-		npm ci && \
-		npm run build
-	@gemini extensions list 2>&1 | grep -F "Source: $(HOME)/Code/github.com/gemini-cli-extensions/workspace (Type: link)" >/dev/null || \
-	(gemini extensions uninstall google-workspace >/dev/null 2>&1 || true; \
-	cd $(HOME)/Code/github.com/gemini-cli-extensions/workspace && gemini extensions link .)
