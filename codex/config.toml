@@ -8,3 +8,6 @@ notify = ["sh", "-lc", "printf '\\a' > /dev/tty"]
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir"]
+
+[notice]
+hide_rate_limit_model_nudge = true
