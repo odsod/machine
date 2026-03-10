@@ -70,11 +70,9 @@
 - **CRITICAL**: Header MUST be <= 50 chars. Verify before committing.
 - **Template**: `feat(scope): description`.
 
-## jj migration
+## jj
 
-- The user is in the process of migrating to jj.
-- Do all vcs operations using jj
-- Provide explanations of your jj operations and workflows to the user
+- Use jj for all version control operations
 - Do not push to the remote repo, leave this to the user
 
 ## Nested Workspaces
