@@ -7,10 +7,11 @@ sig_url := $(archive_url).sig
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
 install_dir := $(HOME)/.local/share/odsod/machine/aws-cli
 bin_dir := $(HOME)/.local/bin
+fish_completion := $(HOME)/.config/fish/completions/aws.fish
 install_marker := $(install_dir)/v2/$(version)/dist/aws
 
 .PHONY: install
-install: $(install_marker)
+install: $(install_marker) $(fish_completion)
 
 $(install_marker): $(data_dir)/aws/install $(data_dir)/$(archive).sig
 	$(info [$(name)] Installing AWS CLI $(version)...)
@@ -31,3 +32,9 @@ $(data_dir)/$(archive):
 $(data_dir)/$(archive).sig:
 	$(info [$(name)] Downloading $(sig_url)...)
 	@curl -fsSL "$(sig_url)" --create-dirs -o "$@"
+
+.PHONY: $(fish_completion)
+$(fish_completion): aws.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p "$(dir $@)"
+	@ln -fsT "$(abspath $<)" "$@"
