@@ -11,3 +11,9 @@ status_line = ["model-with-reasoning", "context-remaining", "current-dir"]
 
 [notice]
 hide_rate_limit_model_nudge = true
+
+[projects."/home/odsod/Code"]
+trust_level = "trusted"
+
+[projects."/home/odsod/Workspaces"]
+trust_level = "trusted"
