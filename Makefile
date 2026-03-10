@@ -57,6 +57,7 @@ install-packages:
 		ripgrep \
 		simple-scan \
 		ttyd \
+		unzip \
 		unrar \
 		wl-clipboard \
 		yt-dlp \
