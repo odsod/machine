@@ -10,11 +10,6 @@ export BAT_STYLE="changes,header"
 export DFT_BACKGROUND="dark"
 export DFT_DISPLAY="side-by-side"
 
-# claude
-export CLAUDE_CODE_USE_BEDROCK="1"
-export AWS_REGION="eu-north-1"
-export ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION="eu-north-1"
-
 # encore
 export ENCORE_INSTALL="$HOME/.local/share/odsod/machine/encore"
 export PATH="$ENCORE_INSTALL/bin:$PATH"
