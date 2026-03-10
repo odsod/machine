@@ -28,5 +28,11 @@
   },
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "model": "eu.anthropic.claude-sonnet-4-6"
+  "model": "eu.anthropic.claude-sonnet-4-6",
+  "env": {
+    "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_REGION": "eu-north-1",
+    "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
 }
