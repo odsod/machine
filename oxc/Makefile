@@ -2,7 +2,7 @@ name := oxc
 # Discovery: https://github.com/oxc-project/oxc/releases/latest
 release_tag := apps_v1.51.0
 # Discovery: https://www.npmjs.com/package/oxfmt
-oxfmt_version := 0.36.0
+oxfmt_version := 0.37.0
 # Discovery: https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true
 oxlint_version := 1.51.0
 
