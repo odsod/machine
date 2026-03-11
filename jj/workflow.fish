@@ -23,7 +23,7 @@ function ensure_pr_preflight
         end
     end
 
-    set -l divergent (jj log -r 'mutable() & divergent()' --no-graph)
+    set -l divergent (jj log -r 'mutable() & divergent() & ::@' --no-graph)
     if test -n "$divergent"
         echo "FAIL: mutable divergent change IDs detected."
         echo "$divergent"
