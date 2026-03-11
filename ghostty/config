@@ -29,6 +29,9 @@ command = direct:/home/odsod/.config/ghostty/ghostty-tmux.sh
 # Handled by tmux
 scrollback-limit = 0
 shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo
+# Notify when a long-running command finishes (requires OSC 133 from shell integration)
+notify-on-command-finish = unfocused
+notify-on-command-finish-after = 10s
 
 # Keybindings
 keybind = ctrl+shift+p=toggle_command_palette
