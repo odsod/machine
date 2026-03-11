@@ -206,7 +206,8 @@ function sub_pr
     set -l head (current_head_bookmark_for_rev "$target")
     test -n "$head"; or fail "Could not determine PR head bookmark."
     set -l pr_title (pr_title_for_rev "$target" "chore: update $head")
-    set -l pr_body (pr_body_for_rev "$target")
+    set -l pr_body_file (mktemp)
+    pr_body_for_rev "$target" > $pr_body_file
 
     if string match -rq '^odsod/push-' -- "$head"
         jj git push -c "$target"
@@ -218,8 +219,9 @@ function sub_pr
         or fail "Failed to push bookmark $head."
     end
 
-    set -l pr_url (gh pr create --repo "$repo" --head "$head" --title "$pr_title" --body "$pr_body")
-    or fail "Failed to create PR for $head."
+    set -l pr_url (gh pr create --repo "$repo" --head "$head" --title "$pr_title" --body-file $pr_body_file)
+    rm -f $pr_body_file
+    test -n "$pr_url"; or fail "Failed to create PR for $head."
     xdg-open "$pr_url" >/dev/null 2>&1 || true
     echo "$pr_url"
     post_publish_new_working_commit
