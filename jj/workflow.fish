@@ -294,6 +294,8 @@ function sub_pr_update
 end
 
 function sub_end
+    jj workspace update-stale 2>/dev/null; or true
+
     set -l workspace_name (jj workspace list \
         -T 'if(self.target().current_working_copy(), self.name(), "") ++ "\n"' \
         | sed '/^$/d' | head -n1)
