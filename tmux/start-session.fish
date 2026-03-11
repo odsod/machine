@@ -183,7 +183,7 @@ end
 # --- Agent selection (shared) ---
 
 function select_agent
-    set agent_choice (printf '%s\n' codex gemini claude \
+    set agent_choice (printf '%s\n' claude codex gemini \
         | _fzf_pick_compact Agent)
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
