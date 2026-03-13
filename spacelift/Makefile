@@ -1,6 +1,6 @@
 name := spacelift
 # Discovery: https://github.com/spacelift-io/spacectl/releases/latest
-version := 1.18.5
+version := 1.19.0
 archive_url := https://github.com/spacelift-io/spacectl/releases/download/v$(version)/spacectl_$(version)_linux_amd64.zip
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
