@@ -1,5 +1,6 @@
 name := gemini
-
+# Discovery: https://registry.npmjs.org/@google/gemini-cli/latest
+version := 0.33.1
 
 .PHONY: all
 all: \
@@ -24,5 +25,5 @@ all: \
 
 ~/.local/share/npm/bin/gemini:
 	@$(MAKE) -C ../nodejs ~/.local/bin/npm
-	@~/.local/bin/npm install -g @google/gemini-cli
+	@~/.local/bin/npm install -g @google/gemini-cli@$(version)
 
