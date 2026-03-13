@@ -83,4 +83,40 @@ function M.setup()
   })
 end
 
+function M.jj_changed()
+  local fzf = require("fzf-lua")
+  fzf.fzf_exec("jj diff --name-only", {
+    prompt = false,
+    winopts = { width = 0.9, height = 0.9 },
+    fzf_opts = {
+      ["--no-info"] = "",
+      ["--no-sort"] = "",
+      ["--disabled"] = "",
+      ["--preview-window"] = "right,62%",
+    },
+    keymap = {
+      fzf = {
+        ["j"] = "down",
+        ["k"] = "up",
+        ["q"] = "abort",
+      },
+    },
+    preview = "jj diff --git -- {1} | delta",
+    actions = {
+      ["default"] = function(selected)
+        if selected and selected[1] then
+          local file = selected[1]
+          local diff = vim.fn.system({ "jj", "diff", "--git", "--", file })
+          local line = 1
+          for hunk in diff:gmatch("@@ %S+ %+(%d+)") do
+            line = tonumber(hunk)
+            break
+          end
+          vim.cmd("edit +" .. line .. " " .. vim.fn.fnameescape(file))
+        end
+      end,
+    },
+  })
+end
+
 return M

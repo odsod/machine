@@ -17,6 +17,8 @@ function M.setup()
   map("n", "<leader>n", ":nohlsearch<CR>")
   map("n", "<leader>z", ":qa!<CR>")
   map("n", "<leader>i", "gg=G<C-O><C-O>")
+
+  map("n", "<leader>j", function() require("odsod.ui.fzf").jj_changed() end)
 end
 
 return M
