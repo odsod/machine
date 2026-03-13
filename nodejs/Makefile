@@ -1,7 +1,10 @@
 name := nodejs
 
-# Discovery: https://nodejs.org/dist/index.json
-node_version := 25.8.0
+# Track the RPM-provided Node.js LTS stream on this machine.
+# Skip this module during routine version bumps.
+# Only bump `node_major` when Fedora moves to a new Node.js LTS stream.
+# DNF keeps the exact Node.js and npm versions current within that stream.
+node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
 pnpm_version := 10.32.1
 
@@ -21,26 +24,26 @@ install: \
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y \
-		nodejs24 \
-		nodejs24-npm
+		nodejs$(node_major) \
+		nodejs$(node_major)-npm
 
 .PHONY: ~/.local/bin/node
 ~/.local/bin/node:
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@ln -fsT /usr/bin/node-24 $@
+	@ln -fsT /usr/bin/node-$(node_major) $@
 
 .PHONY: ~/.local/bin/npm
 ~/.local/bin/npm:
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@ln -fsT /usr/bin/npm-24 $@
+	@ln -fsT /usr/bin/npm-$(node_major) $@
 
 .PHONY: ~/.local/bin/npx
 ~/.local/bin/npx:
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@ln -fsT /usr/bin/npx-24 $@
+	@ln -fsT /usr/bin/npx-$(node_major) $@
 
 .PHONY: ~/.local/bin/pnpm
 ~/.local/bin/pnpm: $(data_dir)/pnpm/$(pnpm_version)/pnpm
