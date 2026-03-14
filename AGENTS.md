@@ -59,6 +59,8 @@
 4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
 
 5.  **Verify**: `make -C <dir>` then `<tool> --version`.
+    - For `codex/`: run `make -C codex codex-config-diff`
+    - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
 
 6.  **Commit**: `feat(<dir>): bump versions`.
     - List specific tool bumps in the commit body.
