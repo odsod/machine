@@ -6,7 +6,7 @@
     "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "model": "eu.anthropic.claude-opus-4-6-v1",
+  "model": "eu.anthropic.claude-sonnet-4-6",
   "hooks": {
     "Stop": [
       {
