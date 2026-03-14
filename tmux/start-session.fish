@@ -87,6 +87,60 @@ function _session_name_for --argument-names base suffix
     end
 end
 
+function _relative_time --argument-names epoch
+    set -l now (date +%s)
+    set -l diff (math "$now - $epoch")
+    if test $diff -lt 60
+        printf '%ds ago' $diff
+    else if test $diff -lt 3600
+        printf '%dm ago' (math "floor($diff / 60)")
+    else if test $diff -lt 86400
+        printf '%dh ago' (math "floor($diff / 3600)")
+    else if test $diff -lt 604800
+        printf '%dd ago' (math "floor($diff / 86400)")
+    else
+        printf '%dw ago' (math "floor($diff / 604800)")
+    end
+end
+
+function _build_bookmark_lines --argument-names workspace_base repo_path
+    set -l bookmarks $argv[3..-1]
+    set -l max_epoch 9999999999
+    set -l age_width 9
+
+    # Batch-fetch all bookmark commit timestamps in a single jj call
+    set -l epoch_map (_jj_repo "$repo_path" log --no-graph -r 'bookmarks() | remote_bookmarks()' \
+        -T 'concat(separate("\n", bookmarks.map(|b| b ++ " " ++ committer.timestamp().format("%s")), remote_bookmarks.map(|b| b ++ " " ++ committer.timestamp().format("%s"))), "\n")' \
+        2>/dev/null | sed '/^$/d')
+
+    for bm in $bookmarks
+        set -l ws_dir "$workspace_base/$bm"
+        if test -d "$ws_dir"
+            set -l mtime (stat -c '%Y' "$ws_dir")
+            set -l inverted (math "$max_epoch - $mtime")
+            set -l age (string pad -r -w $age_width -- (_relative_time $mtime))
+            printf '0_%010d %s%s\n' $inverted "$age" "$bm"
+        else
+            set -l commit_epoch ""
+            for entry in $epoch_map
+                set -l parts (string split ' ' -- "$entry")
+                if test "$parts[1]" = "$bm"
+                    set commit_epoch $parts[2]
+                    break
+                end
+            end
+            if test -n "$commit_epoch"
+                set -l inverted (math "$max_epoch - $commit_epoch")
+                set -l age (string pad -r -w $age_width -- (_relative_time $commit_epoch))
+                printf '1_%010d %s%s\n' $inverted "$age" "$bm"
+            else
+                set -l spacer (string pad -r -w $age_width -- "")
+                printf '2_0000000000 %s%s\n' "$spacer" "$bm"
+            end
+        end
+    end | sort
+end
+
 function _select_or_create_dir --argument-names base_dir prompt
     set -l dirs
     for d in "$base_dir"/*/
@@ -175,9 +229,6 @@ function _ensure_jj_repo_ready --argument-names repo_path
 
     _jj_repo "$repo_path" git import >/dev/null 2>&1
     or _fail "Failed to import git refs into jj for $repo_path"
-
-    _jj_repo "$repo_path" git fetch --remote origin --branch main >/dev/null 2>&1
-    or _fail "Failed to fetch origin/main for $repo_path"
 end
 
 # --- Agent selection (shared) ---
@@ -302,6 +353,10 @@ if test "$session_type" = Workspace
     set repo_name $repo_parts[-1]
     _ensure_jj_repo_ready "$repo_path"
 
+    # Fetch in background while user browses bookmarks
+    _jj_repo "$repo_path" git fetch --remote origin >/dev/null 2>&1 &
+    set -l fetch_pid $last_pid
+
     set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' 2>/dev/null | sed '/^$/d' | sort -u)
     set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' 2>/dev/null \
         | sed '/^$/d' \
@@ -310,14 +365,25 @@ if test "$session_type" = Workspace
 
     set bookmark_input ""
     if test (count $suggestion_bookmarks) -gt 0
-        set bookmark_input (printf '%s\n' $suggestion_bookmarks | _fzf_pick_or_query Bookmark)
+        set -l workspace_base "$HOME/Workspaces/$repo_rel"
+        set -l decorated (_build_bookmark_lines "$workspace_base" "$repo_path" $suggestion_bookmarks)
+        set bookmark_input (printf '%s\n' $decorated \
+            | fzf --prompt="Bookmark> " --height=100% --reverse \
+                --print-query --bind='tab:transform-query(echo {} | cut -c23-),enter:print-query+accept' \
+                --with-nth=2..)
     else
         set bookmark_input (printf '\n' | _fzf_pick_or_query Bookmark)
     end
     set status_code $status
     _handle_pick_or_query_status "$status_code" Bookmark "$bookmark_input"; or exit 0
 
-    set selected_bookmark (_first_non_empty_line $bookmark_input)
+    set -l raw_line (_first_non_empty_line $bookmark_input)
+    if string match -rq '^\d+_\d+ ' -- "$raw_line"
+        # Selected from decorated list: strip sort key (13 chars) and age column (9 chars)
+        set selected_bookmark (string sub -s 23 -- "$raw_line")
+    else
+        set selected_bookmark "$raw_line"
+    end
     test -n "$selected_bookmark"; or exit 0
     _trace "workspace: repo=$repo_rel bookmark_input=$selected_bookmark"
 
@@ -373,8 +439,8 @@ if test "$session_type" = Workspace
             exit 1
         end
 
-        # Refresh remote refs if possible, but do not require network/auth for local workspace creation.
-        _jj_repo "$repo_path" git fetch --remote origin >/dev/null 2>&1 || true
+        # Wait for background fetch started before the bookmark picker
+        wait $fetch_pid 2>/dev/null || true
 
         if test -n "$selected_remote_ref"
             _jj_repo "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
