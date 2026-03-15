@@ -1,6 +1,6 @@
 name := agent-browser
 # Discovery: https://github.com/vercel-labs/agent-browser/releases/latest
-version := 0.20.0
+version := 0.20.11
 url := https://registry.npmjs.org/$(name)/-/$(name)-$(version).tgz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 active_dir := $(HOME)/.local/share/odsod/machine/$(name)
@@ -19,16 +19,16 @@ package_dir := $(version_dir)/package
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-$(active_dir): $(package_dir)/dist/daemon.js
+.PHONY: $(active_dir)
+$(active_dir): $(package_dir)/bin/agent-browser-linux-x64
 	$(info [$(name)] Activating version $(version)...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $(package_dir)) $@
 
-$(package_dir)/dist/daemon.js: $(version_dir)/$(name)-$(version).tgz
+$(package_dir)/bin/agent-browser-linux-x64: $(version_dir)/$(name)-$(version).tgz
 	$(info [$(name)] Extracting $<...)
 	@tar -C $(version_dir) -xzf $<
 	@chmod +x $(package_dir)/bin/agent-browser-linux-x64
-	@touch $@
 
 $(version_dir)/$(name)-$(version).tgz:
 	$(info [$(name)] Downloading $(url)...)
