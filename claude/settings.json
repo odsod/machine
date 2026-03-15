@@ -4,7 +4,7 @@
     "CLAUDE_CODE_USE_BEDROCK": "1",
     "AWS_REGION": "eu-north-1",
     "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"
   },
   "model": "eu.anthropic.claude-sonnet-4-6",
   "hooks": {
@@ -34,6 +34,7 @@
     "typescript-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true
   },
+  "effortLevel": "medium",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true
 }
