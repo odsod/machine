@@ -1,6 +1,7 @@
 name := gemini
 # Discovery: https://registry.npmjs.org/@google/gemini-cli/latest
-version := 0.33.1
+version := 0.33.2
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
 all: \
@@ -23,7 +24,10 @@ all: \
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-~/.local/share/npm/bin/gemini:
+~/.local/share/npm/bin/gemini: $(data_dir)/$(version)/installed
+
+$(data_dir)/$(version)/installed:
 	@$(MAKE) -C ../nodejs ~/.local/bin/npm
 	@~/.local/bin/npm install -g @google/gemini-cli@$(version)
-
+	@mkdir -p $(dir $@)
+	@touch $@
