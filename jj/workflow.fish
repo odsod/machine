@@ -189,57 +189,22 @@ function sub_start
     echo "Now working on a new commit on top of latest main@origin."
 end
 
-function sub_pr_check
-    ensure_pr_preflight
-    echo "OK: pr preflight checks passed."
-end
-
 function sub_pr
     ensure_pr_preflight
 
-    set -l repo (github_repo_from_origin)
-    test -n "$repo"; or fail "Could not infer GitHub repo from origin remote."
-
-    set -l target (effective_publish_rev)
-    test -n "$target"; or fail "Could not determine publish target revision."
-
-    set -l head (current_head_bookmark_for_rev "$target")
-    test -n "$head"; or fail "Could not determine PR head bookmark."
-    set -l pr_title (pr_title_for_rev "$target" "chore: update $head")
-    set -l pr_body_file (mktemp)
-    pr_body_for_rev "$target" > $pr_body_file
-
-    if string match -rq '^odsod/push-' -- "$head"
-        jj git push -c "$target"
-        or fail "Failed to push publish target."
-    else
-        jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
-        ensure_head_at_target "$head" "$target"
-        jj git push --remote origin --bookmark "$head"
-        or fail "Failed to push bookmark $head."
+    if test (count $argv) -gt 1
+        fail "Usage: jj pr [head-bookmark]"
     end
 
-    set -l pr_url (gh pr create --repo "$repo" --head "$head" --title "$pr_title" --body-file $pr_body_file)
-    rm -f $pr_body_file
-    test -n "$pr_url"; or fail "Failed to create PR for $head."
-    xdg-open "$pr_url" >/dev/null 2>&1 || true
-    echo "$pr_url"
-    post_publish_new_working_commit
-end
-
-function sub_pr_update
-    ensure_pr_preflight
-
     set -l repo (github_repo_from_origin)
     test -n "$repo"; or fail "Could not infer GitHub repo from origin remote."
 
     set -l target (effective_publish_rev)
     test -n "$target"; or fail "Could not determine publish target revision."
 
+    # Resolve head bookmark
     set -l head
-    if test (count $argv) -gt 1
-        fail "Usage: jj pr-update [head-bookmark]"
-    else if test (count $argv) -eq 1
+    if test (count $argv) -eq 1
         set head "$argv[1]"
     else
         set -l candidates
@@ -257,8 +222,8 @@ function sub_pr_update
 
         set -l matched_heads
         for c in $candidates
-            set -l pr_url (gh pr list --repo "$repo" --state open --head "$c" --json url --jq '.[0].url')
-            if test -n "$pr_url"; and test "$pr_url" != "null"
+            set -l existing_pr (gh pr list --repo "$repo" --state open --head "$c" --json url --jq '.[0].url')
+            if test -n "$existing_pr"; and test "$existing_pr" != "null"
                 set -a matched_heads "$c"
             end
         end
@@ -270,7 +235,7 @@ function sub_pr_update
             for h in $matched_heads
                 echo "  $h"
             end
-            fail "Use: jj pr-update <head-bookmark>"
+            fail "Use: jj pr <head-bookmark>"
         else
             set head (current_head_bookmark_for_rev "$target")
         end
@@ -278,18 +243,36 @@ function sub_pr_update
 
     test -n "$head"; or fail "Could not determine PR head bookmark."
 
-    set -l pr_number (gh pr list --repo "$repo" --state open --head "$head" --json number --jq '.[0].number')
-    if test -z "$pr_number"; or test "$pr_number" = "null"
-        fail "No existing PR found for $head. Use jj pr to create one."
+    # Push
+    if string match -rq '^odsod/push-' -- "$head"
+        set -l pr_exists (gh pr list --repo "$repo" --state open --head "$head" --json number --jq '.[0].number')
+        if test -n "$pr_exists"; and test "$pr_exists" != "null"
+            jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
+            ensure_head_at_target "$head" "$target"
+            jj git push --remote origin --bookmark "$head"
+            or fail "Failed to push bookmark $head."
+        else
+            jj git push -c "$target"
+            or fail "Failed to push publish target."
+        end
+    else
+        jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
+        ensure_head_at_target "$head" "$target"
+        jj git push --remote origin --bookmark "$head"
+        or fail "Failed to push bookmark $head."
     end
 
-    jj bookmark track "$head" --remote=origin >/dev/null 2>&1 || true
-    ensure_head_at_target "$head" "$target"
-    jj git push --remote origin --bookmark "$head"
-    or fail "Failed to push bookmark $head."
-
+    # Create or find existing PR
     set -l pr_url (gh pr list --repo "$repo" --state open --head "$head" --json url --jq '.[0].url')
-    test -n "$pr_url"; or fail "Could not resolve PR URL for $head."
+    if test -z "$pr_url"; or test "$pr_url" = "null"
+        set -l pr_title (pr_title_for_rev "$target" "chore: update $head")
+        set -l pr_body_file (mktemp)
+        pr_body_for_rev "$target" > $pr_body_file
+        set pr_url (gh pr create --repo "$repo" --head "$head" --title "$pr_title" --body-file $pr_body_file)
+        rm -f $pr_body_file
+        test -n "$pr_url"; or fail "Failed to create PR for $head."
+    end
+
     xdg-open "$pr_url" >/dev/null 2>&1 || true
     echo "$pr_url"
     post_publish_new_working_commit
@@ -344,7 +327,7 @@ end
 
 function usage
     echo "Usage: jj-workflow <subcommand>"
-    echo "Subcommands: sync clean start pr-check pr pr-update end"
+    echo "Subcommands: sync clean start pr end"
 end
 
 if not command -q jj
@@ -369,14 +352,8 @@ switch "$subcmd"
     case start
         test (count $subargs) -eq 0; or fail "Usage: jj start"
         sub_start
-    case pr-check
-        test (count $subargs) -eq 0; or fail "Usage: jj pr-check"
-        sub_pr_check
     case pr
-        test (count $subargs) -eq 0; or fail "Usage: jj pr"
-        sub_pr
-    case pr-update
-        sub_pr_update $subargs
+        sub_pr $subargs
     case end
         test (count $subargs) -eq 0; or fail "Usage: jj end"
         sub_end
