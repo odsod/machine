@@ -32,9 +32,9 @@ function ensure_pr_preflight
 
     set -l rebased (jj log -r '@ & descendants(main@origin)' --no-graph)
     if test -z "$rebased"
-        echo "FAIL: current commit is not rebased onto latest main@origin."
-        echo "Run: jj rebase -d main@origin"
-        exit 1
+        echo "Rebasing onto latest main@origin..."
+        jj rebase -d main@origin >/dev/null
+        or fail "Failed to rebase onto main@origin."
     end
 end
 
