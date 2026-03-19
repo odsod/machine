@@ -1,6 +1,6 @@
 name := agent-browser
 # Discovery: https://github.com/vercel-labs/agent-browser/releases/latest
-version := 0.21.0
+version := 0.21.2
 url := https://registry.npmjs.org/$(name)/-/$(name)-$(version).tgz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 active_dir := $(HOME)/.local/share/odsod/machine/$(name)
