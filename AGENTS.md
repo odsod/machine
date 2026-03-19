@@ -75,6 +75,7 @@
 ## jj
 
 - Use jj for all version control operations
+- Remote read operations are allowed (`jj git fetch`, release/API queries, cloning)
 - Do not push to the remote repo, leave this to the user
 
 ## Nested Workspaces
