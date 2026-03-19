@@ -23,12 +23,8 @@ sync = ["util", "exec", "--", "jj-workflow", "sync"]
 clean = ["util", "exec", "--", "jj-workflow", "clean"]
 # Start a new empty working commit on top of latest main@origin.
 start = ["util", "exec", "--", "jj-workflow", "start"]
-# Run preflight only: fetch, mutable divergence check, and base-on-main check.
-pr-check = ["util", "exec", "--", "jj-workflow", "pr-check"]
-# Create a new PR for the current change-id bookmark after passing preflight.
+# Create or update a PR for the current change. Auto-rebases onto main@origin.
 pr = ["util", "exec", "--", "jj-workflow", "pr"]
-# Update an existing PR for the current change-id bookmark after passing preflight.
-pr-update = ["util", "exec", "--", "jj-workflow", "pr-update"]
 # Close current non-default workspace and clean up associated tmux session.
 end = ["util", "exec", "--", "jj-workflow", "end"]
 delta = ["diff", "--config", "ui.diff-formatter=\":git\"", "--config", "ui.pager=\"delta\""]
