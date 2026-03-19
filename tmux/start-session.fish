@@ -458,6 +458,7 @@ if test "$session_type" = Workspace
 
             if test $origin_bookmark_exists -eq 1
                 set base_rev "$bookmark@origin"
+                set selected_remote_ref "$bookmark@origin"
             else if test $bookmark_exists -eq 1
                 set base_rev "$bookmark"
             else if _jj_repo "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
@@ -490,7 +491,9 @@ if test "$session_type" = Workspace
             exit 1
         end
 
-        if test $bookmark_exists -eq 0
+        if test -n "$selected_remote_ref"
+            jj --ignore-working-copy -R "$workspace_path" bookmark track "$bookmark" --remote=origin >/dev/null 2>&1 || true
+        else if test $bookmark_exists -eq 0
             jj --ignore-working-copy -R "$workspace_path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
             or begin
                 _status_clear
