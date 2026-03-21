@@ -1,5 +1,8 @@
 # Agent Instructions
 
+Project-specific instructions for the `machine` repo. Global agent
+instructions live in `.agents/AGENTS.md` — do not duplicate them here.
+
 ## Principles
 
 - **Minimalism**: Standard solutions > Custom scripts.
@@ -61,6 +64,7 @@
 5.  **Verify**: `make -C <dir>` then `<tool> --version`.
     - For `codex/`: run `make -C codex codex-config-diff`
     - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
+    - Check `<dir>/AGENTS.md` for module-specific update notes.
 
 6.  **Commit**: `feat(<dir>): bump versions`.
     - List specific tool bumps in the commit body.
