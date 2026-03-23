@@ -10,6 +10,11 @@ function fetch_origin
     or fail "Failed to fetch from origin."
 end
 
+function try_update_stale_workspace
+    jj workspace update-stale >/dev/null 2>&1
+    or true
+end
+
 function ensure_pr_preflight
     fetch_origin
 
@@ -150,6 +155,7 @@ function ensure_head_at_target --argument-names head target
 end
 
 function sub_sync
+    try_update_stale_workspace
     fetch_origin
     echo "Synced refs from origin."
 end
