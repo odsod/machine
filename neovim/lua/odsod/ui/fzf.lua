@@ -88,9 +88,12 @@ function M.setup()
 		},
 		files = {
 			no_ignore = true,
+			file_ignore_patterns = {
+				"%.worktrees/",
+			},
 		},
 		grep = {
-			rg_opts = "--column --line-number --no-heading --color=never --smart-case --max-columns=4096 --hidden --no-ignore --glob '!.git' --glob '!.jj' --glob '!node_modules'",
+			rg_opts = "--column --line-number --no-heading --color=never --smart-case --max-columns=4096 --hidden --no-ignore --glob '!.git' --glob '!.jj' --glob '!node_modules' --glob '!.worktrees'",
 		},
 	})
 end
