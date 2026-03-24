@@ -185,4 +185,4 @@ if not jj git clone "$_clone_url" "$dest" 2>&1
     end
 end
 
-read -P "Cloned to $dest — press Enter to close" _
+echo "Cloned to $dest"
