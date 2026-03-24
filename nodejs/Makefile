@@ -6,7 +6,7 @@ name := nodejs
 # DNF keeps the exact Node.js and npm versions current within that stream.
 node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
-pnpm_version := 10.32.1
+pnpm_version := 10.33.0
 
 pnpm_url := https://github.com/pnpm/pnpm/releases/download/v$(pnpm_version)/pnpm-linux-x64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
