@@ -4,6 +4,7 @@ name := slack
 # curl -I https://downloads.slack-edge.com/desktop-releases/linux/x64/<version>/slack-<build>.x86_64.rpm
 # Discovery: https://slack.com/release-notes/linux/rss
 version := 4.47.69
+# Discovery: curl -I https://downloads.slack-edge.com/desktop-releases/linux/x64/<version>/slack-<build>.x86_64.rpm
 build := 4.47.69-0.1.el8
 package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
