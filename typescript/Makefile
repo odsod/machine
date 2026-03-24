@@ -2,8 +2,8 @@ name := typescript
 
 # Discovery: https://www.npmjs.com/package/typescript
 typescript_version := 6.0.2
-# Discovery: https://www.npmjs.com/package/@vtsls/language-server
-vtsls_version := 0.3.0
+# Discovery: https://www.npmjs.com/package/@typescript/native-preview
+tsgo_version := 7.0.0-dev.20260323.1
 
 .PHONY: all
 all: install
@@ -17,4 +17,5 @@ install:
 npm-packages:
 	$(info [$(name)] Installing npm packages...)
 	@~/.local/bin/npm install -g typescript@$(typescript_version)
-	@~/.local/bin/npm install -g @vtsls/language-server@$(vtsls_version)
+	@~/.local/bin/npm uninstall -g @vtsls/language-server >/dev/null 2>&1 || true
+	@~/.local/bin/npm install -g @typescript/native-preview@$(tsgo_version)

@@ -11,7 +11,7 @@ function M.setup()
   })
 
   -- Enable all servers
-  vim.lsp.enable({ "ty", "ruff", "oxfmt", "oxlint", "vtsls", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide", "buf_ls" })
+  vim.lsp.enable({ "ty", "ruff", "oxfmt", "oxlint", "tsgo", "bashls", "fish_lsp", "lua_ls", "gopls", "yamlls", "markdown_oxide", "buf_ls" })
 
   local lsp_attach_group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true })
   vim.api.nvim_create_autocmd("LspAttach", {
