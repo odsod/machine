@@ -1,7 +1,7 @@
 name := typescript
 
 # Discovery: https://www.npmjs.com/package/typescript
-typescript_version := 5.9.3
+typescript_version := 6.0.2
 # Discovery: https://www.npmjs.com/package/@vtsls/language-server
 vtsls_version := 0.3.0
 

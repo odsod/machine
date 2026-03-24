@@ -1,6 +1,6 @@
 name := obsidian
 # Discovery: https://github.com/obsidianmd/obsidian-releases/releases/latest
-version := 1.12.4
+version := 1.12.7
 appimage_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/Obsidian-$(version).AppImage
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
