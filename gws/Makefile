@@ -1,7 +1,7 @@
 name := gws
 # Discovery: https://github.com/googleworkspace/cli/releases/latest
-version := 0.19.0
-archive := gws-x86_64-unknown-linux-gnu.tar.gz
+version := 0.22.0
+archive := google-workspace-cli-x86_64-unknown-linux-gnu.tar.gz
 archive_url := https://github.com/googleworkspace/cli/releases/download/v$(version)/$(archive)
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
@@ -20,7 +20,7 @@ $(data_dir)/$(version)/$(name): $(data_dir)/$(version)/$(archive) $(data_dir)/$(
 	@cd $(dir $<) && sha256sum -c $(archive).sha256
 	$(info [$(name)] Extracting $(archive)...)
 	@tar -C $(dir $<) -xzf $<
-	@mv $(dir $<)/gws-x86_64-unknown-linux-gnu/$(name) $@
+	@mv $(dir $<)/google-workspace-cli-x86_64-unknown-linux-gnu/$(name) $@
 	@touch $@
 	@chmod +x $@
 
