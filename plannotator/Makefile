@@ -1,6 +1,6 @@
 name := plannotator
 # Discovery: https://github.com/backnotprop/plannotator/releases/latest
-version := 0.15.0
+version := 0.15.2
 binary_url := https://github.com/backnotprop/plannotator/releases/download/v$(version)/plannotator-linux-x64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
 marketplace_dir := $(HOME)/.claude/plugins/marketplaces/$(name)
