@@ -4,6 +4,7 @@ name := nodejs
 # Skip this module during routine version bumps.
 # Only bump `node_major` when Fedora moves to a new Node.js LTS stream.
 # DNF keeps the exact Node.js and npm versions current within that stream.
+# Discovery: https://nodejs.org/en/about/previous-releases
 node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
 pnpm_version := 10.33.0
