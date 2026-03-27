@@ -1,6 +1,6 @@
 name := gws
 # Discovery: https://github.com/googleworkspace/cli/releases/latest
-version := 0.22.1
+version := 0.22.3
 archive := google-workspace-cli-x86_64-unknown-linux-gnu.tar.gz
 archive_url := https://github.com/googleworkspace/cli/releases/download/v$(version)/$(archive)
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
