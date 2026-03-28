@@ -3,16 +3,15 @@ name := kde
 .PHONY: install
 install: \
 	~/.config/mimeapps.list \
-	disable-kwallet
+	enable-kwallet
 
-.PHONY: disable-kwallet
-# Disable KWallet, remove PAM integration, and delete existing wallets.
-disable-kwallet:
-	$(info [$(name)] Disabling KWallet...)
+.PHONY: enable-kwallet
+# Enable KWallet and install PAM integration for automatic unlocking.
+enable-kwallet:
+	$(info [$(name)] Enabling KWallet...)
 	@mkdir -p ~/.config
-	@printf '%s\n' '[Wallet]' 'Enabled=false' 'First Use=false' > ~/.config/kwalletrc
-	@sudo dnf remove -y kwallet-pam
-	@rm -f ~/.local/share/kwalletd/*.kwallet ~/.local/share/kwalletd/*.kwl
+	@printf '%s\n' '[Wallet]' 'Enabled=true' 'First Use=false' > ~/.config/kwalletrc
+	@sudo dnf install -y kwallet-pam
 
 .PHONY: ~/.config/mimeapps.list
 ~/.config/mimeapps.list: mimeapps.list
