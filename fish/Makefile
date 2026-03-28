@@ -1,6 +1,6 @@
 name := fish
 # Discovery: https://github.com/fish-shell/fish-shell/releases/latest
-version := 4.5.0
+version := 4.6.0
 fish_lsp_name := fish-lsp
 # Discovery: https://github.com/ndonfris/fish-lsp/releases/latest
 fish_lsp_version := 1.1.3
