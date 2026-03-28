@@ -35,6 +35,10 @@
     "lua-lsp@claude-plugins-official": true
   },
   "effortLevel": "medium",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true
 }

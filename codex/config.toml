@@ -5,6 +5,7 @@ web_search = "live"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 notify = ["sh", "-lc", "printf '\\a' > /dev/tty"]
+commit_attribution = ""
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir"]
