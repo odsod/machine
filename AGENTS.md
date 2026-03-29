@@ -66,7 +66,19 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
     - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
     - Check `<dir>/AGENTS.md` for module-specific update notes.
 
-6.  **Commit**: `feat(<dir>): bump versions`.
+6.  **External Skills** (in `.agents/skills/`):
+    - Check: `npx skills check -g`
+    - Update: `npx skills update -g`, or re-add individual skills:
+      ```
+      npx skills add anthropics/skills -s skill-creator -y -g --copy
+      npx skills add vercel-labs/agent-browser -s agent-browser -y -g --copy
+      npx skills add anthropics/claude-plugins-official -s claude-md-improver -y -g --copy
+      ```
+    - `-g` writes to `~/.agents/` which symlinks to `.agents/` in this repo
+    - Lock file: `.agents/.skill-lock.json` (v3 format)
+    - Commit in `.agents/`: `jj describe -m "feat(skills): update external skills"`
+
+7.  **Commit**: `feat(<dir>): bump versions`.
     - List specific tool bumps in the commit body.
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 
