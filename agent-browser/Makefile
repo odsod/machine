@@ -1,6 +1,6 @@
 name := agent-browser
 # Discovery: https://registry.npmjs.org/agent-browser/latest
-version := 0.23.0
+version := 0.23.3
 url := https://registry.npmjs.org/$(name)/-/$(name)-$(version).tgz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 active_dir := $(HOME)/.local/share/odsod/machine/$(name)
