@@ -15,8 +15,26 @@ function try_update_stale_workspace
     or true
 end
 
+function has_origin_main
+    set -l hit (jj log -r 'present(main@origin)' --no-graph -T 'commit_id.short()' | string collect)
+    test -n "$hit"
+end
+
+function require_origin_main --argument-names action
+    has_origin_main
+    and return 0
+
+    echo "origin/main doesn't exist yet." >&2
+    echo "Bootstrap the repo first, then retry: $action" >&2
+    echo "Suggested bootstrap:" >&2
+    echo "  jj bookmark set main -r @-" >&2
+    echo "  jj git push --remote origin --bookmark main" >&2
+    exit 1
+end
+
 function ensure_pr_preflight
     fetch_origin
+    require_origin_main "jj pr"
 
     set -l at_empty (jj log -r @ --no-graph -T 'if(empty, "1", "0")' | string collect)
     if test "$at_empty" != "1"
@@ -74,6 +92,8 @@ function commit_is_empty --argument-names rev
 end
 
 function effective_publish_rev
+    require_origin_main "jj pr"
+
     set -l rev "@"
     while true
         set -l in_main_lineage (jj log -r "$rev & descendants(main@origin)" --no-graph | string collect)
@@ -163,6 +183,11 @@ end
 function sub_clean
     fetch_origin
 
+    if not has_origin_main
+        echo "No origin/main yet; nothing to prune."
+        return 0
+    end
+
     set -l to_delete
     for b in (jj bookmark list | awk '/^odsod\/push-/{gsub(":", "", $1); print $1}')
         set -l merged_hit (jj log -r "bookmarks(\"$b\") & ::main@origin" --no-graph | string collect)
@@ -190,6 +215,7 @@ end
 
 function sub_start
     fetch_origin
+    require_origin_main "jj start"
     jj new main@origin >/dev/null
     or fail "Failed to create new commit from main@origin."
     echo "Now working on a new commit on top of latest main@origin."
