@@ -93,6 +93,18 @@ function _resolve_clone_input --argument-names input
         return 0
     end
 
+    # Host shorthand: host/org/repo(.git)
+    set -l host_shorthand (string match -r --groups-only '^([^/]+)/([^/]+)/([^/]+?)(?:\.git)?$' -- "$input")
+    if test (count $host_shorthand) -eq 3
+        set -l host "$host_shorthand[1]"
+        set -l org "$host_shorthand[2]"
+        set -l repo "$host_shorthand[3]"
+        set -g _clone_repo_rel "$host/$org/$repo"
+        set -g _clone_url "git@$host:$org/$repo.git"
+        set -g _clone_fallback_url "https://$host/$org/$repo.git"
+        return 0
+    end
+
     # SCP-style URL: git@host:path/to/repo(.git)
     set -l scp_parts (string match -r --groups-only '^[^@]+@([^:]+):(.+)$' -- "$input")
     if test (count $scp_parts) -eq 2
