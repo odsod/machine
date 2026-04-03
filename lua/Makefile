@@ -1,7 +1,7 @@
 name := lua
 
 # Discovery: https://github.com/LuaLS/lua-language-server/releases/latest
-lua_ls_version := 3.17.1
+lua_ls_version := 3.18.0
 lua_ls_archive := lua-language-server-$(lua_ls_version)-linux-x64.tar.gz
 lua_ls_url := https://github.com/LuaLS/lua-language-server/releases/download/$(lua_ls_version)/$(lua_ls_archive)
 
