@@ -47,26 +47,35 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
 
 **Trigger**: "Let's bump versions" -> Agents must check ALL tools.
 
-1.  **Identify Candidates**:
+1.  **Start Clean**:
+    - Top-level repo: ensure the working tree is committed before changing versions.
+    - Top-level repo: `jj git fetch --remote origin`
+    - Top-level repo: if `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
+    - `.agents/`: if external skills may be updated, `cd .agents`
+    - `.agents/`: ensure the working tree is committed before updating skills
+    - `.agents/`: `jj git fetch --remote origin`
+    - `.agents/`: if `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
+
+2.  **Identify Candidates**:
     - Search for `version :=` (or variations like `gopls_version :=`) to find all tools managed by version variables.
 
-2.  **Discover**:
+3.  **Discover**:
     - Check `# Discovery: <url>` comment above each version variable. **Mandatory** to add if missing.
     - **Quality**: URL must be future-proof (e.g., `latest` endpoints, releases pages). Avoid hardcoded version paths in discovery URLs unless unavoidable.
     - Check GitHub Releases, APIs, or project downloads pages.
 
-3.  **Validate**:
+4.  **Validate**:
     - For archive-based tools: `curl -I <url>` to ensure assets exist.
     - For `go install` tools: Ensure the version string is valid for the module.
 
-4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
+5.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
 
-5.  **Verify**: `make -C <dir>` then `<tool> --version`.
+6.  **Verify**: `make -C <dir>` then `<tool> --version`.
     - For `codex/`: run `make -C codex codex-config-diff`
     - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
     - Check `<dir>/AGENTS.md` for module-specific update notes.
 
-6.  **External Skills** (in `.agents/skills/`):
+7.  **External Skills** (in `.agents/skills/`):
     - Check: `npx skills check -g`
     - Update: `npx skills update -g`, or re-add individual skills:
       ```
@@ -78,7 +87,7 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
     - Lock file: `.agents/.skill-lock.json` (v3 format)
     - Commit in `.agents/`: `jj describe -m "feat(skills): update external skills"`
 
-7.  **Commit**: `feat(<dir>): bump versions`.
+8.  **Commit**: `feat(<dir>): bump versions`.
     - List specific tool bumps in the commit body.
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 
@@ -104,7 +113,12 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
 
 - **Purpose**: Agent skills (tmux, skill-creator, etc.)
 - **Install**: `make install` clones if `.agents/.jj` is absent.
-- **Update**: `cd .agents && jj git fetch && jj new main`
+- **Update**:
+  - `cd .agents`
+  - Ensure the working tree is committed before starting work
+  - `jj git fetch --remote origin`
+  - If `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
+  - Only then start the `.agents` update work
 
 ## Maintaining This File
 
