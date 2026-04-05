@@ -27,7 +27,7 @@
 - `init.lua`
   - bootstrap + top-level module loading
 - `lua/odsod/plugins.lua`
-  - plugin specs + plugin wiring
+  - `vim.pack.add()` declarations + plugin configuration
 - `lua/odsod/lsp.lua`
   - LSP defaults + server enable list + LspAttach hooks
 - `lua/odsod/lsp/save_actions.lua`
@@ -80,7 +80,7 @@
 make -C neovim
 ```
 
-- Sync plugins only:
+- Sync/update plugins only:
 
 ```sh
 make -C neovim install-plugins
