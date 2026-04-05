@@ -47,6 +47,7 @@ install-packages:
 		keepassxc \
 		maven \
 		ncdu \
+		net-snmp-utils \
 		ngrep \
 		pdftk \
 		python3-devel \
