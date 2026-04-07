@@ -9,7 +9,7 @@ shellcheck_archive := shellcheck-$(shellcheck_version).linux.x86_64.tar.xz
 shellcheck_url := https://github.com/koalaman/shellcheck/releases/download/$(shellcheck_version)/$(shellcheck_archive)
 
 # Discovery: https://github.com/mvdan/sh/releases/latest
-shfmt_version := v3.13.0
+shfmt_version := v3.13.1
 shfmt_binary := shfmt_$(shfmt_version)_linux_amd64
 shfmt_url := https://github.com/mvdan/sh/releases/download/$(shfmt_version)/$(shfmt_binary)
 
