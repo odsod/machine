@@ -160,6 +160,13 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] handy", "KWin", ""],
+    key: "Meta+N",
+    kind: "command",
+    command: ["handy-toggle"],
+  },
+
+  {
     actionId: ["kwin", "[odsod] zed", "KWin", ""],
     key: "Meta+Z",
     kind: "app",
