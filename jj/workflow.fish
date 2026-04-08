@@ -327,7 +327,10 @@ function sub_end
     test -n "$workspace_root"
         or fail "Could not determine workspace root."
 
-    set -l repo_name (basename (dirname "$workspace_root"))
+    # Strip "/<workspace_name>" suffix to find the repo directory.
+    # Needed because workspace names can contain slashes (e.g. dependabot/go_modules/...).
+    set -l repo_dir (string replace -- "/$workspace_name" "" "$workspace_root")
+    set -l repo_name (basename "$repo_dir")
     set -l session_name "$repo_name($workspace_name)"
 
     echo "Closing workspace: $workspace_name"
