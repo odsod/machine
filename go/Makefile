@@ -1,6 +1,6 @@
 name := go
 # Discovery: https://go.dev/VERSION?m=text
-version := 1.26.1
+version := 1.26.2
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 
 # Discovery: https://github.com/golang/tools/releases (tags: gopls/v*)
