@@ -38,6 +38,7 @@ install-packages:
 		gifsicle \
 		git \
 		git-delta \
+		gtk-layer-shell \
 		hexyl \
 		htop \
 		iftop \
@@ -60,6 +61,7 @@ install-packages:
 		ttyd \
 		unzip \
 		unrar \
+		wtype \
 		wl-clipboard \
 		yt-dlp \
 		-y -q
