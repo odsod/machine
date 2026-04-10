@@ -1,7 +1,7 @@
 name := python
 
 # Discovery: https://pypi.org/project/ruff/
-ruff_version := 0.15.9
+ruff_version := 0.15.10
 # Discovery: https://pypi.org/project/ty/
 ty_version := 0.0.29
 

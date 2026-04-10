@@ -1,9 +1,6 @@
 {
   "context": {
-    "fileName": [
-      "AGENTS.md",
-      "README.md"
-    ],
+    "fileName": ["AGENTS.md", "README.md"],
     "fileFiltering": {
       "respectGitIgnore": false
     },
@@ -73,12 +70,16 @@
       "enabled": true,
       "maxAge": "30d",
       "warningAcknowledged": true
+    },
+    "plan": {
+      "enabled": true
     }
   },
   "tools": {
     "sandbox": false
   },
-  "experimental": {
-    "plan": true
+  "experimental": {},
+  "agents": {
+    "overrides": {}
   }
 }
