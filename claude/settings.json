@@ -2,11 +2,13 @@
   "respectGitignore": false,
   "env": {
     "CLAUDE_CODE_USE_BEDROCK": "1",
+    "AWS_PROFILE": "bedrock",
     "AWS_REGION": "eu-north-1",
     "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
+  "awsAuthRefresh": "aws sso login --profile bedrock",
   "model": "eu.anthropic.claude-opus-4-6-v1",
   "hooks": {
     "Stop": [
