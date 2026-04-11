@@ -69,6 +69,19 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] remote-terminal", "KWin", ""],
+    key: "Meta+N",
+    kind: "app",
+    command: [
+      "ghostty",
+      "--class=com.mitchellh.ghostty.remote",
+      "-e",
+      "remote-tmux",
+    ],
+    resourceClass: "com.mitchellh.ghostty.remote",
+  },
+
+  {
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",

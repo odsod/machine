@@ -1,7 +1,7 @@
 name := tailscale
 
 .PHONY: install
-install: install-package enable-service
+install: install-package enable-service ~/.local/bin/remote-tmux
 
 .PHONY: install-package
 install-package:
@@ -13,3 +13,9 @@ install-package:
 enable-service: install-package
 	$(info [$(name)] Enabling service...)
 	@sudo systemctl enable --now tailscaled
+
+.PHONY: ~/.local/bin/remote-tmux
+~/.local/bin/remote-tmux: remote-tmux.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
