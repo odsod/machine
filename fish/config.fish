@@ -21,6 +21,14 @@ function source_env_sh --argument-names env_file
 end
 source_env_sh
 
+# Stabilize SSH agent socket for tmux session persistence.
+# New SSH/KDE connections update the symlink; tmux panes read from the stable path.
+set -l stable_sock "$HOME/.ssh/auth_sock"
+if set -q SSH_AUTH_SOCK; and test "$SSH_AUTH_SOCK" != "$stable_sock" -a -S "$SSH_AUTH_SOCK"
+    ln -sf "$SSH_AUTH_SOCK" "$stable_sock"
+end
+set -gx SSH_AUTH_SOCK "$stable_sock"
+
 status is-interactive; or return
 set -q CURSOR_AGENT; and return
 
