@@ -81,7 +81,7 @@ end
 
 function _session_name_for --argument-names base suffix
     if test -n "$suffix"
-        printf '%s(%s)\n' "$base" "$suffix"
+        printf '%s/%s\n' "$base" "$suffix"
     else
         printf '%s\n' "$base"
     end
