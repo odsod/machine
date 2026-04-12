@@ -7,4 +7,4 @@ set -l host (tailscale status --json \
 
 test -n "$host"; or exit 0
 
-ssh "$host" -t tmux new-session -A -s main
+ssh -A "$host" -t tmux new-session -A -s main
