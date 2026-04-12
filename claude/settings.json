@@ -1,4 +1,5 @@
 {
+  "awsAuthRefresh": "aws sso login --profile bedrock",
   "respectGitignore": false,
   "env": {
     "CLAUDE_CODE_USE_BEDROCK": "1",
@@ -8,7 +9,10 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
     "CLAUDE_CODE_NO_FLICKER": "1"
   },
-  "awsAuthRefresh": "aws sso login --profile bedrock",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "model": "eu.anthropic.claude-opus-4-6-v1",
   "hooks": {
     "Stop": [
@@ -38,10 +42,6 @@
     "lua-lsp@claude-plugins-official": true
   },
   "effortLevel": "medium",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true
 }
