@@ -331,7 +331,7 @@ function sub_end
     # Needed because workspace names can contain slashes (e.g. dependabot/go_modules/...).
     set -l repo_dir (string replace -- "/$workspace_name" "" "$workspace_root")
     set -l repo_name (basename "$repo_dir")
-    set -l session_name "$repo_name($workspace_name)"
+    set -l session_name "$repo_name/$workspace_name"
 
     echo "Closing workspace: $workspace_name"
     echo "  Session:  $session_name"
