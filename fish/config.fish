@@ -22,12 +22,87 @@ end
 source_env_sh
 
 # Stabilize SSH agent socket for tmux session persistence.
-# New SSH/KDE connections update the symlink; tmux panes read from the stable path.
-set -l stable_sock "$HOME/.ssh/auth_sock"
-if set -q SSH_AUTH_SOCK; and test "$SSH_AUTH_SOCK" != "$stable_sock" -a -S "$SSH_AUTH_SOCK"
-    ln -sf "$SSH_AUTH_SOCK" "$stable_sock"
+# Remote SSH sessions should keep their forwarded agent; local desktop shells
+# should fall back to the user ssh-agent socket if a forwarded one is absent.
+function refresh_ssh_auth_sock
+    set -l stable_sock "$HOME/.ssh/auth_sock"
+    set -l runtime_sock "/run/user/"(id -u)"/ssh-agent.socket"
+    set -l chosen_sock
+
+    if set -q SSH_AUTH_SOCK[1]; and test "$SSH_AUTH_SOCK" != "$stable_sock" -a -S "$SSH_AUTH_SOCK"
+        set chosen_sock "$SSH_AUTH_SOCK"
+    else if not set -q SSH_CONNECTION[1]; and test -S "$runtime_sock"
+        set chosen_sock "$runtime_sock"
+    else if test -S "$stable_sock"
+        set chosen_sock "$stable_sock"
+    else if test -S "$runtime_sock"
+        set chosen_sock "$runtime_sock"
+    end
+
+    if test -n "$chosen_sock"
+        if test "$chosen_sock" != "$stable_sock"
+            ln -sf "$chosen_sock" "$stable_sock"
+        end
+        set -gx SSH_AUTH_SOCK "$stable_sock"
+    else
+        set -e SSH_AUTH_SOCK
+    end
 end
-set -gx SSH_AUTH_SOCK "$stable_sock"
+refresh_ssh_auth_sock
+
+function _ssh_auth_sock_source
+    set -l stable_sock "$HOME/.ssh/auth_sock"
+    set -l runtime_sock "/run/user/"(id -u)"/ssh-agent.socket"
+    set -l target
+
+    if test "$SSH_AUTH_SOCK" = "$stable_sock"
+        set target (readlink "$stable_sock" 2>/dev/null)
+    else
+        set target "$SSH_AUTH_SOCK"
+    end
+
+    if test "$target" = "$runtime_sock"
+        echo local
+    else if test -n "$target"
+        echo forwarded
+    else
+        echo none
+    end
+end
+
+function ssh-refresh
+    refresh_ssh_auth_sock
+    if not set -q SSH_AUTH_SOCK[1]
+        echo "no live ssh agent found" >&2
+        return 1
+    end
+
+    set -l source (_ssh_auth_sock_source)
+    switch "$source"
+        case local
+            if ssh-add -l >/dev/null 2>&1
+                echo "using local agent"
+                ssh-add -l
+                return $status
+            end
+
+            echo "using local agent"
+            if test -f "$HOME/.ssh/id_rsa"
+                ssh-add "$HOME/.ssh/id_rsa"
+                return $status
+            end
+
+            echo "missing key: $HOME/.ssh/id_rsa" >&2
+            return 1
+        case forwarded
+            echo "using forwarded agent"
+            ssh-add -l
+            return $status
+        case '*'
+            echo "no live ssh agent found" >&2
+            return 1
+    end
+end
 
 status is-interactive; or return
 set -q CURSOR_AGENT; and return
