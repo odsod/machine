@@ -1,7 +1,7 @@
 name := typescript
 
 # Discovery: https://www.npmjs.com/package/typescript
-typescript_version := 6.0.2
+typescript_version := 6.0.3
 # Discovery: https://www.npmjs.com/package/@typescript/native-preview
 tsgo_version := 7.0.0-dev.20260416.2
 
