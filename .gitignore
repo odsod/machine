@@ -4,3 +4,4 @@ TODO.md
 __pycache__/
 .agents/
 agents/
+skills-lock.json
