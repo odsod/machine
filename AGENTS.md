@@ -33,10 +33,7 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
 
 ## Home Folder
 
-- **Source repos**: `~/Code/<full-vcs-root>/<org>/<repo>`
-  - E.g. `~/Code/github.com/odsod/machine`
-- **Worktrees root**: `~/Worktrees/<full-vcs-root>/<org>/<repo>/<branch>`
-  - E.g. `~/Worktrees/github.com/odsod/machine/example-branch`
+See "File System" in `.agents/AGENTS.md` for the standard directory layout.
 
 ## Package Management
 
