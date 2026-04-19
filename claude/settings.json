@@ -7,13 +7,13 @@
     "AWS_REGION": "eu-north-1",
     "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
-    "CLAUDE_CODE_NO_FLICKER": "1"
+    "CLAUDE_CODE_NO_FLICKER": "0"
   },
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "model": "eu.anthropic.claude-opus-4-6-v1",
+  "model": "eu.anthropic.claude-opus-4-6-v1[1m]",
   "hooks": {
     "Stop": [
       {
