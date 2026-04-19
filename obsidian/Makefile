@@ -4,8 +4,8 @@ version := 1.12.7
 appimage_url := https://github.com/obsidianmd/obsidian-releases/releases/download/v$(version)/Obsidian-$(version).AppImage
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
-.PHONY: ~/.local/bin/obsidian
-~/.local/bin/obsidian: $(data_dir)/$(version)/app.AppImage
+.PHONY: ~/.local/bin/obsidian-app
+~/.local/bin/obsidian-app: $(data_dir)/$(version)/app.AppImage
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

@@ -220,7 +220,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] obsidian", "KWin", ""],
     key: "Meta+V",
     kind: "app",
-    command: ["obsidian"],
+    command: ["obsidian-app"],
     resourceName: "obsidian",
   },
 
