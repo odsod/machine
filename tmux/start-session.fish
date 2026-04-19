@@ -165,6 +165,26 @@ function _select_or_create_dir --argument-names base_dir prompt
     printf '%s\n' "$session_root"
 end
 
+function _select_existing_dir --argument-names base_dir prompt
+    set -l dirs
+    for d in "$base_dir"/*/
+        test -d "$d"; or continue
+        set -a dirs (basename "$d")
+    end
+
+    if test (count $dirs) -eq 0
+        echo "No $prompt directories found in $base_dir." >&2
+        return 1
+    end
+
+    set -l dir_name (printf '%s\n' $dirs | _fzf_pick_full "$prompt")
+    set -l status_code $status
+    _handle_fzf_status "$status_code" "$prompt"; or return 1
+    test -n "$dir_name"; or return 1
+
+    printf '%s\n' "$base_dir/$dir_name"
+end
+
 # --- Repo discovery (shared by Code, Workspace) ---
 
 function discover_repos
@@ -280,7 +300,7 @@ end
 
 # --- Type selection ---
 
-set session_type (printf '%s\n' Workspace Code Activity Project \
+set session_type (printf '%s\n' Workspace Code Activity Project Vault \
     | _fzf_pick_compact Session)
 set status_code $status
 _handle_fzf_status "$status_code" Session; or exit 0
@@ -315,6 +335,21 @@ if test "$session_type" = Project
     exit 0
 end
 
+# --- Vault ---
+
+if test "$session_type" = Vault
+    set session_root (_select_existing_dir "$HOME/Vaults" Vault)
+    or exit 0
+
+    select_agent; or exit 0
+
+    set dir_name (basename "$session_root")
+    set session_name (_session_name_for "Vaults" "$dir_name")
+
+    _launch_session $session_name $session_root
+    exit 0
+end
+
 # --- Code ---
 
 if test "$session_type" = Code
@@ -333,7 +368,7 @@ if test "$session_type" = Code
     _ensure_jj_repo_ready "$repo_path"
 
     set repo_parts (string split '/' -- $repo_rel)
-    set session_name (_session_name_for "$repo_parts[-1]")
+    set session_name (_session_name_for (string join '/' -- $repo_parts[-2..-1]))
 
     _launch_session $session_name "$repo_path"
     exit 0
