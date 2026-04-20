@@ -7,9 +7,14 @@ marketplace_dir := $(HOME)/.claude/plugins/marketplaces/$(name)
 cache_dir := $(HOME)/.claude/plugins/cache/$(name)/$(name)/$(version)
 
 .PHONY: install
-install: ~/.local/bin/$(name) $(cache_dir)/hooks/hooks.json
+install: ~/.local/bin/$(name) ~/.local/bin/$(name)-browser $(cache_dir)/hooks/hooks.json
 
 ~/.local/bin/$(name): $(data_dir)/$(name)
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+~/.local/bin/$(name)-browser: $(name)-browser
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@

@@ -1,0 +1,3 @@
+#!/bin/sh
+data_dir="$HOME/.local/share/odsod/machine/data/plannotator/chrome-profile"
+exec google-chrome --password-store=basic --user-data-dir="$data_dir" --class=Plannotator "$1"
