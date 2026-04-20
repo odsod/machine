@@ -20,7 +20,7 @@ $(data_dir)/$(name):
 	@chmod +x "$@"
 
 # Claude Code plugin — replicates /plugin marketplace add + /plugin install
-$(cache_dir)/hooks/hooks.json: $(marketplace_dir)/.git
+$(cache_dir)/hooks/hooks.json: $(marketplace_dir)/v$(version).tag
 	$(info [$(name)] Installing Claude Code plugin...)
 	@rm -rf "$(cache_dir)"
 	@mkdir -p "$(dir $(cache_dir))"
@@ -37,7 +37,10 @@ $(cache_dir)/hooks/hooks.json: $(marketplace_dir)/.git
 	    "$(HOME)/.claude/settings.json" > "$(HOME)/.claude/settings.json.tmp" \
 	    && mv "$(HOME)/.claude/settings.json.tmp" "$(HOME)/.claude/settings.json"
 
-$(marketplace_dir)/.git:
+# Sentinel file ensures re-clone when version changes
+$(marketplace_dir)/v$(version).tag:
 	$(info [$(name)] Cloning marketplace repo at v$(version)...)
+	@rm -rf "$(marketplace_dir)"
 	@git clone --depth 1 --branch "v$(version)" \
 	    https://github.com/backnotprop/plannotator "$(marketplace_dir)"
+	@touch "$@"
