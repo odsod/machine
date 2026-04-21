@@ -29,12 +29,16 @@ pr = ["util", "exec", "--", "jj-workflow", "pr"]
 end = ["util", "exec", "--", "jj-workflow", "end"]
 delta = ["diff", "--config", "ui.diff-formatter=\":git\"", "--config", "ui.pager=\"delta\""]
 
+[snapshot]
+auto-update-stale = true
+
 [revset-aliases]
 upstream_work = "@ | ancestors(remote_bookmarks().., 2) | trunk()"
 
 [revsets]
 # Default view: current work + your bookmarked branches + latest upstream main context.
 log = "present(@ | ancestors(@, 4) | (bookmarks() & mine()) | main@origin | descendants(main@origin, 4))"
+immutable-heads = "present(trunk()) | (working_copies() ~ @)"
 
 [signing]
 backend = "ssh"
