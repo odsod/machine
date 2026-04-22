@@ -1,6 +1,6 @@
 name := defuddle
 # Discovery: https://registry.npmjs.org/defuddle/latest
-version := 0.17.0
+version := 0.18.1
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 npm_bin := $(HOME)/.local/share/npm/bin/$(name)
 
