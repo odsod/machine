@@ -15,6 +15,11 @@
             "name": "notify-completion",
             "type": "command",
             "command": "printf '\\a' > /dev/tty"
+          },
+          {
+            "name": "jj-snapshot",
+            "type": "command",
+            "command": "test -d .jj && jj st > /dev/null 2>&1 || true"
           }
         ]
       }
