@@ -7,7 +7,8 @@
     "AWS_REGION": "eu-north-1",
     "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
-    "CLAUDE_CODE_NO_FLICKER": "0"
+    "CLAUDE_CODE_NO_FLICKER": "0",
+    "PLANNOTATOR_BROWSER": "plannotator-browser"
   },
   "attribution": {
     "commit": "",
@@ -21,6 +22,10 @@
           {
             "type": "command",
             "command": "printf '\\a' > /dev/tty"
+          },
+          {
+            "type": "command",
+            "command": "test -d .jj && jj st > /dev/null 2>&1 || true"
           }
         ]
       }
@@ -39,7 +44,8 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true,
+    "plannotator@plannotator": true
   },
   "effortLevel": "high",
   "autoMemoryEnabled": false,

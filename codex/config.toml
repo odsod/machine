@@ -4,7 +4,7 @@ personality = "pragmatic"
 web_search = "live"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
-notify = ["sh", "-lc", "printf '\\a' > /dev/tty"]
+notify = ["sh", "-lc", "printf '\\a' > /dev/tty; test -d .jj && jj st > /dev/null 2>&1 || true"]
 commit_attribution = ""
 
 [tui]
