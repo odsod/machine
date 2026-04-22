@@ -1,6 +1,6 @@
 name := neovim
 # Discovery: https://github.com/neovim/neovim/releases
-version := 0.12.1
+version := 0.12.2
 archive_url := https://github.com/neovim/neovim/releases/download/v$(version)/nvim-linux-x86_64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 install_dir := $(data_dir)/$(version)/nvim-linux-x86_64
