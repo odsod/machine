@@ -323,12 +323,27 @@ end
 # --- Project ---
 
 if test "$session_type" = Project
+    set existing_projects
+    for d in "$HOME/Projects"/*/
+        test -d "$d"; and set -a existing_projects (basename "$d")
+    end
+
     set session_root (_select_or_create_dir "$HOME/Projects" Project)
     or exit 0
 
+    set dir_name (basename "$session_root")
+    if not contains -- "$dir_name" $existing_projects
+        if not string match -rq '^[0-9]{4}-[0-9]{2}-[0-9]{2}-' -- "$dir_name"
+            set dated_name (date '+%Y-%m-%d')-$dir_name
+            set dated_root "$HOME/Projects/$dated_name"
+            mv "$session_root" "$dated_root"
+            set session_root "$dated_root"
+            set dir_name "$dated_name"
+        end
+    end
+
     select_agent; or exit 0
 
-    set dir_name (basename "$session_root")
     set session_name (_session_name_for "$dir_name")
 
     _launch_session $session_name $session_root
