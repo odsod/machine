@@ -1,4 +1,4 @@
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_reasoning_effort = "high"
 personality = "pragmatic"
 web_search = "live"
@@ -12,6 +12,7 @@ status_line = ["model-with-reasoning", "context-remaining", "current-dir"]
 
 [notice]
 hide_rate_limit_model_nudge = true
+fast_default_opt_out = true
 
 [projects."/home/odsod/Code"]
 trust_level = "trusted"
