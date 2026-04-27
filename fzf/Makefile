@@ -1,6 +1,6 @@
 name := fzf
 # Discovery: https://github.com/junegunn/fzf/releases/latest
-version := 0.71.0
+version := 0.72.0
 archive_url := https://github.com/junegunn/fzf/releases/download/v$(version)/fzf-$(version)-linux_amd64.tar.gz
 manpage_url := https://raw.githubusercontent.com/junegunn/fzf/refs/tags/v$(version)/man/man1/fzf.1
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
