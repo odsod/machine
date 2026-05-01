@@ -7,9 +7,9 @@ name := nodejs
 # Discovery: https://nodejs.org/en/about/previous-releases
 node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
-pnpm_version := 10.33.2
+pnpm_version := 11.0.3
 
-pnpm_url := https://github.com/pnpm/pnpm/releases/download/v$(pnpm_version)/pnpm-linux-x64
+pnpm_url := https://github.com/pnpm/pnpm/releases/download/v$(pnpm_version)/pnpm-linux-x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: install
@@ -52,11 +52,15 @@ install-packages:
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-$(data_dir)/pnpm/$(pnpm_version)/pnpm:
+$(data_dir)/pnpm/$(pnpm_version)/pnpm: $(data_dir)/pnpm/$(pnpm_version)/archive.tar.gz
+	$(info [$(name)] Extracting pnpm $(pnpm_version)...)
+	@tar -C $(dir $@) -xzf $<
+	@chmod +x $@
+
+$(data_dir)/pnpm/$(pnpm_version)/archive.tar.gz:
 	$(info [$(name)] Downloading pnpm $(pnpm_version)...)
 	@mkdir -p $(dir $@)
 	@curl -L $(pnpm_url) -o $@
-	@chmod +x $@
 
 .PHONY: ~/.npmrc
 ~/.npmrc: npmrc
