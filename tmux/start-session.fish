@@ -234,6 +234,14 @@ function _jj_repo --argument-names repo_path
     jj --ignore-working-copy -R "$repo_path" $argv[2..-1]
 end
 
+function _jj_fetch_origin_for_picker --argument-names repo_path
+    if command -q timeout
+        timeout --kill-after=2s 10s jj --ignore-working-copy -R "$repo_path" git fetch --remote origin
+    else
+        jj --ignore-working-copy -R "$repo_path" git fetch --remote origin
+    end
+end
+
 function _ensure_jj_repo_ready --argument-names repo_path
     if not test -d "$repo_path/.jj"
         jj git init --colocate "$repo_path" >/dev/null 2>&1
@@ -404,11 +412,11 @@ if test "$session_type" = Workspace
     _ensure_jj_repo_ready "$repo_path"
 
     # Fetch in background while user browses bookmarks
-    _jj_repo "$repo_path" git fetch --remote origin >/dev/null 2>&1 &
+    _jj_fetch_origin_for_picker "$repo_path" >/dev/null 2>&1 &
     set -l fetch_pid $last_pid
 
     set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' 2>/dev/null | sed '/^$/d' | sort -u)
-    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote(), self.name() ++ "@" ++ self.remote(), "") ++ "\n"' 2>/dev/null \
+    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote() == "origin", self.name() ++ "@origin", "") ++ "\n"' 2>/dev/null \
         | sed '/^$/d' \
         | sort -u)
     set suggestion_bookmarks (printf '%s\n' $local_bookmarks $remote_bookmarks | sed '/^$/d' | sort -u)
@@ -489,8 +497,12 @@ if test "$session_type" = Workspace
             exit 1
         end
 
-        # Wait for background fetch started before the bookmark picker
-        wait $fetch_pid 2>/dev/null || true
+        # Wait for the best-effort background fetch started before the picker.
+        wait $fetch_pid 2>/dev/null
+        set -l fetch_status $status
+        if test $fetch_status -ne 0
+            _trace "workspace: background fetch skipped or timed out status=$fetch_status"
+        end
 
         if test -n "$selected_remote_ref"
             _jj_repo "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
