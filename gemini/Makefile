@@ -1,6 +1,6 @@
 name := gemini
 # Discovery: https://registry.npmjs.org/@google/gemini-cli/latest
-version := 0.40.1
+version := 0.41.1
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all

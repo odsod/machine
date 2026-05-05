@@ -1,8 +1,8 @@
 name := cursor
 include ../vscode/extensions.mk
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
-version := 3.2.16
-rpm_url := https://downloads.cursor.com/production/3e548838cf824b70851dd3ef27d0c6aae371b3f6/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
+version := 3.2.21
+rpm_url := https://downloads.cursor.com/production/806df57ed3b6f1ee0175140d38039a38574ec722/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 cursor_extensions := $(filter-out be5invis.toml,$(EDITOR_EXTENSIONS))
 
