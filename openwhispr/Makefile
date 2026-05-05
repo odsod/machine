@@ -1,6 +1,6 @@
 name := openwhispr
 # Discovery: https://github.com/OpenWhispr/openwhispr/releases/latest
-version := 1.6.10
+version := 1.7.0
 package_url := https://github.com/OpenWhispr/openwhispr/releases/download/v$(version)/OpenWhispr-$(version)-linux-x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 

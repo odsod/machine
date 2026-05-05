@@ -8,7 +8,7 @@ gopls_version := v0.21.1
 # Discovery: https://github.com/dominikh/go-tools/releases
 staticcheck_version := 2026.1
 # Discovery: https://github.com/mvdan/gofumpt/releases
-gofumpt_version := v0.9.2
+gofumpt_version := v0.10.0
 
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
