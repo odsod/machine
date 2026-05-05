@@ -56,5 +56,15 @@ export CARGO_HOME="$HOME/.cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
 [ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
 
+# ssh — needed for non-fish shells (e.g. Claude Code's zsh) where
+# fish's refresh_ssh_auth_sock doesn't run; without this, jj sign-on-push hangs.
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    if [ -S "$HOME/.ssh/auth_sock" ]; then
+        export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
+    elif [ -S "/run/user/$(id -u)/ssh-agent.socket" ]; then
+        export SSH_AUTH_SOCK="/run/user/$(id -u)/ssh-agent.socket"
+    fi
+fi
+
 # machine
 export PATH="$HOME/.local/bin:$PATH"
