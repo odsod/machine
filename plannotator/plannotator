@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ -z "${PLANNOTATOR_REMOTE+x}" ] && [ "${PLANNOTATOR_BROWSER:-}" = "plannotator-browser" ]; then
+  export PLANNOTATOR_REMOTE=0
+fi
+
+exec "$HOME/.local/share/odsod/machine/plannotator/plannotator" "$@"
