@@ -6,6 +6,8 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 .PHONY: all
 all: \
 	~/.gemini/settings.json \
+	~/.gemini/hooks/rtk-hook-gemini.sh \
+	~/.gemini/hooks/.rtk-hook.sha256 \
 	~/.gemini/policies/machine.toml \
 	~/.local/share/npm/bin/gemini
 
@@ -17,6 +19,19 @@ all: \
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
+.PHONY: ~/.gemini/hooks/rtk-hook-gemini.sh
+~/.gemini/hooks/rtk-hook-gemini.sh: hooks/rtk-hook-gemini.sh
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+~/.gemini/hooks/.rtk-hook.sha256: ~/.gemini/hooks/rtk-hook-gemini.sh
+	$(info [$(name)] Writing $@...)
+	@hash=$$(sha256sum "$<" | awk '{print $$1}'); \
+		tmp=$@.tmp; \
+		printf '%s  rtk-hook-gemini.sh\n' "$$hash" > "$$tmp"; \
+		mv "$$tmp" $@; \
+		chmod 0444 $@
 
 .PHONY: ~/.gemini/policies/machine.toml
 ~/.gemini/policies/machine.toml: policies.toml

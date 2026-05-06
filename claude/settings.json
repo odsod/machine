@@ -16,6 +16,17 @@
   },
   "model": "eu.anthropic.claude-sonnet-4-6[1m]",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
