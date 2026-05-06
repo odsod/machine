@@ -3,13 +3,14 @@ name := plannotator
 version := 0.19.8
 binary_url := https://github.com/backnotprop/plannotator/releases/download/v$(version)/plannotator-linux-x64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
+active_dir := $(HOME)/.local/share/odsod/machine/$(name)
 marketplace_dir := $(HOME)/.claude/plugins/marketplaces/$(name)
 cache_dir := $(HOME)/.claude/plugins/cache/$(name)/$(name)/$(version)
 
 .PHONY: install
 install: ~/.local/bin/$(name) ~/.local/bin/$(name)-browser $(cache_dir)/hooks/hooks.json
 
-~/.local/bin/$(name): $(data_dir)/$(name)
+~/.local/bin/$(name): $(name) $(active_dir)
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
@@ -23,6 +24,11 @@ $(data_dir)/$(name):
 	$(info [$(name)] Downloading $(binary_url)...)
 	@curl -fsSL "$(binary_url)" --create-dirs -o "$@"
 	@chmod +x "$@"
+
+$(active_dir): $(data_dir)/$(name)
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT "$(data_dir)" "$@"
 
 # Claude Code plugin — replicates /plugin marketplace add + /plugin install
 $(cache_dir)/hooks/hooks.json: $(marketplace_dir)/v$(version).tag
