@@ -7,7 +7,7 @@ name := nodejs
 # Discovery: https://nodejs.org/en/about/previous-releases
 node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
-pnpm_version := 11.0.6
+pnpm_version := 11.0.8
 
 pnpm_url := https://github.com/pnpm/pnpm/releases/download/v$(pnpm_version)/pnpm-linux-x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)

@@ -1,7 +1,7 @@
 name := yaml
 
 # Discovery: https://www.npmjs.com/package/yaml-language-server
-yamlls_version := 1.22.0
+yamlls_version := 1.23.0
 
 .PHONY: all
 all: install
