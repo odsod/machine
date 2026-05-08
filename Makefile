@@ -4,8 +4,7 @@ name := machine
 install: \
 	~/.profile \
 	~/.config/plasma-workspace/env/odsod-machine.sh \
-	install-packages \
-	install-flatpak-packages \
+	install-fedora \
 	install-agents \
 	install-modules
 
@@ -21,56 +20,10 @@ install: \
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-.PHONY: install-packages
-install-packages:
-	$(info [$(name)] Installing packages...)
-	@sudo dnf install \
-		bat \
-		ca-certificates \
-		curl \
-		difftastic \
-		dnf5-plugins \
-		dos2unix \
-		fd-find \
-		fedora-workstation-repositories \
-		firefox \
-		flatpak \
-		gifsicle \
-		git \
-		git-delta \
-		gtk-layer-shell \
-		hexyl \
-		htop \
-		iftop \
-		intel-media-driver \
-		java-25-openjdk-devel \
-		jq \
-		keepassxc \
-		maven \
-		ncdu \
-		net-snmp-utils \
-		ngrep \
-		pdftk \
-		python3-devel \
-		python3-pip \
-		python3-virtualenv \
-		python3.12 \
-		qbittorrent \
-		ripgrep \
-		simple-scan \
-		ttyd \
-		unzip \
-		unrar \
-		wtype \
-		wl-clipboard \
-		yt-dlp \
-		-y -q
-
-.PHONY: install-flatpak-packages
-install-flatpak-packages:
-	$(info [$(name)] Installing Flatpak packages...)
-	@flatpak install flathub \
-		com.spotify.Client
+.PHONY: install-fedora
+install-fedora:
+	$(info [$(name)] Installing Fedora OS layer...)
+	@$(MAKE) -C fedora
 
 .PHONY: install-agents
 install-agents:
@@ -82,7 +35,9 @@ install-agents:
 .PHONY: install-modules
 install-modules:
 	$(info [$(name)] Installing modules...)
-	@find . -mindepth 2 -maxdepth 2 -name Makefile | xargs dirname | xargs -n1 make -C
+	@find . -mindepth 2 -maxdepth 2 -name Makefile \
+		-not -path './fedora/*' \
+		| xargs dirname | xargs -n1 make -C
 
 .PHONY: install-sudoers
 install-sudoers:
