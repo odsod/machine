@@ -139,7 +139,7 @@ const shortcuts = [
     key: "Meta+S",
     kind: "app",
     command: ["slack"],
-    resourceClass: "Slack",
+    resourceClass: "slack",
     noBorder: true,
   },
 
@@ -160,7 +160,7 @@ const shortcuts = [
       "run",
       "com.spotify.Client",
     ],
-    resourceClass: "Spotify",
+    resourceClass: "spotify",
     noBorder: true,
   },
 
