@@ -66,5 +66,8 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
     fi
 fi
 
+# intel gpu — prefer iHD over i965 for Broadwell+ VA-API
+export LIBVA_DRIVER_NAME=iHD
+
 # machine
 export PATH="$HOME/.local/bin:$PATH"
