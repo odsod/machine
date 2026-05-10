@@ -18,6 +18,9 @@ install-package: $(data_dir)/$(version)/package.rpm $(data_dir)/$(version)/signi
 	@if ! rpm -q slack-$(build).x86_64 >/dev/null 2>&1; then \
 		sudo dnf install -y $<; \
 	fi
+	@if [ -f /etc/yum.repos.d/slack.repo ]; then \
+		sudo sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/slack.repo; \
+	fi
 
 $(data_dir)/$(version)/package.rpm:
 	$(info [$(name)] Downloading package...)
