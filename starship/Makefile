@@ -27,7 +27,7 @@ $(version_dir)/starship:
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: ~/.config/fish/conf.d/starship.fish
-~/.config/fish/conf.d/starship.fish: $(version_dir)/starship
+~/.config/fish/conf.d/starship.fish: ~/.local/bin/starship
 	$(info [$(name)] Generating fish init...)
 	@mkdir -p $(dir $@)
-	@$(version_dir)/starship init fish --print-full-init > $@
+	@PATH="$(HOME)/.local/bin:$$PATH" $< init fish --print-full-init > $@
