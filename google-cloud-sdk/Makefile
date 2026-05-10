@@ -1,11 +1,23 @@
 name := google-cloud-sdk
+# Discovery: https://cloud.google.com/sdk/docs/install-sdk
+version := 567.0.0
+archive_url := https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-$(version)-linux-x86_64.tar.gz
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
+install_dir := $(data_dir)/$(version)/google-cloud-sdk
 
-.PHONY: install-package
-install-package: /etc/yum.repos.d/$(name).repo
-	$(info [$(name)] Installing package...)
-	@sudo dnf install -y google-cloud-sdk
+.PHONY: ~/.local/bin/gcloud
+~/.local/bin/gcloud: $(install_dir)/bin/gcloud
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
-/etc/yum.repos.d/$(name).repo: $(name).repo
-	$(info [$(name)] Installing repo...)
-	@sudo cp -f $< $@
-	@dnf -y check-update; status=$$?; [ $$status -eq 0 ] || [ $$status -eq 100 ]
+$(install_dir)/bin/gcloud: $(data_dir)/$(version)/archive.tar.gz
+	$(info [$(name)] Extracting $<...)
+	@tar -C $(data_dir)/$(version) -xf $<
+	@$(install_dir)/bin/gcloud components install alpha beta --quiet
+	@touch $@
+
+$(data_dir)/$(version)/archive.tar.gz:
+	$(info [$(name)] Downloading $(archive_url)...)
+	@curl $(archive_url) -fLo $@ --create-dirs
+	@touch $@
