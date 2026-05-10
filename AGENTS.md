@@ -35,6 +35,35 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
 
 See "File System" in `.agents/AGENTS.md` for the standard directory layout.
 
+## Workflow: Bootstrap
+
+**Trigger**: "bootstrap", "fresh install", "set up this machine"
+
+A fresh machine has nothing except a git clone of this repo. The agent
+guides the user through the three-phase bootstrap:
+
+1. **Pre-install** (interactive — user must be present):
+   - Run `make bootstrap-pre` — installs passwordless sudo (one password prompt)
+   - Verify output: `sudo -n true` must succeed
+   - If SSH keys are not configured, help the user set them up
+
+2. **Install** (unattended — user can walk away):
+   - Run `make install`
+   - Monitor for failures, diagnose and fix broken modules
+   - Cross-module dependency failures: add the missing `$(MAKE) -C ../dep` call
+   - Repo/package failures: check idempotency (file targets, exit codes)
+   - On success: all modules installed, services enabled
+
+3. **Post-install** (interactive — service logins):
+   - Run `make bootstrap-post`
+   - Guides user through: `gh auth login`, `sudo tailscale up`, `gcloud auth login`
+   - Verify each service: `gh auth status`, `tailscale status`, `gcloud auth list`
+
+**Key principles**:
+- Never skip failures — diagnose, fix in the Makefile, re-run
+- Fixes go into the module, not one-off shell commands
+- After bootstrap completes, `make install` must be re-runnable and idempotent
+
 ## Package Management
 
 - **Preference**: RPM > Flatpak > Manual.
