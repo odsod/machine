@@ -17,6 +17,11 @@ instructions live in `.agents/AGENTS.md` — do not duplicate them here.
   - **Binaries**: Symlink/Install to `~/.local/bin/`.
   - **Resources**: Download/Extract to `~/.local/share/odsod/machine/data/<tool>/<version>/`.
     - Symlink active version (`ln -fsT`) to `~/.local/share/odsod/machine/<tool>` if needed.
+  - **System daemons**: Compiled from source, installed to `/usr/local/bin/`, managed via systemd system service.
+    - Build deps declared in `install-packages` target.
+    - Binary built in source dir (gitignored), installed via `sudo install`.
+    - Service file copied to `/etc/systemd/system/`.
+    - Requires `deploy` target (build + install + restart) for dev iteration.
 - **Environment**: `env.sh` (POSIX sh).
   - **Role**: Source of Truth for all environment variables and PATH.
   - **Install**: Symlinked to `~/.profile` and `~/.config/plasma-workspace/env/odsod-machine.sh` by Root Makefile.
