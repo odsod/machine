@@ -21,6 +21,7 @@ install: \
 	$(system_fish) \
 	ensure-shell-registered \
 	~/.config/fish/config.fish \
+	~/.config/fish/conf.d/00-env.fish \
 	~/.config/fish/conf.d/fzf.fish \
 	change-shell \
 	install-packages
@@ -79,6 +80,12 @@ $(system_fish): $(fish_bin)
 
 .PHONY: ~/.config/fish/config.fish
 ~/.config/fish/config.fish: config.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.config/fish/conf.d/00-env.fish
+~/.config/fish/conf.d/00-env.fish: env.fish
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
