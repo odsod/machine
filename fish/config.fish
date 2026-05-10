@@ -1,25 +1,14 @@
 set fish_greeting
 set -g fish_history (string replace -a '-' '_' (hostname))
 
-# Source ~/.profile (env.sh) for SSH sessions where KDE hasn't set the environment.
-function source_env_sh --argument-names env_file
-    set -q env_file[1]; or set env_file "$HOME/.profile"
-    test -f "$env_file"; or return 1
-
-    for entry in (env -i HOME="$HOME" USER="$USER" PATH="/usr/bin:/bin" sh -c '. "$1" >/dev/null 2>&1; env -0' sh "$env_file" | string split0)
-        set -l parts (string split -m 1 '=' -- $entry)
-        set -l key $parts[1]
-        set -l value $parts[2]
-
-        switch $key
-            case PWD OLDPWD SHLVL _
-                continue
-        end
-
-        set -gx $key $value
-    end
+# conf.d/00-env.fish normally loads env.sh before generated integrations run.
+# Keep this fallback for manually sourced config.fish or partial installs.
+if not functions -q source_env_sh
+    set -l env_loader "$__fish_config_dir/conf.d/00-env.fish"
+    test -f "$env_loader"; and source "$env_loader"
 end
-source_env_sh
+
+functions -q source_env_sh; and not set -q ODSOD_MACHINE; and source_env_sh
 
 # Stabilize SSH agent socket for tmux session persistence.
 # Remote SSH sessions should keep their forwarded agent; local desktop shells
