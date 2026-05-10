@@ -1,11 +1,22 @@
 name := gh-cli
+# Discovery: https://github.com/cli/cli/releases/latest
+version := 2.92.0
+archive_url := https://github.com/cli/cli/releases/download/v$(version)/gh_$(version)_linux_amd64.tar.gz
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
-.PHONY: install-package
-install-package: /etc/yum.repos.d/$(name).repo
-	$(info [$(name)] Installing package...)
-	@sudo dnf install -y --repo gh-cli gh
+.PHONY: ~/.local/bin/gh
+~/.local/bin/gh: $(data_dir)/$(version)/gh_$(version)_linux_amd64/bin/gh
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
-/etc/yum.repos.d/$(name).repo:
-	$(info [$(name)] Adding $@...)
-	@sudo dnf config-manager addrepo --overwrite --from-repofile=https://cli.github.com/packages/rpm/gh-cli.repo
-	@sudo dnf -y check-update; status=$$?; [ $$status -eq 0 ] || [ $$status -eq 100 ]
+$(data_dir)/$(version)/gh_$(version)_linux_amd64/bin/gh: $(data_dir)/$(version)/archive.tar.gz
+	$(info [$(name)] Extracting $<...)
+	@tar -C $(dir $<) -xf $<
+	@touch $@
+	@chmod +x $@
+
+$(data_dir)/$(version)/archive.tar.gz:
+	$(info [$(name)] Downloading $(archive_url)...)
+	@curl $(archive_url) -fLo $@ --create-dirs
+	@touch $@
