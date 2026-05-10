@@ -11,9 +11,9 @@ if test "$state" = "NeedsLogin"
     exit 1
 end
 
-set -l self (echo $status_json | jq -r '.Self.HostName')
+set -l self_id (echo $status_json | jq -r '.Self.ID')
 set -l host (echo $status_json \
-    | jq -r --arg self "$self" '(.Peer // {}) | to_entries[] | .value | select(.Online == true) | .HostName | select(. != $self)' \
+    | jq -r --arg self_id "$self_id" '(.Peer // {}) | to_entries[] | .value | select(.Online == true and .ID != $self_id) | (.DNSName // .TailscaleIPs[0] // .HostName) | rtrimstr(".")' \
     | fzf --prompt="remote-tmux> " --height=~50% --reverse)
 
 test -n "$host"; or exit 0
