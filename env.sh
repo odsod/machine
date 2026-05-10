@@ -66,8 +66,13 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
     fi
 fi
 
-# intel gpu — prefer iHD over i965 for Broadwell+ VA-API
-export LIBVA_DRIVER_NAME=iHD
+# va-api — auto-select driver based on available GPU
+if grep -q '0x1002' /sys/class/drm/card*/device/vendor 2>/dev/null; then
+    export LIBVA_DRIVER_NAME=radeonsi
+elif grep -q '0x8086' /sys/class/drm/card*/device/vendor 2>/dev/null; then
+    # prefer iHD over i965 for Broadwell+ Intel integrated graphics
+    export LIBVA_DRIVER_NAME=iHD
+fi
 
 # machine
 export PATH="$HOME/.local/bin:$PATH"
