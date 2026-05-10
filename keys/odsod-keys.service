@@ -1,0 +1,14 @@
+[Unit]
+Description=odsod-keys keyboard remapper
+After=systemd-udevd.service
+Wants=systemd-udevd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/odsod-keys
+Restart=always
+RestartSec=1
+Nice=-20
+
+[Install]
+WantedBy=multi-user.target
