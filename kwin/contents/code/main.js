@@ -54,7 +54,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
       "--app=https://calendar.google.com",
     ],
     resourceClassIncludes: "calendar.google.com",
@@ -103,7 +102,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
       "--app=https://linear.app",
     ],
     resourceClassIncludes: "linear.app",
@@ -116,7 +114,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
       "--app=https://mail.google.com",
     ],
     resourceClassIncludes: "mail.google.com",
@@ -128,7 +125,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
       "--app=https://meet.google.com",
     ],
     resourceClassIncludes: "meet.google.com",
@@ -209,7 +205,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
     ],
     resourceClass: "google-chrome",
   },
@@ -237,7 +232,6 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--password-store=basic",
       "--app=https://discord.com",
     ],
     resourceClassIncludes: "discord.com",
