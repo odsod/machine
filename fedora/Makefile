@@ -56,7 +56,7 @@ install-packages:
 .PHONY: install-flatpak-packages
 install-flatpak-packages:
 	$(info [$(name)] Installing Flatpak packages...)
-	@flatpak install flathub \
+	@flatpak install -y --noninteractive flathub \
 		com.spotify.Client
 
 .PHONY: install-graphics

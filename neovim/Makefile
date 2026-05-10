@@ -38,9 +38,13 @@ update-alternatives: ~/.local/bin/nvim
 	@sudo update-alternatives --remove vim /usr/bin/nvim 2>/dev/null || true
 	@sudo update-alternatives --remove vi /usr/bin/nvim 2>/dev/null || true
 	@sudo update-alternatives --install /usr/bin/vim vim $(HOME)/.local/bin/nvim 10
-	@sudo update-alternatives --install /usr/bin/vi vi $(HOME)/.local/bin/nvim 10
 	@sudo update-alternatives --set vim $(HOME)/.local/bin/nvim
-	@sudo update-alternatives --set vi $(HOME)/.local/bin/nvim
+	@if [ -L /usr/bin/vi ] || [ ! -e /usr/bin/vi ]; then \
+		sudo update-alternatives --install /usr/bin/vi vi $(HOME)/.local/bin/nvim 10; \
+		sudo update-alternatives --set vi $(HOME)/.local/bin/nvim; \
+	else \
+		printf '[%s] Skipping vi alternative: /usr/bin/vi is not a symlink\n' "$(name)"; \
+	fi
 
 .PHONY: install-packages
 install-packages:

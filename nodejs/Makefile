@@ -29,19 +29,19 @@ install-packages:
 		nodejs$(node_major)-npm
 
 .PHONY: ~/.local/bin/node
-~/.local/bin/node:
+~/.local/bin/node: install-packages
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT /usr/bin/node-$(node_major) $@
 
 .PHONY: ~/.local/bin/npm
-~/.local/bin/npm:
+~/.local/bin/npm: install-packages
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT /usr/bin/npm-$(node_major) $@
 
 .PHONY: ~/.local/bin/npx
-~/.local/bin/npx:
+~/.local/bin/npx: install-packages
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT /usr/bin/npx-$(node_major) $@

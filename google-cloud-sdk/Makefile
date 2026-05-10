@@ -8,4 +8,4 @@ install-package: /etc/yum.repos.d/$(name).repo
 /etc/yum.repos.d/$(name).repo: $(name).repo
 	$(info [$(name)] Installing repo...)
 	@sudo cp -f $< $@
-	@dnf check-update
+	@dnf -y check-update; status=$$?; [ $$status -eq 0 ] || [ $$status -eq 100 ]
