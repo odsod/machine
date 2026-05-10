@@ -11,5 +11,6 @@ all: tools
 .PHONY: tools
 tools:
 	$(info [$(name)] Installing tools...)
+	@$(MAKE) -C ../uv install-packages
 	@uv tool install ruff@$(ruff_version)
 	@uv tool install ty@$(ty_version)

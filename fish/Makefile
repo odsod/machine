@@ -86,5 +86,6 @@ $(system_fish): $(fish_bin)
 .PHONY: ~/.config/fish/conf.d/fzf.fish
 ~/.config/fish/conf.d/fzf.fish:
 	$(info [$(name)] Generating fzf init...)
+	@$(MAKE) -C ../fzf ~/.local/bin/fzf
 	@mkdir -p $(dir $@)
-	@fzf --fish > $@
+	@$(HOME)/.local/bin/fzf --fish > $@
