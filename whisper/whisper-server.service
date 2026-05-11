@@ -1,0 +1,18 @@
+[Unit]
+Description=whisper-server (GPU-accelerated speech-to-text)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=@SERVER_BIN@ \
+    --model @MODEL_PATH@ \
+    --port @PORT@ \
+    --host 0.0.0.0 \
+    --language auto \
+    --convert \
+    --inference-path /v1/audio/transcriptions
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
