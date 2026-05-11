@@ -1,0 +1,10 @@
+[Unit]
+Description=Meeting Recorder (mic + system audio transcription)
+Requires=whisper-server.service
+After=whisper-server.service
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/meeting-recorder
+KillSignal=SIGTERM
+TimeoutStopSec=60

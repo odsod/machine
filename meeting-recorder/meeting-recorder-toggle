@@ -1,0 +1,12 @@
+#!/usr/bin/env fish
+#
+# Switch to the meeting recorder session, creating it if needed.
+# Stop recording with regular Ctrl-C in the pane.
+
+set -l session "meeting"
+
+if not tmux has-session -t "=$session" 2>/dev/null
+    tmux new-session -d -s $session -n rec "meeting-recorder"
+end
+
+tmux switch-client -t "=$session"
