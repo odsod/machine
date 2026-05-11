@@ -1,0 +1,18 @@
+[Unit]
+Description=llama-server (GPU-accelerated LLM inference)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=@SERVER_BIN@ \
+    --model @MODEL_PATH@ \
+    --port @PORT@ \
+    --host 0.0.0.0 \
+    --ctx-size 4096 \
+    --n-gpu-layers 99 \
+    --reasoning off
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
