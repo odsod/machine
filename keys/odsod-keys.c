@@ -123,11 +123,11 @@ static int is_keyboard(int fd) {
 	return has_keys >= 5;
 }
 
-static int is_our_virtual_device(int fd) {
+static int is_virtual_device(int fd) {
 	struct input_id id;
 	if (ioctl(fd, EVIOCGID, &id) < 0)
 		return 0;
-	return id.vendor == 0x4f44 && id.product == 0x4b59;
+	return id.bustype == BUS_VIRTUAL;
 }
 
 static int grab_device(const char *path) {
@@ -138,7 +138,7 @@ static int grab_device(const char *path) {
 	if (fd < 0)
 		return -1;
 
-	if (!is_keyboard(fd) || is_our_virtual_device(fd)) {
+	if (!is_keyboard(fd) || is_virtual_device(fd)) {
 		close(fd);
 		return -1;
 	}
