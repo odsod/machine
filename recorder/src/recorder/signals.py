@@ -5,11 +5,12 @@ from collections.abc import Callable
 from datetime import datetime
 
 from recorder.config import SignalsConfig
+from recorder.transcript import DailyTranscript, format_message
+
 try:
     from recorder.meet import get_participants
 except (ImportError, ValueError):
     get_participants = None
-from recorder.transcript import DailyTranscript
 
 
 class SilenceMonitor:
@@ -26,12 +27,11 @@ class SilenceMonitor:
             ts = datetime.now().strftime("%H:%M:%S")
             mins = consecutive_silent_secs // 60
             self._transcript.append(ts, "💤 idl", f"{mins} min")
-            self._log(f"💤 idl | {mins} min")
+            self._log(format_message("💤 idl", f"{mins} min"))
             self._notified = True
 
     def reset(self):
         self._notified = False
-
 
 
 class KwinMonitor:
@@ -98,27 +98,27 @@ class KwinMonitor:
                     ts = datetime.now().strftime("%H:%M:%S")
                     msg = f"\"{title}\" opened"
                     self._transcript.append(ts, "\U0001fa9f win", msg)
-                    self._log(f"\U0001fa9f win | {msg}")
+                    self._log(format_message("\U0001fa9f win", msg))
                 elif self._known_windows[wid] != title:
                     old_title = self._known_windows[wid]
                     ts = datetime.now().strftime("%H:%M:%S")
                     msg = f"\"{old_title}\" → \"{title}\""
                     self._transcript.append(ts, "\U0001fa9f win", msg)
-                    self._log(f"\U0001fa9f win | {msg}")
+                    self._log(format_message("\U0001fa9f win", msg))
 
             for wid in set(self._known_windows) - set(current):
                 title = self._known_windows[wid]
                 ts = datetime.now().strftime("%H:%M:%S")
                 msg = f"\"{title}\" closed"
                 self._transcript.append(ts, "\U0001fa9f win", msg)
-                self._log(f"\U0001fa9f win | {msg}")
+                self._log(format_message("\U0001fa9f win", msg))
 
         if not self._initialized:
             for wid, title in current.items():
                 ts = datetime.now().strftime("%H:%M:%S")
                 msg = f"\"{title}\" active"
                 self._transcript.append(ts, "\U0001fa9f win", msg)
-                self._log(f"\U0001fa9f win | {msg}")
+                self._log(format_message("\U0001fa9f win", msg))
         self._initialized = True
         self._known_windows = current
 
@@ -175,4 +175,4 @@ class MeetParticipantMonitor:
         names = ", ".join(sorted(current))
         ts = datetime.now().strftime("%H:%M:%S")
         self._transcript.append(ts, "\U0001f465 ppl", names)
-        self._log(f"\U0001f465 ppl | {names}")
+        self._log(format_message("\U0001f465 ppl", names))
