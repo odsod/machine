@@ -1,6 +1,6 @@
 name := google-cloud-sdk
 # Discovery: https://cloud.google.com/sdk/docs/install-sdk
-version := 567.0.0
+version := 568.0.0
 archive_url := https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-$(version)-linux-x86_64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 install_dir := $(data_dir)/$(version)/google-cloud-sdk
