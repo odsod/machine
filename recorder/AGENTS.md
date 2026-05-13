@@ -12,8 +12,8 @@ parec (mic) ─┐                          ┌─ server-side ─┐
 parec (sys) ─┘                          │ whisper decode│
                                         └───────────────┘
 
-pw-dump --monitor ──→ PipeWire events ──┐
-KWin D-Bus ─────────→ window events ────┼→ interleaved into transcript
+KWin (kdotool) ─────→ window events ────┐
+AT-SPI (Meet) ──────→ participants ─────┼→ interleaved into transcript
 silence detector ───→ silence markers ──┘
 ```
 
@@ -24,11 +24,12 @@ silence detector ───→ silence markers ──┘
 
 ### Layers
 
-| Layer | Purpose                                         |
-| ----- | ----------------------------------------------- |
-| 1     | Capture + transcribe + clean → daily transcript |
-| 2     | Segment transcript → interaction boundaries     |
-| 3     | Summarize closed segments → `inbox/` drafts     |
+| Layer | Purpose                                         | Status |
+| ----- | ----------------------------------------------- | ------ |
+| 1     | Capture + transcribe + clean → daily transcript | ✅     |
+| 2     | Context signals interleaved into transcript     | ✅     |
+| 3     | Segment transcript → interaction boundaries     |        |
+| 4     | Summarize closed segments → `inbox/` drafts     |        |
 
 ## Structure
 
@@ -37,6 +38,8 @@ recorder/
 ├── src/recorder/
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
+│   ├── meet.py         # AT-SPI participant extraction from Google Meet
+│   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   └── transcript.py   # DailyTranscript — append-only markdown event log
 ├── config.toml         # Default config (installed to ~/.config/recorder/)
@@ -68,26 +71,33 @@ Append-only daily event log at `~/Vaults/odsod/raw/transcripts/YYYY-MM-DD-record
 Speech and context events interleaved chronologically:
 
 ```markdown
-[09:00:15] 🎙 PipeWire: chrome mic stream created (pid: 12345)
-[09:00:15] 🪟 KWin: "Meet - Weekly Sync" window active
-[09:00:32] **System** Hey, can you hear me?
-[09:00:35] **You** Yeah, all good. Let's start.
-[09:15:05] 📝 decision: split terraform schema by resource
-[09:34:12] 🎙 PipeWire: chrome mic stream destroyed
-[09:39:15] ⏸ Silence: 5 min
+[09:00:15] 🪟 win | "Meet" → "Meet - Weekly Sync"
+[09:00:20] 👥 ppl | Alice, Bob, Oscar Söderlund
+[09:00:32] 🔊 sys | Hey, can you hear me?
+[09:00:35] 🎤 mic | Yeah, all good. Let's start.
+[09:15:05] 📝 nfo | decision: split terraform schema
+[09:34:12] 🪟 win | "Meet - Weekly Sync" → "Meet"
+[09:39:15] 💤 idl | 5 min
+[09:40:00] 📍 pin |
 ```
 
-## Event Insertion
+## Line Grammar
 
-Events injected into the transcript from outside the recorder process:
+Every line: `[HH:MM:SS] <emoji> <tag> | <text>`
 
-| Event          | Trigger              | Source                       |
-| -------------- | -------------------- | ---------------------------- |
-| `✂️ split`     | Keybind (tmux popup) | User — hard segment boundary |
-| `📝 <text>`    | Keybind (tmux popup) | User — freeform annotation   |
-| `🎙 PipeWire:` | `pw-dump --monitor`  | Automatic                    |
-| `🪟 KWin:`     | KWin D-Bus           | Automatic                    |
-| `⏸ Silence:`   | Silence detector     | Automatic                    |
+Fixed-width 3-char tag — grepable, parseable, human-readable.
+Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) which cause inconsistent terminal width:
+
+| Tag | Emoji | Source                                    |
+| --- | ----- | ----------------------------------------- |
+| sys | 🔊    | System audio transcription                |
+| mic | 🎤    | Mic audio transcription                   |
+| win | 🪟    | kdotool polling — open/close/title change |
+| ppl | 👥    | AT-SPI polling — participant set changes  |
+| idl | 💤    | Silence detector                          |
+| nfo | 📝    | User — freeform annotation (tmux popup)   |
+| pin | 📍    | User — segment boundary hint (tmux popup) |
+| rec | 🟢/🔴 | Recorder started/stopped                  |
 
 ## Runtime Dependencies
 
@@ -96,7 +106,7 @@ Events injected into the transcript from outside the recorder process:
 | whisper-server | `http://odsod-desktop:8178/v1/audio/…`          | ASR (ROCm GPU)     |
 | llama-server   | `http://odsod-desktop:8179/v1/chat/completions` | Cleanup (Qwen 3.5) |
 
-System: `pipewire-utils`, `pulseaudio-utils` (parec), `libnotify`.
+System: `pulseaudio-utils` (parec), `kdotool`, `at-spi2-core`, `libnotify`.
 
 ## Development
 
@@ -133,20 +143,24 @@ Whisper hallucinates on near-silence that passes the RMS gate. Layered defense:
 - **`no_speech_thold` alone** — doesn't help when language is forced (whisper confidently emits artifacts)
 - **Forcing a single language** — meetings mix English + Swedish; forcing one degrades the other
 
-## Segmentation (Layer 2)
+## Segmentation (Layer 3)
 
 Pure function: reads transcript event log → outputs segment boundaries with metadata.
 
-**Boundary rules** (priority order):
+**Boundary signals** (priority order):
 
-1. `✂️ split` → hard boundary (user override)
-2. `🎙 PipeWire: stream destroyed` → meeting app released mic
-3. `⏸ Silence: 5 min` with no active context → natural boundary
+1. `🪟 win` title reverts (e.g. "Meet - X" → "Meet") → meeting ended
+2. `👥 ppl` disappears → left the call
+3. `💤 idl` with no active context → natural boundary
 4. New calendar event while previous segment open → split
+
+`📍 pin` is a hint, not a hard boundary — the user may drop it slightly before
+or after the real transition. The segmenter should snap to the nearest natural
+boundary (silence/inactivity) within a window around the pin.
 
 **Execution**: batch every 10 min (with lookahead), immediately on `✂️ split`, on shutdown.
 
-## Summarization (Layer 3)
+## Summarization (Layer 4)
 
 Triggered on segment close. Input is already clean text from Layer 1.
 

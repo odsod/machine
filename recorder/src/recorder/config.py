@@ -37,7 +37,6 @@ class DedupConfig:
 class SignalsConfig:
     silence_threshold_secs: int = 180
     kwin_poll_interval_secs: int = 10
-    meeting_app_patterns: list[str] = field(default_factory=lambda: ["chrome"])
     meeting_window_patterns: list[str] = field(default_factory=lambda: ["meet.google.com"])
 
 

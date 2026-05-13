@@ -25,22 +25,10 @@ class DailyTranscript:
         header = f"---\ndate: {self._date}\ntype: recorder-transcript\n---\n\n"
         self._path.write_text(header)
 
-    def append_speech(self, timestamp: str, speaker: str, text: str):
-        line = f"[{timestamp}] **{speaker}** {text}\n"
-        with open(self.path, "a") as f:
-            f.write(line)
-
-    def append_split(self, timestamp: str):
-        line = f"[{timestamp}] ✂️ split\n"
-        with open(self.path, "a") as f:
-            f.write(line)
-
-    def append_note(self, timestamp: str, text: str):
-        line = f"[{timestamp}] \U0001f4dd {text}\n"
-        with open(self.path, "a") as f:
-            f.write(line)
-
-    def append_event(self, timestamp: str, emoji: str, text: str):
-        line = f"[{timestamp}] {emoji} {text}\n"
+    def append(self, timestamp: str, tag: str, text: str = ""):
+        if text:
+            line = f"[{timestamp}] {tag} | {text}\n"
+        else:
+            line = f"[{timestamp}] {tag} |\n"
         with open(self.path, "a") as f:
             f.write(line)
