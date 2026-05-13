@@ -9,6 +9,7 @@ commit_attribution = ""
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir"]
+theme = "nord"
 
 [notice]
 hide_rate_limit_model_nudge = true
