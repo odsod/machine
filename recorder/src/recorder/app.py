@@ -24,7 +24,7 @@ import array
 import math
 
 from recorder.config import AudioConfig, Config, load_config
-from recorder.signals import KwinMonitor, MeetParticipantMonitor, PipewireMonitor, SilenceMonitor
+from recorder.signals import KwinMonitor, MeetParticipantMonitor, SilenceMonitor
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
 from recorder.transcript import DailyTranscript
 
@@ -70,7 +70,7 @@ class Recorder:
         self._log(f"llm: {self.config.llm.url}")
 
         ts = datetime.now().strftime("%H:%M:%S")
-        self.transcript.append_event(ts, "▶", "Recorder started")
+        self.transcript.append(ts, "🟢 rec", "started")
 
         transcription_thread = threading.Thread(
             target=self._transcription_worker, daemon=True
@@ -96,9 +96,6 @@ class Recorder:
         self._stopping = True
 
     def _start_signals(self):
-        pw = PipewireMonitor(self.transcript, self.config.signals, self._log)
-        pw.start()
-        self._signal_monitors.append(pw)
         kw = KwinMonitor(self.transcript, self.config.signals, self._log)
         kw.start()
         self._signal_monitors.append(kw)
@@ -271,7 +268,7 @@ class Recorder:
             if sys_text:
                 cleaned = cleanup_text(sys_text, self.config.llm) or sys_text
                 if cleaned:
-                    self.transcript.append_speech(timestamp, "System", cleaned)
+                    self.transcript.append(timestamp, "\U0001f50a sys", cleaned)
                     self._last_system_text = cleaned
                     self._log(f"sys: {cleaned[:80]}")
                 else:
@@ -282,7 +279,7 @@ class Recorder:
                 ):
                     mic_cleaned = cleanup_text(mic_text, self.config.llm) or mic_text
                     if mic_cleaned:
-                        self.transcript.append_speech(timestamp, "You", mic_cleaned)
+                        self.transcript.append(timestamp, "\U0001f3a4 mic", mic_cleaned)
                         self._log(f"mic: {mic_cleaned[:80]}")
                     else:
                         self._log("mic: (hallucination removed)")
@@ -296,7 +293,7 @@ class Recorder:
                 else:
                     cleaned = cleanup_text(mic_text, self.config.llm) or mic_text
                     if cleaned:
-                        self.transcript.append_speech(timestamp, "You", cleaned)
+                        self.transcript.append(timestamp, "\U0001f3a4 mic", cleaned)
                         self._log(f"mic: {cleaned[:80]}")
                     else:
                         self._log("mic: (hallucination removed)")
@@ -326,7 +323,7 @@ class Recorder:
                     self._log("paused" if self._paused else "listening")
                 elif ch == "s":
                     timestamp = datetime.now().strftime("%H:%M:%S")
-                    self.transcript.append_split(timestamp)
+                    self.transcript.append(timestamp, "📍 pin")
                     self._log("split")
                 elif ch == "n":
                     sys.stdout.write("\nnote: ")
@@ -336,7 +333,7 @@ class Recorder:
                     tty.setcbreak(fd)
                     if text:
                         timestamp = datetime.now().strftime("%H:%M:%S")
-                        self.transcript.append_note(timestamp, text)
+                        self.transcript.append(timestamp, "\U0001f4dd nfo", text)
                         self._log(f"note: {text}")
         except (EOFError, OSError):
             pass
@@ -389,7 +386,7 @@ class Recorder:
 
     def _cleanup(self):
         ts = datetime.now().strftime("%H:%M:%S")
-        self.transcript.append_event(ts, "⏹", "Recorder stopped")
+        self.transcript.append(ts, "🔴 rec", "stopped")
         for f in self._work_dir.iterdir():
             f.unlink(missing_ok=True)
         self._work_dir.rmdir()
