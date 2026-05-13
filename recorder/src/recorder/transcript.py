@@ -2,6 +2,16 @@ from datetime import datetime
 from pathlib import Path
 
 
+def format_message(tag: str, text: str = "") -> str:
+    emoji, _, name = tag.partition(" ")
+    formatted_tag = f"{emoji} **{name}**" if name else f"**{emoji}**"
+    return f"{formatted_tag} {text}".rstrip()
+
+
+def format_line(timestamp: str, tag: str, text: str = "") -> str:
+    return f"[{timestamp}] {format_message(tag, text)}"
+
+
 class DailyTranscript:
     """Append-only daily transcript at raw/transcripts/YYYY-MM-DD-recorder.md"""
 
@@ -26,9 +36,6 @@ class DailyTranscript:
         self._path.write_text(header)
 
     def append(self, timestamp: str, tag: str, text: str = ""):
-        if text:
-            line = f"[{timestamp}] {tag} | {text}\n"
-        else:
-            line = f"[{timestamp}] {tag} |\n"
+        line = f"{format_line(timestamp, tag, text)}\n"
         with open(self.path, "a") as f:
             f.write(line)
