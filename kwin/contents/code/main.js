@@ -126,6 +126,7 @@ const shortcuts = [
     command: [
       "google-chrome",
       "--app=https://meet.google.com",
+      "--force-renderer-accessibility"
     ],
     resourceClassIncludes: "meet.google.com",
   },
