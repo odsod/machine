@@ -9,9 +9,20 @@ model_url := $(model_base_url)/$(model)
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 build_dir := $(CURDIR)/whisper.cpp-$(version)/build
 port := 8178
+# Bootstrap shells may not have loaded env.sh yet, so force-source the repo copy.
+has_radeon_dgpu := $(shell env -u ODSOD_MACHINE sh -c '. ../env.sh >/dev/null 2>&1; printf "%s" "$$ODSOD_HAS_RADEON_DGPU"')
 
-.PHONY: install
-install: install-packages build $(data_dir)/$(model) install-service
+.PHONY: install install-radeon
+ifeq ($(has_radeon_dgpu),1)
+install: install-radeon
+install-radeon: install-packages build $(data_dir)/$(model) install-service
+else
+# Desktop hosts the ROCm whisper-server on its dedicated Radeon card.
+# Laptops skip this module and use odsod-desktop:8178 over Tailscale.
+install install-radeon:
+	$(info [$(name)] Skipping install: no dedicated Radeon GPU detected)
+	@:
+endif
 
 .PHONY: install-packages
 install-packages:

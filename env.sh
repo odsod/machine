@@ -74,5 +74,13 @@ elif grep -q '0x8086' /sys/class/drm/card*/device/vendor 2>/dev/null; then
     export LIBVA_DRIVER_NAME=iHD
 fi
 
+# local inference — llama/whisper run only on the desktop Radeon dGPU.
+# Laptops skip the ROCm servers and call odsod-desktop through Tailscale.
+export ODSOD_HAS_RADEON_DGPU=0
+if command -v lspci >/dev/null 2>&1 && \
+    lspci -nn -d 1002: | grep -Eqi '(VGA compatible controller|3D controller|Display controller).*(Radeon RX|Radeon PRO|Radeon VII|Radeon Instinct)'; then
+    export ODSOD_HAS_RADEON_DGPU=1
+fi
+
 # machine
 export PATH="$HOME/.local/bin:$PATH"
