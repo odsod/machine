@@ -6,6 +6,9 @@ source_url := https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v$(vers
 model := ggml-large-v3.bin
 model_base_url := https://huggingface.co/ggerganov/whisper.cpp/resolve/main
 model_url := $(model_base_url)/$(model)
+# Discovery: https://huggingface.co/ggml-org/whisper-vad/tree/main
+vad_model := ggml-silero-v5.1.2.bin
+vad_model_url := https://huggingface.co/ggml-org/whisper-vad/resolve/main/$(vad_model)
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 build_dir := $(CURDIR)/whisper.cpp-$(version)/build
 port := 8178
@@ -15,7 +18,7 @@ has_radeon_dgpu := $(shell env -u ODSOD_MACHINE sh -c '. ../env.sh >/dev/null 2>
 .PHONY: install install-radeon
 ifeq ($(has_radeon_dgpu),1)
 install: install-radeon
-install-radeon: install-packages build $(data_dir)/$(model) install-service
+install-radeon: install-packages build $(data_dir)/$(model) $(data_dir)/$(vad_model) install-service
 else
 # Desktop hosts the ROCm whisper-server on its dedicated Radeon card.
 # Laptops skip this module and use odsod-desktop:8178 over Tailscale.
@@ -51,12 +54,13 @@ whisper.cpp-$(version):
 	@curl -fL $(source_url) | tar xz
 
 .PHONY: install-service
-install-service: build $(data_dir)/$(model)
+install-service: build $(data_dir)/$(model) $(data_dir)/$(vad_model)
 	$(info [$(name)] Installing systemd user service...)
 	@mkdir -p $(HOME)/.config/systemd/user
 	@sed \
 		-e 's|@SERVER_BIN@|$(build_dir)/bin/whisper-server|' \
 		-e 's|@MODEL_PATH@|$(data_dir)/$(model)|' \
+		-e 's|@VAD_MODEL_PATH@|$(data_dir)/$(vad_model)|' \
 		-e 's|@PORT@|$(port)|' \
 		whisper-server.service > $(HOME)/.config/systemd/user/whisper-server.service
 	@systemctl --user daemon-reload
@@ -65,6 +69,10 @@ install-service: build $(data_dir)/$(model)
 $(data_dir)/$(model):
 	$(info [$(name)] Downloading model...)
 	@curl -fL $(model_url) --create-dirs -o $@
+
+$(data_dir)/$(vad_model):
+	$(info [$(name)] Downloading VAD model...)
+	@curl -fL $(vad_model_url) --create-dirs -o $@
 
 .PHONY: download-model
 download-model:
