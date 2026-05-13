@@ -1,4 +1,6 @@
 name := recorder
+hostname := $(shell hostnamectl --static 2>/dev/null || hostname -s)
+host_config := hosts/$(hostname).toml
 
 # Discovery: https://github.com/snakers4/silero-vad/releases/latest
 silero_vad_version := 5.1.2
@@ -6,15 +8,17 @@ silero_vad_url := https://github.com/snakers4/silero-vad/raw/v$(silero_vad_versi
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: install
-install: install-dependencies install-model install-tool install-config install-toggle install-shortcut
+install: install-dependencies install-model install-tool install-config install-toggle
 
 .PHONY: install-dependencies
 install-dependencies:
 	$(info [$(name)] Installing dependencies...)
 	@sudo dnf install -y -q \
 		libnotify \
+		kdotool \
 		pipewire-utils \
-		pulseaudio-utils
+		pulseaudio-utils \
+		at-spi2-core
 
 $(data_dir)/silero_vad.onnx:
 	$(info [$(name)] Downloading Silero VAD ONNX model v$(silero_vad_version)...)
@@ -33,10 +37,13 @@ install-tool:
 .PHONY: install-config
 install-config: $(HOME)/.config/recorder/config.toml
 
-$(HOME)/.config/recorder/config.toml: config.toml
-	$(info [$(name)] Installing default config...)
+.PHONY: $(HOME)/.config/recorder/config.toml
+$(HOME)/.config/recorder/config.toml:
+	$(info [$(name)] Symlinking host config for $(hostname)...)
+	@test -f "$(host_config)" || { echo "[$(name)] ERROR: missing $(host_config)" >&2; exit 1; }
 	@mkdir -p $(dir $@)
-	@cp -n $< $@
+	@ln -fsT $(abspath $(host_config)) $@
+	@if [ -L "$(HOME)/.config/recorder/hosts" ]; then rm -f "$(HOME)/.config/recorder/hosts"; fi
 
 .PHONY: install-toggle
 install-toggle: $(HOME)/.local/bin/recorder-toggle
@@ -44,11 +51,3 @@ install-toggle: $(HOME)/.local/bin/recorder-toggle
 $(HOME)/.local/bin/recorder-toggle: recorder-toggle
 	$(info [$(name)] Installing toggle script...)
 	@install -m 0755 $< $@
-
-.PHONY: install-shortcut
-install-shortcut:
-	$(info [$(name)] Registering KDE global shortcut (Meta+Shift+M)...)
-	@if ! kreadconfig6 --file kglobalshortcutsrc --group "recorder-toggle.desktop" --key "_launch" 2>/dev/null | grep -q "Meta+Shift+M"; then \
-		kwriteconfig6 --file kglobalshortcutsrc --group "recorder-toggle.desktop" --key "_launch" "Meta+Shift+M,none,Toggle Recorder"; \
-		kwriteconfig6 --file kglobalshortcutsrc --group "recorder-toggle.desktop" --key "_k_friendly_name" "Toggle Recorder"; \
-	fi

@@ -11,13 +11,13 @@ class AudioConfig:
 
 @dataclass
 class WhisperConfig:
-    url: str = "http://odsod-desktop:8178/v1/audio/transcriptions"
+    url: str = "http://localhost:8178/v1/audio/transcriptions"
     timeout_s: int = 60
 
 
 @dataclass
 class LlmConfig:
-    url: str = "http://odsod-desktop:8179/v1/chat/completions"
+    url: str = "http://localhost:8179/v1/chat/completions"
     timeout_s: int = 180
 
 
