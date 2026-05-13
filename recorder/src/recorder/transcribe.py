@@ -99,6 +99,9 @@ def cleanup_text(text: str, config: LlmConfig) -> str | None:
             result = data["choices"][0]["message"]["content"].strip()
             if not result:
                 return None
+            lower = result.lower()
+            if lower.startswith(("no meaningful", "no speech", "the input", "[empty")):
+                return None
             return result
     except (URLError, json.JSONDecodeError, KeyError, TimeoutError):
         return None

@@ -34,12 +34,21 @@ class DedupConfig:
 
 
 @dataclass
+class SignalsConfig:
+    silence_threshold_secs: int = 180
+    kwin_poll_interval_secs: int = 10
+    meeting_app_patterns: list[str] = field(default_factory=lambda: ["chrome"])
+    meeting_window_patterns: list[str] = field(default_factory=lambda: ["meet.google.com"])
+
+
+@dataclass
 class Config:
     audio: AudioConfig = field(default_factory=AudioConfig)
     whisper: WhisperConfig = field(default_factory=WhisperConfig)
     llm: LlmConfig = field(default_factory=LlmConfig)
     transcript: TranscriptConfig = field(default_factory=TranscriptConfig)
     dedup: DedupConfig = field(default_factory=DedupConfig)
+    signals: SignalsConfig = field(default_factory=SignalsConfig)
 
 
 def _expand_path(s: str) -> Path:
@@ -64,6 +73,7 @@ def load_config() -> Config:
     transcript = TranscriptConfig(**transcript_raw)
 
     dedup = DedupConfig(**raw.get("dedup", {}))
+    signals = SignalsConfig(**raw.get("signals", {}))
 
     return Config(
         audio=audio,
@@ -71,4 +81,5 @@ def load_config() -> Config:
         llm=llm,
         transcript=transcript,
         dedup=dedup,
+        signals=signals,
     )

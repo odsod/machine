@@ -15,3 +15,9 @@ output_dir = "~/Vaults/odsod/raw/transcripts"
 
 [dedup]
 threshold = 0.6
+
+[signals]
+silence_threshold_secs = 180
+kwin_poll_interval_secs = 10
+meeting_app_patterns = ["chrome"]
+meeting_window_patterns = ["meet.google.com"]
