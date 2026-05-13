@@ -39,6 +39,7 @@ install-packages:
 		net-snmp-utils \
 		ngrep \
 		pdftk \
+		pciutils \
 		python3-devel \
 		python3-pip \
 		python3-virtualenv \

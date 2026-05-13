@@ -4,6 +4,7 @@ After=default.target
 
 [Service]
 Type=simple
+# Listen on Tailscale so laptop clients can use the desktop GPU server.
 ExecStart=@SERVER_BIN@ \
     --model @MODEL_PATH@ \
     --port @PORT@ \
