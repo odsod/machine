@@ -72,7 +72,10 @@ install-modules:
 	$(info [$(name)] Installing modules...)
 	@find . -mindepth 2 -maxdepth 2 -name Makefile \
 		-not -path './fedora/*' \
-		| xargs dirname | xargs -n1 make -C
+		| while IFS= read -r makefile; do \
+			dir=$$(dirname "$$makefile"); \
+			$(MAKE) -C "$$dir" || exit $$?; \
+		done
 
 .PHONY: install-sudoers
 install-sudoers:
