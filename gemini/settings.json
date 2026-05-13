@@ -49,6 +49,7 @@
     "hideBanner": true,
     "useAlternateBuffer": true,
     "incrementalRendering": true,
+    "useTopicNarrations": true,
     "accessibility": {
       "enableLoadingPhrases": false
     },
@@ -61,7 +62,7 @@
       "hideSandboxStatus": true,
       "hideContextPercentage": false
     },
-    "theme": "Default",
+    "theme": "ANSI",
     "loadingPhrases": "off"
   },
   "output": {
@@ -83,7 +84,9 @@
   "tools": {
     "sandbox": false
   },
-  "experimental": {},
+  "experimental": {
+    "memoryV2": true
+  },
   "agents": {
     "overrides": {}
   }
