@@ -10,6 +10,7 @@
 
 - `make install-package && make enable-plugin`: Reload after editing `main.js`
 - `make tail`: Stream debug logs from the DBus service
+- `Meta+W`: Recorder note popup (`recorder-note` via kdialog)
 - `Meta+;`: Debug shortcut — dumps all window `resourceName`/`resourceClass` to journal
 
 ## Chrome on Wayland: Window Class Rules

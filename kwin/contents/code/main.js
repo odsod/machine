@@ -81,6 +81,13 @@ const shortcuts = [
   },
 
   {
+    actionId: ["kwin", "[odsod] recorder-note", "KWin", ""],
+    key: "Meta+W",
+    kind: "command",
+    command: ["recorder-note"],
+  },
+
+  {
     actionId: ["kwin", "[odsod] browser", "KWin", ""],
     key: "Meta+H",
     kind: "app",
@@ -392,13 +399,16 @@ callDBus(
   },
 );
 
-function applyNoBorder(window) {
+function applyWindowRules(window) {
   shortcuts.forEach(function(shortcut) {
-    if (shortcut.noBorder && matchesShortcut(window, shortcut)) {
+    if (!matchesShortcut(window, shortcut)) {
+      return;
+    }
+    if (shortcut.noBorder) {
       window.noBorder = true;
     }
   });
 }
 
-workspace.stackingOrder.forEach(applyNoBorder);
-workspace.windowAdded.connect(applyNoBorder);
+workspace.stackingOrder.forEach(applyWindowRules);
+workspace.windowAdded.connect(applyWindowRules);
