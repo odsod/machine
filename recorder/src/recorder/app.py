@@ -20,7 +20,8 @@ import traceback
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
+import array
+import math
 
 from recorder.config import AudioConfig, Config, load_config
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
@@ -28,16 +29,17 @@ from recorder.transcript import DailyTranscript
 
 SAMPLE_RATE = 16000
 FRAME_BYTES = SAMPLE_RATE * 2  # 1 second of s16le mono
-SPEECH_RMS_THRESHOLD = 0.003  # Either channel above this = speech
-MIN_CHUNK_SECS = 3  # Don't transcribe anything shorter (whisper hallucinates)
+SPEECH_RMS_THRESHOLD = 0.002  # Permissive per-frame gate; server-side VAD makes the real call
+CHUNK_RMS_THRESHOLD = 0.003  # Whole-chunk gate to avoid sending dead silence over HTTP
+MIN_CHUNK_SECS = 10  # Short clips cause whisper hallucination
 CHUNK_MAX_SECS = 45
 
 
 def compute_rms(pcm: bytes) -> float:
     if len(pcm) < 2:
         return 0.0
-    samples = np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768.0
-    return float(np.sqrt(np.mean(samples**2)))
+    samples = array.array("h", pcm)
+    return math.sqrt(sum(s * s for s in samples) / len(samples)) / 32768.0
 
 
 
@@ -199,6 +201,13 @@ class Recorder:
         duration = len(sys_pcm) / (SAMPLE_RATE * 2)
         sys_rms = compute_rms(sys_pcm)
         mic_rms = compute_rms(mic_pcm)
+
+        if sys_rms < CHUNK_RMS_THRESHOLD and mic_rms < CHUNK_RMS_THRESHOLD:
+            self._log(
+                f"chunk #{self._chunk_num}: {duration:.0f}s "
+                f"sys={sys_rms:.4f} mic={mic_rms:.4f} (below chunk threshold, skipped)"
+            )
+            return
 
         sys_path = self._work_dir / f"sys_{self._chunk_num}.wav"
         sys_path.write_bytes(make_wav(sys_pcm))

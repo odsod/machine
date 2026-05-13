@@ -1,9 +1,9 @@
 [project]
 name = "recorder"
 version = "0.1.0"
-description = "Ambient meeting recorder with Textual TUI"
+description = "Ambient meeting recorder daemon"
 requires-python = ">=3.12"
-dependencies = ["numpy>=2.0"]
+dependencies = []
 
 [project.scripts]
 recorder = "recorder.app:main"

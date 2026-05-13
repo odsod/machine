@@ -5,11 +5,17 @@ After=default.target
 [Service]
 Type=simple
 # Listen on Tailscale so laptop clients can use the desktop GPU server.
+# --vad: server-side Silero VAD skips non-speech before decoding (primary hallucination defense)
+# --suppress-nst: suppresses [Music]/bracket tokens whisper emits on ambient noise (trained on video)
+# --language auto: meetings mix English + Swedish; forcing one degrades the other
 ExecStart=@SERVER_BIN@ \
     --model @MODEL_PATH@ \
     --port @PORT@ \
     --host 0.0.0.0 \
     --language auto \
+    --suppress-nst \
+    --vad \
+    --vad-model @VAD_MODEL_PATH@ \
     --convert \
     --inference-path /v1/audio/transcriptions
 Restart=on-failure
