@@ -6,8 +6,7 @@ requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
-recorder = "recorder.app:main"
-recorder-note = "recorder.note:main"
+recorder = "recorder.__main__:main"
 
 [build-system]
 requires = ["hatchling"]
