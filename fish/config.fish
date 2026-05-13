@@ -96,6 +96,10 @@ end
 status is-interactive; or return
 set -q CURSOR_AGENT; and return
 
+if test -x "$HOME/.local/bin/mise"
+    "$HOME/.local/bin/mise" activate fish | source
+end
+
 abbr -a vim nvim
 abbr -a vi nvim
 abbr -a cat bat
