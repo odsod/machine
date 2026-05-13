@@ -84,7 +84,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] recorder-note", "KWin", ""],
     key: "Meta+W",
     kind: "command",
-    command: ["recorder-note"],
+    command: ["recorder", "note"],
   },
 
   {

@@ -31,7 +31,7 @@ from recorder.transcript import DailyTranscript, format_message
 SAMPLE_RATE = 16000
 FRAME_BYTES = SAMPLE_RATE * 2  # 1 second of s16le mono
 SPEECH_RMS_THRESHOLD = 0.002  # Permissive per-frame gate; server-side VAD makes the real call
-CHUNK_RMS_THRESHOLD = 0.003  # Whole-chunk gate to avoid sending dead silence over HTTP
+CHUNK_RMS_THRESHOLD = 0.0025  # Whole-chunk gate to avoid sending dead silence over HTTP
 MIN_CHUNK_SECS = 10  # Short clips cause whisper hallucination
 CHUNK_MAX_SECS = 45
 
