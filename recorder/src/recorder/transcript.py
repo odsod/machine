@@ -39,3 +39,8 @@ class DailyTranscript:
         line = f"[{timestamp}] \U0001f4dd {text}\n"
         with open(self.path, "a") as f:
             f.write(line)
+
+    def append_event(self, timestamp: str, emoji: str, text: str):
+        line = f"[{timestamp}] {emoji} {text}\n"
+        with open(self.path, "a") as f:
+            f.write(line)

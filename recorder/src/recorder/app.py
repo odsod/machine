@@ -24,6 +24,7 @@ import array
 import math
 
 from recorder.config import AudioConfig, Config, load_config
+from recorder.signals import KwinMonitor, MeetParticipantMonitor, PipewireMonitor, SilenceMonitor
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
 from recorder.transcript import DailyTranscript
 
@@ -54,6 +55,8 @@ class Recorder:
         self._start_time = time.time()
         self._work_dir = Path(tempfile.mkdtemp(prefix="recorder."))
         self._chunk_num = 0
+        self._silence_monitor = SilenceMonitor(self.transcript, config.signals, self._log)
+        self._signal_monitors: list = []
 
     def run(self):
         signal.signal(signal.SIGTERM, lambda *_: self._stop())
@@ -66,6 +69,9 @@ class Recorder:
         self._log(f"whisper: {self.config.whisper.url}")
         self._log(f"llm: {self.config.llm.url}")
 
+        ts = datetime.now().strftime("%H:%M:%S")
+        self.transcript.append_event(ts, "▶", "Recorder started")
+
         transcription_thread = threading.Thread(
             target=self._transcription_worker, daemon=True
         )
@@ -74,17 +80,36 @@ class Recorder:
         input_thread = threading.Thread(target=self._input_loop, daemon=True)
         input_thread.start()
 
+        self._start_signals()
+
         try:
             self._capture_loop()
         except Exception:
             self._log(f"ERROR: {traceback.format_exc()}")
         finally:
+            self._stop_signals()
             self._transcription_queue.put(None)
             transcription_thread.join(timeout=30)
             self._cleanup()
 
     def _stop(self):
         self._stopping = True
+
+    def _start_signals(self):
+        pw = PipewireMonitor(self.transcript, self.config.signals, self._log)
+        pw.start()
+        self._signal_monitors.append(pw)
+        kw = KwinMonitor(self.transcript, self.config.signals, self._log)
+        kw.start()
+        self._signal_monitors.append(kw)
+        mp = MeetParticipantMonitor(self.transcript, self.config.signals, self._log)
+        mp.start()
+        self._signal_monitors.append(mp)
+        self._log("signals started")
+
+    def _stop_signals(self):
+        for m in self._signal_monitors:
+            m.stop()
 
     def _capture_loop(self):
         """Record audio continuously, emit chunks on silence boundaries.
@@ -148,11 +173,13 @@ class Recorder:
                         was_speech = True
                     has_speech = True
                     consecutive_silent_secs = 0
+                    self._silence_monitor.reset()
                 else:
                     if was_speech and consecutive_silent_secs == 1:
                         self._log("silence")
                         was_speech = False
                     consecutive_silent_secs += 1
+                    self._silence_monitor.tick(consecutive_silent_secs)
 
                 buf_secs = len(sys_buf) / (SAMPLE_RATE * 2)
 
@@ -361,6 +388,8 @@ class Recorder:
                 pass
 
     def _cleanup(self):
+        ts = datetime.now().strftime("%H:%M:%S")
+        self.transcript.append_event(ts, "⏹", "Recorder stopped")
         for f in self._work_dir.iterdir():
             f.unlink(missing_ok=True)
         self._work_dir.rmdir()
