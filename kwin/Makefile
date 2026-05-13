@@ -18,8 +18,10 @@ configure:
 enable-plugin:
 	$(info [$(name)] Enabling Plasma plugin...)
 	@kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled false
+	@qdbus-qt6 org.kde.KWin /KWin reconfigure
 	@sleep 1
 	@kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled true
+	@qdbus-qt6 org.kde.KWin /KWin reconfigure
 
 .PHONY: install-package
 install-package:
