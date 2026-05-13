@@ -20,7 +20,7 @@ silence detector ───→ silence markers ──┘
 - **Daemon** — runs in a tmux session, stdout is a structured log stream
 - **No TUI** — plain timestamped log output, composable with tmux panes
 - **Event insertion** — tmux popup helpers callable from any window via keybind
-- **Toggle** — `recorder-toggle` creates/switches tmux session (Meta+Shift+M)
+- **Toggle** — `recorder-toggle` creates/switches tmux session
 
 ### Layers
 
@@ -42,9 +42,9 @@ recorder/
 │   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   └── transcript.py   # DailyTranscript — append-only markdown event log
-├── config.toml         # Default config (installed to ~/.config/recorder/)
-├── recorder-toggle     # Fish script — tmux session toggle (Meta+Shift+M)
-├── Makefile            # Install: deps, silero model, uv tool, config, toggle, shortcut
+├── hosts/             # Full host-specific configs
+├── recorder-toggle     # Fish script — tmux session toggle
+├── Makefile            # Install: deps, silero model, uv tool, config, toggle
 └── pyproject.toml      # uv tool install -e
 ```
 
@@ -71,21 +71,21 @@ Append-only daily event log at `~/Vaults/odsod/raw/transcripts/YYYY-MM-DD-record
 Speech and context events interleaved chronologically:
 
 ```markdown
-[09:00:15] 🪟 win | "Meet" → "Meet - Weekly Sync"
-[09:00:20] 👥 ppl | Alice, Bob, Oscar Söderlund
-[09:00:32] 🔊 sys | Hey, can you hear me?
-[09:00:35] 🎤 mic | Yeah, all good. Let's start.
-[09:15:05] 📝 nfo | decision: split terraform schema
-[09:34:12] 🪟 win | "Meet - Weekly Sync" → "Meet"
-[09:39:15] 💤 idl | 5 min
-[09:40:00] 📍 pin |
+[09:00:15] 🪟 **win** "Meet" → "Meet - Weekly Sync"
+[09:00:20] 👥 **ppl** Alice, Bob, Oscar Söderlund
+[09:00:32] 🔊 **sys** Hey, can you hear me?
+[09:00:35] 🎤 **mic** Yeah, all good. Let's start.
+[09:15:05] 📝 **nfo** decision: split terraform schema
+[09:34:12] 🪟 **win** "Meet - Weekly Sync" → "Meet"
+[09:39:15] 💤 **idl** 5 min
+[09:40:00] 📍 **pin**
 ```
 
 ## Line Grammar
 
-Every line: `[HH:MM:SS] <emoji> <tag> | <text>`
+Every line: `[HH:MM:SS] <emoji> **<tag>** <text>`
 
-Fixed-width 3-char tag — grepable, parseable, human-readable.
+Fixed-width 3-char tag inside bold markers — grepable, parseable, human-readable.
 Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) which cause inconsistent terminal width:
 
 | Tag | Emoji | Source                                    |
@@ -113,6 +113,7 @@ System: `pulseaudio-utils` (parec), `kdotool`, `at-spi2-core`, `libnotify`.
 - **Install**: `make -C recorder install`
 - **Run**: `recorder` (editable install via `uv tool install -e`)
 - **Config**: `~/.config/recorder/config.toml`
+- **Host source**: `recorder/hosts/$(hostname).toml`
 
 ## Hallucination Mitigation
 
