@@ -14,8 +14,8 @@ install: install-dependencies install-model install-tool install-config install-
 install-dependencies:
 	$(info [$(name)] Installing dependencies...)
 	@sudo dnf install -y -q \
-		libnotify \
 		kdotool \
+		kdialog \
 		pipewire-utils \
 		pulseaudio-utils \
 		at-spi2-core
@@ -43,7 +43,6 @@ $(HOME)/.config/recorder/config.toml:
 	@test -f "$(host_config)" || { echo "[$(name)] ERROR: missing $(host_config)" >&2; exit 1; }
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $(host_config)) $@
-	@if [ -L "$(HOME)/.config/recorder/hosts" ]; then rm -f "$(HOME)/.config/recorder/hosts"; fi
 
 .PHONY: install-toggle
 install-toggle: $(HOME)/.local/bin/recorder-toggle

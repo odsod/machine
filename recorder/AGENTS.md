@@ -19,7 +19,7 @@ silence detector ───→ silence markers ──┘
 
 - **Daemon** — runs in a tmux session, stdout is a structured log stream
 - **No TUI** — plain timestamped log output, composable with tmux panes
-- **Event insertion** — tmux popup helpers callable from any window via keybind
+- **Notes** — `Meta+W` launches `recorder-note` via KWin/kdialog
 - **Toggle** — `recorder-toggle` creates/switches tmux session
 
 ### Layers
@@ -39,6 +39,7 @@ recorder/
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
 │   ├── meet.py         # AT-SPI participant extraction from Google Meet
+│   ├── note.py         # Desktop-global note dialog entrypoint
 │   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   └── transcript.py   # DailyTranscript — append-only markdown event log
@@ -88,16 +89,16 @@ Every line: `[HH:MM:SS] <emoji> **<tag>** <text>`
 Fixed-width 3-char tag inside bold markers — grepable, parseable, human-readable.
 Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) which cause inconsistent terminal width:
 
-| Tag | Emoji | Source                                    |
-| --- | ----- | ----------------------------------------- |
-| sys | 🔊    | System audio transcription                |
-| mic | 🎤    | Mic audio transcription                   |
-| win | 🪟    | kdotool polling — open/close/title change |
-| ppl | 👥    | AT-SPI polling — participant set changes  |
-| idl | 💤    | Silence detector                          |
-| nfo | 📝    | User — freeform annotation (tmux popup)   |
-| pin | 📍    | User — segment boundary hint (tmux popup) |
-| rec | 🟢/🔴 | Recorder started/stopped                  |
+| Tag | Emoji | Source                                              |
+| --- | ----- | --------------------------------------------------- |
+| sys | 🔊    | System audio transcription                          |
+| mic | 🎤    | Mic audio transcription                             |
+| win | 🪟    | kdotool polling — open/close/title change           |
+| ppl | 👥    | AT-SPI polling — participant set changes            |
+| idl | 💤    | Silence detector                                    |
+| nfo | 📝    | User — freeform annotation (`Meta+W`)               |
+| pin | 📍    | User — segment boundary hint (`s` in recorder pane) |
+| rec | 🟢/🔴 | Recorder started/stopped                            |
 
 ## Runtime Dependencies
 
@@ -106,14 +107,23 @@ Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) wh
 | whisper-server | `http://odsod-desktop:8178/v1/audio/…`          | ASR (ROCm GPU)     |
 | llama-server   | `http://odsod-desktop:8179/v1/chat/completions` | Cleanup (Qwen 3.5) |
 
-System: `pulseaudio-utils` (parec), `kdotool`, `at-spi2-core`, `libnotify`.
+System: `pulseaudio-utils` (parec), `kdotool`, `kdialog`, `at-spi2-core`.
 
 ## Development
 
 - **Install**: `make -C recorder install`
 - **Run**: `recorder` (editable install via `uv tool install -e`)
+- **Note**: `recorder-note` opens a kdialog input box and appends submitted text as `📝 nfo`
 - **Config**: `~/.config/recorder/config.toml`
 - **Host source**: `recorder/hosts/$(hostname).toml`
+
+## Notes
+
+- **Shortcut**: `Meta+W` (KWin global shortcut)
+- **Dialog**: `kdialog --title "Note" --geometry 420 --inputbox "Note:"`
+- **Save**: Enter/OK with non-empty text appends to the daily transcript as `📝 **nfo**`
+- **Discard**: Esc/cancel, or blank input, appends nothing
+- **Daemon**: Recorder does not need to be running; `recorder-note` writes directly to the transcript
 
 ## Hallucination Mitigation
 

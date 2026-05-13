@@ -7,6 +7,7 @@ dependencies = []
 
 [project.scripts]
 recorder = "recorder.app:main"
+recorder-note = "recorder.note:main"
 
 [build-system]
 requires = ["hatchling"]

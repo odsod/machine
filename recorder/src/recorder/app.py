@@ -43,7 +43,6 @@ def compute_rms(pcm: bytes) -> float:
     return math.sqrt(sum(s * s for s in samples) / len(samples)) / 32768.0
 
 
-
 class Recorder:
     def __init__(self, config: Config):
         self.config = config
@@ -325,16 +324,6 @@ class Recorder:
                     timestamp = datetime.now().strftime("%H:%M:%S")
                     self.transcript.append(timestamp, "📍 pin")
                     self._log(format_message("📍 pin"))
-                elif ch == "n":
-                    sys.stdout.write("\nnote: ")
-                    sys.stdout.flush()
-                    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-                    text = sys.stdin.readline().strip()
-                    tty.setcbreak(fd)
-                    if text:
-                        timestamp = datetime.now().strftime("%H:%M:%S")
-                        self.transcript.append(timestamp, "\U0001f4dd nfo", text)
-                        self._log(format_message("\U0001f4dd nfo", text))
         except (EOFError, OSError):
             pass
         finally:
@@ -344,8 +333,6 @@ class Recorder:
         ts = datetime.now().strftime("%H:%M:%S")
         print(f"[{ts}] {msg}", flush=True)
 
-    # parec + .monitor: always-on, full digital level regardless of sink volume,
-    # outputs silence when nothing plays. Same pattern as hyprwhspr/goodroot.
     def _get_monitor_source(self) -> str:
         result = subprocess.run(
             ["pactl", "get-default-sink"], capture_output=True, text=True, timeout=5
@@ -359,8 +346,6 @@ class Recorder:
         return result.stdout.strip()
 
     def _start_parec(self, device: str, audio_cfg: AudioConfig) -> subprocess.Popen:
-        # parec streams raw PCM indefinitely (no WAV headers, no EOF on pause).
-        # Pattern from github.com/goodroot/hyprwhspr utils/meeting-recorder.py
         return subprocess.Popen(
             [
                 "parec",
