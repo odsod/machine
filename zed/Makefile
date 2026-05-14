@@ -1,6 +1,6 @@
 name := zed
 # Discovery: https://github.com/zed-industries/zed/releases/latest
-version := 1.1.8
+version := 1.2.3
 archive_url := https://github.com/zed-industries/zed/releases/download/v$(version)/zed-linux-x86_64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 version_dir := $(data_dir)/$(version)

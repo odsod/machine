@@ -1,7 +1,7 @@
 name := cursor
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
-version := 3.3.30
-rpm_url := https://downloads.cursor.com/production/3dc559280adc5f931ade8e25c7b85393842acf34/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
+version := 3.4.16
+rpm_url := https://downloads.cursor.com/production/f736016b0aa20ba1f99b7eec1dda48579fa4c295/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 extensions := \
@@ -37,7 +37,7 @@ all: \
 .PHONY: install-rpm
 install-rpm: $(data_dir)/$(version)/cursor.rpm
 	$(info [$(name)] Installing $@...)
-	@if ! rpm -q cursor >/dev/null 2>&1; then \
+	@if [ "$$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$(version)" ]; then \
 		sudo dnf install -y $<; \
 	fi
 
