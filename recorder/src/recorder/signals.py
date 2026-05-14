@@ -5,12 +5,8 @@ from collections.abc import Callable
 from datetime import datetime
 
 from recorder.config import SignalsConfig
+from recorder.meet_cdp import CDP_PORT, SpeakerDetector
 from recorder.transcript import DailyTranscript, format_message
-
-try:
-    from recorder.meet import get_participants
-except (ImportError, ValueError):
-    get_participants = None
 
 
 class SilenceMonitor:
@@ -134,7 +130,7 @@ class KwinMonitor:
 
 
 class MeetParticipantMonitor:
-    """Polls Meet participants via AT-SPI. Emits events on join/leave."""
+    """Polls Meet via CDP. Tracks participants (rendered tiles) and speakers (active indicator)."""
 
     def __init__(self, transcript: DailyTranscript, config: SignalsConfig, log: Callable):
         self._transcript = transcript
@@ -143,6 +139,8 @@ class MeetParticipantMonitor:
         self._stopping = False
         self._thread: threading.Thread | None = None
         self._known_participants: set[str] = set()
+        self._active_speaker: str | None = None
+        self._detector = SpeakerDetector(CDP_PORT)
 
     def start(self):
         self._thread = threading.Thread(target=self._run, daemon=True)
@@ -151,28 +149,42 @@ class MeetParticipantMonitor:
     def stop(self):
         self._stopping = True
 
+    def reset_participants(self):
+        self._known_participants = set()
+        self._active_speaker = None
+
     def _run(self):
-        if get_participants is None:
-            return
         while not self._stopping:
             self._poll()
-            for _ in range(60 * 10):
+            for _ in range(10):
                 if self._stopping:
                     return
                 time.sleep(0.1)
 
     def _poll(self):
-        participants = get_participants()
-        if participants is None:
-            self._known_participants = set()
+        states = self._detector.poll()
+        if states is None:
+            self._active_speaker = None
             return
 
-        current = set(participants)
-        if current == self._known_participants:
-            return
+        # Union of all names ever seen (tiles + speakers)
+        current_names = {s.name for s in states}
+        new_names = current_names - self._known_participants
 
-        self._known_participants = current
-        names = ", ".join(sorted(current))
-        ts = datetime.now().strftime("%H:%M:%S")
-        self._transcript.append(ts, "\U0001f465 ppl", names)
-        self._log(format_message("\U0001f465 ppl", names))
+        speaker = next((s.name for s in states if s.speaking), None)
+        if speaker:
+            new_names |= {speaker} - self._known_participants
+
+        if new_names:
+            self._known_participants |= new_names
+            names = ", ".join(sorted(self._known_participants))
+            ts = datetime.now().strftime("%H:%M:%S")
+            self._transcript.append(ts, "\U0001f465 ppl", names)
+            self._log(format_message("\U0001f465 ppl", names))
+
+        if speaker != self._active_speaker:
+            self._active_speaker = speaker
+            if speaker:
+                ts = datetime.now().strftime("%H:%M:%S")
+                self._transcript.append(ts, "\U0001f5e3️ spk", speaker)
+                self._log(format_message("\U0001f5e3️ spk", speaker))

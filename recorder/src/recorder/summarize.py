@@ -1,8 +1,8 @@
 """
-Summarize a segmented interaction via local LLM (Qwen).
+Summarize a transcript segment via local LLM (Qwen).
 
-Produces a draft interaction for the vault inbox. The vault ingest agent
-later enriches it with wikilinks, entity pages, and cross-references.
+Produces an inbox draft for the vault. The vault ingest agent later enriches
+it with wikilinks, entity pages, and cross-references.
 """
 
 import importlib.resources
@@ -15,7 +15,7 @@ from pathlib import Path
 import httpx
 
 from recorder.config import LlmConfig
-from recorder.segment import Event, Interaction, is_speech
+from recorder.segment import Event, Segment, is_speech
 
 
 def _load_prompt(name: str) -> str:
@@ -36,10 +36,10 @@ CHUNK_CHARS = 35000  # chars per chunk (~12k tokens, leaves room for prompt + re
 COMBINE_PROMPT = _load_prompt("combine.md")
 
 
-def summarize_interaction(
-    interaction: Interaction, llm_config: LlmConfig, date: str
+def summarize_segment(
+    segment: Segment, llm_config: LlmConfig, date: str
 ) -> Summary | None:
-    transcript_text = _format_transcript(interaction)
+    transcript_text = _format_transcript(segment)
     if not transcript_text.strip():
         return None
 
@@ -138,13 +138,13 @@ def _slugify(title: str) -> str:
     slug = title.lower().strip()
     slug = re.sub(r"[^a-z0-9\s-]", "", slug)
     slug = re.sub(r"[\s]+", "-", slug)
-    return slug[:60]
+    return slug[:50]
 
 
-def _extract_participants(interaction: Interaction) -> list[str]:
+def _extract_participants(segment: Segment) -> list[str]:
     """Extract unique participant names from ppl events."""
     names: set[str] = set()
-    for e in interaction.events:
+    for e in segment.events:
         if e.tag != "ppl":
             continue
         # Strip parenthetical annotations before splitting (may contain commas)
@@ -158,19 +158,19 @@ def _extract_participants(interaction: Interaction) -> list[str]:
 
 
 def write_inbox_draft(
-    summary: Summary, interaction: Interaction, date: str, inbox_dir: Path
+    summary: Summary, segment: Segment, date: str, inbox_dir: Path
 ) -> Path:
-    duration_min = int((interaction.end - interaction.start).total_seconds() / 60)
-    time_range = f"{interaction.start.strftime('%H:%M')}–{interaction.end.strftime('%H:%M')}"
+    duration_min = int((segment.end - segment.start).total_seconds() / 60)
+    time_range = f"{segment.start.strftime('%H:%M')}–{segment.end.strftime('%H:%M')}"
     slug = _slugify(summary.title)
-    participants = _extract_participants(interaction)
+    participants = _extract_participants(segment)
 
     content = f"""---
 title: "{summary.title}"
 date: {date}
 time: "{time_range}"
 duration: {duration_min}m
-type: interaction
+type: segment
 source: "[[raw/transcripts/{date}-recorder.md]]"
 """
     if participants:
@@ -184,9 +184,9 @@ source: "[[raw/transcripts/{date}-recorder.md]]"
 ## Transcript
 
 """
-    content += _format_transcript(interaction)
+    content += _format_transcript(segment)
 
-    filename = f"{date}-{interaction.id}-{slug}.md"
+    filename = f"{date}-{segment.id}-{slug}.md"
     path = inbox_dir / filename
     tmp = path.with_suffix(".md.tmp")
     tmp.write_text(content)
@@ -194,14 +194,14 @@ source: "[[raw/transcripts/{date}-recorder.md]]"
     return path
 
 
-def _format_transcript(interaction: Interaction) -> str:
+def _format_transcript(segment: Segment) -> str:
     lines = []
-    for e in interaction.events:
+    for e in segment.events:
         if not is_speech(e):
             continue
         if _is_hallucination(e.text):
             continue
-        speaker = "Oscar" if e.tag == "mic" else "Other"
+        speaker = "mic" if e.tag == "mic" else "sys"
         lines.append(f"[{e.time.strftime('%H:%M')}] {speaker}: {e.text}")
     return "\n".join(lines)
 

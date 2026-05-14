@@ -13,3 +13,5 @@ Respond ONLY with valid JSON:
   "summary": "## Topic 1\n\n- Point 1\n- Point 2\n\n## Topic 2\n\n- Point 3"
 }
 ```
+
+Title: ≤8 words, subject-first, no stop words ("the", "a", "of", "about").

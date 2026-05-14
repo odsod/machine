@@ -63,13 +63,13 @@ def main():
     print(f"Boundaries: {len(results.boundaries)}")
     for b in results.boundaries:
         print(f"  [{b.time.strftime('%H:%M:%S')}] {b.reason}")
-    print(f"Interactions: {len(results.interactions)}")
+    print(f"Segments: {len(results.segments)}")
     print()
 
-    for r in results.interactions:
-        duration = (r.interaction.end - r.interaction.start).total_seconds() / 60
-        lines = len(_format_transcript(r.interaction).splitlines())
-        time_range = f"{r.interaction.start.strftime('%H:%M')}–{r.interaction.end.strftime('%H:%M')}"
+    for r in results.segments:
+        duration = (r.segment.end - r.segment.start).total_seconds() / 60
+        lines = len(_format_transcript(r.segment).splitlines())
+        time_range = f"{r.segment.start.strftime('%H:%M')}–{r.segment.end.strftime('%H:%M')}"
         print(f"  [{time_range}] {duration:.0f}m, {lines} lines")
         if r.summary:
             print(f"    {r.summary.title}")
