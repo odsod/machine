@@ -28,19 +28,39 @@ silence detector ───→ silence markers ──┘
 | ----- | ----------------------------------------------- | ------ |
 | 1     | Capture + transcribe + clean → daily transcript | ✅     |
 | 2     | Context signals interleaved into transcript     | ✅     |
-| 3     | Segment transcript → interaction boundaries     |        |
-| 4     | Summarize closed segments → `inbox/` drafts     |        |
+| 3     | Segment transcript → interaction boundaries     | ✅     |
+| 4     | Summarize closed segments → `inbox/` drafts     | ✅     |
+
+## CLI
+
+Single `recorder` binary, all functionality as subcommands:
+
+```
+recorder run                                  # start the daemon
+recorder note                                 # desktop note dialog
+recorder segment <transcript>                 # dry-run: show boundaries + summaries
+recorder segment <transcript> --write         # write inbox drafts + seg markers
+recorder segment <transcript> --boundaries    # only show boundaries, no LLM calls
+```
+
+**Principle**: all recorder functionality lives under the `recorder` command as subcommands.
 
 ## Structure
 
 ```
 recorder/
 ├── src/recorder/
+│   ├── __main__.py     # Subcommand dispatch
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
+│   ├── lock.py         # Lockfile — prevents multiple instances across machines
 │   ├── meet.py         # AT-SPI participant extraction from Google Meet
 │   ├── note.py         # Desktop-global note dialog entrypoint
+│   ├── segment.py      # Segmentation algorithm — silence + meeting change + pins
+│   ├── segment_cli.py  # CLI for segment subcommand
+│   ├── segment_run.py  # Shared segmentation orchestration (online + offline)
 │   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
+│   ├── summarize.py    # LLM summarization — system prompt, chunking, inbox writer
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   └── transcript.py   # DailyTranscript — append-only markdown event log
 ├── hosts/             # Full host-specific configs
@@ -98,6 +118,7 @@ Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) wh
 | idl | 💤    | Silence detector                                    |
 | nfo | 📝    | User — freeform annotation (`Meta+W`)               |
 | pin | 📍    | User — segment boundary hint (`s` in recorder pane) |
+| seg | ✂️    | Segmenter — interaction boundary emitted            |
 | rec | 🟢/🔴 | Recorder started/stopped                            |
 
 ## Runtime Dependencies
@@ -156,24 +177,51 @@ Whisper hallucinates on near-silence that passes the RMS gate. Layered defense:
 
 ## Segmentation (Layer 3)
 
-Pure function: reads transcript event log → outputs segment boundaries with metadata.
+Pure function: reads transcript event log → outputs segment boundaries.
 
-**Boundary signals** (priority order):
+### Algorithm: Silence + Signals + Pins
 
-1. `🪟 win` title reverts (e.g. "Meet - X" → "Meet") → meeting ended
-2. `👥 ppl` disappears → left the call
-3. `💤 idl` with no active context → natural boundary
-4. New calendar event while previous segment open → split
+Three independent OR triggers — any one is sufficient to emit a boundary:
 
-`📍 pin` is a hint, not a hard boundary — the user may drop it slightly before
-or after the real transition. The segmenter should snap to the nearest natural
-boundary (silence/inactivity) within a window around the pin.
+| Trigger                 | Detects                                        | Requires integration |
+| ----------------------- | ---------------------------------------------- | -------------------- |
+| Silence ≥ 5 min         | Topic changes in long calls, gaps between work | No                   |
+| Meeting identity change | Back-to-back meetings with no silence gap      | Yes                  |
+| Pin                     | Anything the algorithm misses                  | No                   |
 
-**Execution**: batch every 10 min (with lookahead), immediately on `✂️ split`, on shutdown.
+**Design**: silence is the baseline — works without any integrations. In a day-long
+work call, silence between topics IS the boundary. Meeting signals only handle the
+zero-gap case (hang up one meeting, join another immediately). The segmenter
+over-generates boundaries; trivial interactions are filtered by the LLM returning skip.
+
+**Pin snapping**: walks backwards from pin time to find the nearest ≥3s silence gap
+within 90s. Snaps the boundary there instead of at the raw pin time.
+
+### Execution
+
+- **Online**: triggers when silence crosses threshold (GPU idle — no whisper work)
+- **Offline**: `recorder segment <transcript>` for tuning/backfill
+- **Dedup**: `✂️ seg` lines in transcript mark processed interactions
+- **On stop**: runs segmenter one final time to catch the last interaction
 
 ## Summarization (Layer 4)
 
-Triggered on segment close. Input is already clean text from Layer 1.
+Local LLM (Qwen 3.5 9B) produces structured markdown summaries per interaction.
 
-- Extract: title, key decisions, action items, open questions
-- Write draft interaction to `~/Vaults/odsod/inbox/YYYY-MM-DD-<slug>.md`
+- **Short interactions** (≤35k chars): single LLM call
+- **Long interactions**: map-reduce — summarize each chunk → combine results
+- **Chunking**: splits at natural silence gaps in the transcript
+- **Output**: `~/Vaults/odsod/inbox/YYYY-MM-DD-HHMM-<slug>.md`
+- **Format**: frontmatter + structured markdown summary (headings per topic) + raw transcript
+
+The vault ingest agent (Claude) later enriches these with wikilinks, entity pages,
+and cross-references. The local LLM focuses on faithful content extraction.
+
+## Lockfile
+
+Prevents multiple recorder instances (same machine or across tailnet via Syncthing).
+
+- **Location**: `<transcript_output_dir>/.recorder-lock`
+- **Contents**: JSON with `hostname`, `pid`, `updated` (unix timestamp)
+- **Heartbeat**: refreshed every 30s in the capture loop
+- **Stale after**: 120s — covers crash/kill without clean shutdown

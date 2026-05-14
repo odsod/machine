@@ -24,6 +24,9 @@ import array
 import math
 
 from recorder.config import AudioConfig, Config, load_config
+from recorder.lock import LockError, RecorderLock
+from recorder.segment import SILENCE_THRESHOLD
+from recorder.segment_run import process_transcript
 from recorder.signals import KwinMonitor, MeetParticipantMonitor, SilenceMonitor
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
 from recorder.transcript import DailyTranscript, format_message
@@ -47,6 +50,7 @@ class Recorder:
     def __init__(self, config: Config):
         self.config = config
         self.transcript = DailyTranscript(config.transcript.output_dir)
+        self._lock = RecorderLock(config.transcript.output_dir)
         self._paused = False
         self._stopping = False
         self._last_system_text = ""
@@ -56,10 +60,14 @@ class Recorder:
         self._chunk_num = 0
         self._silence_monitor = SilenceMonitor(self.transcript, config.signals, self._log)
         self._signal_monitors: list = []
+        self._segmenter_triggered = False
+        self._segmenter_thread: threading.Thread | None = None
 
     def run(self):
         signal.signal(signal.SIGTERM, lambda *_: self._stop())
         signal.signal(signal.SIGINT, lambda *_: self._stop())
+
+        self._lock.acquire()
 
         self._transcription_queue: queue.Queue = queue.Queue()
 
@@ -142,6 +150,8 @@ class Recorder:
                     time.sleep(0.1)
                     continue
 
+                self._lock.heartbeat()
+
                 sys_data = sys_proc.stdout.read(FRAME_BYTES)
                 mic_data = mic_proc.stdout.read(FRAME_BYTES)
                 if not sys_data:
@@ -170,12 +180,19 @@ class Recorder:
                     has_speech = True
                     consecutive_silent_secs = 0
                     self._silence_monitor.reset()
+                    self._segmenter_triggered = False
                 else:
                     if was_speech and consecutive_silent_secs == 1:
                         self._log("silence")
                         was_speech = False
                     consecutive_silent_secs += 1
                     self._silence_monitor.tick(consecutive_silent_secs)
+                    if (
+                        consecutive_silent_secs == SILENCE_THRESHOLD
+                        and not self._segmenter_triggered
+                    ):
+                        self._segmenter_triggered = True
+                        self._run_segmenter()
 
                 buf_secs = len(sys_buf) / (SAMPLE_RATE * 2)
 
@@ -369,9 +386,45 @@ class Recorder:
             except ProcessLookupError:
                 pass
 
+    def _run_segmenter(self):
+        """Trigger segmentation in background thread (GPU is idle during silence)."""
+        if self._segmenter_thread and self._segmenter_thread.is_alive():
+            return
+        self._segmenter_thread = threading.Thread(
+            target=self._segmenter_worker, daemon=True
+        )
+        self._segmenter_thread.start()
+
+    def _segmenter_worker(self):
+        try:
+            date = datetime.now().strftime("%Y-%m-%d")
+            now = datetime.strptime(datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
+            inbox = Path.home() / "Vaults/odsod/inbox"
+            result = process_transcript(
+                transcript_path=self.transcript.path,
+                date=date,
+                now=now,
+                llm_config=self.config.llm,
+                inbox_dir=inbox,
+                summarize=True,
+                write=True,
+            )
+            new = [r for r in result.interactions if r.summary]
+            if new:
+                self._log(f"segmenter: {len(new)} interactions summarized")
+            skipped = [r for r in result.interactions if r.skipped]
+            if skipped:
+                self._log(f"segmenter: {len(skipped)} interactions skipped")
+        except Exception as e:
+            self._log(f"segmenter error: {e}")
+
     def _cleanup(self):
         ts = datetime.now().strftime("%H:%M:%S")
         self.transcript.append(ts, "🔴 rec", "stopped")
+        self._run_segmenter()
+        if self._segmenter_thread:
+            self._segmenter_thread.join(timeout=120)
+        self._lock.release()
         for f in self._work_dir.iterdir():
             f.unlink(missing_ok=True)
         self._work_dir.rmdir()
@@ -381,4 +434,8 @@ class Recorder:
 def main():
     config = load_config()
     recorder = Recorder(config)
-    recorder.run()
+    try:
+        recorder.run()
+    except LockError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)

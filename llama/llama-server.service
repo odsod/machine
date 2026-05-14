@@ -9,7 +9,7 @@ ExecStart=@SERVER_BIN@ \
     --model @MODEL_PATH@ \
     --port @PORT@ \
     --host 0.0.0.0 \
-    --ctx-size 4096 \
+    --ctx-size 16384 \
     --n-gpu-layers 99 \
     --reasoning off
 Restart=on-failure
