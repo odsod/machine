@@ -7,7 +7,7 @@ model := ggml-large-v3.bin
 model_base_url := https://huggingface.co/ggerganov/whisper.cpp/resolve/main
 model_url := $(model_base_url)/$(model)
 # Discovery: https://huggingface.co/ggml-org/whisper-vad/tree/main
-vad_model := ggml-silero-v5.1.2.bin
+vad_model := ggml-silero-v6.2.0.bin
 vad_model_url := https://huggingface.co/ggml-org/whisper-vad/resolve/main/$(vad_model)
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 build_dir := $(CURDIR)/whisper.cpp-$(version)/build

@@ -1,6 +1,6 @@
 name := jj-starship
 # Discovery: https://api.github.com/repos/dmmulroy/jj-starship/releases/latest
-version := 0.7.0
+version := 0.7.1
 
 archive := jj-starship-x86_64-unknown-linux-gnu.tar.gz
 archive_url := https://github.com/dmmulroy/jj-starship/releases/download/v$(version)/$(archive)
