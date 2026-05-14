@@ -24,12 +24,13 @@ silence detector ───→ silence markers ──┘
 
 ### Layers
 
-| Layer | Purpose                                         | Status |
-| ----- | ----------------------------------------------- | ------ |
-| 1     | Capture + transcribe + clean → daily transcript | ✅     |
-| 2     | Context signals interleaved into transcript     | ✅     |
-| 3     | Segment transcript → interaction boundaries     | ✅     |
-| 4     | Summarize closed segments → `inbox/` drafts     | ✅     |
+| Layer | Purpose                                         | Status  |
+| ----- | ----------------------------------------------- | ------- |
+| 1     | Capture + transcribe + clean → daily transcript | ✅      |
+| 2     | Context signals interleaved into transcript     | ✅      |
+| 3     | Segment transcript → interaction boundaries     | ✅      |
+| 4     | Summarize closed segments → `inbox/` drafts     | ✅      |
+| 5     | AT-SPI speaker signal → per-speaker transcript  | Planned |
 
 ## CLI
 
@@ -260,6 +261,90 @@ participants: ["Alice", "Bob"] # from ppl events, optional
 
 The vault ingest agent (Claude) later enriches these with wikilinks, entity pages,
 and cross-references. The local LLM focuses on faithful content extraction.
+
+## Speaker Attribution (Layer 5, Planned)
+
+Real-time speaker identification for the `sys` channel via AT-SPI.
+
+### Approach: AT-SPI active speaker signal
+
+Google Meet shows a speaking indicator on each participant tile. Screen readers need this
+state, so it almost certainly exists in the AT-SPI tree. If readable, we get exact
+real-time speaker attribution with zero compute cost.
+
+- **Accuracy**: exact — Meet's own data, not ML inference
+- **Latency**: real-time → `spk` events land in the daily transcript as speech happens
+- **Cost**: negligible — same polling model as `MeetParticipantMonitor`
+- **Scope**: Meet only (sufficient for the primary use case)
+- **Dependencies**: none new — already have `gi`/AT-SPI from `meet.py`
+
+### Unknown: which node carries the speaking state
+
+Candidates in the AT-SPI tree:
+
+- Node named `"Alice (speaking)"` — currently dropped by `_filter_participants`
+- A `state` on the tile (e.g. `focused`, `selected`) that activates when speaking
+- A child element with text `"speaking"` or a mic icon description
+- An `aria-live` region that announces speaker changes
+
+### Investigation
+
+Add `dump_tree()` to `meet.py`, run during a call while someone else is speaking, grep
+the output for that person's name — whatever role/state wraps it is the signal:
+
+```python
+def dump_tree():
+    doc = _find_meet_document()
+    if doc:
+        _dump_node(doc)
+
+def _dump_node(node, depth=0):
+    try:
+        role = node.get_role_name()
+        name = node.get_name() or ""
+        state_set = node.get_state_set()
+        active = [s.value_nick for s in Atspi.StateType.__enum_values__.values()
+                  if state_set.contains(s)]
+        print("  " * depth + f"[{role}] {name!r} {active}")
+        for i in range(min(node.get_child_count(), 50)):
+            child = node.get_child_at_index(i)
+            if child:
+                _dump_node(child, depth + 1)
+    except Exception:
+        pass
+```
+
+### Implementation (once signal is confirmed)
+
+Three files change; nothing else touched:
+
+| File           | Change                                                                                   |
+| -------------- | ---------------------------------------------------------------------------------------- |
+| `meet.py`      | Add `get_active_speaker() -> str \| None` using the confirmed node/state                 |
+| `signals.py`   | Add `ActiveSpeakerMonitor` — polls every 2s, emits `🗣️ spk` tag on speaker change        |
+| `summarize.py` | In `_format_transcript`: attribute each `sys` event to most recent `spk` event before it |
+
+New `spk` event in the daily transcript (real-time, not post-hoc):
+
+```
+[09:15:03] 🗣️ **spk** Alice
+[09:15:12] 🔊 **sys** We should move to Postgres.
+[09:15:18] 🗣️ **spk** Bob
+[09:15:31] 🔊 **sys** I disagree, the migration risk is too high.
+```
+
+Inbox draft transcript section becomes:
+
+```
+[09:15] Alice: We should move to Postgres.
+[09:16] Bob: I disagree, the migration risk is too high.
+```
+
+New tag to add to the Line Grammar table:
+
+| Tag | Emoji | Source                                   |
+| --- | ----- | ---------------------------------------- |
+| spk | 🗣️    | AT-SPI active speaker change (Meet only) |
 
 ## Lockfile
 
