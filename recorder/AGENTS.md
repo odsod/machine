@@ -62,12 +62,25 @@ recorder/
 │   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
 │   ├── summarize.py    # LLM summarization — system prompt, chunking, inbox writer
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
-│   └── transcript.py   # DailyTranscript — append-only markdown event log
+│   ├── transcript.py   # DailyTranscript — append-only markdown event log
+│   └── prompts/
+│       ├── summarize.md  # System prompt for per-interaction summarization
+│       └── combine.md    # System prompt for map-reduce combine step
 ├── hosts/             # Full host-specific configs
 ├── recorder-toggle     # Fish script — tmux session toggle
 ├── Makefile            # Install: deps, silero model, uv tool, config, toggle
 └── pyproject.toml      # uv tool install -e
 ```
+
+## Daemon Controls
+
+Keybindings in the tmux pane (raw terminal input, no prefix):
+
+| Key | Action                                     |
+| --- | ------------------------------------------ |
+| `q` | Quit (clean shutdown, final segmenter run) |
+| `p` | Pause/resume capture                       |
+| `s` | Insert `📍 pin` (segment boundary hint)    |
 
 ## Capture Pipeline
 
@@ -79,7 +92,8 @@ Per-channel chunking with server-side VAD:
 4. Submit to whisper-server → **Silero VAD** decides speech/non-speech server-side
 5. Whisper decodes only VAD-approved segments (ROCm GPU)
 6. LLM cleanup (filler, grammar, dedup, hallucination filtering)
-7. Append clean timestamped speech to daily transcript
+7. **Audio dedup** — mic text suppressed if token overlap ≥ 60% with system text (prevents double-transcription when mic picks up system audio)
+8. Append clean timestamped speech to daily transcript
 
 Client-side RMS is permissive by design — server-side Silero VAD (0.97 accuracy, spectral
 analysis) makes the real speech/non-speech decision. Previous attempt at client-side Silero
@@ -135,8 +149,19 @@ System: `pulseaudio-utils` (parec), `kdotool`, `kdialog`, `at-spi2-core`.
 - **Install**: `make -C recorder install`
 - **Run**: `recorder` (editable install via `uv tool install -e`)
 - **Note**: `recorder-note` opens a kdialog input box and appends submitted text as `📝 nfo`
-- **Config**: `~/.config/recorder/config.toml`
+- **Config**: `~/.config/recorder/config.toml` (symlink to host config)
 - **Host source**: `recorder/hosts/$(hostname).toml`
+
+### Config Sections
+
+```toml
+[audio]       # sample_rate (16000), format ("s16")
+[whisper]     # url, timeout_s (60)
+[llm]         # url, timeout_s (180)
+[transcript]  # output_dir ("~/Vaults/odsod/raw/transcripts")
+[dedup]       # threshold (0.6) — token overlap ratio for mic/sys dedup
+[signals]     # silence_threshold_secs (180), kwin_poll_interval_secs (10), meeting_window_patterns
+```
 
 ## Notes
 
@@ -165,6 +190,7 @@ Whisper hallucinates on near-silence that passes the RMS gate. Layered defense:
 ### Post-transcription
 
 - **LLM cleanup prompt** hardened to return empty on non-speech (no regex filtering)
+- **Summarizer filter** — `_is_hallucination()` in summarize.py strips known hallucination phrases from transcript lines before feeding to the summarization LLM (separate defense layer from cleanup prompt)
 - If hallucinations persist despite VAD, next step: integrate the
   `sachaarbonel/whisper-hallucinations` dataset (7,889 phrases, MIT, flat CSV)
   as a phrase set lookup — see `huggingface.co/datasets/sachaarbonel/whisper-hallucinations`
@@ -194,6 +220,11 @@ work call, silence between topics IS the boundary. Meeting signals only handle t
 zero-gap case (hang up one meeting, join another immediately). The segmenter
 over-generates boundaries; trivial interactions are filtered by the LLM returning skip.
 
+**Two silence thresholds** (different purposes):
+
+- `signals.py` SilenceMonitor: 180s (3 min) → emits `💤 idl` transcript marker (informational)
+- `segment.py` SILENCE_THRESHOLD: 300s (5 min) → triggers segmentation boundary + online dispatch
+
 **Pin snapping**: walks backwards from pin time to find the nearest ≥3s silence gap
 within 90s. Snaps the boundary there instead of at the raw pin time.
 
@@ -202,6 +233,7 @@ within 90s. Snaps the boundary there instead of at the raw pin time.
 - **Online**: triggers when silence crosses threshold (GPU idle — no whisper work)
 - **Offline**: `recorder segment <transcript>` for tuning/backfill
 - **Dedup**: `✂️ seg` lines in transcript mark processed interactions
+  - Format: `[HH:MM:SS] ✂️ seg | HHMM slug` — the HHMM id is parsed for idempotency
 - **On stop**: runs segmenter one final time to catch the last interaction
 
 ## Summarization (Layer 4)
@@ -210,9 +242,21 @@ Local LLM (Qwen 3.5 9B) produces structured markdown summaries per interaction.
 
 - **Short interactions** (≤35k chars): single LLM call
 - **Long interactions**: map-reduce — summarize each chunk → combine results
-- **Chunking**: splits at natural silence gaps in the transcript
+- **Chunking**: splits at natural silence gaps in the transcript (largest time gap in second half of chunk)
 - **Output**: `~/Vaults/odsod/inbox/YYYY-MM-DD-HHMM-<slug>.md`
 - **Format**: frontmatter + structured markdown summary (headings per topic) + raw transcript
+
+### Inbox Draft Frontmatter
+
+```yaml
+title: "Short Descriptive Title"
+date: YYYY-MM-DD
+time: "HH:MM–HH:MM"
+duration: Xm
+type: interaction
+source: "[[raw/transcripts/YYYY-MM-DD-recorder.md]]"
+participants: ["Alice", "Bob"] # from ppl events, optional
+```
 
 The vault ingest agent (Claude) later enriches these with wikilinks, entity pages,
 and cross-references. The local LLM focuses on faithful content extraction.
