@@ -7,9 +7,13 @@ bin_dir := $(HOME)/.local/bin
 install_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
 
 .PHONY: install
-install:
+install: ~/.config/mise/config.toml
 	$(info [$(name)] Installing...)
 	@mkdir -p "$(install_dir)"
 	@curl -sL "$(url)" | tar -xz -C "$(install_dir)" --strip-components=1
 	@mkdir -p "$(bin_dir)"
 	@ln -fsT "$(install_dir)/bin/mise" "$(bin_dir)/mise"
+
+~/.config/mise/config.toml: config.toml
+	@mkdir -p "$(@D)"
+	@ln -fsT "$(CURDIR)/config.toml" "$@"

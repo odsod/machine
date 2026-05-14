@@ -1,0 +1,37 @@
+[settings]
+# Docs: https://mise.jdx.dev/faq.html#how-do-idiomatic-version-files-python-version-node-version-etc-work
+# Good for mixed repos: opt into common ecosystem version files explicitly.
+idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
+
+# Docs: https://mise.jdx.dev/configuration/settings.html#minimum_release_age
+# Good for loose versions: avoid installing brand-new releases immediately.
+minimum_release_age = "3d"
+
+# Docs: https://mise.jdx.dev/configuration/settings.html#pin
+# Good for shared projects: `mise use` writes concrete versions by default.
+pin = true
+
+# Docs: https://mise.jdx.dev/configuration/settings.html#trusted_config_paths
+# Good for jj workflows: new local workspaces do not need manual `mise trust`.
+trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
+
+[settings.python]
+# Docs: https://mise.jdx.dev/lang/python.html#automatic-virtualenv-activation
+# Good for uv projects: use existing `.venv` without creating one on `cd`.
+uv_venv_auto = "source"
+
+[settings.status]
+# Docs: https://mise.jdx.dev/configuration/settings.html#status.missing_tools
+# Good for prompts: only warn when another version exists and output stays quiet.
+missing_tools = "if_other_versions_installed"
+show_env = false
+show_tools = false
+
+[settings.task]
+# Docs: https://mise.jdx.dev/configuration/settings.html#task.output
+# Good for parallel tasks: every output line shows which task produced it.
+output = "prefix"
+
+# Docs: https://mise.jdx.dev/configuration/settings.html#task.run_auto_install
+# Good for onboarding: `mise run` installs task tools declared by the project.
+run_auto_install = true
