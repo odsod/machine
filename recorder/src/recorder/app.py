@@ -62,10 +62,11 @@ class Recorder:
         self._signal_monitors: list = []
         self._segmenter_triggered = False
         self._segmenter_thread: threading.Thread | None = None
+        self._capture_procs: list = []
 
     def run(self):
         signal.signal(signal.SIGTERM, lambda *_: self._stop())
-        signal.signal(signal.SIGINT, lambda *_: self._stop())
+        signal.signal(signal.SIGINT, self._handle_sigint)
 
         self._lock.acquire()
 
@@ -101,14 +102,20 @@ class Recorder:
 
     def _stop(self):
         self._stopping = True
+        self._log("stopping...")
+        for proc in self._capture_procs:
+            self._terminate(proc)
+
+    def _handle_sigint(self, *_):
+        self._stop()
 
     def _start_signals(self):
         kw = KwinMonitor(self.transcript, self.config.signals, self._log)
         kw.start()
         self._signal_monitors.append(kw)
-        mp = MeetParticipantMonitor(self.transcript, self.config.signals, self._log)
-        mp.start()
-        self._signal_monitors.append(mp)
+        self._meet_monitor = MeetParticipantMonitor(self.transcript, self.config.signals, self._log)
+        self._meet_monitor.start()
+        self._signal_monitors.append(self._meet_monitor)
         self._log("signals started")
 
     def _stop_signals(self):
@@ -135,6 +142,7 @@ class Recorder:
         # Pattern from github.com/goodroot/hyprwhspr utils/meeting-recorder.py
         sys_proc = self._start_parec(monitor, audio_cfg)
         mic_proc = self._start_parec(mic_source, audio_cfg)
+        self._capture_procs = [sys_proc, mic_proc]
 
         sys_buf = bytearray()
         mic_buf = bytearray()
@@ -332,9 +340,7 @@ class Recorder:
             tty.setcbreak(fd)
             while not self._stopping:
                 ch = sys.stdin.read(1)
-                if ch == "q":
-                    self._stop()
-                elif ch == "p":
+                if ch == "p":
                     self._paused = not self._paused
                     self._log("paused" if self._paused else "listening")
                 elif ch == "s":
@@ -409,21 +415,24 @@ class Recorder:
                 summarize=True,
                 write=True,
             )
-            new = [r for r in result.interactions if r.summary]
+            new = [r for r in result.segments if r.summary]
             if new:
-                self._log(f"segmenter: {len(new)} interactions summarized")
-            skipped = [r for r in result.interactions if r.skipped]
+                self._log(f"segmenter: {len(new)} segments summarized")
+                self._meet_monitor.reset_participants()
+            skipped = [r for r in result.segments if r.skipped]
             if skipped:
-                self._log(f"segmenter: {len(skipped)} interactions skipped")
+                self._log(f"segmenter: {len(skipped)} segments skipped")
         except Exception as e:
             self._log(f"segmenter error: {e}")
 
     def _cleanup(self):
         ts = datetime.now().strftime("%H:%M:%S")
         self.transcript.append(ts, "🔴 rec", "stopped")
+        self._log("running final segmentation...")
         self._run_segmenter()
         if self._segmenter_thread:
             self._segmenter_thread.join(timeout=120)
+        self._log("shutdown complete")
         self._lock.release()
         for f in self._work_dir.iterdir():
             f.unlink(missing_ok=True)

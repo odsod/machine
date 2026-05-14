@@ -12,18 +12,18 @@ from pathlib import Path
 from recorder.config import LlmConfig
 from recorder.segment import (
     Boundary,
-    Interaction,
+    Segment,
     is_seg,
     parse_transcript,
     segment,
     split_at_boundaries,
 )
-from recorder.summarize import Summary, summarize_interaction, write_inbox_draft
+from recorder.summarize import Summary, summarize_segment, write_inbox_draft
 
 
 @dataclass
-class InteractionResult:
-    interaction: Interaction
+class SegmentEntry:
+    segment: Segment
     summary: Summary | None = None
     skipped: bool = False
     written_to: Path | None = None
@@ -32,7 +32,7 @@ class InteractionResult:
 @dataclass
 class SegmentResult:
     boundaries: list[Boundary] = field(default_factory=list)
-    interactions: list[InteractionResult] = field(default_factory=list)
+    segments: list[SegmentEntry] = field(default_factory=list)
 
 
 def process_transcript(
@@ -52,41 +52,41 @@ def process_transcript(
     """
     events = parse_transcript(transcript_path)
     boundaries = segment(events, now)
-    interactions = split_at_boundaries(events, boundaries)
+    segs = split_at_boundaries(events, boundaries)
 
-    # Determine which interactions have already been processed
+    # Determine which segments have already been processed
     emitted = {e.text.split()[0] for e in events if is_seg(e) and e.text}
 
     result = SegmentResult(boundaries=boundaries)
 
-    for ix in interactions:
-        if ix.id in emitted:
+    for seg in segs:
+        if seg.id in emitted:
             continue
 
-        ir = InteractionResult(interaction=ix)
+        entry = SegmentEntry(segment=seg)
 
         if summarize:
-            summary = summarize_interaction(ix, llm_config, date)
+            summary = summarize_segment(seg, llm_config, date)
             if summary:
-                ir.summary = summary
+                entry.summary = summary
                 if write:
-                    path = write_inbox_draft(summary, ix, date, inbox_dir)
-                    ir.written_to = path
-                    _append_seg_marker(transcript_path, ix, summary)
+                    path = write_inbox_draft(summary, seg, date, inbox_dir)
+                    entry.written_to = path
+                    _append_seg_marker(transcript_path, seg, summary)
             else:
-                ir.skipped = True
+                entry.skipped = True
                 if write:
-                    _append_seg_marker(transcript_path, ix, None)
+                    _append_seg_marker(transcript_path, seg, None)
 
-        result.interactions.append(ir)
+        result.segments.append(entry)
 
     return result
 
 
 def _append_seg_marker(
-    transcript_path: Path, interaction: Interaction, summary: Summary | None
+    transcript_path: Path, seg: Segment, summary: Summary | None
 ):
     slug = summary.title.lower().replace(" ", "-")[:40] if summary else "skip"
-    line = f"[{datetime.now().strftime('%H:%M:%S')}] ✂️ seg | {interaction.id} {slug}\n"
+    line = f"[{datetime.now().strftime('%H:%M:%S')}] ✂️ seg | {seg.id} {slug}\n"
     with open(transcript_path, "a") as f:
         f.write(line)

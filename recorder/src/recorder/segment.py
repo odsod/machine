@@ -1,5 +1,5 @@
 """
-Segmenter — split daily transcripts into distinct interactions.
+Segmenter — split daily transcripts into segments.
 
 Three independent boundary triggers (any one sufficient):
 1. Silence gap ≥ SILENCE_THRESHOLD between speech events
@@ -39,7 +39,7 @@ class Boundary:
 
 
 @dataclass
-class Interaction:
+class Segment:
     start: datetime
     end: datetime
     events: list[Event]
@@ -196,8 +196,8 @@ def dedupe(boundaries: list[Boundary]) -> list[Boundary]:
 
 def split_at_boundaries(
     events: list[Event], boundaries: list[Boundary]
-) -> list[Interaction]:
-    """Split events into interactions at boundary points."""
+) -> list[Segment]:
+    """Split events into segments at boundary points."""
     if not events:
         return []
 
@@ -206,9 +206,9 @@ def split_at_boundaries(
         return []
 
     cut_times = [b.time for b in boundaries]
-    interactions = []
+    segments = []
 
-    # Each interaction runs from one boundary to the next
+    # Each segment runs from one boundary to the next
     starts = [speech[0].time] + [
         # Find first speech event after each boundary
         next((e.time for e in speech if e.time > ct), ct)
@@ -221,15 +221,15 @@ def split_at_boundaries(
         else:
             end = speech[-1].time if speech else start
 
-        interaction_events = [e for e in events if start <= e.time <= end]
-        if any(is_speech(e) for e in interaction_events):
-            interactions.append(
-                Interaction(
+        segment_events = [e for e in events if start <= e.time <= end]
+        if any(is_speech(e) for e in segment_events):
+            segments.append(
+                Segment(
                     start=start,
                     end=end,
-                    events=interaction_events,
+                    events=segment_events,
                     id=start.strftime("%H%M"),
                 )
             )
 
-    return interactions
+    return segments

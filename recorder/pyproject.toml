@@ -3,10 +3,13 @@ name = "recorder"
 version = "0.1.0"
 description = "Ambient meeting recorder daemon"
 requires-python = ">=3.12"
-dependencies = ["httpx"]
+dependencies = ["httpx", "websockets"]
 
 [project.scripts]
 recorder = "recorder.__main__:main"
+
+[dependency-groups]
+dev = ["pytest"]
 
 [build-system]
 requires = ["hatchling"]

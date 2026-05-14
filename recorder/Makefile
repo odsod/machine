@@ -12,8 +12,7 @@ install-dependencies:
 		kdotool \
 		kdialog \
 		pipewire-utils \
-		pulseaudio-utils \
-		at-spi2-core
+		pulseaudio-utils
 
 .PHONY: install-tool
 install-tool:

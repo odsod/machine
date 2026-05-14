@@ -13,7 +13,7 @@ if not tmux has-session -t "=$session" 2>/dev/null
     set -l transcript ~/Vaults/odsod/raw/transcripts/(date +%Y-%m-%d)-recorder.md
     tmux new-session -d -s $session -n rec "recorder run"
     tmux split-window -t "=$session" -v -l 70% "tail -f $transcript 2>/dev/null || (echo 'waiting for transcript...' && sleep 2 && exec tail -f $transcript)"
-    tmux select-pane -t "=$session:rec.0"
+    tmux select-pane -t "$session:rec.0"
     tmux switch-client -t "=$session"
 else if test (tmux display-message -p '#{session_name}') = "$session"
     tmux switch-client -l

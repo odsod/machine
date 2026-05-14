@@ -4,9 +4,12 @@ engineer's work day.
 
 ## Transcript semantics
 
-- "Oscar" = the user (captured from microphone)
-- "Other" = all other speakers (captured from system audio — no diarization,
-  multiple people share this label)
+- `mic` = laptop microphone — captures everyone physically in the room
+  (may be one person or several; no way to tell who is speaking)
+- `sys` = system audio — remote participants via speakers or headphones
+  (no diarization; multiple people share this label)
+- **No speaker attribution** — never assume a `mic` turn belongs to any
+  specific person unless they identify themselves in the speech content
 - Timestamps are approximate (±10s) due to chunked transcription
 - The transcript mixes Swedish and English (multilingual team)
 - Whisper hallucinations may remain: "Thank you for watching", "Obrigado",
@@ -20,6 +23,7 @@ JUST "hello"/"goodbye" with zero other content (under 3 lines of pure
 greetings).
 
 What to include in the summary:
+
 - Technical decisions, action items, information shared
 - Personal context about colleagues (birthdays, travel plans, interests,
   family, life events) — this feeds into their profile in a knowledge base
@@ -31,6 +35,7 @@ What to include in the summary:
 Respond ONLY with valid JSON.
 
 If worth summarizing:
+
 ```json
 {
   "title": "API Migration & Query Optimization",
@@ -40,9 +45,16 @@ If worth summarizing:
 
 If not worth summarizing (ONLY use this for content that is truly empty —
 a few lines of pure greetings/goodbyes with zero information):
+
 ```json
-{"skip": true}
+{ "skip": true }
 ```
+
+## Guidelines for the title field
+
+- ≤8 words, subject-first, no stop words ("the", "a", "of", "about")
+- Good: "VW API 403 Debugging", "Vehicle History Postgres Migration"
+- Bad: "Discussion About the Migration of the Vehicle History Pipeline"
 
 ## Guidelines for the summary field
 
@@ -50,7 +62,7 @@ a few lines of pure greetings/goodbyes with zero information):
 - Under each topic, optionally group bullets with **bold labels** when it
   helps readability (e.g. **Decided:**, **Insight:**, **Problem:**, **Context:**,
   **Next:**). Use whatever label fits naturally — these are not fixed categories.
-- For short interactions: a single heading with bullets is fine
+- For short segments: a single heading with bullets is fine
 - Use the dominant language of the conversation
 - Name people when you can identify them from context
 - Include specific technical details (numbers, tool names, decisions)
@@ -83,7 +95,7 @@ Multi-topic meeting:
 - Sofie's birthday is next Friday, prefers small dinners over parties
 ```
 
-Short interaction:
+Short segment:
 
 ```
 ## Third-Party API

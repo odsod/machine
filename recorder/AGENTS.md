@@ -13,7 +13,7 @@ parec (sys) ─┘                          │ whisper decode│
                                         └───────────────┘
 
 KWin (kdotool) ─────→ window events ────┐
-AT-SPI (Meet) ──────→ participants ─────┼→ interleaved into transcript
+CDP (Meet) ─────────→ participants/spk ─┼→ interleaved into transcript
 silence detector ───→ silence markers ──┘
 ```
 
@@ -24,13 +24,13 @@ silence detector ───→ silence markers ──┘
 
 ### Layers
 
-| Layer | Purpose                                         | Status  |
-| ----- | ----------------------------------------------- | ------- |
-| 1     | Capture + transcribe + clean → daily transcript | ✅      |
-| 2     | Context signals interleaved into transcript     | ✅      |
-| 3     | Segment transcript → interaction boundaries     | ✅      |
-| 4     | Summarize closed segments → `inbox/` drafts     | ✅      |
-| 5     | AT-SPI speaker signal → per-speaker transcript  | Planned |
+| Layer | Purpose                                         | Status |
+| ----- | ----------------------------------------------- | ------ |
+| 1     | Capture + transcribe + clean → daily transcript | ✅     |
+| 2     | Context signals interleaved into transcript     | ✅     |
+| 3     | Segment transcript → segment boundaries         | ✅     |
+| 4     | Summarize closed segments → `inbox/` drafts     | ✅     |
+| 5     | CDP speaker signal → per-speaker transcript     | ✅     |
 
 ## CLI
 
@@ -42,6 +42,7 @@ recorder note                                 # desktop note dialog
 recorder segment <transcript>                 # dry-run: show boundaries + summaries
 recorder segment <transcript> --write         # write inbox drafts + seg markers
 recorder segment <transcript> --boundaries    # only show boundaries, no LLM calls
+recorder meet-dom  [--interval SECS]          # snapshot Meet DOM via CDP port 9224 (debugging)
 ```
 
 **Principle**: all recorder functionality lives under the `recorder` command as subcommands.
@@ -55,7 +56,8 @@ recorder/
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
 │   ├── lock.py         # Lockfile — prevents multiple instances across machines
-│   ├── meet.py         # AT-SPI participant extraction from Google Meet
+│   ├── meet_cdp.py    # Meet participant + speaker detection via CDP (port 9224)
+│   ├── meet_dom.py    # CDP DOM snapshot tool for debugging class name changes
 │   ├── note.py         # Desktop-global note dialog entrypoint
 │   ├── segment.py      # Segmentation algorithm — silence + meeting change + pins
 │   ├── segment_cli.py  # CLI for segment subcommand
@@ -65,7 +67,7 @@ recorder/
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   ├── transcript.py   # DailyTranscript — append-only markdown event log
 │   └── prompts/
-│       ├── summarize.md  # System prompt for per-interaction summarization
+│       ├── summarize.md  # System prompt for per-segment summarization
 │       └── combine.md    # System prompt for map-reduce combine step
 ├── hosts/             # Full host-specific configs
 ├── recorder-toggle     # Fish script — tmux session toggle
@@ -77,11 +79,11 @@ recorder/
 
 Keybindings in the tmux pane (raw terminal input, no prefix):
 
-| Key | Action                                     |
-| --- | ------------------------------------------ |
-| `q` | Quit (clean shutdown, final segmenter run) |
-| `p` | Pause/resume capture                       |
-| `s` | Insert `📍 pin` (segment boundary hint)    |
+| Key   | Action                                     |
+| ----- | ------------------------------------------ |
+| `C-c` | Quit (clean shutdown, final segmenter run) |
+| `p`   | Pause/resume capture                       |
+| `s`   | Insert `📍 pin` (segment boundary hint)    |
 
 ## Capture Pipeline
 
@@ -129,11 +131,12 @@ Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) wh
 | sys | 🔊    | System audio transcription                          |
 | mic | 🎤    | Mic audio transcription                             |
 | win | 🪟    | kdotool polling — open/close/title change           |
-| ppl | 👥    | AT-SPI polling — participant set changes            |
+| ppl | 👥    | CDP polling — participant set changes               |
+| spk | 🗣️    | CDP polling — active speaker change (Meet only)     |
 | idl | 💤    | Silence detector                                    |
 | nfo | 📝    | User — freeform annotation (`Meta+W`)               |
 | pin | 📍    | User — segment boundary hint (`s` in recorder pane) |
-| seg | ✂️    | Segmenter — interaction boundary emitted            |
+| seg | ✂️    | Segmenter — segment boundary emitted                |
 | rec | 🟢/🔴 | Recorder started/stopped                            |
 
 ## Runtime Dependencies
@@ -143,7 +146,8 @@ Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) wh
 | whisper-server | `http://odsod-desktop:8178/v1/audio/…`          | ASR (ROCm GPU)     |
 | llama-server   | `http://odsod-desktop:8179/v1/chat/completions` | Cleanup (Qwen 3.5) |
 
-System: `pulseaudio-utils` (parec), `kdotool`, `kdialog`, `at-spi2-core`.
+System: `pulseaudio-utils` (parec), `kdotool`, `kdialog`.
+Chrome (Meet): `--remote-debugging-port=9224` via dedicated profile `data/google-chrome/recorder`.
 
 ## Development
 
@@ -219,7 +223,7 @@ Three independent OR triggers — any one is sufficient to emit a boundary:
 **Design**: silence is the baseline — works without any integrations. In a day-long
 work call, silence between topics IS the boundary. Meeting signals only handle the
 zero-gap case (hang up one meeting, join another immediately). The segmenter
-over-generates boundaries; trivial interactions are filtered by the LLM returning skip.
+over-generates boundaries; trivial segments are filtered by the LLM returning skip.
 
 **Two silence thresholds** (different purposes):
 
@@ -233,16 +237,16 @@ within 90s. Snaps the boundary there instead of at the raw pin time.
 
 - **Online**: triggers when silence crosses threshold (GPU idle — no whisper work)
 - **Offline**: `recorder segment <transcript>` for tuning/backfill
-- **Dedup**: `✂️ seg` lines in transcript mark processed interactions
+- **Dedup**: `✂️ seg` lines in transcript mark processed segments
   - Format: `[HH:MM:SS] ✂️ seg | HHMM slug` — the HHMM id is parsed for idempotency
-- **On stop**: runs segmenter one final time to catch the last interaction
+- **On stop**: runs segmenter one final time to catch the last segment
 
 ## Summarization (Layer 4)
 
-Local LLM (Qwen 3.5 9B) produces structured markdown summaries per interaction.
+Local LLM (Qwen 3.5 9B) produces structured markdown summaries per segment.
 
-- **Short interactions** (≤35k chars): single LLM call
-- **Long interactions**: map-reduce — summarize each chunk → combine results
+- **Short segments** (≤35k chars): single LLM call
+- **Long segments**: map-reduce — summarize each chunk → combine results
 - **Chunking**: splits at natural silence gaps in the transcript (largest time gap in second half of chunk)
 - **Output**: `~/Vaults/odsod/inbox/YYYY-MM-DD-HHMM-<slug>.md`
 - **Format**: frontmatter + structured markdown summary (headings per topic) + raw transcript
@@ -250,81 +254,62 @@ Local LLM (Qwen 3.5 9B) produces structured markdown summaries per interaction.
 ### Inbox Draft Frontmatter
 
 ```yaml
-title: "Short Descriptive Title"
+title: "Short Descriptive Title" # ≤8 words, subject-first
 date: YYYY-MM-DD
 time: "HH:MM–HH:MM"
 duration: Xm
-type: interaction
+type: segment
 source: "[[raw/transcripts/YYYY-MM-DD-recorder.md]]"
 participants: ["Alice", "Bob"] # from ppl events, optional
 ```
 
-The vault ingest agent (Claude) later enriches these with wikilinks, entity pages,
-and cross-references. The local LLM focuses on faithful content extraction.
+`type: segment` reflects what this file is — the recorder's raw segmented
+output. The vault ingest agent promotes it to `type: interaction` when it
+creates the wiki page in `wiki/interactions/`.
 
-## Speaker Attribution (Layer 5, Planned)
+The vault ingest agent (Claude) later enriches these with wikilinks, entity
+pages, and cross-references. The local LLM focuses on faithful content
+extraction.
 
-Real-time speaker identification for the `sys` channel via AT-SPI.
+## Speaker Attribution (Layer 5)
 
-### Approach: AT-SPI active speaker signal
+Real-time speaker identification via CDP.
 
-Google Meet shows a speaking indicator on each participant tile. Screen readers need this
-state, so it almost certainly exists in the AT-SPI tree. If readable, we get exact
-real-time speaker attribution with zero compute cost.
+### Approach: Chrome DevTools Protocol + Auto-Discovery
 
-- **Accuracy**: exact — Meet's own data, not ML inference
-- **Latency**: real-time → `spk` events land in the daily transcript as speech happens
-- **Cost**: negligible — same polling model as `MeetParticipantMonitor`
-- **Scope**: Meet only (sufficient for the primary use case)
-- **Dependencies**: none new — already have `gi`/AT-SPI from `meet.py`
+Meet runs in a dedicated Chrome profile with `--remote-debugging-port=9224`.
+`SpeakerDetector` in `meet_cdp.py` discovers the speaking indicator class
+automatically — no hardcoded class names that break on Meet deploys.
 
-### Unknown: which node carries the speaking state
+- **Accuracy**: exact — Meet's own visual indicator data
+- **Latency**: ~1s polling interval
+- **Cost**: one WebSocket round-trip per poll
+- **Scope**: Meet only (Teams/Zoom can be added to same profile + new selectors)
+- **Dependencies**: `websockets`, Chrome on CDP port 9224
 
-Candidates in the AT-SPI tree:
+### Detection Algorithm
 
-- Node named `"Alice (speaking)"` — currently dropped by `_filter_participants`
-- A `state` on the tile (e.g. `focused`, `selected`) that activates when speaking
-- A child element with text `"speaking"` or a mic icon description
-- An `aria-live` region that announces speaker changes
+1. **Discovery phase** (first few polls, until someone speaks):
+   - Snapshot all CSS classes inside each `[data-participant-id]` tile
+   - Diff class sets between consecutive polls
+   - Any class that appears in one poll but was absent in the previous → candidate speaking class
+   - Pick the shortest candidate (obfuscated names are short, e.g. `kssMZb`)
 
-### Investigation
+2. **Cached phase** (rest of session):
+   - Use the discovered class directly: `tile.querySelector('.<class>')` per tile
+   - Fast — single `querySelector` per participant, ~100 bytes JSON response
 
-Add `dump_tree()` to `meet.py`, run during a call while someone else is speaking, grep
-the output for that person's name — whatever role/state wraps it is the signal:
+3. **Stable anchors** (survive all Meet deploys):
+   - `[data-participant-id]` — semantic, internal routing
+   - `.notranslate` — Google Translate exclusion marker for name text
 
-```python
-def dump_tree():
-    doc = _find_meet_document()
-    if doc:
-        _dump_node(doc)
+### Participant Tracking
 
-def _dump_node(node, depth=0):
-    try:
-        role = node.get_role_name()
-        name = node.get_name() or ""
-        state_set = node.get_state_set()
-        active = [s.value_nick for s in Atspi.StateType.__enum_values__.values()
-                  if state_set.contains(s)]
-        print("  " * depth + f"[{role}] {name!r} {active}")
-        for i in range(min(node.get_child_count(), 50)):
-            child = node.get_child_at_index(i)
-            if child:
-                _dump_node(child, depth + 1)
-    except Exception:
-        pass
-```
+- `ppl` events derived from the union of rendered tiles + observed speakers
+- Set only grows (never shrinks) — resets when a new segment is cut
+- Ensures all active contributors appear in the segment frontmatter
 
-### Implementation (once signal is confirmed)
-
-Three files change; nothing else touched:
-
-| File           | Change                                                                                   |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `meet.py`      | Add `get_active_speaker() -> str \| None` using the confirmed node/state                 |
-| `signals.py`   | Add `ActiveSpeakerMonitor` — polls every 2s, emits `🗣️ spk` tag on speaker change        |
-| `summarize.py` | In `_format_transcript`: attribute each `sys` event to most recent `spk` event before it |
-
-New `spk` event in the daily transcript (real-time, not post-hoc):
+### Transcript Output
 
 ```
 [09:15:03] 🗣️ **spk** Alice
@@ -333,18 +318,17 @@ New `spk` event in the daily transcript (real-time, not post-hoc):
 [09:15:31] 🔊 **sys** I disagree, the migration risk is too high.
 ```
 
-Inbox draft transcript section becomes:
+### Debugging
+
+If detection stops working after a Meet update:
 
 ```
-[09:15] Alice: We should move to Postgres.
-[09:16] Bob: I disagree, the migration risk is too high.
+recorder meet-dom --interval 3
 ```
 
-New tag to add to the Line Grammar table:
-
-| Tag | Emoji | Source                                   |
-| --- | ----- | ---------------------------------------- |
-| spk | 🗣️    | AT-SPI active speaker change (Meet only) |
+Captures DOM snapshots to `~/Tmp/meet-dom/`. Diff two files (one silent, one
+speaking) to find the new class — `SpeakerDetector` should auto-discover it,
+but this tool helps verify.
 
 ## Lockfile
 
