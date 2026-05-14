@@ -3,7 +3,7 @@ name = "recorder"
 version = "0.1.0"
 description = "Ambient meeting recorder daemon"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["httpx"]
 
 [project.scripts]
 recorder = "recorder.__main__:main"
