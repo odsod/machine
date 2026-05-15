@@ -153,7 +153,14 @@ def _cdp_eval(ws_url: str, js: str) -> str | None:
 
 
 class SpeakerDetector:
-    """Stateful speaker detector that auto-discovers the speaking class.
+    """Stateful speaker detector that discovers the speaking class via temporal diff.
+
+    Polls the Meet DOM for per-tile class sets. When a class appears on one tile
+    that wasn't there in the previous poll, that class is the speaking indicator.
+    Once discovered, uses it for fast direct lookups until the page reloads.
+
+    Cold start: no spk events fire until the first speaker *change* is observed
+    (typically within the first minute of any real meeting).
 
     Usage:
         detector = SpeakerDetector()
@@ -176,8 +183,7 @@ class SpeakerDetector:
 
         if self._speaking_class:
             return self._poll_cached(ws_url)
-        else:
-            return self._poll_discovery(ws_url)
+        return self._poll_discovery(ws_url)
 
     def _poll_cached(self, ws_url: str) -> list[ParticipantState] | None:
         js = _make_poll_js(self._speaking_class)
@@ -188,7 +194,7 @@ class SpeakerDetector:
         return [ParticipantState(name=d["name"], speaking=d["speaking"]) for d in data]
 
     def _poll_discovery(self, ws_url: str) -> list[ParticipantState] | None:
-        """Compare class sets between two polls to discover the speaking indicator."""
+        """Snapshot tile class sets and diff against previous to find the speaking class."""
         js = _make_snapshot_js()
         val = _cdp_eval(ws_url, js)
         if not val:
@@ -199,41 +205,22 @@ class SpeakerDetector:
         for tile in data:
             current[tile["name"]] = set(tile["classes"])
 
-        if self._prev_snapshot is None:
-            self._prev_snapshot = current
-            return [ParticipantState(name=name, speaking=False) for name in current]
+        names = list(current.keys())
 
-        # Diff: find classes that appeared in any tile since last poll
-        new_classes: set[str] = set()
-        for name, classes in current.items():
-            prev = self._prev_snapshot.get(name, set())
-            new_classes |= classes - prev
+        if self._prev_snapshot is not None:
+            # Find classes that changed on any tile since last poll
+            changed: set[str] = set()
+            for name in current:
+                prev = self._prev_snapshot.get(name, set())
+                changed |= (current[name] - prev) | (prev - current[name])
 
-        # Also find classes that disappeared (speaker stopped)
-        gone_classes: set[str] = set()
-        for name, prev in self._prev_snapshot.items():
-            curr = current.get(name, set())
-            gone_classes |= prev - curr
-
-        # The speaking class is one that appears AND disappears across polls
-        # (it's transient — added when speaking, removed when silent)
-        candidates = new_classes & gone_classes
-        if not candidates:
-            # Check if something new appeared (speaker just started)
-            candidates = new_classes - {"notranslate"}
-
-        if candidates:
-            # Pick the most likely: shortest class name (obfuscated names are short)
-            self._speaking_class = min(candidates, key=len)
-            self._prev_snapshot = current
-            return self._identify_speakers(current)
+            if changed:
+                self._speaking_class = min(changed, key=len)
+                self._prev_snapshot = current
+                return [
+                    ParticipantState(name=n, speaking=self._speaking_class in current[n])
+                    for n in names
+                ]
 
         self._prev_snapshot = current
-        return [ParticipantState(name=name, speaking=False) for name in current]
-
-    def _identify_speakers(self, snapshot: dict[str, set[str]]) -> list[ParticipantState]:
-        """Using the discovered class, determine who is speaking."""
-        return [
-            ParticipantState(name=name, speaking=self._speaking_class in classes)
-            for name, classes in snapshot.items()
-        ]
+        return [ParticipantState(name=n, speaking=False) for n in names]
