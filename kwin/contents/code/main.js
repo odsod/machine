@@ -134,7 +134,6 @@ const shortcuts = [
       "google-chrome",
       "--user-data-dir=/home/odsod/.local/share/odsod/machine/data/google-chrome/recorder",
       "--app=https://meet.google.com",
-      "--force-renderer-accessibility",
       "--remote-debugging-port=9224",
     ],
     resourceClassIncludes: "meet.google.com",
