@@ -77,7 +77,7 @@ class _TileParser(HTMLParser):
     def handle_data(self, data):
         if self._in_tile and not self._tile_name:
             text = data.strip()
-            if len(text) > 2 and len(text) < 50 and text[0].isupper():
+            if len(text) > 2 and len(text) < 50 and text[0].isupper() and " " in text:
                 self._tile_name = text
 
 
@@ -95,30 +95,39 @@ def get_meet_ws_url(port: int = CDP_PORT) -> str | None:
     return None
 
 
+_NAME_FILTER_JS = r"""
+function _getName(tile) {
+  var names = Array.from(tile.querySelectorAll('.notranslate'))
+    .map(function(n) { return n.innerText.trim(); })
+    .filter(function(s) {
+      return s.length > 2 && s.length < 50
+        && s[0] === s[0].toUpperCase()
+        && s.includes(' ');
+    });
+  return names[0] || null;
+}
+"""
+
+
 def _make_snapshot_js() -> str:
     """JS that returns per-tile name + class set for diffing."""
-    return r"""
+    return _NAME_FILTER_JS + r"""
 JSON.stringify(Array.from(document.querySelectorAll('[data-participant-id]')).map(function(t) {
-  var names = Array.from(t.querySelectorAll('.notranslate'))
-    .map(function(n) { return n.innerText; })
-    .filter(function(s) { return s.length > 2 && s.length < 50 && s[0] === s[0].toUpperCase(); });
+  var name = _getName(t);
   var classes = new Set();
   t.querySelectorAll('[class]').forEach(function(el) {
     el.classList.forEach(function(c) { classes.add(c); });
   });
-  return {name: names[0] || null, classes: Array.from(classes)};
+  return {name: name, classes: Array.from(classes)};
 }).filter(function(x) { return x.name; }))
 """
 
 
 def _make_poll_js(speaking_class: str) -> str:
     """JS that checks for the cached speaking class."""
-    return (
+    return _NAME_FILTER_JS + (
         "JSON.stringify(Array.from(document.querySelectorAll('[data-participant-id]')).map(function(t) {"
-        "  var names = Array.from(t.querySelectorAll('.notranslate'))"
-        "    .map(function(n) { return n.innerText; })"
-        "    .filter(function(s) { return s.length > 2 && s.length < 50 && s[0] === s[0].toUpperCase(); });"
-        "  var name = names[0] || null;"
+        "  var name = _getName(t);"
         "  if (!name) return null;"
         f"  var speaking = !!t.querySelector('.{speaking_class}') || !!t.closest('.{speaking_class}');"
         "  return {name: name, speaking: speaking};"
