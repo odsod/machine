@@ -1,6 +1,6 @@
 name := llama
 # Discovery: https://github.com/ggml-org/llama.cpp/releases/latest
-version := b9144
+version := b9174
 source_url := https://github.com/ggml-org/llama.cpp/archive/refs/tags/$(version).tar.gz
 # Discovery: https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/tree/main
 model := Qwen3.5-9B-Q5_K_M.gguf
