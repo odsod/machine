@@ -26,7 +26,14 @@ make download-model URL=https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/m
 
 ## Ports
 
-- `8179` — OpenAI-compatible `/v1/chat/completions`
+- `8179` — OpenAI-compatible `/v1/chat/completions` (chat model)
+- `8180` — OpenAI-compatible `/v1/embeddings` (embedding model)
+
+## Obsidian Copilot config
+
+- Chat model: Add Custom Model → provider "3rd party (openai format)" → Base URL `http://localhost:8179/v1`
+- Embedding model: Add Custom Model → provider "3rd party (openai format)" → Base URL `http://localhost:8180/v1`
+- Enable "Semantic Search" toggle in QA settings, run "Index vault" command
 
 ## OpenWhispr config
 
@@ -37,23 +44,25 @@ make download-model URL=https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/m
 
 ### High-spec (default)
 
-| Component                     | VRAM         |
-| ----------------------------- | ------------ |
-| whisper-server (large-v3)     | 3.1 GB       |
-| llama-server (Qwen3.5-9B Q5)  | 6.3 GB       |
-| KV cache + overhead (16k ctx) | ~3 GB        |
-| Desktop/browsers              | ~4 GB        |
-| **Total**                     | **~16.4 GB** |
+| Component                         | VRAM         |
+| --------------------------------- | ------------ |
+| whisper-server (large-v3)         | 3.1 GB       |
+| llama-server (Qwen3.5-9B Q5)      | 6.3 GB       |
+| llama-embed (Qwen3-Embed 0.6B Q8) | 0.8 GB       |
+| KV cache + overhead (16k + 32k)   | ~4 GB        |
+| Desktop/browsers                  | ~4 GB        |
+| **Total**                         | **~18.2 GB** |
 
 ### Low-spec (fallback if VRAM-constrained)
 
-| Component                       | VRAM         |
-| ------------------------------- | ------------ |
-| whisper-server (large-v3-turbo) | 1.6 GB       |
-| llama-server (Qwen3-8B Q4)      | 5.0 GB       |
-| KV cache + overhead (16k ctx)   | ~2 GB        |
-| Desktop/browsers                | ~4 GB        |
-| **Total**                       | **~12.6 GB** |
+| Component                         | VRAM         |
+| --------------------------------- | ------------ |
+| whisper-server (large-v3-turbo)   | 1.6 GB       |
+| llama-server (Qwen3-8B Q4)        | 5.0 GB       |
+| llama-embed (Qwen3-Embed 0.6B Q8) | 0.8 GB       |
+| KV cache + overhead (16k + 32k)   | ~3 GB        |
+| Desktop/browsers                  | ~4 GB        |
+| **Total**                         | **~14.4 GB** |
 
 If desktop apps stutter during inference, switch to the low-spec models.
 The AMD GPU driver pages inactive VRAM to system RAM (GTT) under pressure,
