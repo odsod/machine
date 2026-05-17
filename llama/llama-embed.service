@@ -1,17 +1,17 @@
 [Unit]
-Description=llama-server (GPU-accelerated LLM inference)
+Description=llama-server (embedding model)
 After=default.target
 
 [Service]
 Type=simple
-# Listen on Tailscale so laptop clients can use the desktop GPU server.
 ExecStart=@SERVER_BIN@ \
     --model @MODEL_PATH@ \
     --port @PORT@ \
     --host 0.0.0.0 \
-    --ctx-size 32768 \
+    --embeddings \
+    --pooling last \
     --n-gpu-layers 99 \
-    --reasoning off
+    --ctx-size 32768
 Restart=on-failure
 RestartSec=5
 
