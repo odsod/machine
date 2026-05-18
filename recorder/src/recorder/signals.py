@@ -164,7 +164,6 @@ class MeetParticipantMonitor:
     def _poll(self):
         states = self._detector.poll()
         if states is None:
-            self._active_speaker = None
             return
 
         # Union of all names ever seen (tiles + speakers)
@@ -186,5 +185,5 @@ class MeetParticipantMonitor:
             self._active_speaker = speaker
             if speaker:
                 ts = datetime.now().strftime("%H:%M:%S")
-                self._transcript.append(ts, "\U0001f5e3️ spk", speaker)
-                self._log(format_message("\U0001f5e3️ spk", speaker))
+                self._transcript.append(ts, "\U0001f5e3 spk", speaker)
+                self._log(format_message("\U0001f5e3 spk", speaker))
