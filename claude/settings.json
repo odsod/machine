@@ -33,7 +33,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '\\a' > /dev/tty"
+            "command": "bell"
           },
           {
             "type": "command",
@@ -47,7 +47,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '\\a' > /dev/tty"
+            "command": "bell"
           }
         ]
       }
