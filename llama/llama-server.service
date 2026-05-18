@@ -11,6 +11,9 @@ ExecStart=@SERVER_BIN@ \
     --host 0.0.0.0 \
     --ctx-size 32768 \
     --n-gpu-layers 99 \
+    --flash-attn on \
+    --cache-type-k q8_0 \
+    --cache-type-v q8_0 \
     --reasoning off
 Restart=on-failure
 RestartSec=5

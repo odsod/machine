@@ -10,8 +10,8 @@ ExecStart=@SERVER_BIN@ \
     --host 0.0.0.0 \
     --embeddings \
     --pooling last \
-    --n-gpu-layers 99 \
-    --ctx-size 32768
+    --n-gpu-layers 0 \
+    --ctx-size 2048
 Restart=on-failure
 RestartSec=5
 
