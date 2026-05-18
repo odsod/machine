@@ -16,7 +16,8 @@ install: \
         ~/.config/tmux/tmux.conf \
         ~/.local/bin/print-tmux-colors \
         ~/.local/bin/start-session \
-        ~/.local/bin/clone-repo
+        ~/.local/bin/clone-repo \
+        ~/.local/bin/bell
 
 .PHONY: reload
 reload:
@@ -75,6 +76,12 @@ $(tmux_bin): $(src_dir)/configure
 
 .PHONY: ~/.local/bin/clone-repo
 ~/.local/bin/clone-repo: clone-repo.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/bell
+~/.local/bin/bell: bell
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
