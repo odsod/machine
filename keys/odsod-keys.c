@@ -439,7 +439,7 @@ int main(void) {
 		}
 
 		for (int i = 0; i < npfds; i++) {
-			if (!(pfds[i].revents & POLLIN))
+			if (!(pfds[i].revents & (POLLIN | POLLERR | POLLHUP)))
 				continue;
 
 			/* inotify — new device */
