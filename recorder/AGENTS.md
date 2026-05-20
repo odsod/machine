@@ -42,7 +42,7 @@ recorder note                                 # desktop note dialog
 recorder segment <transcript>                 # dry-run: show boundaries + summaries
 recorder segment <transcript> --write         # write inbox drafts + seg markers
 recorder segment <transcript> --boundaries    # only show boundaries, no LLM calls
-recorder meet-dom  [--interval SECS]          # snapshot Meet DOM via CDP port 9224 (debugging)
+recorder dom [--interval SECS] [--ports 9224 9223]  # snapshot meeting DOM (auto-detects platform)
 ```
 
 **Principle**: all recorder functionality lives under the `recorder` command as subcommands.
@@ -56,13 +56,14 @@ recorder/
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
 │   ├── lock.py         # Lockfile — prevents multiple instances across machines
-│   ├── meet_cdp.py    # Meet participant + speaker detection via CDP (port 9224)
-│   ├── meet_dom.py    # CDP DOM snapshot tool for debugging class name changes
+│   ├── speaker_cdp.py  # Multi-platform speaker detection via CDP (Meet, Teams)
+│   ├── meet_cdp.py    # Backward-compat shim + Meet HTML parser (for tests)
+│   ├── debug_dom.py   # CDP DOM snapshot tool — auto-detects platform
 │   ├── note.py         # Desktop-global note dialog entrypoint
 │   ├── segment.py      # Segmentation algorithm — silence + meeting change + pins
 │   ├── segment_cli.py  # CLI for segment subcommand
 │   ├── segment_run.py  # Shared segmentation orchestration (online + offline)
-│   ├── signals.py      # Context signal monitors (KWin, Meet participants, silence)
+│   ├── signals.py      # Context signal monitors (KWin, participants, silence)
 │   ├── summarize.py    # LLM summarization — system prompt, chunking, inbox writer
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   ├── transcript.py   # DailyTranscript — append-only markdown event log
@@ -148,6 +149,7 @@ Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) wh
 
 System: `pulseaudio-utils` (parec), `kdotool`, `kdialog`.
 Chrome (Meet): `--remote-debugging-port=9224` via dedicated profile `data/google-chrome/recorder`.
+Chrome (Teams): work browser on `--remote-debugging-port=9223`.
 
 ## Development
 
@@ -165,7 +167,7 @@ Chrome (Meet): `--remote-debugging-port=9224` via dedicated profile `data/google
 [llm]         # url, timeout_s (180)
 [transcript]  # output_dir ("~/Vaults/odsod/raw/transcripts")
 [dedup]       # threshold (0.6) — token overlap ratio for mic/sys dedup
-[signals]     # silence_threshold_secs (180), kwin_poll_interval_secs (10), meeting_window_patterns
+[signals]     # silence_threshold_secs (180), kwin_poll_interval_secs (10), meeting_window_patterns, cdp_ports ([9224, 9223])
 ```
 
 ## Notes
@@ -273,35 +275,37 @@ extraction.
 
 ## Speaker Attribution (Layer 5)
 
-Real-time speaker identification via CDP.
+Real-time speaker identification via CDP. Multi-platform: supports Meet and Teams.
 
 ### Approach: Chrome DevTools Protocol + Auto-Discovery
 
-Meet runs in a dedicated Chrome profile with `--remote-debugging-port=9224`.
-`SpeakerDetector` in `meet_cdp.py` discovers the speaking indicator class
-automatically — no hardcoded class names that break on Meet deploys.
+`SpeakerDetector` in `speaker_cdp.py` scans configured CDP ports for active
+meeting tabs, auto-detects the platform, and discovers the speaking indicator
+class via temporal diffing — no hardcoded CSS classes.
 
-- **Accuracy**: exact — Meet's own visual indicator data
+- **Accuracy**: exact — platform's own visual indicator data
 - **Latency**: ~1s polling interval
 - **Cost**: one WebSocket round-trip per poll
-- **Scope**: Meet only (Teams/Zoom can be added to same profile + new selectors)
-- **Dependencies**: `websockets`, Chrome on CDP port 9224
+- **Platforms**: Meet (port 9224), Teams (port 9223 — work browser)
+- **Dependencies**: `websockets`, `httpx`, Chrome with `--remote-debugging-port`
+
+### Platform Configs
+
+| Platform | Tile selector | Name source | Class scope |
+| -------- | ------------- | ----------- | ----------- |
+| Meet | `[data-participant-id]` | `.notranslate` text | Subtree |
+| Teams | `[data-tid="voice-level-stream-outline"]` | Parent `data-tid` attr | Element |
 
 ### Detection Algorithm
 
-1. **Discovery phase** (first few polls, until someone speaks):
-   - Snapshot all CSS classes inside each `[data-participant-id]` tile
+1. **Port scan**: iterate `cdp_ports`, GET `/json`, match tab URL to platform
+2. **Discovery phase** (first few polls, until someone speaks):
+   - Snapshot CSS classes per participant tile (scope depends on platform)
    - Diff class sets between consecutive polls
-   - Any class that appears in one poll but was absent in the previous → candidate speaking class
-   - Pick the shortest candidate (obfuscated names are short, e.g. `kssMZb`)
-
-2. **Cached phase** (rest of session):
-   - Use the discovered class directly: `tile.querySelector('.<class>')` per tile
-   - Fast — single `querySelector` per participant, ~100 bytes JSON response
-
-3. **Stable anchors** (survive all Meet deploys):
-   - `[data-participant-id]` — semantic, internal routing
-   - `.notranslate` — Google Translate exclusion marker for name text
+   - Pick the shortest class that appeared/disappeared → speaking indicator
+3. **Cached phase** (rest of session):
+   - Use discovered class for fast direct lookups
+4. **Cache invalidation**: if the active WebSocket URL changes (meeting ended/new meeting started), reset discovery state
 
 ### Participant Tracking
 
@@ -320,15 +324,15 @@ automatically — no hardcoded class names that break on Meet deploys.
 
 ### Debugging
 
-If detection stops working after a Meet update:
+If detection stops working after a platform update:
 
 ```
-recorder meet-dom --interval 3
+recorder dom --interval 3
 ```
 
-Captures DOM snapshots to `~/Tmp/meet-dom/`. Diff two files (one silent, one
-speaking) to find the new class — `SpeakerDetector` should auto-discover it,
-but this tool helps verify.
+Captures DOM snapshots to `--output-dir` (default `~/Tmp/meeting-dom/`). Diff
+two tile snapshots (one silent, one speaking) to find the new class —
+`SpeakerDetector` should auto-discover it, but this tool helps verify.
 
 ## Lockfile
 

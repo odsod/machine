@@ -5,7 +5,7 @@ from collections.abc import Callable
 from datetime import datetime
 
 from recorder.config import SignalsConfig
-from recorder.meet_cdp import CDP_PORT, SpeakerDetector
+from recorder.speaker_cdp import SpeakerDetector
 from recorder.transcript import DailyTranscript, format_message
 
 
@@ -129,8 +129,8 @@ class KwinMonitor:
             return None
 
 
-class MeetParticipantMonitor:
-    """Polls Meet via CDP. Tracks participants (rendered tiles) and speakers (active indicator)."""
+class ParticipantMonitor:
+    """Polls meeting tabs via CDP. Tracks participants and speakers across platforms."""
 
     def __init__(self, transcript: DailyTranscript, config: SignalsConfig, log: Callable):
         self._transcript = transcript
@@ -140,7 +140,7 @@ class MeetParticipantMonitor:
         self._thread: threading.Thread | None = None
         self._known_participants: set[str] = set()
         self._active_speaker: str | None = None
-        self._detector = SpeakerDetector(CDP_PORT)
+        self._detector = SpeakerDetector(ports=config.cdp_ports)
 
     def start(self):
         self._thread = threading.Thread(target=self._run, daemon=True)
@@ -187,3 +187,6 @@ class MeetParticipantMonitor:
                 ts = datetime.now().strftime("%H:%M:%S")
                 self._transcript.append(ts, "\U0001f5e3 spk", speaker)
                 self._log(format_message("\U0001f5e3 spk", speaker))
+
+
+MeetParticipantMonitor = ParticipantMonitor

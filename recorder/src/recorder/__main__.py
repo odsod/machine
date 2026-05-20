@@ -3,7 +3,7 @@ import sys
 
 def main():
     if len(sys.argv) < 2:
-        print("usage: recorder <run|note|segment|meet-dom>", file=sys.stderr)
+        print("usage: recorder <run|note|segment|dom>", file=sys.stderr)
         sys.exit(1)
 
     cmd = sys.argv[1]
@@ -20,10 +20,10 @@ def main():
 
         sys.argv = sys.argv[1:]  # shift so argparse sees "segment <path> ..."
         segment_main()
-    elif cmd == "meet-dom":
+    elif cmd in ("dom", "meet-dom"):
         import argparse
 
-        parser = argparse.ArgumentParser(prog="recorder meet-dom")
+        parser = argparse.ArgumentParser(prog="recorder dom")
         parser.add_argument(
             "--interval",
             type=float,
@@ -33,20 +33,21 @@ def main():
         )
         parser.add_argument(
             "--output-dir",
-            default="~/Tmp/meet-dom",
+            default="~/Tmp/meeting-dom",
             metavar="DIR",
-            help="directory for snapshot files (default: ~/Tmp/meet-dom)",
+            help="directory for snapshot files (default: ~/Tmp/meeting-dom)",
         )
         parser.add_argument(
-            "--port",
+            "--ports",
             type=int,
-            default=9224,
-            help="CDP port (default: 9224)",
+            nargs="+",
+            default=[9224, 9223],
+            help="CDP ports to scan (default: 9224 9223)",
         )
         args = parser.parse_args(sys.argv[2:])
-        from recorder.meet_dom import dump_dom
+        from recorder.debug_dom import dump_dom
 
-        dump_dom(interval_secs=args.interval, output_dir=args.output_dir, port=args.port)
+        dump_dom(interval_secs=args.interval, output_dir=args.output_dir, ports=args.ports)
     else:
         print(f"recorder: unknown command '{cmd}'", file=sys.stderr)
         sys.exit(1)
