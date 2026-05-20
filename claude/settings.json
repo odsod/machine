@@ -62,5 +62,6 @@
   "effortLevel": "xhigh",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark"
+  "theme": "dark",
+  "cleanupPeriodDays": 3650
 }
