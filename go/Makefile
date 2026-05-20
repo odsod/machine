@@ -4,7 +4,7 @@ version := 1.26.3
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 
 # Discovery: https://github.com/golang/tools/releases (tags: gopls/v*)
-gopls_version := v0.21.1
+gopls_version := v0.22.0
 # Discovery: https://github.com/dominikh/go-tools/releases
 staticcheck_version := 2026.1
 # Discovery: https://github.com/mvdan/gofumpt/releases
