@@ -106,6 +106,7 @@ abbr -a cat bat
 abbr -a find fd
 abbr -a ls eza
 abbr -a claude 'claude --dangerously-skip-permissions'
+abbr -a agy 'agy --dangerously-skip-permissions'
 
 set -g fish_key_bindings fish_vi_key_bindings
 

@@ -1,0 +1,16 @@
+{
+  "allowNonWorkspaceAccess": true,
+  "altScreenMode": "always",
+  "enableTelemetry": false,
+  "gcp": {
+    "project": "way-platform-ai",
+    "location": "eu"
+  },
+  "model": "Gemini 3.5 Flash",
+  "notifications": true,
+  "showFeedbackSurvey": false,
+  "trustedWorkspaces": [
+    "/home/odsod/Code/github.com/odsod/machine"
+  ],
+  "verbosity": "low"
+}
