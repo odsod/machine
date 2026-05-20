@@ -20,3 +20,4 @@ threshold = 0.6
 silence_threshold_secs = 180
 kwin_poll_interval_secs = 10
 meeting_window_patterns = ["meet.google.com"]
+cdp_ports = [9224, 9223]

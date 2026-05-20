@@ -27,7 +27,7 @@ from recorder.config import AudioConfig, Config, load_config
 from recorder.lock import LockError, RecorderLock
 from recorder.segment import SILENCE_THRESHOLD
 from recorder.segment_run import process_transcript
-from recorder.signals import KwinMonitor, MeetParticipantMonitor, SilenceMonitor
+from recorder.signals import KwinMonitor, ParticipantMonitor, SilenceMonitor
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
 from recorder.transcript import DailyTranscript, format_message
 
@@ -113,9 +113,9 @@ class Recorder:
         kw = KwinMonitor(self.transcript, self.config.signals, self._log)
         kw.start()
         self._signal_monitors.append(kw)
-        self._meet_monitor = MeetParticipantMonitor(self.transcript, self.config.signals, self._log)
-        self._meet_monitor.start()
-        self._signal_monitors.append(self._meet_monitor)
+        self._participant_monitor = ParticipantMonitor(self.transcript, self.config.signals, self._log)
+        self._participant_monitor.start()
+        self._signal_monitors.append(self._participant_monitor)
         self._log("signals started")
 
     def _stop_signals(self):
@@ -418,7 +418,7 @@ class Recorder:
             new = [r for r in result.segments if r.summary]
             if new:
                 self._log(f"segmenter: {len(new)} segments summarized")
-                self._meet_monitor.reset_participants()
+                self._participant_monitor.reset_participants()
             skipped = [r for r in result.segments if r.skipped]
             if skipped:
                 self._log(f"segmenter: {len(skipped)} segments skipped")
