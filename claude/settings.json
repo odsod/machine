@@ -17,17 +17,7 @@
   },
   "model": "eu.anthropic.claude-opus-4-6-v1[1m]",
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "rtk hook claude"
-          }
-        ]
-      }
-    ],
+    "PreToolUse": [],
     "Stop": [
       {
         "hooks": [
