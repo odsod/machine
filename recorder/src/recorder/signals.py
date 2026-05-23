@@ -1,3 +1,11 @@
+"""
+Signal collectors — write to in-memory timelines only.
+
+The transcription worker is the sole writer to the transcript file.
+These collectors feed real-time data into timelines that the worker
+queries when processing each audio chunk.
+"""
+
 import subprocess
 import threading
 import time
@@ -6,40 +14,99 @@ from datetime import datetime
 
 from recorder.config import SignalsConfig
 from recorder.speaker_cdp import SpeakerDetector
-from recorder.transcript import DailyTranscript, format_message
+from recorder.timeline import ParticipantSet, SpeakerTimeline, WindowTimeline
 
 
 class SilenceMonitor:
-    """Emits silence markers to the transcript. Called from the capture loop."""
+    """Tracks silence duration. Called from the capture loop."""
 
-    def __init__(self, transcript: DailyTranscript, config: SignalsConfig, log: Callable):
-        self._transcript = transcript
-        self._threshold = config.silence_threshold_secs
+    def __init__(self, threshold_secs: int, log: Callable):
+        self._threshold = threshold_secs
         self._notified = False
         self._log = log
 
-    def tick(self, consecutive_silent_secs: int):
+    @property
+    def notified(self) -> bool:
+        return self._notified
+
+    def tick(self, consecutive_silent_secs: int) -> bool:
+        """Returns True the first time silence crosses threshold."""
         if consecutive_silent_secs >= self._threshold and not self._notified:
-            ts = datetime.now().strftime("%H:%M:%S")
-            mins = consecutive_silent_secs // 60
-            self._transcript.append(ts, "💤 idl", f"{mins} min")
-            self._log(format_message("💤 idl", f"{mins} min"))
             self._notified = True
+            return True
+        return False
 
     def reset(self):
         self._notified = False
 
 
-class KwinMonitor:
-    """Polls KWin window stack for meeting windows. Detects open/close/title change."""
+class SpeakerCollector:
+    """Polls CDP for speaker changes, writes to SpeakerTimeline + ParticipantSet."""
 
-    def __init__(self, transcript: DailyTranscript, config: SignalsConfig, log: Callable):
-        self._transcript = transcript
+    def __init__(
+        self,
+        speaker_timeline: SpeakerTimeline,
+        participant_set: ParticipantSet,
+        config: SignalsConfig,
+        log: Callable,
+    ):
+        self._speaker_timeline = speaker_timeline
+        self._participant_set = participant_set
         self._config = config
         self._log = log
         self._stopping = False
         self._thread: threading.Thread | None = None
-        self._known_windows: dict[str, str] = {}  # window_id -> title
+        self._detector = SpeakerDetector(ports=config.cdp_ports)
+        self._active_speaker: str | None = None
+
+    def start(self):
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._stopping = True
+
+    def _run(self):
+        while not self._stopping:
+            self._poll()
+            for _ in range(10):
+                if self._stopping:
+                    return
+                time.sleep(0.1)
+
+    def _poll(self):
+        states = self._detector.poll()
+        if states is None:
+            return
+
+        now = datetime.now()
+        current_names = {s.name for s in states}
+        self._participant_set.update(current_names)
+
+        speaker = next((s.name for s in states if s.speaking), None)
+        if speaker:
+            self._participant_set.update({speaker})
+
+        if speaker != self._active_speaker:
+            self._active_speaker = speaker
+            self._speaker_timeline.append(now, speaker)
+
+
+class WindowCollector:
+    """Polls KWin window stack, writes to WindowTimeline."""
+
+    def __init__(
+        self,
+        window_timeline: WindowTimeline,
+        config: SignalsConfig,
+        log: Callable,
+    ):
+        self._window_timeline = window_timeline
+        self._config = config
+        self._log = log
+        self._stopping = False
+        self._thread: threading.Thread | None = None
+        self._known_windows: dict[str, str] = {}
         self._initialized = False
 
     def start(self):
@@ -88,33 +155,22 @@ class KwinMonitor:
             title = self._get_prop(window_id, "getwindowname") or class_name
             current[window_id] = title
 
+        now = datetime.now()
+
         if self._initialized:
             for wid, title in current.items():
                 if wid not in self._known_windows:
-                    ts = datetime.now().strftime("%H:%M:%S")
-                    msg = f"\"{title}\" opened"
-                    self._transcript.append(ts, "\U0001fa9f win", msg)
-                    self._log(format_message("\U0001fa9f win", msg))
+                    self._window_timeline.append(now, title, "opened")
                 elif self._known_windows[wid] != title:
-                    old_title = self._known_windows[wid]
-                    ts = datetime.now().strftime("%H:%M:%S")
-                    msg = f"\"{old_title}\" → \"{title}\""
-                    self._transcript.append(ts, "\U0001fa9f win", msg)
-                    self._log(format_message("\U0001fa9f win", msg))
+                    self._window_timeline.append(now, title, "renamed")
 
             for wid in set(self._known_windows) - set(current):
                 title = self._known_windows[wid]
-                ts = datetime.now().strftime("%H:%M:%S")
-                msg = f"\"{title}\" closed"
-                self._transcript.append(ts, "\U0001fa9f win", msg)
-                self._log(format_message("\U0001fa9f win", msg))
-
-        if not self._initialized:
+                self._window_timeline.append(now, title, "closed")
+        else:
             for wid, title in current.items():
-                ts = datetime.now().strftime("%H:%M:%S")
-                msg = f"\"{title}\" active"
-                self._transcript.append(ts, "\U0001fa9f win", msg)
-                self._log(format_message("\U0001fa9f win", msg))
+                self._window_timeline.append(now, title, "active")
+
         self._initialized = True
         self._known_windows = current
 
@@ -127,66 +183,3 @@ class KwinMonitor:
             return result.stdout.strip() if result.returncode == 0 else None
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return None
-
-
-class ParticipantMonitor:
-    """Polls meeting tabs via CDP. Tracks participants and speakers across platforms."""
-
-    def __init__(self, transcript: DailyTranscript, config: SignalsConfig, log: Callable):
-        self._transcript = transcript
-        self._config = config
-        self._log = log
-        self._stopping = False
-        self._thread: threading.Thread | None = None
-        self._known_participants: set[str] = set()
-        self._active_speaker: str | None = None
-        self._detector = SpeakerDetector(ports=config.cdp_ports)
-
-    def start(self):
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
-
-    def stop(self):
-        self._stopping = True
-
-    def reset_participants(self):
-        self._known_participants = set()
-        self._active_speaker = None
-
-    def _run(self):
-        while not self._stopping:
-            self._poll()
-            for _ in range(10):
-                if self._stopping:
-                    return
-                time.sleep(0.1)
-
-    def _poll(self):
-        states = self._detector.poll()
-        if states is None:
-            return
-
-        # Union of all names ever seen (tiles + speakers)
-        current_names = {s.name for s in states}
-        new_names = current_names - self._known_participants
-
-        speaker = next((s.name for s in states if s.speaking), None)
-        if speaker:
-            new_names |= {speaker} - self._known_participants
-
-        if new_names:
-            self._known_participants |= new_names
-            names = ", ".join(sorted(self._known_participants))
-            ts = datetime.now().strftime("%H:%M:%S")
-            self._transcript.append(ts, "\U0001f465 ppl", names)
-            self._log(format_message("\U0001f465 ppl", names))
-
-        if speaker != self._active_speaker:
-            self._active_speaker = speaker
-            if speaker:
-                ts = datetime.now().strftime("%H:%M:%S")
-                self._transcript.append(ts, "\U0001f5e3 spk", speaker)
-                self._log(format_message("\U0001f5e3 spk", speaker))
-
-
-MeetParticipantMonitor = ParticipantMonitor

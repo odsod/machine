@@ -199,11 +199,19 @@ def _format_transcript(segment: Segment) -> str:
     for e in segment.events:
         if not is_speech(e):
             continue
-        if _is_hallucination(e.text):
+        speaker, text = _extract_speaker_and_text(e)
+        if _is_hallucination(text):
             continue
-        speaker = "mic" if e.tag == "mic" else "sys"
-        lines.append(f"[{e.time.strftime('%H:%M')}] {speaker}: {e.text}")
+        lines.append(f"[{e.time.strftime('%H:%M')}] {speaker}: {text}")
     return "\n".join(lines)
+
+
+def _extract_speaker_and_text(event: Event) -> tuple[str, str]:
+    """Extract speaker name and clean text from event."""
+    m = re.match(r"^\[([^\]]+)\]\s*(.*)$", event.text)
+    if m:
+        return m.group(1), m.group(2)
+    return event.tag, event.text
 
 
 def _is_hallucination(text: str) -> bool:
