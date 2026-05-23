@@ -54,4 +54,5 @@
     "editor.defaultFormatter": "oxc.oxc-vscode",
   },
   "python.defaultInterpreterPath": "/bin/python",
+  "window.autoDetectColorScheme": true,
 }
