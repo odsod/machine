@@ -20,7 +20,8 @@ all: \
 	install-rpm \
 	install-extensions \
 	~/.config/Cursor/User/settings.json \
-	~/.config/Cursor/User/keybindings.json
+	~/.config/Cursor/User/keybindings.json \
+	~/.cursor/cli-config.json
 
 .PHONY: ~/.config/Cursor/User/settings.json
 ~/.config/Cursor/User/settings.json: settings.json
@@ -33,6 +34,16 @@ all: \
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.cursor/cli-config.json
+~/.cursor/cli-config.json: cli-config.json
+	$(info [$(name)] Merging configuration into $@...)
+	@mkdir -p $(dir $@)
+	@if [ -f $@ ]; then \
+		jq -s '.[0] * .[1]' $@ $< > $@.tmp && mv $@.tmp $@; \
+	else \
+		cp $< $@; \
+	fi
 
 .PHONY: install-rpm
 install-rpm: $(data_dir)/$(version)/cursor.rpm
