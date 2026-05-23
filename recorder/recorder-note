@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# KDE popup for adding a note to the recorder transcript.
+text=$(kdialog --title Note --geometry 420 --inputbox 'Note:')
+[ -n "$text" ] && exec recorder note "$text"
