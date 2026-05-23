@@ -3,10 +3,11 @@ Ambient meeting recorder.
 
 Captures mic + system audio via parec (PulseAudio/PipeWire), detects speech
 using RMS energy, transcribes via whisper-server, cleans up via llama-server,
-appends to daily transcript.
+appends to daily transcript with inline speaker attribution.
 
-Audio capture pattern from github.com/goodroot/hyprwhspr (parec + .monitor).
-Speech detection from the original meeting-recorder.py on this repo's main branch.
+Architecture: the transcription worker is the sole writer to the transcript
+file. Signal collectors write to in-memory timelines; the worker queries
+these when processing each chunk.
 """
 
 import queue
@@ -17,6 +18,7 @@ import tempfile
 import threading
 import time
 import traceback
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
@@ -25,18 +27,26 @@ import math
 
 from recorder.config import AudioConfig, Config, load_config
 from recorder.lock import LockError, RecorderLock
-from recorder.segment import SILENCE_THRESHOLD
-from recorder.segment_run import process_transcript
-from recorder.signals import KwinMonitor, ParticipantMonitor, SilenceMonitor
+from recorder.segmenter import IncrementalSegmenter
+from recorder.signals import SilenceMonitor, SpeakerCollector, WindowCollector
+from recorder.timeline import ParticipantSet, SpeakerTimeline, WindowTimeline
 from recorder.transcribe import cleanup_text, make_wav, texts_overlap, transcribe_chunk
 from recorder.transcript import DailyTranscript, format_message
 
 SAMPLE_RATE = 16000
 FRAME_BYTES = SAMPLE_RATE * 2  # 1 second of s16le mono
-SPEECH_RMS_THRESHOLD = 0.002  # Permissive per-frame gate; server-side VAD makes the real call
-CHUNK_RMS_THRESHOLD = 0.0025  # Whole-chunk gate to avoid sending dead silence over HTTP
-MIN_CHUNK_SECS = 10  # Short clips cause whisper hallucination
+SPEECH_RMS_THRESHOLD = 0.002
+CHUNK_RMS_THRESHOLD = 0.0025
+MIN_CHUNK_SECS = 10
 CHUNK_MAX_SECS = 45
+
+
+@dataclass
+class AudioChunk:
+    sys_path: Path
+    mic_path: Path
+    start_time: datetime
+    end_time: datetime
 
 
 def compute_rms(pcm: bytes) -> float:
@@ -58,11 +68,33 @@ class Recorder:
         self._start_time = time.time()
         self._work_dir = Path(tempfile.mkdtemp(prefix="recorder."))
         self._chunk_num = 0
-        self._silence_monitor = SilenceMonitor(self.transcript, config.signals, self._log)
-        self._signal_monitors: list = []
-        self._segmenter_triggered = False
-        self._segmenter_thread: threading.Thread | None = None
         self._capture_procs: list = []
+
+        self._speaker_timeline = SpeakerTimeline()
+        self._participant_set = ParticipantSet()
+        self._window_timeline = WindowTimeline()
+
+        self._silence_monitor = SilenceMonitor(
+            config.signals.silence_threshold_secs, self._log
+        )
+
+        inbox_dir = Path.home() / "Vaults/odsod/inbox"
+        self._segmenter = IncrementalSegmenter(
+            transcript=self.transcript,
+            llm_config=config.llm,
+            inbox_dir=inbox_dir,
+            log=self._log,
+        )
+
+        self._speaker_collector = SpeakerCollector(
+            self._speaker_timeline, self._participant_set, config.signals, self._log
+        )
+        self._window_collector = WindowCollector(
+            self._window_timeline, config.signals, self._log
+        )
+
+        self._last_flushed_time: datetime | None = None
+        self._last_ppl_set: set[str] = set()
 
     def run(self):
         signal.signal(signal.SIGTERM, lambda *_: self._stop())
@@ -88,14 +120,17 @@ class Recorder:
         input_thread = threading.Thread(target=self._input_loop, daemon=True)
         input_thread.start()
 
-        self._start_signals()
+        self._speaker_collector.start()
+        self._window_collector.start()
+        self._log("signals started")
 
         try:
             self._capture_loop()
         except Exception:
             self._log(f"ERROR: {traceback.format_exc()}")
         finally:
-            self._stop_signals()
+            self._speaker_collector.stop()
+            self._window_collector.stop()
             self._transcription_queue.put(None)
             transcription_thread.join(timeout=30)
             self._cleanup()
@@ -109,28 +144,8 @@ class Recorder:
     def _handle_sigint(self, *_):
         self._stop()
 
-    def _start_signals(self):
-        kw = KwinMonitor(self.transcript, self.config.signals, self._log)
-        kw.start()
-        self._signal_monitors.append(kw)
-        self._participant_monitor = ParticipantMonitor(self.transcript, self.config.signals, self._log)
-        self._participant_monitor.start()
-        self._signal_monitors.append(self._participant_monitor)
-        self._log("signals started")
-
-    def _stop_signals(self):
-        for m in self._signal_monitors:
-            m.stop()
-
     def _capture_loop(self):
-        """Record audio continuously, emit chunks on silence boundaries.
-
-        Accumulates audio 1 second at a time. Emits a chunk when:
-        - Silence detected after MIN_CHUNK_SECS of speech
-        - Max duration (CHUNK_MAX_SECS) reached
-
-        Discards accumulated audio if it never exceeds the RMS threshold.
-        """
+        """Record audio continuously, emit chunks on silence boundaries."""
         audio_cfg = self.config.audio
 
         monitor = self._get_monitor_source()
@@ -138,8 +153,6 @@ class Recorder:
         self._log(f"system: {monitor}")
         self._log(f"mic: {mic_source}")
 
-        # parec streams raw PCM indefinitely — never dies on pause/resume.
-        # Pattern from github.com/goodroot/hyprwhspr utils/meeting-recorder.py
         sys_proc = self._start_parec(monitor, audio_cfg)
         mic_proc = self._start_parec(mic_source, audio_cfg)
         self._capture_procs = [sys_proc, mic_proc]
@@ -149,6 +162,7 @@ class Recorder:
         has_speech = False
         consecutive_silent_secs = 0
         was_speech = False
+        chunk_start_time: datetime | None = None
 
         self._log("listening")
 
@@ -165,6 +179,9 @@ class Recorder:
                 if not sys_data:
                     self._log("system audio ended")
                     break
+
+                if not chunk_start_time:
+                    chunk_start_time = datetime.now()
 
                 sys_buf.extend(sys_data)
                 mic_buf.extend(mic_data or b"\x00" * FRAME_BYTES)
@@ -188,23 +205,20 @@ class Recorder:
                     has_speech = True
                     consecutive_silent_secs = 0
                     self._silence_monitor.reset()
-                    self._segmenter_triggered = False
                 else:
                     if was_speech and consecutive_silent_secs == 1:
                         self._log("silence")
                         was_speech = False
                     consecutive_silent_secs += 1
-                    self._silence_monitor.tick(consecutive_silent_secs)
-                    if (
-                        consecutive_silent_secs == SILENCE_THRESHOLD
-                        and not self._segmenter_triggered
-                    ):
-                        self._segmenter_triggered = True
-                        self._run_segmenter()
+                    if self._silence_monitor.tick(consecutive_silent_secs):
+                        mins = consecutive_silent_secs // 60
+                        ts = datetime.now().strftime("%H:%M:%S")
+                        self.transcript.append(ts, "💤 idl", f"{mins} min")
+                        self._log(format_message("💤 idl", f"{mins} min"))
+                    self._segmenter.on_silence(consecutive_silent_secs)
 
                 buf_secs = len(sys_buf) / (SAMPLE_RATE * 2)
 
-                # Emit chunk when: silence after enough speech, or max duration
                 should_emit = False
                 if has_speech and buf_secs >= MIN_CHUNK_SECS:
                     if consecutive_silent_secs >= 1:
@@ -212,11 +226,11 @@ class Recorder:
                     elif buf_secs >= CHUNK_MAX_SECS:
                         should_emit = True
 
-                # Discard if we've accumulated a lot of silence without speech
                 if not has_speech and buf_secs >= 5:
                     sys_buf.clear()
                     mic_buf.clear()
                     consecutive_silent_secs = 0
+                    chunk_start_time = None
                     continue
 
                 if should_emit:
@@ -228,24 +242,26 @@ class Recorder:
                         sys_pcm = bytes(sys_buf)
                         mic_pcm = bytes(mic_buf)
 
-                    self._emit_chunk(sys_pcm, mic_pcm)
+                    self._emit_chunk(sys_pcm, mic_pcm, chunk_start_time or datetime.now())
                     sys_buf.clear()
                     mic_buf.clear()
                     has_speech = False
                     consecutive_silent_secs = 0
                     was_speech = False
+                    chunk_start_time = None
 
-            # Flush remaining audio on stop
             if has_speech and len(sys_buf) >= MIN_CHUNK_SECS * SAMPLE_RATE * 2:
-                self._emit_chunk(bytes(sys_buf), bytes(mic_buf))
+                self._emit_chunk(
+                    bytes(sys_buf), bytes(mic_buf), chunk_start_time or datetime.now()
+                )
 
         finally:
             self._terminate(sys_proc)
             self._terminate(mic_proc)
 
-    def _emit_chunk(self, sys_pcm: bytes, mic_pcm: bytes):
+    def _emit_chunk(self, sys_pcm: bytes, mic_pcm: bytes, start_time: datetime):
         self._chunk_num += 1
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        end_time = datetime.now()
         duration = len(sys_pcm) / (SAMPLE_RATE * 2)
         sys_rms = compute_rms(sys_pcm)
         mic_rms = compute_rms(mic_pcm)
@@ -267,34 +283,52 @@ class Recorder:
             f"chunk #{self._chunk_num}: {duration:.0f}s "
             f"sys={sys_rms:.4f} mic={mic_rms:.4f}"
         )
-        self._transcription_queue.put((sys_path, mic_path, timestamp))
+        self._transcription_queue.put(AudioChunk(
+            sys_path=sys_path,
+            mic_path=mic_path,
+            start_time=start_time,
+            end_time=end_time,
+        ))
 
     def _transcription_worker(self):
         while True:
             item = self._transcription_queue.get()
             if item is None:
                 break
-            sys_path, mic_path, timestamp = item
+            chunk: AudioChunk = item
             self._log("transcribing")
             t0 = time.time()
-            self._transcribe_chunk(sys_path, mic_path, timestamp)
+            self._transcribe_chunk(chunk)
             elapsed = time.time() - t0
             self._log(f"transcribed in {elapsed:.1f}s")
 
-    def _transcribe_chunk(self, sys_path: Path, mic_path: Path, timestamp: str):
+    def _transcribe_chunk(self, chunk: AudioChunk):
         try:
-            sys_text = transcribe_chunk(sys_path, self.config.whisper)
-            mic_text = transcribe_chunk(mic_path, self.config.whisper)
+            sys_text = transcribe_chunk(chunk.sys_path, self.config.whisper)
+            mic_text = transcribe_chunk(chunk.mic_path, self.config.whisper)
 
-            sys_path.unlink(missing_ok=True)
-            mic_path.unlink(missing_ok=True)
+            chunk.sys_path.unlink(missing_ok=True)
+            chunk.mic_path.unlink(missing_ok=True)
+
+            timestamp = chunk.start_time.strftime("%H:%M:%S")
+
+            self._flush_signal_events(chunk.start_time, chunk.end_time)
+
+            speakers = self._speaker_timeline.speakers_in(
+                chunk.start_time, chunk.end_time
+            )
 
             if sys_text:
                 cleaned = cleanup_text(sys_text, self.config.llm) or sys_text
                 if cleaned:
-                    self.transcript.append(timestamp, "\U0001f50a sys", cleaned)
+                    self.transcript.append(
+                        timestamp, "\U0001f50a sys", cleaned,
+                        speakers=speakers or None,
+                    )
                     self._last_system_text = cleaned
-                    self._log(format_message("\U0001f50a sys", cleaned[:80]))
+                    speaker_str = f" [{', '.join(speakers)}]" if speakers else ""
+                    self._log(format_message("\U0001f50a sys", f"{speaker_str} {cleaned[:80]}"))
+                    self._segmenter.on_speech(chunk.start_time, "sys", cleaned)
                 else:
                     self._log("sys: (hallucination removed)")
 
@@ -303,8 +337,12 @@ class Recorder:
                 ):
                     mic_cleaned = cleanup_text(mic_text, self.config.llm) or mic_text
                     if mic_cleaned:
-                        self.transcript.append(timestamp, "\U0001f3a4 mic", mic_cleaned)
+                        self.transcript.append(
+                            timestamp, "\U0001f3a4 mic", mic_cleaned,
+                            speakers=speakers or None,
+                        )
                         self._log(format_message("\U0001f3a4 mic", mic_cleaned[:80]))
+                        self._segmenter.on_speech(chunk.start_time, "mic", mic_cleaned)
                     else:
                         self._log("mic: (hallucination removed)")
                 elif mic_text:
@@ -317,8 +355,12 @@ class Recorder:
                 else:
                     cleaned = cleanup_text(mic_text, self.config.llm) or mic_text
                     if cleaned:
-                        self.transcript.append(timestamp, "\U0001f3a4 mic", cleaned)
+                        self.transcript.append(
+                            timestamp, "\U0001f3a4 mic", cleaned,
+                            speakers=speakers or None,
+                        )
                         self._log(format_message("\U0001f3a4 mic", cleaned[:80]))
+                        self._segmenter.on_speech(chunk.start_time, "mic", cleaned)
                     else:
                         self._log("mic: (hallucination removed)")
             else:
@@ -329,6 +371,33 @@ class Recorder:
         except Exception as e:
             self._log(f"transcription error: {e}")
             self._log("listening")
+
+    def _flush_signal_events(self, start: datetime, end: datetime):
+        """Write window and participant events for this chunk's time window."""
+        flush_start = self._last_flushed_time or start
+        self._last_flushed_time = end
+
+        window_events = self._window_timeline.events_between(flush_start, end)
+        for we in window_events:
+            ts = we.time.strftime("%H:%M:%S")
+            msg = f"\"{we.title}\" {we.action}"
+            self.transcript.append(ts, "\U0001fa9f win", msg)
+            self._log(format_message("\U0001fa9f win", msg))
+            self._segmenter.on_signal(we.time, "win", "\U0001fa9f", msg)
+
+            if we.action in ("opened", "renamed", "active"):
+                current = self._window_timeline.current_meeting()
+                if current:
+                    self._segmenter.on_meeting_change(current, we.time)
+
+        all_participants = self._participant_set.get_all()
+        if all_participants and all_participants != self._last_ppl_set:
+            self._last_ppl_set = set(all_participants)
+            ts = start.strftime("%H:%M:%S")
+            names = ", ".join(sorted(all_participants))
+            self.transcript.append(ts, "\U0001f465 ppl", names)
+            self._log(format_message("\U0001f465 ppl", names))
+            self._segmenter.on_signal(start, "ppl", "\U0001f465", names)
 
     def _input_loop(self):
         import tty
@@ -344,9 +413,11 @@ class Recorder:
                     self._paused = not self._paused
                     self._log("paused" if self._paused else "listening")
                 elif ch == "s":
-                    timestamp = datetime.now().strftime("%H:%M:%S")
+                    now = datetime.now()
+                    timestamp = now.strftime("%H:%M:%S")
                     self.transcript.append(timestamp, "📍 pin")
                     self._log(format_message("📍 pin"))
+                    self._segmenter.on_pin(now)
         except (EOFError, OSError):
             pass
         finally:
@@ -392,46 +463,11 @@ class Recorder:
             except ProcessLookupError:
                 pass
 
-    def _run_segmenter(self):
-        """Trigger segmentation in background thread (GPU is idle during silence)."""
-        if self._segmenter_thread and self._segmenter_thread.is_alive():
-            return
-        self._segmenter_thread = threading.Thread(
-            target=self._segmenter_worker, daemon=True
-        )
-        self._segmenter_thread.start()
-
-    def _segmenter_worker(self):
-        try:
-            date = datetime.now().strftime("%Y-%m-%d")
-            now = datetime.strptime(datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
-            inbox = Path.home() / "Vaults/odsod/inbox"
-            result = process_transcript(
-                transcript_path=self.transcript.path,
-                date=date,
-                now=now,
-                llm_config=self.config.llm,
-                inbox_dir=inbox,
-                summarize=True,
-                write=True,
-            )
-            new = [r for r in result.segments if r.summary]
-            if new:
-                self._log(f"segmenter: {len(new)} segments summarized")
-                self._participant_monitor.reset_participants()
-            skipped = [r for r in result.segments if r.skipped]
-            if skipped:
-                self._log(f"segmenter: {len(skipped)} segments skipped")
-        except Exception as e:
-            self._log(f"segmenter error: {e}")
-
     def _cleanup(self):
         ts = datetime.now().strftime("%H:%M:%S")
         self.transcript.append(ts, "🔴 rec", "stopped")
         self._log("running final segmentation...")
-        self._run_segmenter()
-        if self._segmenter_thread:
-            self._segmenter_thread.join(timeout=120)
+        self._segmenter.flush()
         self._log("shutdown complete")
         self._lock.release()
         for f in self._work_dir.iterdir():

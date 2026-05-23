@@ -8,29 +8,45 @@ Ambient meeting recorder daemon. Always-on capture → transcription → daily e
 
 ```
 parec (mic) ─┐                          ┌─ server-side ─┐
-             ├→ RMS gate (permissive) → │ Silero VAD    │→ LLM cleanup → append transcript
-parec (sys) ─┘                          │ whisper decode│
-                                        └───────────────┘
-
-KWin (kdotool) ─────→ window events ────┐
-CDP (Meet) ─────────→ participants/spk ─┼→ interleaved into transcript
-silence detector ───→ silence markers ──┘
+             ├→ RMS gate → AudioChunk → │ Silero VAD    │→ LLM cleanup ─┐
+parec (sys) ─┘   (with timestamps)      │ whisper decode│               │
+                                         └───────────────┘               │
+                                                                         ↓
+CDP (Meet/Teams) → SpeakerTimeline ←─── Transcription Worker → Transcript
+KWin (kdotool) → WindowTimeline ←───────────────┘                  ↓
+                                                          IncrementalSegmenter
+                                                                  ↓
+                                                          Summarize → Inbox
 ```
 
 - **Daemon** — runs in a tmux session, stdout is a structured log stream
 - **No TUI** — plain timestamped log output, composable with tmux panes
+- **Sole writer** — only the transcription worker writes to the transcript file
 - **Notes** — `Meta+W` launches `recorder-note` via KWin/kdialog
 - **Toggle** — `recorder-toggle` creates/switches tmux session
 
+### Threading Model
+
+| Thread                     | Role                                                               | Writes to transcript?    |
+| -------------------------- | ------------------------------------------------------------------ | ------------------------ |
+| Main                       | Capture loop, silence counting, segmenter.on_silence()             | No                       |
+| Transcription worker       | Whisper → cleanup → speaker lookup → write → segmenter.on_speech() | Yes (sole writer)        |
+| Signal collector (Speaker) | CDP polling → SpeakerTimeline + ParticipantSet                     | No                       |
+| Signal collector (Window)  | KWin polling → WindowTimeline                                      | No                       |
+| Input loop                 | Keyboard (p/s)                                                     | No                       |
+| Ephemeral                  | Summarization (per segment)                                        | Yes (seg marker + inbox) |
+
+Critical invariant: only the transcription worker calls `transcript.append()` for speech and signal lines.
+
 ### Layers
 
-| Layer | Purpose                                         | Status |
-| ----- | ----------------------------------------------- | ------ |
-| 1     | Capture + transcribe + clean → daily transcript | ✅     |
-| 2     | Context signals interleaved into transcript     | ✅     |
-| 3     | Segment transcript → segment boundaries         | ✅     |
-| 4     | Summarize closed segments → `inbox/` drafts     | ✅     |
-| 5     | CDP speaker signal → per-speaker transcript     | ✅     |
+| Layer | Purpose                                                   | Status |
+| ----- | --------------------------------------------------------- | ------ |
+| 1     | Capture + transcribe + clean → daily transcript           | ✅     |
+| 2     | Context signals interleaved into transcript               | ✅     |
+| 3     | Segment transcript → segment boundaries (incremental)     | ✅     |
+| 4     | Summarize closed segments → `inbox/` drafts               | ✅     |
+| 5     | CDP speaker signal → inline speaker attribution on speech | ✅     |
 
 ## CLI
 
@@ -56,14 +72,16 @@ recorder/
 │   ├── app.py          # Recorder daemon — capture loop, transcription worker, log output
 │   ├── config.py       # Dataclass config, loads ~/.config/recorder/config.toml
 │   ├── lock.py         # Lockfile — prevents multiple instances across machines
+│   ├── timeline.py     # Time-indexed ring buffers (SpeakerTimeline, WindowTimeline, ParticipantSet)
+│   ├── segmenter.py    # Incremental stateful segmenter — detects + finalizes boundaries
+│   ├── signals.py      # Signal collectors (write to in-memory timelines only)
 │   ├── speaker_cdp.py  # Multi-platform speaker detection via CDP (Meet, Teams)
-│   ├── meet_cdp.py    # Backward-compat shim + Meet HTML parser (for tests)
-│   ├── debug_dom.py   # CDP DOM snapshot tool — auto-detects platform
+│   ├── meet_cdp.py     # Backward-compat shim + Meet HTML parser (for tests)
+│   ├── debug_dom.py    # CDP DOM snapshot tool — auto-detects platform
 │   ├── note.py         # Desktop-global note dialog entrypoint
-│   ├── segment.py      # Segmentation algorithm — silence + meeting change + pins
+│   ├── segment.py      # Segmentation algorithm — pure functions for offline CLI
 │   ├── segment_cli.py  # CLI for segment subcommand
-│   ├── segment_run.py  # Shared segmentation orchestration (online + offline)
-│   ├── signals.py      # Context signal monitors (KWin, participants, silence)
+│   ├── segment_run.py  # Offline segmentation orchestration (CLI only)
 │   ├── summarize.py    # LLM summarization — system prompt, chunking, inbox writer
 │   ├── transcribe.py   # whisper HTTP, LLM cleanup, dedup, hallucination filter
 │   ├── transcript.py   # DailyTranscript — append-only markdown event log
@@ -93,15 +111,16 @@ Per-channel chunking with server-side VAD:
 1. `parec` captures mic + system audio continuously (separate channels)
 2. Permissive RMS gate (threshold 0.002) — avoids sending dead silence over HTTP
 3. Accumulate until 1s+ silence, min 10s / max 45s chunks
-4. Submit to whisper-server → **Silero VAD** decides speech/non-speech server-side
-5. Whisper decodes only VAD-approved segments (ROCm GPU)
-6. LLM cleanup (filler, grammar, dedup, hallucination filtering)
-7. **Audio dedup** — mic text suppressed if token overlap ≥ 60% with system text (prevents double-transcription when mic picks up system audio)
-8. Append clean timestamped speech to daily transcript
+4. Each chunk carries wall-clock `(start_time, end_time)` for speaker correlation
+5. Submit to whisper-server → **Silero VAD** decides speech/non-speech server-side
+6. Whisper decodes only VAD-approved segments (ROCm GPU)
+7. LLM cleanup (filler, grammar, dedup, hallucination filtering)
+8. **Speaker resolution** — query SpeakerTimeline for chunk's time window
+9. **Audio dedup** — mic text suppressed if token overlap ≥ 60% with system text
+10. Append clean timestamped speech to daily transcript with inline speaker attribution
 
 Client-side RMS is permissive by design — server-side Silero VAD (0.97 accuracy, spectral
-analysis) makes the real speech/non-speech decision. Previous attempt at client-side Silero
-failed because it needed mic gain boost; server-side processes already-captured audio.
+analysis) makes the real speech/non-speech decision.
 
 ## Transcript Format
 
@@ -112,10 +131,12 @@ Speech and context events interleaved chronologically:
 ```markdown
 [09:00:15] 🪟 **win** "Meet" → "Meet - Weekly Sync"
 [09:00:20] 👥 **ppl** Alice, Bob, Oscar Söderlund
-[09:00:32] 🔊 **sys** Hey, can you hear me?
-[09:00:35] 🎤 **mic** Yeah, all good. Let's start.
+[09:00:32] 🔊 **sys** [Alice] Hey, can you hear me?
+[09:00:35] 🎤 **mic** [Oscar Söderlund] Yeah, all good. Let's start.
+[09:01:12] 🔊 **sys** [Bob] I'll share the design doc.
+[09:01:45] 🔊 **sys** [Alice, Bob] Right, and about the migration...
 [09:15:05] 📝 **nfo** decision: split terraform schema
-[09:34:12] 🪟 **win** "Meet - Weekly Sync" → "Meet"
+[09:34:12] 🪟 **win** "Meet - Weekly Sync" closed
 [09:39:15] 💤 **idl** 5 min
 [09:40:00] 📍 **pin**
 ```
@@ -124,21 +145,22 @@ Speech and context events interleaved chronologically:
 
 Every line: `[HH:MM:SS] <emoji> **<tag>** <text>`
 
+For speech lines, optional inline speaker: `[HH:MM:SS] 🔊 **sys** [Speaker] text` / `[HH:MM:SS] 🎤 **mic** [Speaker] text`
+
 Fixed-width 3-char tag inside bold markers — grepable, parseable, human-readable.
 Emojis must be single codepoint (U+1Fxxx) — no variation selectors (U+FE0F) which cause inconsistent terminal width:
 
-| Tag | Emoji | Source                                              |
-| --- | ----- | --------------------------------------------------- |
-| sys | 🔊    | System audio transcription                          |
-| mic | 🎤    | Mic audio transcription                             |
-| win | 🪟    | kdotool polling — open/close/title change           |
-| ppl | 👥    | CDP polling — participant set changes               |
-| spk | 🗣️    | CDP polling — active speaker change (Meet only)     |
-| idl | 💤    | Silence detector                                    |
-| nfo | 📝    | User — freeform annotation (`Meta+W`)               |
-| pin | 📍    | User — segment boundary hint (`s` in recorder pane) |
-| seg | ✂️    | Segmenter — segment boundary emitted                |
-| rec | 🟢/🔴 | Recorder started/stopped                            |
+| Tag | Emoji | Source                                                           |
+| --- | ----- | ---------------------------------------------------------------- |
+| sys | 🔊    | System audio transcription (with inline `[Speaker]` attribution) |
+| mic | 🎤    | Mic audio transcription (with inline `[Speaker]` attribution)    |
+| win | 🪟    | kdotool polling — open/close/title change                        |
+| ppl | 👥    | CDP polling — participant set changes                            |
+| idl | 💤    | Silence detector                                                 |
+| nfo | 📝    | User — freeform annotation (`Meta+W`)                            |
+| pin | 📍    | User — segment boundary hint (`s` in recorder pane)              |
+| seg | ✂️    | Segmenter — segment boundary emitted                             |
+| rec | 🟢/🔴 | Recorder started/stopped                                         |
 
 ## Runtime Dependencies
 
@@ -210,38 +232,41 @@ Whisper hallucinates on near-silence that passes the RMS gate. Layered defense:
 
 ## Segmentation (Layer 3)
 
-Pure function: reads transcript event log → outputs segment boundaries.
+### Online: Incremental Segmenter
 
-### Algorithm: Silence + Signals + Pins
+The `IncrementalSegmenter` detects boundaries and finalizes segments as they complete:
+
+- **Boundary detected** when: silence crosses 5 min, meeting identity changes, or user pins
+- **Boundary finalized** when: speech resumes after the boundary — previous segment is now complete
+- **Finalization triggers** summarization immediately (in background thread)
+- **Crash resilience** — completed segments are finalized within seconds of ending; only the in-progress segment at crash time is affected
+
+### Offline: Pure Function CLI
+
+`recorder segment <transcript>` uses the pure functions in `segment.py` for tuning/backfill.
+
+### Boundary Triggers
 
 Three independent OR triggers — any one is sufficient to emit a boundary:
 
-| Trigger                 | Detects                                        | Requires integration |
-| ----------------------- | ---------------------------------------------- | -------------------- |
-| Silence ≥ 5 min         | Topic changes in long calls, gaps between work | No                   |
-| Meeting identity change | Back-to-back meetings with no silence gap      | Yes                  |
-| Pin                     | Anything the algorithm misses                  | No                   |
-
-**Design**: silence is the baseline — works without any integrations. In a day-long
-work call, silence between topics IS the boundary. Meeting signals only handle the
-zero-gap case (hang up one meeting, join another immediately). The segmenter
-over-generates boundaries; trivial segments are filtered by the LLM returning skip.
+| Trigger                 | Detects                                        |
+| ----------------------- | ---------------------------------------------- |
+| Silence ≥ 5 min         | Topic changes in long calls, gaps between work |
+| Meeting identity change | Back-to-back meetings with no silence gap      |
+| Pin                     | Anything the algorithm misses                  |
 
 **Two silence thresholds** (different purposes):
 
-- `signals.py` SilenceMonitor: 180s (3 min) → emits `💤 idl` transcript marker (informational)
-- `segment.py` SILENCE_THRESHOLD: 300s (5 min) → triggers segmentation boundary + online dispatch
+- `SilenceMonitor`: 180s (3 min) → emits `💤 idl` transcript marker (informational)
+- `IncrementalSegmenter`: 300s (5 min) → triggers segmentation boundary
 
 **Pin snapping**: walks backwards from pin time to find the nearest ≥3s silence gap
 within 90s. Snaps the boundary there instead of at the raw pin time.
 
-### Execution
+### Seg Markers
 
-- **Online**: triggers when silence crosses threshold (GPU idle — no whisper work)
-- **Offline**: `recorder segment <transcript>` for tuning/backfill
-- **Dedup**: `✂️ seg` lines in transcript mark processed segments
-  - Format: `[HH:MM:SS] ✂️ seg | HHMM slug` — the HHMM id is parsed for idempotency
-- **On stop**: runs segmenter one final time to catch the last segment
+- `✂️ seg` lines in transcript mark processed segments
+- Format: `[HH:MM:SS] ✂️ seg | HHMM slug` — the HHMM id is for idempotency
 
 ## Summarization (Layer 4)
 
@@ -289,12 +314,21 @@ class via temporal diffing — no hardcoded CSS classes.
 - **Platforms**: Meet (port 9224), Teams (port 9223 — work browser)
 - **Dependencies**: `websockets`, `httpx`, Chrome with `--remote-debugging-port`
 
+### Attribution Mechanics
+
+1. `SpeakerCollector` polls CDP every ~1s, writes `SpeakerChange(time, name)` to `SpeakerTimeline`
+2. Audio chunk carries wall-clock `(start_time, end_time)` from capture
+3. After transcription, worker queries `speaker_timeline.speakers_in(start, end)`
+4. All distinct speakers during the window are listed: `[Alice]` or `[Alice, Bob]`
+5. Both `sys` and `mic` lines get the same attribution (local user's tile lights up in Meet/Teams too)
+6. No speaker detected → no brackets (bare line)
+
 ### Platform Configs
 
-| Platform | Tile selector | Name source | Class scope |
-| -------- | ------------- | ----------- | ----------- |
-| Meet | `[data-participant-id]` | `.notranslate` text | Subtree |
-| Teams | `[data-tid="voice-level-stream-outline"]` | Parent `data-tid` attr | Element |
+| Platform | Tile selector                             | Name source            | Class scope |
+| -------- | ----------------------------------------- | ---------------------- | ----------- |
+| Meet     | `[data-participant-id]`                   | `.notranslate` text    | Subtree     |
+| Teams    | `[data-tid="voice-level-stream-outline"]` | Parent `data-tid` attr | Element     |
 
 ### Detection Algorithm
 
@@ -309,18 +343,10 @@ class via temporal diffing — no hardcoded CSS classes.
 
 ### Participant Tracking
 
-- `ppl` events derived from the union of rendered tiles + observed speakers
-- Set only grows (never shrinks) — resets when a new segment is cut
+- `ParticipantSet` — thread-safe accumulating set of all participant names
+- Set only grows (never shrinks) — resets when a segment is finalized
+- Transcription worker emits `👥 ppl` when the set grows
 - Ensures all active contributors appear in the segment frontmatter
-
-### Transcript Output
-
-```
-[09:15:03] 🗣️ **spk** Alice
-[09:15:12] 🔊 **sys** We should move to Postgres.
-[09:15:18] 🗣️ **spk** Bob
-[09:15:31] 🔊 **sys** I disagree, the migration risk is too high.
-```
 
 ### Debugging
 
