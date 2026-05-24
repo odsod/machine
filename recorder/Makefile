@@ -15,9 +15,13 @@ install-dependencies:
 		pulseaudio-utils
 
 .PHONY: install-tool
-install-tool:
+install-tool: $(HOME)/.local/bin/recorder
+
+$(HOME)/.local/bin/recorder:
 	$(info [$(name)] Installing recorder@$(version)...)
 	@go install github.com/odsod/recorder@$(version)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(HOME)/go/bin/recorder $@
 
 .PHONY: install-config
 install-config: $(HOME)/.config/recorder/config.json
