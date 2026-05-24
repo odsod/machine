@@ -1,12 +1,12 @@
 # Recorder — Machine Module
 
-Installation and host-specific configuration for the [recorder](https://github.com/odsod/recorder) daemon.
+Installation and configuration for the [recorder](https://github.com/odsod/recorder) daemon.
 
 ## Source
 
 - **Repo**: `github.com/odsod/recorder`
 - **Local checkout**: `~/Code/github.com/odsod/recorder`
-- **Install method**: `go install github.com/odsod/recorder/cmd/recorder@<hash>`
+- **Install method**: `go install github.com/odsod/recorder@<hash>`
 
 ## Install
 
@@ -21,16 +21,14 @@ make -C recorder install-tool     # rebuild binary only
 recorder/
 ├── Makefile            # Installation targets
 ├── AGENTS.md           # This file
-├── hosts/              # Host-specific JSON configs
-│   ├── odsod-desktop.json
-│   └── odsod-x1-carbon.json
+├── config.json         # Shared config (symlinked to ~/.config/recorder/)
 ├── recorder-toggle     # Fish script — tmux session manager
 └── recorder-note       # Bash script — kdialog note popup
 ```
 
-## Host Config
+## Config
 
-Symlinked to `~/.config/recorder/config.json` based on hostname.
+Symlinked to `~/.config/recorder/config.json`. Single config works on all hosts via Tailscale hostname resolution (`odsod-desktop` resolves everywhere).
 
 ```json
 {
@@ -39,9 +37,15 @@ Symlinked to `~/.config/recorder/config.json` based on hostname.
   "transcript": { "outputDir": "~/Vaults/odsod/raw/transcripts" },
   "segments": { "outputDir": "~/Vaults/odsod/inbox" },
   "dedup": { "threshold": 0.6 },
-  "signals": { "silenceThresholdS": 180, "cdpPorts": [9224, 9223] }
+  "signals": { "silenceThresholdS": 180, "cdpPorts": [9224, 9223] },
+  "log": { "file": "~/.local/share/recorder/recorder.jsonl" },
+  "promptVars": { "languages": [...], "owner": { "role": "...", "summaryFor": "..." }, "includeInSummary": [...] },
+  "prompts": { "cleanup": "~/.config/recorder/prompts/cleanup.md", ... }
 }
 ```
+
+- **`promptVars`** — template variables for system prompts (languages, owner context, summary content guidance)
+- **`prompts`** — paths to prompt template files; seeded with defaults on first run if missing
 
 ## Scripts
 

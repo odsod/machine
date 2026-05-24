@@ -1,8 +1,7 @@
 name := recorder
-hostname := $(shell hostnamectl --static 2>/dev/null || hostname -s)
 
 # Discovery: https://github.com/odsod/recorder/commits/main
-version := bb2e740
+version := 10f1040
 
 .PHONY: install
 install: install-dependencies install-tool install-config install-scripts
@@ -18,14 +17,14 @@ install-dependencies:
 .PHONY: install-tool
 install-tool:
 	$(info [$(name)] Installing recorder@$(version)...)
-	@go install github.com/odsod/recorder/cmd/recorder@$(version)
+	@go install github.com/odsod/recorder@$(version)
 
 .PHONY: install-config
 install-config: $(HOME)/.config/recorder/config.json
 
 .PHONY: $(HOME)/.config/recorder/config.json
-$(HOME)/.config/recorder/config.json: hosts/$(hostname).json
-	$(info [$(name)] Symlinking host config for $(hostname)...)
+$(HOME)/.config/recorder/config.json: config.json
+	$(info [$(name)] Symlinking config...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
