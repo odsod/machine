@@ -1,4 +1,25 @@
 {
+  "permissions": {
+    "allow": ["Shell(ls)"],
+    "deny": []
+  },
+  "editor": {
+    "vimMode": true,
+    "defaultBehavior": "agent"
+  },
+  "notifications": true,
+  "hints": true,
+  "rewind": false,
+  "suggestNextPrompt": false,
+  "maxMode": false,
+  "network": {
+    "useHttp1ForAgent": false
+  },
+  "approvalMode": "unrestricted",
+  "sandbox": {
+    "mode": "disabled",
+    "networkAccess": "user_config_with_defaults"
+  },
   "attribution": {
     "attributeCommitsToAgent": false,
     "attributePRsToAgent": false

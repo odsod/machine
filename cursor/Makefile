@@ -21,7 +21,9 @@ all: \
 	install-extensions \
 	~/.config/Cursor/User/settings.json \
 	~/.config/Cursor/User/keybindings.json \
-	~/.cursor/cli-config.json
+	~/.cursor/cli-config.json \
+	~/.cursor/hooks.json \
+	~/.cursor/hooks
 
 .PHONY: ~/.config/Cursor/User/settings.json
 ~/.config/Cursor/User/settings.json: settings.json
@@ -44,6 +46,24 @@ all: \
 	else \
 		cp $< $@; \
 	fi
+
+.PHONY: cursor-config-diff
+cursor-config-diff:
+	@jq -S 'del(.privacyCache, .serverConfigCache, .authInfo, .version, .model, .selectedModel, .modelParameters, .hasChangedDefaultModel, .showSandboxIntro, .runEverythingSettingsPromptStreak)' \
+		$(HOME)/.cursor/cli-config.json > /tmp/cursor-live-trackable.json
+	@diff -u cli-config.json /tmp/cursor-live-trackable.json || true
+
+.PHONY: ~/.cursor/hooks.json
+~/.cursor/hooks.json: hooks.json
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.cursor/hooks
+~/.cursor/hooks: hooks
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
 
 .PHONY: install-rpm
 install-rpm: $(data_dir)/$(version)/cursor.rpm
