@@ -1,7 +1,7 @@
 name := antigravity
 # Discovery: https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json
-version := 1.0.0
-archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/$(version)-5288553236791296/linux-x64/cli_linux_x64.tar.gz
+version := 1.0.2
+archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/$(version)-6109799369277440/linux-x64/cli_linux_x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
