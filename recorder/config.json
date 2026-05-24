@@ -1,0 +1,45 @@
+{
+  "whisper": {
+    "url": "http://odsod-desktop:8178/v1/audio/transcriptions",
+    "timeoutS": 60
+  },
+  "llm": {
+    "url": "http://odsod-desktop:8179/v1/chat/completions",
+    "model": "default",
+    "timeoutS": 180
+  },
+  "transcript": {
+    "outputDir": "~/Vaults/odsod/raw/transcripts"
+  },
+  "segments": {
+    "outputDir": "~/Vaults/odsod/inbox"
+  },
+  "dedup": {
+    "threshold": 0.6
+  },
+  "signals": {
+    "silenceThresholdS": 180,
+    "cdpPorts": [9224, 9223]
+  },
+  "log": {
+    "file": "~/.local/share/recorder/recorder.jsonl"
+  },
+  "promptVars": {
+    "languages": ["Swedish", "English"],
+    "owner": {
+      "role": "software engineer",
+      "summaryFor": "a personal knowledge base inbox"
+    },
+    "includeInSummary": [
+      "Technical decisions, action items, information shared",
+      "Personal context about colleagues (birthdays, travel plans, interests, family, life events) — this feeds into their profile in the knowledge base",
+      "Tool discoveries, workflow insights, opinions expressed",
+      "Even casual conversation has value if it reveals something about people"
+    ]
+  },
+  "prompts": {
+    "cleanup": "~/.config/recorder/prompts/cleanup.md",
+    "summarize": "~/.config/recorder/prompts/summarize.md",
+    "combine": "~/.config/recorder/prompts/combine.md"
+  }
+}
