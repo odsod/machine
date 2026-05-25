@@ -6,7 +6,7 @@ Installation and configuration for the [recorder](https://github.com/odsod/recor
 
 - **Repo**: `github.com/odsod/recorder`
 - **Local checkout**: `~/Code/github.com/odsod/recorder`
-- **Install method**: `go install github.com/odsod/recorder@<hash>`
+- **Install method**: Prebuilt GitHub Release (calver)
 
 ## Install
 
@@ -61,7 +61,7 @@ Symlinked to `~/.config/recorder/config.json`. Single config works on all hosts 
 
 ## Version Bumps
 
-1. Get latest commit hash from `https://github.com/odsod/recorder/commits/main`
+1. Get latest version from `https://github.com/odsod/recorder/releases/latest`
 2. Update `version :=` in `Makefile`
 3. `make -C recorder install-tool`
 4. Verify: `recorder run`
