@@ -262,7 +262,7 @@ end
 # --- Agent selection (shared) ---
 
 function select_agent
-    set agent_choice (printf '%s\n' claude codex cursor gemini \
+    set agent_choice (printf '%s\n' claude codex cursor agy \
         | _fzf_pick_compact Agent)
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
@@ -271,9 +271,9 @@ function select_agent
         case codex
             set -g agent_cmd codex
             set -g agent_bin codex
-        case gemini
-            set -g agent_cmd gemini
-            set -g agent_bin gemini
+        case agy
+            set -g agent_cmd agy
+            set -g agent_bin agy
         case claude
             set -g agent_cmd claude
             set -g agent_bin claude
