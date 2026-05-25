@@ -1,7 +1,9 @@
 name := recorder
 
-# Discovery: https://github.com/odsod/recorder/commits/main
-version := 10f1040
+# Discovery: https://github.com/odsod/recorder/releases/latest
+version := 2026.5.1
+archive_url := https://github.com/odsod/recorder/releases/download/v$(version)/recorder_$(version)_linux_amd64.tar.gz
+data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: install
 install: install-dependencies install-tool install-config install-scripts
@@ -17,11 +19,22 @@ install-dependencies:
 .PHONY: install-tool
 install-tool: $(HOME)/.local/bin/recorder
 
-$(HOME)/.local/bin/recorder:
-	$(info [$(name)] Installing recorder@$(version)...)
-	@go install github.com/odsod/recorder@$(version)
+.PHONY: $(HOME)/.local/bin/recorder
+$(HOME)/.local/bin/recorder: $(data_dir)/$(version)/recorder
+	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
-	@ln -fsT $(HOME)/go/bin/recorder $@
+	@ln -fsT $(abspath $<) $@
+
+$(data_dir)/$(version)/recorder: $(data_dir)/$(version)/archive.tar.gz
+	$(info [$(name)] Extracting archive...)
+	@tar -C $(dir $<) -xf $<
+	@touch $@
+	@chmod +x $@
+
+$(data_dir)/$(version)/archive.tar.gz:
+	$(info [$(name)] Downloading archive...)
+	@curl -L $(archive_url) --create-dirs -o $@
+	@touch $@
 
 .PHONY: install-config
 install-config: $(HOME)/.config/recorder/config.json
