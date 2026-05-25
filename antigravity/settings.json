@@ -6,11 +6,12 @@
     "project": "way-platform-ai",
     "location": "eu"
   },
-  "model": {
-    "name": "Gemini 3.5 Flash"
-  },
+  "model": "Gemini 3.5 Flash",
   "notifications": true,
   "showFeedbackSurvey": false,
-  "trustedWorkspaces": ["/home/odsod/Code/github.com/odsod/machine"],
+  "trustedWorkspaces": [
+    "/home/odsod/Code/github.com/odsod/machine",
+    "/home/odsod/Vaults/odsod"
+  ],
   "verbosity": "low"
 }
