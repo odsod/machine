@@ -1,0 +1,542 @@
+[
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/agent-browser/Makefile",
+    "variable": "version",
+    "current": "0.27.0",
+    "discovery_url": "https://registry.npmjs.org/agent-browser/latest",
+    "line_no": 3,
+    "latest": "0.27.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/aws/Makefile",
+    "variable": "version",
+    "current": "2.34.53",
+    "discovery_url": "https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst",
+    "line_no": 3,
+    "latest": "2.34.53",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/bash/Makefile",
+    "variable": "bashls_version",
+    "current": "5.6.0",
+    "discovery_url": "https://www.npmjs.com/package/bash-language-server",
+    "line_no": 4,
+    "latest": "5.6.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/bash/Makefile",
+    "variable": "shellcheck_version",
+    "current": "v0.11.0",
+    "discovery_url": "https://github.com/koalaman/shellcheck/releases/latest",
+    "line_no": 7,
+    "latest": "v0.11.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/bash/Makefile",
+    "variable": "shfmt_version",
+    "current": "v3.13.1",
+    "discovery_url": "https://github.com/mvdan/sh/releases/latest",
+    "line_no": 12,
+    "latest": "v3.13.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/buf/Makefile",
+    "variable": "version",
+    "current": "1.69.0",
+    "discovery_url": "https://github.com/bufbuild/buf/releases/latest",
+    "line_no": 3,
+    "latest": "1.70.0",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/claude/Makefile",
+    "variable": "version",
+    "current": "2.1.150",
+    "discovery_url": "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/latest",
+    "line_no": 3,
+    "latest": "2.1.150",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/codex/Makefile",
+    "variable": "version",
+    "current": "0.133.0",
+    "discovery_url": "https://github.com/openai/codex/releases/latest",
+    "line_no": 3,
+    "latest": "0.133.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/cursor/Makefile",
+    "variable": "version",
+    "current": "3.5.33",
+    "discovery_url": "curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest",
+    "line_no": 3,
+    "latest": "3.5.33",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/defuddle/Makefile",
+    "variable": "version",
+    "current": "0.18.1",
+    "discovery_url": "https://registry.npmjs.org/defuddle/latest",
+    "line_no": 3,
+    "latest": "0.18.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/encore/Makefile",
+    "variable": "version",
+    "current": "1.57.5",
+    "discovery_url": "https://encore.dev/api/releases?target=linux_amd64",
+    "line_no": 3,
+    "latest": "FAILED",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/eza/Makefile",
+    "variable": "version",
+    "current": "0.23.4",
+    "discovery_url": "https://github.com/eza-community/eza/releases/latest",
+    "line_no": 3,
+    "latest": "0.23.4",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/fish/Makefile",
+    "variable": "version",
+    "current": "4.7.1",
+    "discovery_url": "https://github.com/fish-shell/fish-shell/releases/latest",
+    "line_no": 3,
+    "latest": "4.7.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/fish/Makefile",
+    "variable": "fish_lsp_version",
+    "current": "1.1.3",
+    "discovery_url": "https://github.com/ndonfris/fish-lsp/releases/latest",
+    "line_no": 6,
+    "latest": "1.1.3",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/fx/Makefile",
+    "variable": "version",
+    "current": "39.2.0",
+    "discovery_url": "https://github.com/antonmedv/fx/releases/latest",
+    "line_no": 3,
+    "latest": "39.2.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/fzf/Makefile",
+    "variable": "version",
+    "current": "0.73.0",
+    "discovery_url": "https://github.com/junegunn/fzf/releases/latest",
+    "line_no": 3,
+    "latest": "0.73.1",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/gh-cli/Makefile",
+    "variable": "version",
+    "current": "2.92.0",
+    "discovery_url": "https://github.com/cli/cli/releases/latest",
+    "line_no": 3,
+    "latest": "2.92.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/go/Makefile",
+    "variable": "version",
+    "current": "1.26.3",
+    "discovery_url": "https://go.dev/VERSION?m=text",
+    "line_no": 3,
+    "latest": "1.26.3",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/go/Makefile",
+    "variable": "gopls_version",
+    "current": "v0.22.0",
+    "discovery_url": "https://github.com/golang/tools/releases (tags: gopls/v*)",
+    "line_no": 7,
+    "latest": "v0.22.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/go/Makefile",
+    "variable": "staticcheck_version",
+    "current": "2026.1",
+    "discovery_url": "https://github.com/dominikh/go-tools/releases",
+    "line_no": 9,
+    "latest": "2026.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/go/Makefile",
+    "variable": "gofumpt_version",
+    "current": "v0.10.0",
+    "discovery_url": "https://github.com/mvdan/gofumpt/releases",
+    "line_no": 11,
+    "latest": "v0.10.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/google-cloud-sdk/Makefile",
+    "variable": "version",
+    "current": "569.0.0",
+    "discovery_url": "https://cloud.google.com/sdk/docs/install-sdk",
+    "line_no": 3,
+    "latest": "FAILED",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/gws/Makefile",
+    "variable": "version",
+    "current": "0.22.5",
+    "discovery_url": "https://github.com/googleworkspace/cli/releases/latest",
+    "line_no": 3,
+    "latest": "0.22.5",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/hyperfine/Makefile",
+    "variable": "version",
+    "current": "1.20.0",
+    "discovery_url": "https://github.com/sharkdp/hyperfine/releases/latest",
+    "line_no": 3,
+    "latest": "1.20.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/idasen/Makefile",
+    "variable": "version",
+    "current": "0.12.0",
+    "discovery_url": "https://pypi.org/pypi/idasen/json",
+    "line_no": 3,
+    "latest": "0.13.0",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/inter/Makefile",
+    "variable": "version",
+    "current": "4.1",
+    "discovery_url": "https://github.com/rsms/inter/releases/latest",
+    "line_no": 3,
+    "latest": "4.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/iosevka/Makefile",
+    "variable": "version",
+    "current": "34.6.1",
+    "discovery_url": "https://github.com/be5invis/Iosevka/releases/latest",
+    "line_no": 3,
+    "latest": "34.6.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/jj-starship/Makefile",
+    "variable": "version",
+    "current": "0.7.1",
+    "discovery_url": "https://api.github.com/repos/dmmulroy/jj-starship/releases/latest",
+    "line_no": 3,
+    "latest": "0.7.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/jj/Makefile",
+    "variable": "version",
+    "current": "0.41.0",
+    "discovery_url": "https://github.com/jj-vcs/jj/releases/latest",
+    "line_no": 3,
+    "latest": "0.41.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/jwt-cli/Makefile",
+    "variable": "version",
+    "current": "6.2.0",
+    "discovery_url": "https://github.com/mike-engel/jwt-cli/releases/latest",
+    "line_no": 3,
+    "latest": "6.2.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/lua/Makefile",
+    "variable": "lua_ls_version",
+    "current": "3.18.2",
+    "discovery_url": "https://github.com/LuaLS/lua-language-server/releases/latest",
+    "line_no": 4,
+    "latest": "3.18.2",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/lua/Makefile",
+    "variable": "stylua_version",
+    "current": "v2.5.2",
+    "discovery_url": "https://github.com/JohnnyMorganz/StyLua/releases/latest",
+    "line_no": 9,
+    "latest": "v2.5.2",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/markdown-oxide/Makefile",
+    "variable": "version",
+    "current": "0.25.10",
+    "discovery_url": "https://github.com/Feel-ix-343/markdown-oxide/releases/latest",
+    "line_no": 3,
+    "latest": "0.25.10",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/neovim/Makefile",
+    "variable": "version",
+    "current": "0.12.2",
+    "discovery_url": "https://github.com/neovim/neovim/releases",
+    "line_no": 3,
+    "latest": "0.12.2",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/nerd-fonts/Makefile",
+    "variable": "version",
+    "current": "3.4.0",
+    "discovery_url": "https://github.com/ryanoasis/nerd-fonts/releases/latest",
+    "line_no": 3,
+    "latest": "3.4.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/nodejs/Makefile",
+    "variable": "pnpm_version",
+    "current": "11.3.0",
+    "discovery_url": "https://github.com/pnpm/pnpm/releases/latest",
+    "line_no": 10,
+    "latest": "11.3.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/obsidian/Makefile",
+    "variable": "version",
+    "current": "1.12.7",
+    "discovery_url": "https://github.com/obsidianmd/obsidian-releases/releases/latest",
+    "line_no": 3,
+    "latest": "1.12.7",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/oxc/Makefile",
+    "variable": "oxfmt_version",
+    "current": "0.51.0",
+    "discovery_url": "https://www.npmjs.com/package/oxfmt",
+    "line_no": 5,
+    "latest": "0.51.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/oxc/Makefile",
+    "variable": "oxlint_version",
+    "current": "1.66.0",
+    "discovery_url": "https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true",
+    "line_no": 7,
+    "latest": "1.66.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/plannotator/Makefile",
+    "variable": "version",
+    "current": "0.19.22",
+    "discovery_url": "https://github.com/backnotprop/plannotator/releases/latest",
+    "line_no": 3,
+    "latest": "0.19.23",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/python/Makefile",
+    "variable": "ruff_version",
+    "current": "0.15.14",
+    "discovery_url": "https://pypi.org/project/ruff/",
+    "line_no": 4,
+    "latest": "0.15.14",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/python/Makefile",
+    "variable": "ty_version",
+    "current": "0.0.39",
+    "discovery_url": "https://pypi.org/project/ty/",
+    "line_no": 6,
+    "latest": "0.0.39",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/qbittorrent-cli/Makefile",
+    "variable": "version",
+    "current": "2.2.0",
+    "discovery_url": "https://github.com/ludviglundgren/qbittorrent-cli/releases/latest",
+    "line_no": 3,
+    "latest": "2.2.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/slack/Makefile",
+    "variable": "version",
+    "current": "4.49.89",
+    "discovery_url": "https://slack.com/release-notes/linux/rss",
+    "line_no": 6,
+    "latest": "4.49.81",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/soap-ui/Makefile",
+    "variable": "version",
+    "current": "5.9.1",
+    "discovery_url": "https://www.soapui.org/downloads/latest-release/",
+    "line_no": 3,
+    "latest": "FAILED",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/spacelift/Makefile",
+    "variable": "version",
+    "current": "1.21.5",
+    "discovery_url": "https://github.com/spacelift-io/spacectl/releases/latest",
+    "line_no": 3,
+    "latest": "1.21.5",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/starship/Makefile",
+    "variable": "version",
+    "current": "1.25.1",
+    "discovery_url": "https://github.com/starship/starship/releases/latest",
+    "line_no": 3,
+    "latest": "1.25.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/tmux/Makefile",
+    "variable": "version",
+    "current": "3.6b",
+    "discovery_url": "https://api.github.com/repos/tmux/tmux/releases/latest",
+    "line_no": 3,
+    "latest": "3.6b",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/typescript/Makefile",
+    "variable": "typescript_version",
+    "current": "6.0.3",
+    "discovery_url": "https://www.npmjs.com/package/typescript",
+    "line_no": 4,
+    "latest": "6.0.3",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/typescript/Makefile",
+    "variable": "tsgo_version",
+    "current": "7.0.0-dev.20260524.1",
+    "discovery_url": "https://www.npmjs.com/package/@typescript/native-preview",
+    "line_no": 6,
+    "latest": "7.0.0-dev.20260525.1",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/yaak/Makefile",
+    "variable": "version",
+    "current": "2026.4.0",
+    "discovery_url": "https://github.com/mountain-loop/yaak/releases/latest",
+    "line_no": 3,
+    "latest": "2026.4.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/yaegi/Makefile",
+    "variable": "version",
+    "current": "0.16.1",
+    "discovery_url": "https://github.com/traefik/yaegi/releases/latest",
+    "line_no": 3,
+    "latest": "0.16.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/yaml/Makefile",
+    "variable": "yamlls_version",
+    "current": "1.23.0",
+    "discovery_url": "https://www.npmjs.com/package/yaml-language-server",
+    "line_no": 4,
+    "latest": "1.23.0",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/zed/Makefile",
+    "variable": "version",
+    "current": "1.3.6",
+    "discovery_url": "https://github.com/zed-industries/zed/releases/latest",
+    "line_no": 3,
+    "latest": "1.3.7",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/zoom/Makefile",
+    "variable": "version",
+    "current": "7.0.5.3034",
+    "discovery_url": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0061222",
+    "line_no": 3,
+    "latest": "FAILED",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/whisper/Makefile",
+    "variable": "version",
+    "current": "1.8.4",
+    "discovery_url": "https://github.com/ggerganov/whisper.cpp/releases/latest",
+    "line_no": 3,
+    "latest": "1.8.4",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/llama/Makefile",
+    "variable": "version",
+    "current": "b9305",
+    "discovery_url": "https://github.com/ggml-org/llama.cpp/releases/latest",
+    "line_no": 3,
+    "latest": "b9330",
+    "is_new": true
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/mise/Makefile",
+    "variable": "version",
+    "current": "2026.5.15",
+    "discovery_url": "https://github.com/jdx/mise/releases/latest",
+    "line_no": 3,
+    "latest": "2026.5.15",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/recorder/Makefile",
+    "variable": "version",
+    "current": "2026.5.1",
+    "discovery_url": "https://github.com/odsod/recorder/releases/latest",
+    "line_no": 4,
+    "latest": "2026.5.1",
+    "is_new": false
+  },
+  {
+    "file": "/home/odsod/Code/github.com/odsod/machine/antigravity/Makefile",
+    "variable": "version",
+    "current": "1.0.2",
+    "discovery_url": "https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json",
+    "line_no": 3,
+    "latest": "1.0.2",
+    "is_new": false
+  }
+]
