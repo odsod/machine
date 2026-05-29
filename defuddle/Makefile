@@ -19,3 +19,8 @@ $(data_dir)/$(version)/installed:
 	@~/.local/bin/npm install -g $(name)@$(version)
 	@mkdir -p $(dir $@)
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://registry.npmjs.org/defuddle/latest \
+		| jq -r '.version // "UNKNOWN"')"

@@ -1,6 +1,6 @@
 name := gh-cli
 # Discovery: https://github.com/cli/cli/releases/latest
-version := 2.92.0
+version := 2.93.0
 archive_url := https://github.com/cli/cli/releases/download/v$(version)/gh_$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
@@ -20,3 +20,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) -fLo $@ --create-dirs
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/cli/cli/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' || echo UNKNOWN)"

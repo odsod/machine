@@ -96,3 +96,10 @@ $(system_fish): $(fish_bin)
 	@$(MAKE) -C ../fzf ~/.local/bin/fzf
 	@mkdir -p $(dir $@)
 	@$(HOME)/.local/bin/fzf --fish > $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/fish-shell/fish-shell/releases/latest \
+		| grep -i ^location: | grep -oP '/\K[0-9][0-9.]*' || echo UNKNOWN)"
+	@printf 'fish_lsp_version=%s\n' "$$(curl -sI https://github.com/ndonfris/fish-lsp/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' || echo UNKNOWN)"

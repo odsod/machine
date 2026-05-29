@@ -87,26 +87,25 @@ guides the user through the three-phase bootstrap:
     - `.agents/`: `jj git fetch --remote origin`
     - `.agents/`: if `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
 
-2.  **Identify Candidates**:
-    - Search for `version :=` (or variations like `gopls_version :=`) to find all tools managed by version variables.
+2.  **Discover**:
+    - Run `make discover` to get all latest versions in one shot.
+    - Output format: `# ./<dir>` headers followed by `variable_name=latest_version` lines.
+    - On upstream failure: `variable_name=UNKNOWN` — fix the module's `discover` target.
+    - Compare output against current `version :=` values in each Makefile.
+    - For modules without a `discover` target (slack, zoom): fall back to manual discovery via `# Discovery:` URL.
 
-3.  **Discover**:
-    - Check `# Discovery: <url>` comment above each version variable. **Mandatory** to add if missing.
-    - **Quality**: URL must be future-proof (e.g., `latest` endpoints, releases pages). Avoid hardcoded version paths in discovery URLs unless unavoidable.
-    - Check GitHub Releases, APIs, or project downloads pages.
-
-4.  **Validate**:
+3.  **Validate**:
     - For archive-based tools: `curl -I <url>` to ensure assets exist.
     - For `go install` tools: Ensure the version string is valid for the module.
 
-5.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
+4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
 
-6.  **Verify**: `make -C <dir>` then `<tool> --version`.
+5.  **Verify**: `make -C <dir>` then `<tool> --version`.
     - For `codex/`: run `make -C codex codex-config-diff`
     - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
     - Check `<dir>/AGENTS.md` for module-specific update notes.
 
-7.  **External Skills** (in `.agents/skills/`):
+6.  **External Skills** (in `.agents/skills/`):
     - Check: `npx skills check -g`
     - Update: `npx skills update -g`, or re-add individual skills:
       ```
@@ -118,7 +117,7 @@ guides the user through the three-phase bootstrap:
     - Lock file: `.agents/.skill-lock.json` (v3 format)
     - Commit in `.agents/`: `jj describe -m "feat(skills): update external skills"`
 
-8.  **Commit**: `feat(<dir>): bump versions`.
+7.  **Commit**: `feat(<dir>): bump versions`.
     - List specific tool bumps in the commit body.
     - **Optional**: Include release notes/changelog link in body if easily fetchable.
 

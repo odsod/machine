@@ -82,3 +82,8 @@ download-model:
 .PHONY: clean
 clean:
 	rm -rf whisper.cpp-$(version)
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/ggml-org/whisper.cpp/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' || echo UNKNOWN)"

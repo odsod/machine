@@ -20,3 +20,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading archive...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/mike-engel/jwt-cli/releases/latest \
+		| grep -i ^location: | grep -oP '/\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

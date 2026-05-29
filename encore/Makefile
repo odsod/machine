@@ -24,3 +24,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s 'https://encore.dev/api/releases?target=linux_amd64' \
+		| jq -r '.version // "UNKNOWN"')"

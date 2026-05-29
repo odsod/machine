@@ -20,3 +20,8 @@ $(data_dir)/$(version)/iosevka.zip:
 	$(info [$(name)] Downloading archive...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/be5invis/Iosevka/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

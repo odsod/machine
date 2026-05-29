@@ -33,3 +33,8 @@ $(venv_pip):
 	$(info [$(name)] Initializing virtualenv...)
 	@mkdir -p $(dir $@)
 	@python3 -m venv $(venv_dir)
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://pypi.org/pypi/idasen/json \
+		| jq -r '.info.version // "UNKNOWN"')"

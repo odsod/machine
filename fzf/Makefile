@@ -34,3 +34,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 $(manpage_data_path):
 	$(info [$(name)] Downloading $(manpage_url)...)
 	@curl -L $(manpage_url) --create-dirs -o $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/junegunn/fzf/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

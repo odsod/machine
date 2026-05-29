@@ -38,3 +38,9 @@ $(fish_completion): aws.fish
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p "$(dir $@)"
 	@ln -fsT "$(abspath $<)" "$@"
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s \
+		https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst \
+		| grep -oP '^\d+\.\d+\.\d+$$' | head -1 || echo UNKNOWN)"

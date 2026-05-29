@@ -1,6 +1,6 @@
 name := codex
 # Discovery: https://github.com/openai/codex/releases/latest
-version := 0.133.0
+version := 0.135.0
 archive_url := https://github.com/openai/codex/releases/download/rust-v$(version)/$(name)-x86_64-unknown-linux-musl.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 config_target := $(HOME)/.codex/config.toml
@@ -46,3 +46,8 @@ $(data_dir)/$(version)/$(name): $(data_dir)/$(version)/archive.tar.gz
 $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/openai/codex/releases/latest \
+		| grep -i ^location: | grep -oP '/rust-v\K[0-9][0-9.]*' || echo UNKNOWN)"

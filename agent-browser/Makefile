@@ -47,3 +47,8 @@ configure-profiles:
 	@tmp=$$(mktemp) && \
 	 jq '.download += {"default_directory": "$(downloads_dir)", "prompt_for_download": false, "directory_upgrade": true}' \
 	   $(work_prefs) > "$$tmp" && mv "$$tmp" $(work_prefs)
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://registry.npmjs.org/agent-browser/latest \
+		| jq -r '.version // "UNKNOWN"')"

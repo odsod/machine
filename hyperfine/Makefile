@@ -13,3 +13,8 @@ install:
 	@curl -sL "$(url)" | tar -xz -C "$(install_dir)" --strip-components=1
 	@mkdir -p "$(bin_dir)"
 	@ln -fsT "$(install_dir)/hyperfine" "$(bin_dir)/hyperfine"
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/sharkdp/hyperfine/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

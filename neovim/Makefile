@@ -57,3 +57,8 @@ install-packages:
 	@mkdir -p $(dir $@)
 	@rm -rf $@
 	@ln -fsT $(abspath .) $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://api.github.com/repos/neovim/neovim/releases/latest \
+		| jq -r '.tag_name | ltrimstr("v")' || echo UNKNOWN)"

@@ -43,3 +43,15 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s 'https://go.dev/VERSION?m=text' \
+		| head -1 | sed 's/^go//' || echo UNKNOWN)"
+	@printf 'gopls_version=%s\n' "$$(curl -s https://api.github.com/repos/golang/tools/releases \
+		| jq -r '[.[] | select(.tag_name | startswith("gopls/"))][0].tag_name | ltrimstr("gopls/")' \
+		|| echo UNKNOWN)"
+	@printf 'staticcheck_version=%s\n' "$$(curl -sI https://github.com/dominikh/go-tools/releases/latest \
+		| grep -i ^location: | grep -oP '/\K[0-9][0-9.]*' || echo UNKNOWN)"
+	@printf 'gofumpt_version=%s\n' "$$(curl -sI https://github.com/mvdan/gofumpt/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' | sed 's/^/v/' || echo UNKNOWN)"
