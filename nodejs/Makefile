@@ -7,7 +7,7 @@ name := nodejs
 # Discovery: https://nodejs.org/en/about/previous-releases
 node_major := 24
 # Discovery: https://github.com/pnpm/pnpm/releases/latest
-pnpm_version := 11.3.0
+pnpm_version := 11.4.0
 
 pnpm_url := https://github.com/pnpm/pnpm/releases/download/v$(pnpm_version)/pnpm-linux-x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
@@ -67,3 +67,8 @@ $(data_dir)/pnpm/$(pnpm_version)/archive.tar.gz:
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: discover
+discover:
+	@printf 'pnpm_version=%s\n' "$$(curl -sI https://github.com/pnpm/pnpm/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' || echo UNKNOWN)"

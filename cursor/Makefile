@@ -84,3 +84,9 @@ $(data_dir)/$(version)/cursor.rpm:
 	@mkdir -p $(dir $@)
 	@curl -D $(data_dir)/$(version)/headers.txt $(rpm_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI \
+		'https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest' \
+		| grep -i ^location: | grep -oP 'cursor-\K[0-9]+\.[0-9]+\.[0-9]+' || echo UNKNOWN)"

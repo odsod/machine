@@ -15,3 +15,8 @@ $(data_dir)/$(version)/fx:
 	@curl $(bin_url) --create-dirs -Lo $@
 	@touch $@
 	@chmod +x $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/antonmedv/fx/releases/latest \
+		| grep -i ^location: | grep -oP '/\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

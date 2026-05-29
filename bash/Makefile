@@ -52,3 +52,12 @@ $(data_dir)/shfmt/$(shfmt_version)/shfmt:
 	$(info [$(name)] Downloading $(shfmt_url)...)
 	@curl -L $(shfmt_url) --create-dirs -o $@
 	@chmod +x $@
+
+.PHONY: discover
+discover:
+	@printf 'bashls_version=%s\n' "$$(curl -s https://registry.npmjs.org/bash-language-server/latest \
+		| jq -r '.version // "UNKNOWN"')"
+	@printf 'shellcheck_version=%s\n' "$$(curl -sI https://github.com/koalaman/shellcheck/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' | sed 's/^/v/' || echo UNKNOWN)"
+	@printf 'shfmt_version=%s\n' "$$(curl -sI https://github.com/mvdan/sh/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' | sed 's/^/v/' || echo UNKNOWN)"

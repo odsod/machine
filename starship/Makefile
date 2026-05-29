@@ -31,3 +31,8 @@ $(version_dir)/starship:
 	$(info [$(name)] Generating fish init...)
 	@mkdir -p $(dir $@)
 	@PATH="$(HOME)/.local/bin:$$PATH" $< init fish --print-full-init > $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/starship/starship/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

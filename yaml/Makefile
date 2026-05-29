@@ -15,3 +15,8 @@ install:
 npm-packages:
 	$(info [$(name)] Installing yaml-language-server...)
 	@~/.local/bin/npm install -g yaml-language-server@$(yamlls_version)
+
+.PHONY: discover
+discover:
+	@printf 'yamlls_version=%s\n' "$$(curl -s https://registry.npmjs.org/yaml-language-server/latest \
+		| jq -r '.version // "UNKNOWN"')"

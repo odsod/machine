@@ -36,3 +36,9 @@ $(data_dir)/$(version)/antigravity: $(data_dir)/$(version)/archive.tar.gz
 $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s \
+		https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json \
+		| jq -r '.version // "UNKNOWN"')"

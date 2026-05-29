@@ -20,3 +20,8 @@ $(data_dir)/$(version)/font.zip:
 	$(info [$(name)] Downloading archive...)
 	@curl -L $(archive_url) --create-dirs -o $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/ryanoasis/nerd-fonts/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

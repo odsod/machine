@@ -30,3 +30,8 @@ $(data_dir)/$(version)/$(archive):
 $(data_dir)/$(version)/$(archive).sha256:
 	$(info [$(name)] Downloading $(archive_url).sha256...)
 	@curl -fsSL $(archive_url).sha256 --create-dirs -o $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/googleworkspace/cli/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

@@ -26,3 +26,8 @@ $(data_dir)/$(version)/$(archive):
 	$(info [$(name)] Downloading archive...)
 	@mkdir -p $(dir $@)
 	@curl -sL $(archive_url) -o $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://api.github.com/repos/dmmulroy/jj-starship/releases/latest \
+		| jq -r '.tag_name | ltrimstr("v")' || echo UNKNOWN)"

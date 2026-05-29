@@ -41,3 +41,8 @@ $(data_dir)/$(version)/app.AppImage:
 	@curl $(appimage_url) --create-dirs -Lo $@
 	@touch $@
 	@chmod +x $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/obsidianmd/obsidian-releases/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

@@ -20,3 +20,8 @@ $(data_dir)/$(version)/archive.zip:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/rsms/inter/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

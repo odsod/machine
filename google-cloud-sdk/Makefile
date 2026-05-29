@@ -21,3 +21,9 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) -fLo $@ --create-dirs
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s \
+		https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json \
+		| jq -r '.version // "UNKNOWN"')"

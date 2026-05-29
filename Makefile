@@ -83,3 +83,16 @@ install-sudoers:
 	@printf '%s\n' 'odsod ALL=(ALL) NOPASSWD: ALL' | sudo tee /etc/sudoers.d/odsod >/dev/null
 	@sudo chmod 0440 /etc/sudoers.d/odsod
 	@sudo visudo -cf /etc/sudoers.d/odsod
+
+.PHONY: discover
+discover:
+	@find . -mindepth 2 -maxdepth 2 -name Makefile \
+		-not -path './fedora/*' \
+		| sort \
+		| while IFS= read -r makefile; do \
+			dir=$$(dirname "$$makefile"); \
+			if $(MAKE) -C "$$dir" -n discover >/dev/null 2>&1; then \
+				echo "# $$dir"; \
+				$(MAKE) -s -C "$$dir" discover; \
+			fi; \
+		done

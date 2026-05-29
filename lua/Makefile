@@ -50,3 +50,10 @@ $(data_dir)/stylua/$(stylua_version)/archive.zip:
 	$(info [$(name)] Downloading $(stylua_url)...)
 	@mkdir -p $(dir $@)
 	@curl -L $(stylua_url) -o $@
+
+.PHONY: discover
+discover:
+	@printf 'lua_ls_version=%s\n' "$$(curl -s https://api.github.com/repos/LuaLS/lua-language-server/releases/latest \
+		| jq -r '.tag_name | ltrimstr("v")' || echo UNKNOWN)"
+	@printf 'stylua_version=%s\n' "$$(curl -sI https://github.com/JohnnyMorganz/StyLua/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9.]*' | sed 's/^/v/' || echo UNKNOWN)"

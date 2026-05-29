@@ -23,3 +23,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading archive...)
 	@curl -sL $(archive_url) --create-dirs -o $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/Feel-ix-343/markdown-oxide/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

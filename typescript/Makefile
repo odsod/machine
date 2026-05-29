@@ -3,7 +3,7 @@ name := typescript
 # Discovery: https://www.npmjs.com/package/typescript
 typescript_version := 6.0.3
 # Discovery: https://www.npmjs.com/package/@typescript/native-preview
-tsgo_version := 7.0.0-dev.20260525.1
+tsgo_version := 7.0.0-dev.20260527.2
 
 .PHONY: all
 all: install
@@ -19,3 +19,10 @@ npm-packages:
 	@~/.local/bin/npm install -g typescript@$(typescript_version)
 	@~/.local/bin/npm uninstall -g @vtsls/language-server >/dev/null 2>&1 || true
 	@~/.local/bin/npm install -g @typescript/native-preview@$(tsgo_version)
+
+.PHONY: discover
+discover:
+	@printf 'typescript_version=%s\n' "$$(curl -s https://registry.npmjs.org/typescript/latest \
+		| jq -r '.version // "UNKNOWN"')"
+	@printf 'tsgo_version=%s\n' "$$(curl -s https://registry.npmjs.org/@typescript/native-preview/latest \
+		| jq -r '.version // "UNKNOWN"')"

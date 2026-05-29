@@ -1,7 +1,7 @@
 name := recorder
 
 # Discovery: https://github.com/odsod/recorder/releases/latest
-version := 2026.5.1
+version := 2026.5.2
 archive_url := https://github.com/odsod/recorder/releases/download/v$(version)/recorder_$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
@@ -55,3 +55,8 @@ $(HOME)/.local/bin/recorder-toggle: recorder-toggle
 $(HOME)/.local/bin/recorder-note: recorder-note
 	$(info [$(name)] Installing note script...)
 	@install -m 0755 $< $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/odsod/recorder/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

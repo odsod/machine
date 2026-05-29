@@ -1,10 +1,10 @@
 name := oxc
 # Discovery: https://github.com/oxc-project/oxc/releases/latest
-release_tag := apps_v1.66.0
+release_tag := apps_v1.67.0
 # Discovery: https://www.npmjs.com/package/oxfmt
-oxfmt_version := 0.51.0
+oxfmt_version := 0.52.0
 # Discovery: https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true
-oxlint_version := 1.66.0
+oxlint_version := 1.67.0
 
 oxlint_archive := oxlint-x86_64-unknown-linux-gnu.tar.gz
 oxlint_extracted_binary := oxlint-x86_64-unknown-linux-gnu
@@ -46,3 +46,10 @@ $(data_dir)/oxlint/$(oxlint_version)/oxlint: $(data_dir)/oxlint/$(oxlint_version
 $(data_dir)/oxlint/$(oxlint_version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(oxlint_archive_url)...)
 	@curl -L $(oxlint_archive_url) --create-dirs -o $@
+
+.PHONY: discover
+discover:
+	@printf 'oxfmt_version=%s\n' "$$(curl -s https://registry.npmjs.org/oxfmt/latest \
+		| jq -r '.version // "UNKNOWN"')"
+	@printf 'oxlint_version=%s\n' "$$(curl -sI https://github.com/oxc-project/oxc/releases/latest \
+		| grep -i ^location: | grep -oP '/apps_v\K[0-9][0-9.]*' || echo UNKNOWN)"

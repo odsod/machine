@@ -20,3 +20,8 @@ $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
 	@curl $(archive_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/ludviglundgren/qbittorrent-cli/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

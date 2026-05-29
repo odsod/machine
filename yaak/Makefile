@@ -13,3 +13,8 @@ $(data_dir)/$(version)/package.rpm:
 	$(info [$(name)] Downloading package...)
 	@curl $(package_url) --create-dirs -Lo $@
 	@touch $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/mountain-loop/yaak/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

@@ -1,6 +1,6 @@
 name := mise
 # Discovery: https://github.com/jdx/mise/releases/latest
-version := 2026.5.15
+version := 2026.5.16
 url := https://github.com/jdx/mise/releases/download/v$(version)/mise-v$(version)-linux-x64.tar.gz
 
 bin_dir := $(HOME)/.local/bin
@@ -17,3 +17,8 @@ install: ~/.config/mise/config.toml
 ~/.config/mise/config.toml: config.toml
 	@mkdir -p "$(@D)"
 	@ln -fsT "$(CURDIR)/config.toml" "$@"
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/jdx/mise/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

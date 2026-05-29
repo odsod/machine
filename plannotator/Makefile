@@ -1,6 +1,6 @@
 name := plannotator
 # Discovery: https://github.com/backnotprop/plannotator/releases/latest
-version := 0.19.23
+version := 0.19.24
 binary_url := https://github.com/backnotprop/plannotator/releases/download/v$(version)/plannotator-linux-x64
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
 active_dir := $(HOME)/.local/share/odsod/machine/$(name)
@@ -60,3 +60,8 @@ $(marketplace_dir)/v$(version).tag:
 	@git clone --depth 1 --branch "v$(version)" \
 	    https://github.com/backnotprop/plannotator "$(marketplace_dir)"
 	@touch "$@"
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -sI https://github.com/backnotprop/plannotator/releases/latest \
+		| grep -i ^location: | grep -oP '/v\K[0-9][0-9a-z.-]+' || echo UNKNOWN)"

@@ -85,3 +85,8 @@ $(tmux_bin): $(src_dir)/configure
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: discover
+discover:
+	@printf 'version=%s\n' "$$(curl -s https://api.github.com/repos/tmux/tmux/releases/latest \
+		| jq -r '.tag_name | ltrimstr("v")' || echo UNKNOWN)"
