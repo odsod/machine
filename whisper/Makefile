@@ -1,6 +1,6 @@
 name := whisper
 # Discovery: https://github.com/ggerganov/whisper.cpp/releases/latest
-version := 1.8.4
+version := 1.8.6
 source_url := https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v$(version).tar.gz
 # Discovery: https://huggingface.co/ggerganov/whisper.cpp/tree/main
 model := ggml-large-v3.bin
