@@ -1,6 +1,6 @@
 name := mise
 # Discovery: https://github.com/jdx/mise/releases/latest
-version := 2026.5.18
+version := 2026.6.0
 url := https://github.com/jdx/mise/releases/download/v$(version)/mise-v$(version)-linux-x64.tar.gz
 
 bin_dir := $(HOME)/.local/bin

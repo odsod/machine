@@ -10,10 +10,6 @@ export BAT_STYLE="changes,header"
 export DFT_BACKGROUND="dark"
 export DFT_DISPLAY="side-by-side"
 
-# encore
-export ENCORE_INSTALL="$HOME/.local/share/odsod/machine/encore"
-export PATH="$ENCORE_INSTALL/bin:$PATH"
-
 # fzf
 export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS="--color=bg+:#3B4252,bg:#2E3440,spinner:#81A1C1,hl:#88C0D0,fg:#D8DEE9,header:#616E88,info:#81A1C1,pointer:#81A1C1,marker:#81A1C1,fg+:#D8DEE9,prompt:#81A1C1,hl+:#88C0D0"

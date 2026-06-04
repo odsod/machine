@@ -1,7 +1,8 @@
 name := antigravity
 # Discovery: https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json
-version := 1.0.4
-archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/$(version)-6410134369468416/linux-x64/cli_linux_x64.tar.gz
+# Bump: update version and archive_url together from `make discover` output.
+version := 1.0.5
+archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.5-5009297080451072/linux-x64/cli_linux_x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
@@ -35,10 +36,10 @@ $(data_dir)/$(version)/antigravity: $(data_dir)/$(version)/archive.tar.gz
 
 $(data_dir)/$(version)/archive.tar.gz:
 	$(info [$(name)] Downloading $(archive_url)...)
-	@curl $(archive_url) --create-dirs -Lo $@
+	@curl -fsSL $(archive_url) --create-dirs -Lo $@
 
 .PHONY: discover
 discover:
-	@printf 'version=%s\n' "$$(curl -s \
+	@curl -fsSL \
 		https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json \
-		| jq -r '.version // "UNKNOWN"')"
+		| jq -r '"version=\(.version // "UNKNOWN")", "archive_url=\(.url // "UNKNOWN")"'
