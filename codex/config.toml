@@ -23,3 +23,10 @@ trust_level = "trusted"
 
 [projects."/home/odsod/Code/github.com/odsod/machine"]
 trust_level = "trusted"
+
+[[hooks.PostToolUse]]
+matcher = "Write|Edit|apply_patch"
+
+[[hooks.PostToolUse.hooks]]
+type = "command"
+command = "jq -r '.tool_input.file_path // .tool_input.path // empty' | { read -r f; case \"$f\" in *.md|*.yaml|*.yml|*.json|*.toml) oxfmt --write \"$f\" ;; esac; } 2>/dev/null || true"
