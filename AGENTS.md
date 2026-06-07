@@ -65,6 +65,7 @@ guides the user through the three-phase bootstrap:
    - Verify each service: `gh auth status`, `tailscale status`, `gcloud auth list`
 
 **Key principles**:
+
 - Never skip failures — diagnose, fix in the Makefile, re-run
 - Fixes go into the module, not one-off shell commands
 - After bootstrap completes, `make install` must be re-runnable and idempotent
@@ -149,6 +150,13 @@ guides the user through the three-phase bootstrap:
   - `jj git fetch --remote origin`
   - If `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
   - Only then start the `.agents` update work
+- **Skills Lock**:
+  - Lock file: `.agents/.skill-lock.json`
+  - Always use `-g` for shared skills — without it, creates public `skills-lock.json`
+  - Never commit `skills-lock.json` in this repo
+  - Install: `npx skills add <source> ... -g -y --copy`
+  - Update: `make -C .agents update-skills`
+  - List: `npx skills list -g --json`
 
 ## Maintaining This File
 
