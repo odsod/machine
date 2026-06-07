@@ -1,6 +1,7 @@
 {
   "awsAuthRefresh": "aws sso login --profile bedrock",
   "respectGitignore": false,
+  "cleanupPeriodDays": 3650,
   "env": {
     "CLAUDE_CODE_USE_BEDROCK": "1",
     "AWS_PROFILE": "bedrock",
@@ -53,6 +54,5 @@
   "effortLevel": "xhigh",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
-  "cleanupPeriodDays": 3650
+  "theme": "dark"
 }
