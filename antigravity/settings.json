@@ -9,11 +9,11 @@
   "hooks": {
     "AfterTool": [
       {
-        "matcher": "write_file|edit",
+        "matcher": "write_file|write_to_file|replace_file_content|multi_replace_file_content|edit",
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path // .tool_input.path // empty' | { read -r f; case \"$f\" in *.md|*.yaml|*.yml|*.json|*.toml) oxfmt --write \"$f\" ;; esac; } 2>/dev/null || true"
+            "command": "jq -r '.tool_input.file_path // .tool_input.path // empty' | { read -r f; if [ -n \"$f\" ] && [ -f \"$f\" ]; then case \"$f\" in *.md|*.yaml|*.yml|*.json|*.toml) oxfmt --write \"$f\" ;; esac; if [ -d .jj ]; then jj delta \"$f\"; elif [ -d .git ]; then git diff --color=always \"$f\"; fi; fi; } 2>/dev/null || true"
           }
         ]
       }
