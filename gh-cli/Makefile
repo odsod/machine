@@ -1,6 +1,6 @@
 name := gh-cli
 # Discovery: https://github.com/cli/cli/releases/latest
-version := 2.93.0
+version := 2.94.0
 archive_url := https://github.com/cli/cli/releases/download/v$(version)/gh_$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
