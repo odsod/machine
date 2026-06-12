@@ -17,6 +17,9 @@
   "dedup": {
     "threshold": 0.6
   },
+  "speaker": {
+    "self": "Oscar Söderlund"
+  },
   "signals": {
     "silenceThresholdS": 180,
     "cdpPorts": [9224, 9223]
