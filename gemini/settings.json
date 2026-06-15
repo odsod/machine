@@ -1,0 +1,103 @@
+{
+  "model": {
+    "name": "gemini-3.5-flash"
+  },
+  "gcp": {
+    "project": "way-platform-ai",
+    "location": "eu"
+  },
+  "context": {
+    "fileName": [
+      "AGENTS.md",
+      "README.md"
+    ],
+    "fileFiltering": {
+      "respectGitIgnore": false
+    },
+    "loadMemoryFromIncludeDirectories": false
+  },
+  "hooks": {
+    "AfterAgent": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "notify-completion",
+            "type": "command",
+            "command": "bell"
+          },
+          {
+            "name": "jj-snapshot",
+            "type": "command",
+            "command": "test -d .jj && jj st > /dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "name": "notify-alert",
+            "type": "command",
+            "command": "bell"
+          }
+        ]
+      }
+    ]
+  },
+  "security": {
+    "auth": {
+      "selectedType": "vertex-ai"
+    }
+  },
+  "privacy": {
+    "usageStatisticsEnabled": false
+  },
+  "ui": {
+    "hideBanner": true,
+    "useAlternateBuffer": true,
+    "incrementalRendering": true,
+    "useTopicNarrations": true,
+    "accessibility": {
+      "enableLoadingPhrases": false
+    },
+    "hideTips": true,
+    "showCitations": true,
+    "showLineNumbers": true,
+    "showMemoryUsage": true,
+    "footer": {
+      "hideModelInfo": false,
+      "hideSandboxStatus": true,
+      "hideContextPercentage": false
+    },
+    "theme": "ANSI",
+    "loadingPhrases": "off"
+  },
+  "output": {
+    "format": "text"
+  },
+  "general": {
+    "vimMode": true,
+    "defaultApprovalMode": "auto_edit",
+    "enableAutoUpdate": false,
+    "sessionRetention": {
+      "enabled": true,
+      "maxAge": "3650d",
+      "warningAcknowledged": true
+    },
+    "plan": {
+      "enabled": true
+    }
+  },
+  "tools": {
+    "sandbox": false
+  },
+  "experimental": {
+    "memoryV2": true
+  },
+  "agents": {
+    "overrides": {}
+  }
+}

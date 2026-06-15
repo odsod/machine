@@ -18,9 +18,10 @@ export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}' --bind 'ctrl-/:chan
 export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-/:toggle-preview'"
 export FZF_ALT_C_COMMAND="fd --type d --strip-cwd-prefix --hidden --follow --exclude .git"
 
-# antigravity
-export GOOGLE_CLOUD_PROJECT="way-local-dev"
-export GOOGLE_CLOUD_LOCATION="global"
+# google-cloud / vertexai
+export GOOGLE_GENAI_USE_VERTEXAI=true
+export GOOGLE_CLOUD_PROJECT="way-platform-ai"
+export GOOGLE_CLOUD_LOCATION="eu"
 
 # go
 export GOROOT="$HOME/.local/share/odsod/machine/go"
