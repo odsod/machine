@@ -3,7 +3,7 @@ name := fish
 version := 4.7.1
 fish_lsp_name := fish-lsp
 # Discovery: https://github.com/ndonfris/fish-lsp/releases/latest
-fish_lsp_version := 1.1.3
+fish_lsp_version := 1.1.4
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 version_dir := $(data_dir)/$(version)
 archive := $(version_dir)/$(name)-$(version)-linux-x86_64.tar.xz
