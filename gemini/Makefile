@@ -2,18 +2,17 @@ name := gemini
 # Discovery: https://registry.npmjs.org/@google/gemini-cli/latest
 version := 0.46.0
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
+npm_bin := $(HOME)/.local/share/npm/bin/$(name)
 
 .PHONY: all
 all: \
-	~/.gemini/settings.json \
+	$(HOME)/.gemini/settings.json \
 	remove-rtk-hook \
-	~/.gemini/policies/machine.toml \
-	~/.local/share/npm/bin/gemini
+	$(HOME)/.gemini/policies/machine.toml \
+	$(HOME)/.local/bin/$(name)
 
-# Discovery: https://github.com/google-gemini/gemini-cli/issues/1825
-# TODO: Move to ~/.config/gemini/settings.json when XDG support is improved
-.PHONY: ~/.gemini/settings.json
-~/.gemini/settings.json: settings.json
+.PHONY: $(HOME)/.gemini/settings.json
+$(HOME)/.gemini/settings.json: settings.json
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
@@ -25,15 +24,20 @@ remove-rtk-hook:
 		$(HOME)/.gemini/hooks/rtk-hook-gemini.sh \
 		$(HOME)/.gemini/hooks/.rtk-hook.sha256
 
-.PHONY: ~/.gemini/policies/machine.toml
-~/.gemini/policies/machine.toml: policies.toml
+.PHONY: $(HOME)/.gemini/policies/machine.toml
+$(HOME)/.gemini/policies/machine.toml: policies.toml
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
 
-~/.local/share/npm/bin/gemini: $(data_dir)/$(version)/installed
+.PHONY: $(HOME)/.local/bin/$(name)
+$(HOME)/.local/bin/$(name): $(data_dir)/$(version)/installed
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(npm_bin) $@
 
 $(data_dir)/$(version)/installed:
+	$(info [$(name)] Installing @google/gemini-cli@$(version) with npm...)
 	@$(MAKE) -C ../nodejs ~/.local/bin/npm
 	@~/.local/bin/npm install -g @google/gemini-cli@$(version)
 	@mkdir -p $(dir $@)
