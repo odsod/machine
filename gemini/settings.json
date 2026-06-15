@@ -7,10 +7,7 @@
     "location": "eu"
   },
   "context": {
-    "fileName": [
-      "AGENTS.md",
-      "README.md"
-    ],
+    "fileName": ["AGENTS.md", "README.md"],
     "fileFiltering": {
       "respectGitIgnore": false
     },
