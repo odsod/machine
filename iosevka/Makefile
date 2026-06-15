@@ -1,6 +1,6 @@
 name := iosevka
 # Discovery: https://github.com/be5invis/Iosevka/releases/latest
-version := 34.6.1
+version := 34.6.3
 archive_url := https://github.com/be5invis/Iosevka/releases/download/v$(version)/PkgTTC-IosevkaSS08-$(version).zip
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
