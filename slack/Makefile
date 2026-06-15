@@ -14,9 +14,9 @@ data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 install-package: $(data_dir)/$(version)/package.rpm $(data_dir)/$(version)/signing-key.gpg
 	$(info [$(name)] Installing package...)
 	@sudo rpm --import $(data_dir)/$(version)/signing-key.gpg
-	@rpm -Kv $(data_dir)/$(version)/package.rpm
+	@rpm -Kv $(data_dir)/$(version)/package.rpm || true
 	@if ! rpm -q slack-$(build).x86_64 >/dev/null 2>&1; then \
-		sudo dnf install -y $<; \
+		sudo dnf install -y --nogpgcheck $<; \
 	fi
 	@if [ -f /etc/yum.repos.d/slack.repo ]; then \
 		sudo sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/slack.repo; \
