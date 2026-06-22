@@ -5,11 +5,26 @@ archive_url := https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 install_dir := $(data_dir)/$(version)/google-cloud-sdk
 
+.PHONY: install
+install: ~/.local/bin/gcloud ~/.local/bin/bq ~/.local/bin/gsutil
+
 .PHONY: ~/.local/bin/gcloud
 ~/.local/bin/gcloud: $(install_dir)/bin/gcloud
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/bq
+~/.local/bin/bq: $(install_dir)/bin/gcloud
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(install_dir)/bin/bq $@
+
+.PHONY: ~/.local/bin/gsutil
+~/.local/bin/gsutil: $(install_dir)/bin/gcloud
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(install_dir)/bin/gsutil $@
 
 $(install_dir)/bin/gcloud: $(data_dir)/$(version)/archive.tar.gz
 	$(info [$(name)] Extracting $<...)
