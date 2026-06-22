@@ -1,6 +1,6 @@
 name := markdown-oxide
 # Discovery: https://github.com/Feel-ix-343/markdown-oxide/releases/latest
-version := 0.25.10
+version := 0.25.11
 archive_url := https://github.com/Feel-ix-343/markdown-oxide/releases/download/v$(version)/markdown-oxide-v$(version)-x86_64-unknown-linux-gnu.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 

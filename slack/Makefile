@@ -3,9 +3,9 @@ name := slack
 # Update `version` and `build` manually, then validate:
 # curl -I https://downloads.slack-edge.com/desktop-releases/linux/x64/<version>/slack-<build>.x86_64.rpm
 # Discovery: https://slack.com/release-notes/linux/rss
-version := 4.50.136
+version := 4.50.140
 # Discovery: curl -I https://downloads.slack-edge.com/desktop-releases/linux/x64/<version>/slack-<build>.x86_64.rpm
-build := 4.50.136-0.1.el8
+build := 4.50.140-0.1.el8
 package_url := https://downloads.slack-edge.com/desktop-releases/linux/x64/$(version)/slack-$(build).x86_64.rpm
 signing_key_url := https://slack.com/gpg/slack_pubkey_20251016.gpg
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
