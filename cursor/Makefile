@@ -1,7 +1,7 @@
 name := cursor
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
-version := 3.8.11
-rpm_url := https://downloads.cursor.com/production/e56ad3440df06d22ca7501e65fd518e905486ef7/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
+version := 3.8.23
+rpm_url := https://downloads.cursor.com/production/7cf19b7482706625cdb70db3211b7dd035b7aa35/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 extensions := \
