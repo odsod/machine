@@ -1,13 +1,13 @@
 name := zoom
 # Discovery: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0061222
-version := 7.0.5.3034
+version := 7.1.0.3715
 package_url := https://zoom.us/client/$(version)/zoom_x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: install-package
 install-package: $(data_dir)/$(version)/package.rpm
 	$(info [$(name)] Installing package...)
-	@if ! rpm -q zoom >/dev/null 2>&1; then \
+	@if ! rpm -q zoom-$(version) >/dev/null 2>&1; then \
 		sudo dnf install -y $<; \
 	fi
 
