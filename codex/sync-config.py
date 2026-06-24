@@ -51,30 +51,44 @@ def format_value(value: Any) -> str:
     raise TypeError(f"unsupported TOML value: {type(value).__name__}")
 
 
-def dump_table(name: tuple[str, ...], table: dict[str, Any], out: list[str]) -> None:
+def dump_table(name: tuple[str, ...], table: dict[str, Any], out: list[str], is_array_member: bool = False) -> None:
     scalars: list[tuple[str, Any]] = []
     subtables: list[tuple[str, dict[str, Any]]] = []
+    array_of_tables: list[tuple[str, list[dict[str, Any]]]] = []
 
     for key, value in table.items():
         if isinstance(value, dict):
             subtables.append((key, value))
+        elif isinstance(value, list) and value and all(isinstance(item, dict) for item in value):
+            array_of_tables.append((key, value))
         else:
             scalars.append((key, value))
 
-    emit_header = bool(name and scalars)
+    emit_header = bool(name and (scalars or is_array_member))
 
     if emit_header:
-        out.append(f"[{'.'.join(format_key(part) for part in name)}]")
+        if is_array_member:
+            out.append(f"[[{'.'.join(format_key(part) for part in name)}]]")
+        else:
+            out.append(f"[{'.'.join(format_key(part) for part in name)}]")
 
     for key, value in scalars:
         out.append(f"{format_key(key)} = {format_value(value)}")
 
-    if emit_header and subtables:
+    if emit_header and (subtables or array_of_tables):
         out.append("")
 
     for index, (key, subtable) in enumerate(subtables):
         dump_table((*name, key), subtable, out)
-        if index != len(subtables) - 1:
+        if index != len(subtables) - 1 or array_of_tables:
+            out.append("")
+
+    for index, (key, list_of_tables) in enumerate(array_of_tables):
+        for sub_index, subtable in enumerate(list_of_tables):
+            dump_table((*name, key), subtable, out, is_array_member=True)
+            if sub_index != len(list_of_tables) - 1:
+                out.append("")
+        if index != len(array_of_tables) - 1:
             out.append("")
 
 
