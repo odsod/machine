@@ -1,8 +1,8 @@
 name := antigravity
 # Discovery: https://antigravity-cli-auto-updater-974169037036.us-central1.run.app/manifests/linux_amd64.json
 # Bump: update version and archive_url together from `make discover` output.
-version := 1.0.11
-archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.11-6118976565149696/linux-x64/cli_linux_x64.tar.gz
+version := 1.0.12
+archive_url := https://storage.googleapis.com/antigravity-public/antigravity-cli/1.0.12-6156052174077952/linux-x64/cli_linux_x64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
 .PHONY: all
