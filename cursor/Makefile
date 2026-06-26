@@ -1,8 +1,10 @@
 name := cursor
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
-version := 3.8.23
-rpm_url := https://downloads.cursor.com/production/7cf19b7482706625cdb70db3211b7dd035b7aa35/linux/x64/rpm/x86_64/cursor-$(version).el8.x86_64.rpm
+# Bump: update version and rpm_url together from `make discover` output.
+version := 3.8.24
+rpm_url := https://downloads.cursor.com/production/cf80f4b937f3b9c48070d7085129a838ce7876a3/linux/x64/rpm/x86_64/cursor-3.8.24.el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
+install_stamp := $(data_dir)/$(version)/cursor-installed.stamp
 
 extensions := \
 	arcticicestudio.nord-visual-studio-code \
@@ -66,11 +68,14 @@ cursor-config-diff:
 	@ln -fsT $(abspath $<) $@
 
 .PHONY: install-rpm
-install-rpm: $(data_dir)/$(version)/cursor.rpm
-	$(info [$(name)] Installing $@...)
+install-rpm: $(install_stamp)
+
+$(install_stamp): $(data_dir)/$(version)/cursor.rpm
+	$(info [$(name)] Installing RPM...)
 	@if [ "$$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$(version)" ]; then \
 		sudo dnf install -y $<; \
 	fi
+	@touch $@
 
 .PHONY: install-extensions
 install-extensions:
@@ -82,11 +87,12 @@ install-extensions:
 $(data_dir)/$(version)/cursor.rpm:
 	$(info [$(name)] Downloading RPM...)
 	@mkdir -p $(dir $@)
-	@curl -D $(data_dir)/$(version)/headers.txt $(rpm_url) --create-dirs -Lo $@
-	@touch $@
+	@curl -fL $(rpm_url) --create-dirs -Lo $@
 
 .PHONY: discover
 discover:
-	@printf 'version=%s\n' "$$(curl -sI \
+	@location=$$(curl -sI \
 		'https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest' \
-		| grep -i ^location: | grep -oP 'cursor-\K[0-9]+\.[0-9]+\.[0-9]+' || echo UNKNOWN)"
+		| tr -d '\r' | grep -i ^location: | awk '{print $$2}'); \
+	version=$$(echo "$$location" | grep -oP 'cursor-\K[0-9]+\.[0-9]+\.[0-9]+' || echo UNKNOWN); \
+	printf 'version=%s\nrpm_url=%s\n' "$$version" "$$location"
