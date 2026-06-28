@@ -1,6 +1,6 @@
 name := codex
 # Discovery: https://github.com/openai/codex/releases/latest
-version := 0.142.2
+version := 0.142.3
 archive_url := https://github.com/openai/codex/releases/download/rust-v$(version)/$(name)-x86_64-unknown-linux-musl.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 config_target := $(HOME)/.codex/config.toml
