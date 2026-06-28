@@ -1,6 +1,6 @@
 name := starship
 # Discovery: https://github.com/starship/starship/releases/latest
-version := 1.25.1
+version := 1.26.0
 archive_url := https://github.com/starship/starship/releases/download/v$(version)/starship-x86_64-unknown-linux-gnu.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 version_dir := $(data_dir)/$(version)

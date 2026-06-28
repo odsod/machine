@@ -1,8 +1,8 @@
 name := cursor
 # Discovery: curl -I https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
 # Bump: update version and rpm_url together from `make discover` output.
-version := 3.8.24
-rpm_url := https://downloads.cursor.com/production/cf80f4b937f3b9c48070d7085129a838ce7876a3/linux/x64/rpm/x86_64/cursor-3.8.24.el8.x86_64.rpm
+version := 3.9.16
+rpm_url := https://downloads.cursor.com/production/042b3c1a4c53f2c3808067f519fbfc67b72cad8b/linux/x64/rpm/x86_64/cursor-3.9.16.el8.x86_64.rpm
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 install_stamp := $(data_dir)/$(version)/cursor-installed.stamp
 
