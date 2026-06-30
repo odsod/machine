@@ -1,6 +1,6 @@
 name := qbittorrent-cli
 # Discovery: https://github.com/ludviglundgren/qbittorrent-cli/releases/latest
-version := 2.2.0
+version := 2.3.0
 archive_url := https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v$(version)/qbittorrent-cli_$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
