@@ -1,6 +1,6 @@
 name := tmux
 # Discovery: https://api.github.com/repos/tmux/tmux/releases/latest
-version := 3.7
+version := 3.7b
 
 data_dir := $(HOME)/.local/share/odsod/machine/data/tmux/$(version)
 src_dir := $(data_dir)/src
