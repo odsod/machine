@@ -1,10 +1,10 @@
 name := oxc
 # Discovery: https://github.com/oxc-project/oxc/releases/latest
-release_tag := apps_v1.72.0
+release_tag := apps_v1.74.0
 # Discovery: https://www.npmjs.com/package/oxfmt
-oxfmt_version := 0.57.0
+oxfmt_version := 0.59.0
 # Discovery: https://github.com/oxc-project/oxc/releases?q=apps_v&expanded=true
-oxlint_version := 1.72.0
+oxlint_version := 1.74.0
 
 oxlint_archive := oxlint-x86_64-unknown-linux-gnu.tar.gz
 oxlint_extracted_binary := oxlint-x86_64-unknown-linux-gnu

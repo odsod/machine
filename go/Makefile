@@ -1,10 +1,10 @@
 name := go
 # Discovery: https://go.dev/VERSION?m=text
-version := 1.26.4
+version := 1.26.5
 archive_url := https://go.dev/dl/go$(version).linux-amd64.tar.gz
 
 # Discovery: https://github.com/golang/tools/releases (tags: gopls/v*)
-gopls_version := v0.22.0
+gopls_version := v0.23.0
 # Discovery: https://github.com/dominikh/go-tools/releases
 staticcheck_version := 2026.1
 # Discovery: https://github.com/mvdan/gofumpt/releases

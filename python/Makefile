@@ -1,9 +1,9 @@
 name := python
 
 # Discovery: https://pypi.org/project/ruff/
-ruff_version := 0.15.20
+ruff_version := 0.15.22
 # Discovery: https://pypi.org/project/ty/
-ty_version := 0.0.56
+ty_version := 0.0.61
 
 .PHONY: all
 all: tools
