@@ -4,7 +4,7 @@
   "enableTelemetry": false,
   "gcp": {
     "project": "way-platform-ai",
-    "location": "eu"
+    "location": "global"
   },
   "hooks": {
     "AfterTool": [
