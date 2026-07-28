@@ -3,7 +3,7 @@ name := python
 # Discovery: https://pypi.org/project/ruff/
 ruff_version := 0.16.0
 # Discovery: https://pypi.org/project/ty/
-ty_version := 0.0.63
+ty_version := 0.0.64
 
 .PHONY: all
 all: tools
