@@ -25,6 +25,8 @@ install-packages:
 		firefox \
 		flatpak \
 		gifsicle \
+		ImageMagick \
+		perl-Image-ExifTool \
 		git \
 		git-delta \
 		gtk-layer-shell \
