@@ -101,10 +101,11 @@ guides the user through the three-phase bootstrap:
 
 4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
 
-5.  **Verify**: `make -C <dir>` then `<tool> --version`.
+5.  **Verify**: For **every** bumped module, before push/PR:
+    - `make -C <dir>` then `<tool> --version` (or module-specific check in `<dir>/AGENTS.md`)
+    - **CRITICAL**: Makefile pin alone does not update installed binaries; `curl -I` is not a substitute
     - For `codex/`: run `make -C codex codex-config-diff`
     - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
-    - Check `<dir>/AGENTS.md` for module-specific update notes.
 
 6.  **External Skills** (in `.agents/skills/`):
     - Check: `npx skills check -g`
