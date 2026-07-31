@@ -14,6 +14,7 @@ install-repos:
 install-packages:
 	$(info [$(name)] Installing packages...)
 	@sudo dnf install -y -q \
+		android-tools \
 		bat \
 		ca-certificates \
 		curl \
@@ -48,6 +49,7 @@ install-packages:
 		python3.12 \
 		qbittorrent \
 		ripgrep \
+		scrcpy \
 		simple-scan \
 		ttyd \
 		unzip \
