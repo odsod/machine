@@ -1,0 +1,34 @@
+# Herdr Configuration
+# Symlinked to ~/.config/herdr/config.toml
+
+# Disable onboarding wizard on first launch
+onboarding = false
+
+[theme]
+# Matches machine Nord palette (bat, fzf, ghostty)
+name = "nord"
+
+[ui]
+# Prompt for workspace name when creating new workspaces
+prompt_new_workspace_name = true
+mouse_scroll_lines = 3
+
+agent_panel_sort = "spaces"
+[experimental]
+# Enable Kitty terminal graphics protocol (supported by Ghostty)
+kitty_graphics = true
+# Persist pane history across server restarts
+pane_history = true
+
+[advanced]
+# Increase scrollback limit to 10MB per pane
+scrollback_limit_bytes = 10000000
+
+[[keys.command]]
+# Quick popup for Jujutsu VCS status
+key = "prefix+g"
+command = "jj status"
+type = "popup"
+width = "85%"
+height = "85%"
+description = "Jujutsu Status"
