@@ -1,6 +1,6 @@
 name := nerd-fonts
 # Discovery: https://github.com/ryanoasis/nerd-fonts/releases/latest
-version := 3.4.0
+version := 3.5.0
 archive_url := https://github.com/ryanoasis/nerd-fonts/releases/download/v$(version)/IosevkaTerm.zip
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
