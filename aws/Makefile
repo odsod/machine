@@ -1,6 +1,6 @@
 name := aws
 # Discovery: https://raw.githubusercontent.com/aws/aws-cli/v2/CHANGELOG.rst
-version := 2.36.13
+version := 2.36.14
 archive := awscli-exe-linux-x86_64-$(version).zip
 archive_url := https://awscli.amazonaws.com/$(archive)
 sig_url := $(archive_url).sig
