@@ -1,6 +1,6 @@
 name := gemini
 # Discovery: https://registry.npmjs.org/@google/gemini-cli/latest
-version := 0.53.1
+version := 0.54.0
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 npm_bin := $(HOME)/.local/share/npm/bin/$(name)
 
