@@ -1,7 +1,7 @@
 name := tailscale
 
 .PHONY: install
-install: install-package enable-service ~/.local/bin/remote-tmux
+install: install-package enable-service ~/.local/bin/remote-tmux ~/.local/bin/remote-herdr
 
 .PHONY: install-package
 install-package:
@@ -16,6 +16,12 @@ enable-service: install-package
 
 .PHONY: ~/.local/bin/remote-tmux
 ~/.local/bin/remote-tmux: remote-tmux.fish
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/remote-herdr
+~/.local/bin/remote-herdr: remote-herdr.fish
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
