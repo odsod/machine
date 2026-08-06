@@ -1,34 +1,103 @@
 # Herdr Configuration
 # Symlinked to ~/.config/herdr/config.toml
 
-# Disable onboarding wizard on first launch
 onboarding = false
 
 [theme]
-# Matches machine Nord palette (bat, fzf, ghostty)
 name = "nord"
+auto_switch = false
+
+[theme.custom]
+# Nord's built-in surface_dim (#2E3440) matches the terminal background,
+# making borders invisible. Use nord3 instead.
+surface_dim = "#4C566A"
+accent = "#5E81AC"
+[terminal]
+new_cwd = "follow"
 
 [ui]
-# Prompt for workspace name when creating new workspaces
 prompt_new_workspace_name = true
 mouse_scroll_lines = 3
-
 agent_panel_sort = "spaces"
+tab_bar_position = "top"
+
+show_agent_labels_on_pane_borders = true
+[ui.toast]
+delivery = "terminal"
+delay_seconds = 1
+
+[session]
+resume_agents_on_restore = true
+
 [experimental]
-# Enable Kitty terminal graphics protocol (supported by Ghostty)
 kitty_graphics = true
-# Persist pane history across server restarts
 pane_history = true
 
 [advanced]
-# Increase scrollback limit to 10MB per pane
 scrollback_limit_bytes = 10000000
 
+[keys]
+prefix = "ctrl+u"
+
+# Pane navigation (vim-style, ctrl held after prefix)
+focus_pane_left = "prefix+ctrl+h"
+focus_pane_down = "prefix+ctrl+j"
+focus_pane_up = "prefix+ctrl+k"
+focus_pane_right = "prefix+ctrl+l"
+
+# Splits
+split_horizontal = "prefix+ctrl+s"
+split_vertical = "prefix+ctrl+v"
+
+# Pane management
+close_pane = "prefix+ctrl+d"
+zoom = "prefix+ctrl+z"
+
+# Tab navigation
+next_tab = "prefix+ctrl+n"
+previous_tab = "prefix+ctrl+b"
+new_tab = "prefix+ctrl+w"
+rename_tab = "prefix+ctrl+m"
+
+# Workspace navigation
+goto = "prefix+ctrl+f"
+
+# Copy mode
+copy_mode = "prefix+ctrl+r"
+
+# Detach
+detach = "prefix+ctrl+q"
+
+# Session picker popup
 [[keys.command]]
-# Quick popup for Jujutsu VCS status
-key = "prefix+g"
+key = "prefix+ctrl+t"
+command = "start-workspace"
+type = "popup"
+width = 72
+height = 28
+description = "Session Picker"
+
+# Clone repo popup
+[[keys.command]]
+key = "prefix+ctrl+c"
+command = "clone-repo"
+type = "popup"
+width = 72
+height = 28
+description = "Clone Repository"
+
+# Jujutsu status
+[[keys.command]]
+key = "prefix+ctrl+g"
 command = "jj status"
 type = "popup"
 width = "85%"
 height = "85%"
 description = "Jujutsu Status"
+
+# Recorder toggle
+[[keys.command]]
+key = "prefix+ctrl+x"
+command = "recorder-toggle-herdr"
+type = "shell"
+description = "Toggle Recorder"
