@@ -25,7 +25,7 @@ selection-clear-on-typing = true
 focus-follows-mouse = true
 
 # Terminal & Integration
-command = direct:/home/odsod/.config/ghostty/ghostty-tmux.sh
+command = direct:/home/odsod/.config/ghostty/ghostty-herdr.sh
 # Handled by tmux
 scrollback-limit = 0
 shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo

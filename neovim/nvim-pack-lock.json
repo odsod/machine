@@ -5,7 +5,7 @@
       "src": "https://github.com/numToStr/Comment.nvim"
     },
     "fzf-lua": {
-      "rev": "511651f198068ef5841ee1635ade58daa2486ef7",
+      "rev": "8671012a7b2a1648595952c655039d51fb301c14",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "nord.nvim": {
@@ -13,11 +13,11 @@
       "src": "https://github.com/shaunsingh/nord.nvim"
     },
     "nvim-tree.lua": {
-      "rev": "4213bd6eabac38b16dd6615002b6243b23cf3bf6",
+      "rev": "b2aadda94b107480c48e548d6db51c6840b7b33c",
       "src": "https://github.com/nvim-tree/nvim-tree.lua"
     },
     "nvim-treesitter": {
-      "rev": "bd41519ff7901da11ba6e1c8f419f17f2d94305a",
+      "rev": "3d3321b560a63ff92a8692401f303a5123336b86",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     }
   }
