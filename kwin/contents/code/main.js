@@ -75,7 +75,7 @@ const shortcuts = [
       "ghostty",
       "--class=com.mitchellh.ghostty.remote",
       "-e",
-      "remote-tmux",
+      "remote-herdr",
     ],
     resourceClass: "com.mitchellh.ghostty.remote",
   },
