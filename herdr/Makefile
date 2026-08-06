@@ -1,6 +1,6 @@
 name := herdr
 # Discovery: https://github.com/herdrdev/herdr/releases/latest
-version := 0.7.5
+version := 0.8.0
 binary_url := https://github.com/herdrdev/herdr/releases/download/v$(version)/herdr-linux-x86_64
 
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
