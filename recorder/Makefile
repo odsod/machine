@@ -1,7 +1,7 @@
 name := recorder
 
 # Discovery: https://github.com/odsod/recorder/releases/latest
-version := 2026.8.0
+version := 2026.8.1
 archive_url := https://github.com/odsod/recorder/releases/download/v$(version)/recorder_$(version)_linux_amd64.tar.gz
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)
 
