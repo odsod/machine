@@ -79,7 +79,7 @@ description = "Session Picker"
 
 # Clone repo popup
 [[keys.command]]
-key = "prefix+ctrl+c"
+key = "prefix+ctrl+o"
 command = "clone-repo"
 type = "popup"
 width = 72
@@ -101,3 +101,13 @@ key = "prefix+ctrl+x"
 command = "recorder-toggle-herdr"
 type = "shell"
 description = "Toggle Recorder"
+
+# URL picker
+[[keys.command]]
+key = "prefix+ctrl+c"
+command = "herdr-url-picker"
+type = "popup"
+width = 80
+height = 20
+description = "URL Picker"
+

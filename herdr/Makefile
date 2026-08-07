@@ -6,7 +6,7 @@ binary_url := https://github.com/herdrdev/herdr/releases/download/v$(version)/he
 data_dir := $(HOME)/.local/share/odsod/machine/data/$(name)/$(version)
 
 .PHONY: install
-install: ~/.local/bin/$(name) ~/.config/$(name)/config.toml ~/.local/bin/start-workspace ~/.local/bin/recorder-toggle-herdr ~/.config/ghostty/ghostty-herdr.sh
+install: ~/.local/bin/$(name) ~/.config/$(name)/config.toml ~/.local/bin/start-workspace ~/.local/bin/recorder-toggle-herdr ~/.local/bin/herdr-url-picker ~/.config/ghostty/ghostty-herdr.sh
 
 .PHONY: ~/.local/bin/$(name)
 ~/.local/bin/$(name): $(data_dir)/$(name)
@@ -28,6 +28,12 @@ install: ~/.local/bin/$(name) ~/.config/$(name)/config.toml ~/.local/bin/start-w
 
 .PHONY: ~/.local/bin/recorder-toggle-herdr
 ~/.local/bin/recorder-toggle-herdr: recorder-toggle
+	$(info [$(name)] Symlinking $@...)
+	@mkdir -p $(dir $@)
+	@ln -fsT $(abspath $<) $@
+
+.PHONY: ~/.local/bin/herdr-url-picker
+~/.local/bin/herdr-url-picker: herdr-url-picker
 	$(info [$(name)] Symlinking $@...)
 	@mkdir -p $(dir $@)
 	@ln -fsT $(abspath $<) $@
