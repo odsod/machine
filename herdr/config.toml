@@ -8,10 +8,22 @@ name = "nord"
 auto_switch = false
 
 [theme.custom]
-# Nord's built-in surface_dim (#2E3440) matches the terminal background,
-# making borders invisible. Use nord3 instead.
-surface_dim = "#4C566A"
-accent = "#5E81AC"
+accent = "#5E81AC" # nord10: focused borders, active highlights
+panel_bg = "#2E3440" # nord0: panel/popup backgrounds
+surface0 = "#3B4252" # nord1: selected row background (navigate mode)
+surface1 = "#434C5E" # nord2: hover/secondary selection
+surface_dim = "#3B4252" # nord1: active agent row bg, separators (matches fzf bg+)
+overlay0 = "#7B88A1" # brighter mid-tone: secondary text, agent subtitles, branch names
+overlay1 = "#9BA4B5" # brighter still: emphasis secondary
+text = "#ECEFF4" # nord6: primary text
+subtext0 = "#D8DEE9" # nord4: slightly muted primary text
+mauve = "#B48EAD" # nord15: aurora purple, branch names when active
+green = "#81A1C1" # nord9 blue: git ahead, idle/done state
+yellow = "#88C0D0" # nord8 frost: working state
+red = "#BF616A" # nord11: blocked state, git behind
+blue = "#81A1C1" # nord9: notifications, done dot
+teal = "#8FBCBB" # nord7: done (unseen) state
+peach = "#D08770" # nord12: aurora orange (unused currently)
 [terminal]
 new_cwd = "follow"
 
@@ -20,7 +32,7 @@ prompt_new_workspace_name = true
 mouse_scroll_lines = 3
 agent_panel_sort = "spaces"
 tab_bar_position = "top"
-
+pane_scrollbars = false
 show_agent_labels_on_pane_borders = true
 [ui.toast]
 delivery = "terminal"
