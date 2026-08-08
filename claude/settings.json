@@ -36,21 +36,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bell"
-          },
-          {
-            "type": "command",
             "command": "test -d .jj && jj st > /dev/null 2>&1 || true"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bell"
           }
         ]
       }

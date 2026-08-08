@@ -19,26 +19,9 @@
         "matcher": ".*",
         "hooks": [
           {
-            "name": "notify-completion",
-            "type": "command",
-            "command": "bell"
-          },
-          {
             "name": "jj-snapshot",
             "type": "command",
             "command": "test -d .jj && jj st > /dev/null 2>&1 || true"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "name": "notify-alert",
-            "type": "command",
-            "command": "bell"
           }
         ]
       }

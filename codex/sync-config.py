@@ -102,11 +102,16 @@ def dump_toml(data: dict[str, Any]) -> str:
 
 def merge_configs(base: dict[str, Any], target: dict[str, Any]) -> dict[str, Any]:
     merged = dict(base)
-    if "projects" in target:
-        projects = target["projects"]
-        if not isinstance(projects, dict):
-            raise TypeError("target projects table must be a TOML table")
-        merged["projects"] = projects
+    for key in ("projects", "hooks"):
+        if key in target:
+            section = target[key]
+            if isinstance(section, dict):
+                if key == "hooks":
+                    merged.setdefault("hooks", {})["state"] = section.get("state", {})
+                else:
+                    merged[key] = section
+    if "tui" in target and "model_availability_nux" in target.get("tui", {}):
+        merged.setdefault("tui", {})["model_availability_nux"] = target["tui"]["model_availability_nux"]
     return merged
 
 

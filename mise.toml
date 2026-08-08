@@ -386,6 +386,7 @@ depends = [
   "setup:kwallet",
   "setup:keyboard",
   "setup:codex",
+  "setup:cursor-cli",
 ]
 run = """
 echo "[bootstrap] Verifying auth services..."
@@ -615,11 +616,25 @@ grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
 """
 
 [tasks."setup:codex"]
-description = "Seed codex config from repo template"
+description = "Sync codex config (preserves trusted dirs and hook state)"
 run = """
-if [ ! -f "$HOME/.codex/config.toml" ]; then
-  mkdir -p "$HOME/.codex"
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+python3 "$repo/codex/sync-config.py" sync --base "$repo/codex/config.toml" --target "$HOME/.codex/config.toml"
+"""
+
+[tasks."codex:diff"]
+description = "Show diff between repo codex config and live config"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+python3 "$repo/codex/sync-config.py" diff --base "$repo/codex/config.toml" --target "$HOME/.codex/config.toml"
+"""
+
+[tasks."setup:cursor-cli"]
+description = "Seed cursor CLI config from repo template"
+run = """
+if [ ! -f "$HOME/.cursor/cli-config.json" ]; then
   repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-  cp "$repo/codex/config.toml" "$HOME/.codex/config.toml"
+  mkdir -p "$HOME/.cursor"
+  cp "$repo/cursor/cli-config.json" "$HOME/.cursor/cli-config.json"
 fi
 """
