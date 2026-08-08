@@ -1,0 +1,18 @@
+[vars]
+version = "1.9.2"
+model = "ggml-large-v3.bin"
+model_url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin"
+vad_model = "ggml-silero-v6.2.0.bin"
+vad_model_url = "https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v6.2.0.bin"
+port = "8178"
+
+[tasks.discover]
+description = "Show latest whisper.cpp release version"
+run = """
+curl -sI https://github.com/ggerganov/whisper.cpp/releases/latest \
+  | grep -i ^location: | grep -oP '/v\\K[0-9][0-9.]*' || echo UNKNOWN
+"""
+
+[tasks.clean]
+description = "Remove source tree"
+run = "rm -rf whisper.cpp-{{vars.version}}"

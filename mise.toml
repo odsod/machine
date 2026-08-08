@@ -1,0 +1,625 @@
+[settings]
+idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
+minimum_release_age = "3d"
+pin = true
+trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
+
+[settings.python]
+uv_venv_auto = "source"
+
+[settings.status]
+missing_tools = "if_other_versions_installed"
+show_env = false
+show_tools = false
+
+[settings.task]
+output = "prefix"
+run_auto_install = true
+
+[tools]
+"aqua:jdx/mise" = "2026.8.3"
+
+# Languages
+go = "1.26.5"
+node = "24"
+python = "3.12"
+
+# Go tools
+"go:golang.org/x/tools/gopls" = "0.23.0"
+"go:honnef.co/go/tools/cmd/staticcheck" = "2026.1"
+"go:mvdan.cc/gofumpt" = "0.11.0"
+
+# Core CLI tools
+buf = "1.72.0"
+claude = "2.1.226"
+codex = "0.147.0"
+eza = "0.23.5"
+fzf = "0.74.2"
+gemini = "0.54.4"
+gh = "2.97.0"
+hyperfine = "1.20.0"
+jj = "0.44.0"
+neovim = { version = "0.12.4", postinstall = """
+sudo dnf remove -y vim-enhanced vim-minimal 2>/dev/null || true
+nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
+nvim_path="$(mise where neovim)/bin/nvim"
+ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
+ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
+""" }
+ruff = "0.16.2"
+starship = "1.26.0"
+usage = "latest"
+
+# Language servers and linters
+lua-language-server = "3.19.0"
+shellcheck = "0.11.0"
+shfmt = "3.13.1"
+stylua = "2.5.2"
+
+# npm tools
+"npm:@typescript/native-preview" = "7.0.0-dev.20260707.2"
+"npm:agent-browser" = "0.33.2"
+"npm:bash-language-server" = "5.6.0"
+"npm:defuddle" = "0.19.2"
+"npm:oxfmt" = "0.62.0"
+"npm:oxlint" = "1.77.0"
+"npm:pnpm" = "11.20.0"
+"npm:typescript" = "7.0.2"
+"npm:yaml-language-server" = "1.24.0"
+
+# Tools via GitHub releases
+"github:backnotprop/plannotator" = "0.26.4"
+"github:dmmulroy/jj-starship" = "0.7.1"
+"github:Feel-ix-343/markdown-oxide" = "0.25.12"
+"github:fish-shell/fish-shell" = { version = "4.8.1", exe = "fish" }
+"github:googleworkspace/cli" = { version = "0.22.5", exe = "gws" }
+"github:ludviglundgren/qbittorrent-cli" = { version = "2.3.0", exe = "qbt" }
+"github:odsod/recorder" = "2026.8.1"
+"github:traefik/yaegi" = "0.16.1"
+
+# Desktop/infra tools
+antigravity-cli = "1.1.11"
+awscli = "2.36.19"
+fx = "39.2.0"
+gcloud = "579.0.0"
+herdr = "0.8.0"
+jwt = "6.2.0"
+spacectl = "1.24.0"
+
+# Python tools (via pipx backend)
+"pipx:idasen" = "0.13.1"
+"pipx:ty" = "0.0.69"
+
+[env]
+_.source = "{{config_root}}/env.sh"
+
+[settings.dotfiles]
+root = "{{config_root}}"
+
+[dotfiles]
+# Fish
+"~/.config/fish/config.fish" = "fish/config.fish"
+"~/.config/fish/conf.d/00-env.fish" = "fish/env.fish"
+"~/.config/fish/completions/aws.fish" = "aws/aws.fish"
+
+# Ghostty
+"~/.config/ghostty/config" = "ghostty/config"
+"~/.config/ghostty/themes" = "ghostty/themes"
+"~/.config/ghostty/ghostty-herdr.sh" = "ghostty/ghostty-herdr.sh"
+
+# Git
+"~/.gitconfig" = "git/gitconfig"
+
+# Neovim
+"~/.config/nvim" = "neovim"
+
+# Starship
+"~/.config/starship.toml" = "starship/starship.toml"
+
+# Btop
+"~/.config/btop/btop.conf" = "btop/btop.conf"
+
+# JJ
+"~/.config/jj/config.toml" = "jj/config.toml"
+
+# Zed
+"~/.config/zed/settings.json" = "zed/settings.json"
+"~/.config/zed/keymap.json" = "zed/keymap.json"
+
+# Cursor
+"~/.config/Cursor/User/settings.json" = "cursor/settings.json"
+"~/.config/Cursor/User/keybindings.json" = "cursor/keybindings.json"
+"~/.cursor/hooks.json" = "cursor/hooks.json"
+"~/.cursor/hooks" = "cursor/hooks"
+
+# Claude
+"~/.claude/settings.json" = "claude/settings.json"
+
+# Gemini
+"~/.gemini/settings.json" = "gemini/settings.json"
+"~/.gemini/antigravity-cli/settings.json" = "antigravity/settings.json"
+"~/.gemini/policies/machine.toml" = "antigravity/policies.toml"
+
+# Herdr
+"~/.config/herdr/config.toml" = "herdr/config.toml"
+
+# Recorder
+"~/.config/recorder/config.json" = "recorder/config.json"
+
+# Agent Browser
+"~/.config/agent-browser/config.json" = "agent-browser/config.json"
+
+# uv
+"~/.config/uv/uv.toml" = "uv/uv.toml"
+
+# mise (self-referential: this file IS the global config via this symlink)
+"~/.config/mise/config.toml" = "mise.toml"
+
+# KDE
+"~/.config/mimeapps.list" = "kde/mimeapps.list"
+"~/.config/fontconfig/fonts.conf" = "kde/fonts.conf"
+
+# PostgreSQL
+"~/.psqlrc" = "postgresql/psqlrc"
+
+# Node
+"~/.npmrc" = "nodejs/npmrc"
+
+# Google Chrome
+"~/.config/chrome-flags.conf" = "google-chrome/chrome-flags.conf"
+"~/.local/bin/google-chrome" = "google-chrome/google-chrome.sh"
+
+# Idasen
+"~/.config/idasen/idasen.yaml" = "idasen/idasen.yaml"
+
+# env.sh (KDE session and login shell)
+"~/.profile" = "env.sh"
+"~/.config/plasma-workspace/env/odsod-machine.sh" = "env.sh"
+
+# Scripts (not tool binaries; repo-local scripts symlinked to PATH)
+"~/.local/bin/clone-repo" = "herdr/clone-repo"
+"~/.local/bin/start-workspace" = "herdr/start-workspace"
+"~/.local/bin/recorder-toggle-herdr" = "herdr/recorder-toggle"
+"~/.local/bin/herdr-url-picker" = "herdr/herdr-url-picker"
+"~/.local/bin/remote-herdr" = "tailscale/remote-herdr.fish"
+"~/.local/bin/jj-workflow" = "jj/workflow.fish"
+"~/.local/bin/odsod-kwin-dbus-service.py" = "kwin/odsod-kwin-dbus-service.py"
+"~/.local/share/dbus-1/services/io.github.odsod.kwin.service" = "kwin/io.github.odsod.kwin.service"
+"~/.local/bin/plannotator" = "plannotator/plannotator"
+"~/.local/bin/plannotator-browser" = "plannotator/plannotator-browser"
+"~/.local/bin/recorder-toggle" = "recorder/recorder-toggle"
+"~/.local/bin/recorder-note" = "recorder/recorder-note"
+
+[bootstrap.packages]
+# Core system tools
+"dnf:android-tools" = "latest"
+"dnf:bat" = "latest"
+"dnf:binutils" = "latest"
+"dnf:btop" = "latest"
+"dnf:ca-certificates" = "latest"
+"dnf:containerd" = "latest"
+"dnf:curl" = "latest"
+"dnf:difftastic" = "latest"
+"dnf:dnf5-plugins" = "latest"
+"dnf:docker-buildx" = "latest"
+"dnf:docker-cli" = "latest"
+"dnf:docker-compose" = "latest"
+"dnf:dos2unix" = "latest"
+"dnf:fd-find" = "latest"
+"dnf:fedora-workstation-repositories" = "latest"
+"dnf:firefox" = "latest"
+"dnf:flatpak" = "latest"
+"dnf:gcc-c++" = "latest"
+"dnf:ghostty" = "latest"
+"dnf:google-chrome-stable" = "latest"
+"dnf:gifsicle" = "latest"
+"dnf:git" = "latest"
+"dnf:git-delta" = "latest"
+"dnf:gtk-layer-shell" = "latest"
+"dnf:gzip" = "latest"
+"dnf:hexyl" = "latest"
+"dnf:htop" = "latest"
+"dnf:iftop" = "latest"
+"dnf:ImageMagick" = "latest"
+"dnf:java-25-openjdk-devel" = "latest"
+"dnf:lame" = "latest"
+"dnf:jq" = "latest"
+"dnf:kdialog" = "latest"
+"dnf:keepassxc" = "latest"
+"dnf:kwallet-pam" = "latest"
+"dnf:maven" = "latest"
+"dnf:mesa-dri-drivers" = "latest"
+"dnf:mesa-vulkan-drivers" = "latest"
+"dnf:libva-utils" = "latest"
+"dnf:ncdu" = "latest"
+"dnf:openh264" = "latest"
+"dnf:net-snmp-utils" = "latest"
+"dnf:ngrep" = "latest"
+"dnf:openssh-server" = "latest"
+"dnf:pciutils" = "latest"
+"dnf:pipewire-codec-aptx" = "latest"
+"dnf:pipewire-utils" = "latest"
+"dnf:perl-Image-ExifTool" = "latest"
+"dnf:postgresql" = "latest"
+"dnf:pulseaudio-utils" = "latest"
+"dnf:python3-devel" = "latest"
+"dnf:python3-pip" = "latest"
+"dnf:python3-virtualenv" = "latest"
+"dnf:python3.12" = "latest"
+"dnf:qbittorrent" = "latest"
+"dnf:ripgrep" = "latest"
+"dnf:scrcpy" = "latest"
+"dnf:simple-scan" = "latest"
+"dnf:syncthing" = "latest"
+"dnf:tailscale" = "latest"
+"dnf:tar" = "latest"
+"dnf:tree-sitter-cli" = "latest"
+"dnf:ttyd" = "latest"
+"dnf:unrar" = "latest"
+"dnf:unzip" = "latest"
+"dnf:util-linux" = "latest"
+"dnf:uv" = "latest"
+"dnf:wl-clipboard" = "latest"
+"dnf:wtype" = "latest"
+"dnf:v4l-utils" = "latest"
+"dnf:wireshark" = "latest"
+"dnf:x264" = "latest"
+"dnf:x265" = "latest"
+"dnf:yt-dlp" = "latest"
+"dnf:1password" = "latest"
+"dnf:mullvad-vpn" = "latest"
+"dnf:mullvad-browser" = "latest"
+"dnf:rustup" = "latest"
+
+
+# Flatpak
+"flatpak:com.spotify.Client" = "latest"
+"flatpak-user:hu.irl.cameractrls" = "latest"
+
+[bootstrap.hooks.pre-packages]
+run = """
+# RPM Fusion (free + nonfree)
+if [ ! -f /etc/yum.repos.d/rpmfusion-free.repo ]; then
+  sudo dnf install -y \
+    https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+fi
+
+# 1Password
+if [ ! -f /etc/yum.repos.d/1password.repo ]; then
+  sudo rpm --import https://downloads.1password.com/linux/keys/1password.asc
+  printf '%s\n' \
+    '[1password]' \
+    'name=1Password Stable Channel' \
+    'baseurl=https://downloads.1password.com/linux/rpm/stable/$basearch' \
+    'enabled=1' \
+    'gpgcheck=1' \
+    'repo_gpgcheck=1' \
+    'gpgkey=https://downloads.1password.com/linux/keys/1password.asc' \
+    | sudo tee /etc/yum.repos.d/1password.repo > /dev/null
+fi
+
+# Tailscale
+if [ ! -f /etc/yum.repos.d/tailscale.repo ]; then
+  sudo dnf config-manager addrepo --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+fi
+
+# Mullvad VPN
+if [ ! -f /etc/yum.repos.d/mullvad.repo ]; then
+  sudo dnf config-manager addrepo --from-repofile=https://repository.mullvad.net/rpm/stable/mullvad.repo
+fi
+
+# Terra (Ghostty)
+if [ ! -f /etc/yum.repos.d/terra.repo ]; then
+  sudo dnf install -y --nogpgcheck https://repos.fyralabs.com/terra$(rpm -E %fedora)/terra-release-$(rpm -E %fedora)-1.noarch.rpm
+fi
+
+# Google Chrome
+if ! dnf repolist --enabled | grep -q google-chrome; then
+  sudo dnf install -y fedora-workstation-repositories
+  sudo dnf config-manager setopt google-chrome.enabled=1
+fi
+"""
+
+[bootstrap.hooks.post-packages]
+run = """
+sudo groupadd -f docker && sudo usermod -aG docker $(whoami)
+sudo groupadd -f wireshark && sudo usermod -aG wireshark $(whoami)
+systemctl --user enable syncthing.service
+uv generate-shell-completion fish > ~/.config/fish/completions/uv.fish
+uvx --generate-shell-completion fish > ~/.config/fish/completions/uvx.fish
+"""
+
+[bootstrap.files."/etc/sudoers.d/odsod"]
+content = "odsod ALL=(ALL) NOPASSWD: ALL\n"
+owner = "root"
+group = "root"
+mode = "0440"
+
+[bootstrap.files."/etc/ssh/sshd_config.d/01-odsod-machine.conf"]
+source = "ssh/machine.conf"
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+notify = ["sshd"]
+
+[bootstrap.services.sshd]
+state = "running"
+enabled = true
+
+[bootstrap.services.docker]
+state = "running"
+enabled = true
+
+[bootstrap.services.tailscaled]
+state = "running"
+enabled = true
+
+[bootstrap.repos]
+".agents" = { url = "git@github.com:odsod/agents.git" }
+
+[bootstrap.user]
+login_shell = "/usr/local/bin/fish"
+
+[bootstrap.hooks.post-tools]
+run = "mise run setup:fish-shell"
+
+[tasks.bootstrap]
+description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
+depends = [
+  "setup:font-inter",
+  "setup:font-iosevka",
+  "setup:font-nerd",
+  "setup:media",
+  "setup:graphics",
+  "setup:slack",
+  "setup:zoom",
+  "setup:obsidian",
+  "setup:cursor",
+  "setup:zed",
+  "setup:yaak",
+  "setup:soap-ui",
+  "setup:llama",
+  "setup:whisper",
+  "setup:kde-fonts",
+  "setup:kwallet",
+  "setup:keyboard",
+  "setup:codex",
+]
+run = """
+echo "[bootstrap] Verifying auth services..."
+gh auth status 2>/dev/null || echo "  → Run: gh auth login"
+tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
+gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
+"""
+
+[tasks."setup:font-inter"]
+description = "Install Inter font from GitHub releases"
+run = """
+VERSION=4.1
+DATA_DIR="$HOME/.local/share/odsod/machine/data/inter/$VERSION"
+FONT_DIR="$HOME/.local/share/fonts"
+if [ -f "$FONT_DIR/inter.ttc" ]; then exit 0; fi
+echo "[font-inter] Installing Inter $VERSION..."
+mkdir -p "$DATA_DIR" "$FONT_DIR"
+curl -L "https://github.com/rsms/inter/releases/download/v${VERSION}/Inter-${VERSION}.zip" -o "$DATA_DIR/archive.zip"
+unzip -o "$DATA_DIR/archive.zip" -d "$DATA_DIR"
+ln -fsT "$DATA_DIR/Inter.ttc" "$FONT_DIR/inter.ttc"
+fc-cache -f
+"""
+
+[tasks."setup:font-iosevka"]
+description = "Install Iosevka SS08 font from GitHub releases"
+run = """
+VERSION=34.8.0
+DATA_DIR="$HOME/.local/share/odsod/machine/data/iosevka/$VERSION"
+FONT_DIR="$HOME/.local/share/fonts"
+if [ -d "$FONT_DIR/iosevka" ]; then exit 0; fi
+echo "[font-iosevka] Installing Iosevka SS08 $VERSION..."
+mkdir -p "$DATA_DIR" "$FONT_DIR"
+curl -L "https://github.com/be5invis/Iosevka/releases/download/v${VERSION}/PkgTTC-IosevkaSS08-${VERSION}.zip" -o "$DATA_DIR/iosevka.zip"
+unzip -o "$DATA_DIR/iosevka.zip" -d "$DATA_DIR"
+ln -fsT "$DATA_DIR" "$FONT_DIR/iosevka"
+fc-cache -f
+"""
+
+[tasks."setup:font-nerd"]
+description = "Install IosevkaTerm Nerd Font from GitHub releases"
+run = """
+VERSION=3.5.0
+DATA_DIR="$HOME/.local/share/odsod/machine/data/nerd-fonts/$VERSION"
+FONT_DIR="$HOME/.local/share/fonts"
+if [ -d "$FONT_DIR/nerd-fonts" ]; then exit 0; fi
+echo "[font-nerd] Installing IosevkaTerm Nerd Font $VERSION..."
+mkdir -p "$DATA_DIR" "$FONT_DIR"
+curl -L "https://github.com/ryanoasis/nerd-fonts/releases/download/v${VERSION}/IosevkaTerm.zip" -o "$DATA_DIR/font.zip"
+unzip -o "$DATA_DIR/font.zip" -d "$DATA_DIR"
+ln -fsT "$DATA_DIR" "$FONT_DIR/nerd-fonts"
+fc-cache -f
+"""
+
+[tasks."setup:media"]
+description = "Install media codecs (ffmpeg swap, group upgrade)"
+run = """
+sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
+sudo dnf group upgrade -y multimedia
+"""
+
+[tasks."setup:graphics"]
+description = "Install GPU-conditional graphics drivers"
+run = """
+if lspci -nn | grep -qi 'intel.*vga\\|vga.*intel'; then
+  echo "[graphics] Intel GPU detected - installing intel-media-driver..."
+  sudo dnf install -y -q intel-media-driver
+fi
+if lspci -nn | grep -qi 'amd.*vga\\|vga.*amd\\|advanced micro devices.*vga\\|vga.*advanced micro devices'; then
+  echo "[graphics] AMD GPU detected - installing udev perf rule..."
+  printf 'ACTION=="add", SUBSYSTEM=="drm", DRIVERS=="amdgpu", ATTR{device/power_dpm_force_performance_level}="high"\\n' \
+    | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
+fi
+"""
+
+[tasks."setup:slack"]
+description = "Install Slack desktop client"
+run = """
+version="4.51.180"
+build="${version}-0.1.el8"
+if ! rpm -q "slack-${build}.x86_64" >/dev/null 2>&1; then
+  sudo dnf install -y "https://downloads.slack-edge.com/desktop-releases/linux/x64/${version}/slack-${build}.x86_64.rpm"
+fi
+"""
+
+[tasks."setup:zoom"]
+description = "Install Zoom desktop client"
+run = """
+version="7.1.5.4332"
+if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
+  sudo dnf install -y "https://zoom.us/client/${version}/zoom_x86_64.rpm"
+fi
+"""
+
+[tasks."setup:obsidian"]
+description = "Install Obsidian AppImage, CLI, and vault config"
+run = """
+version="1.13.4"
+data_dir="$HOME/.local/share/odsod/machine/data/obsidian/${version}"
+app="${data_dir}/app.AppImage"
+cli="${data_dir}/obsidian-cli"
+
+if [ ! -f "$app" ]; then
+  mkdir -p "$data_dir"
+  curl -fsSL "https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/Obsidian-${version}.AppImage" -o "$app"
+  chmod +x "$app"
+fi
+ln -fsT "$app" "$HOME/.local/bin/obsidian-app"
+
+if [ ! -f "$cli" ]; then
+  cd /tmp && "$app" --appimage-extract obsidian-cli >/dev/null 2>&1
+  install -m 755 /tmp/squashfs-root/obsidian-cli "$cli"
+  rm -rf /tmp/squashfs-root
+fi
+ln -fsT "$data_dir" "$HOME/.local/share/odsod/machine/data/obsidian/current"
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+install -m 755 "$repo/obsidian/obsidian-wrapper.sh" "$HOME/.local/bin/obsidian"
+
+mkdir -p "$HOME/.config/obsidian"
+config="$HOME/.config/obsidian/obsidian.json"
+[ -f "$config" ] || echo '{}' > "$config"
+jq --arg path "$HOME/Vaults/odsod" \
+  'if (.vaults // {} | to_entries | map(select(.value.path == $path)) | length) == 0
+   then .vaults.odsod = {"path": $path, "open": true} else . end | .cli = true' \
+  "$config" > "$config.tmp" && mv "$config.tmp" "$config"
+"""
+
+[tasks."setup:cursor"]
+description = "Install Cursor editor"
+run = """
+version="3.15.6"
+if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; then
+  sudo dnf install -y "https://downloads.cursor.com/production/a1f686545fd0ce8917bbd2449f733551a9bce420/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
+fi
+"""
+
+[tasks."setup:zed"]
+description = "Install Zed editor"
+run = """
+version="1.14.2"
+data_dir="$HOME/.local/share/odsod/machine/data/zed/${version}/zed.app"
+if [ ! -d "$data_dir" ]; then
+  mkdir -p "$(dirname "$data_dir")"
+  curl -fsSL "https://github.com/zed-industries/zed/releases/download/v${version}/zed-linux-x86_64.tar.gz" | tar -xz -C "$(dirname "$data_dir")"
+fi
+ln -fsT "${data_dir}/bin/zed" "$HOME/.local/bin/zed"
+mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/512x512/apps"
+desktop_file=$(find "${data_dir}/share/applications" -name "*.desktop" | head -1)
+if [ -n "$desktop_file" ]; then
+  sed "s|Icon=zed|Icon=${data_dir}/share/icons/hicolor/512x512/apps/zed.png|; s|Exec=zed|Exec=${data_dir}/bin/zed|" \
+    "$desktop_file" > "$HOME/.local/share/applications/zed.desktop"
+fi
+ln -fsT "${data_dir}/share/icons/hicolor/512x512/apps/zed.png" \
+  "$HOME/.local/share/icons/hicolor/512x512/apps/zed.png"
+"""
+
+[tasks."setup:yaak"]
+description = "Install Yaak API client"
+run = """
+version="2026.5.0"
+if ! rpm -q "yaak-${version}" >/dev/null 2>&1; then
+  sudo dnf install -y "https://github.com/mountain-loop/yaak/releases/download/v${version}/yaak-${version}-1.x86_64.rpm"
+fi
+"""
+
+[tasks."setup:soap-ui"]
+description = "Install SoapUI"
+run = """
+version="5.10.0"
+data_dir="$HOME/.local/share/odsod/machine/data/soap-ui/${version}/SoapUI-${version}"
+if [ ! -d "$data_dir" ]; then
+  mkdir -p "$(dirname "$data_dir")"
+  curl -fsSL "https://dl.eviware.com/soapuios/${version}/SoapUI-${version}-linux-bin.tar.gz" | tar -xz -C "$(dirname "$data_dir")"
+fi
+ln -fsT "${data_dir}/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
+"""
+
+[tasks."setup:llama"]
+description = "Build and install llama.cpp GPU inference service"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+exec "$repo/tasks/setup-llama.sh"
+"""
+
+[tasks."setup:whisper"]
+description = "Build and install whisper.cpp GPU speech-to-text service"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+exec "$repo/tasks/setup-whisper.sh"
+"""
+
+[tasks."setup:fish-shell"]
+description = "Install mise-managed fish to stable path"
+run = """
+fish_path="$(mise where github:fish-shell/fish-shell)/fish"
+sudo install -m 0755 "$fish_path" /usr/local/bin/fish
+"""
+
+[tasks."setup:kde-fonts"]
+description = "Configure KDE system fonts"
+run = """
+kwriteconfig6 --group "General" --key "font" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "fixed" "Iosevka SS08,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "smallestReadableFont" "Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "toolBarFont" "Inter,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "menuFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "XftAntialias" "true"
+kwriteconfig6 --group "General" --key "XftHintStyle" "hintslight"
+kwriteconfig6 --group "General" --key "XftSubPixel" "none"
+kwriteconfig6 --group "WM" --key "activeFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+"""
+
+[tasks."setup:kwallet"]
+description = "Configure KWallet"
+run = """
+mkdir -p ~/.config
+printf '%s\n' '[Wallet]' 'Enabled=true' 'First Use=false' > ~/.config/kwalletrc
+"""
+
+[tasks."setup:keyboard"]
+description = "Install custom XKB keyboard layout"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+sudo cp "$repo/keyboard/odsod" /usr/share/X11/xkb/symbols/odsod
+grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
+  sudo sed -i 's#</layoutList>#<layout><configItem><name>odsod</name><languageList><iso639Id>eng</iso639Id></languageList></configItem></layout></layoutList>#' \
+  /usr/share/X11/xkb/rules/evdev.xml
+"""
+
+[tasks."setup:codex"]
+description = "Seed codex config from repo template"
+run = """
+if [ ! -f "$HOME/.codex/config.toml" ]; then
+  mkdir -p "$HOME/.codex"
+  repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+  cp "$repo/codex/config.toml" "$HOME/.codex/config.toml"
+fi
+"""

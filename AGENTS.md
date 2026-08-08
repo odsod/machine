@@ -5,162 +5,106 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
 
 ## Principles
 
-- **Minimalism**: Standard solutions > Custom scripts.
-- **Simplicity**: Idempotent, readable Makefiles.
-- **Automation**: All commands MUST be non-interactive (e.g., `dnf install -y`).
+- **Declarative first**: Express desired state in `mise.toml`, fall back to
+- **Single manifest**: `mise.toml` at the repo root is the global config
+- **Minimalism**: Standard mise features > custom scripts.
 
 ## Structure
 
-- **Root Makefile**: Orchestrator (`make install`).
-- **Subdirs**: Tool-specific logic.
-  - **Config**: Symlink (`ln -fsT`) to location required by tool (often `~/.config/<tool>/`).
-  - **Binaries**: Symlink/Install to `~/.local/bin/`.
-  - **Resources**: Download/Extract to `~/.local/share/odsod/machine/data/<tool>/<version>/`.
-    - Symlink active version (`ln -fsT`) to `~/.local/share/odsod/machine/<tool>` if needed.
-  - **System daemons**: Compiled from source, installed to `/usr/local/bin/`, managed via systemd system service.
-    - Build deps declared in `install-packages` target.
-    - Binary built in source dir (gitignored), installed via `sudo install`.
-    - Service file copied to `/etc/systemd/system/`.
-    - Requires `deploy` target (build + install + restart) for dev iteration.
-- **Environment**: `env.sh` (POSIX sh).
-  - **Role**: Source of Truth for all environment variables and PATH.
-  - **Install**: Symlinked to `~/.profile` and `~/.config/plasma-workspace/env/odsod-machine.sh` by Root Makefile.
+- **`mise.toml`**: Source of truth for tools, packages, dotfiles, services,
+- **`env.sh`**: Permanent. Single source of truth for environment variables.
+- **`tasks/`**: Shell scripts for imperative setup that can't be declarative
+- **Topic directories** (`fish/`, `neovim/`, `ghostty/`, etc.): Config source
+- **Exception directories** (keep Makefiles):
 
-## Development
+## Provisioning
 
-- **Efficiency**: Iterating on configs should not trigger a full `make`. Use specific targets.
+- **Bootstrap**: `mise bootstrap --yes` provisions the full machine.
+- **Fresh machine**:
+- **Status check**: `mise bootstrap status --missing`
+- **Dry run**: `mise bootstrap --dry-run`
 
-## Module Dependencies
+## Workflow: Version Bumping
 
-- **Default**: Keep modules independent.
-- **Convention**: Express dependencies only in consumer modules with explicit calls (e.g. `$(MAKE) -C ../nodejs ~/.local/bin/npm`).
-- **Avoid**: Central dependency graphs and root ordering lists.
+- **Tools**: `mise outdated` shows available updates, `mise upgrade` applies them.
+- **Desktop apps** (Slack, Zoom, Cursor, Zed, Yaak, SoapUI): update version
+  variables in `tasks/setup-desktop-apps.sh`.
+- **GPU services** (llama, whisper): update version variables in
+  `tasks/setup-gpu-services.sh`.
 
-## Home Folder
+### Bumping mise itself
 
-See "File System" in `.agents/AGENTS.md` for the standard directory layout.
+mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 
-## Workflow: Bootstrap
+1. Check latest: `mise self-update --dry-run` or GitHub releases
+2. Read release notes for all versions since current:
+   `defuddle parse https://github.com/jdx/mise/releases/tag/v<version> --md`
+3. Evaluate each new feature against the current config:
+   - Does it replace something imperative in our tasks/?
+   - Does it simplify an existing section?
+   - Does it enable removing a hook or script?
+4. Update `mise` version in `[tools]` and `min_version` at top of mise.toml
+5. Apply any config simplifications identified in step 3
 
-**Trigger**: "bootstrap", "fresh install", "set up this machine"
+## Adding Things
 
-A fresh machine has nothing except a git clone of this repo. The agent
-guides the user through the three-phase bootstrap:
+| What                       | Where                                                  |
+| -------------------------- | ------------------------------------------------------ |
+| New dev tool binary        | `mise use <tool>` (adds to `[tools]`)                  |
+| New system package         | Add `"dnf:<pkg>" = "latest"` to `[bootstrap.packages]` |
+| New config symlink         | Add entry to `[dotfiles]`                              |
+| New env var                | Add to `env.sh` (picked up by mise, KDE, systemd)      |
+| New systemd system service | Add to `[bootstrap.services]`                          |
+| New privileged file        | Add to `[bootstrap.files]`                             |
+| Complex imperative setup   | Add script to `tasks/`, wire into `[tasks]`            |
 
-1. **Pre-install** (interactive, user must be present):
-   - Run `make bootstrap-pre` (installs passwordless sudo, one password prompt)
-   - Verify output: `sudo -n true` must succeed
-   - If SSH keys are not configured, help the user set them up
+## mise.toml Sections
 
-2. **Install** (unattended, user can walk away):
-   - Run `make install`
-   - Monitor for failures, diagnose and fix broken modules
-   - Cross-module dependency failures: add the missing `$(MAKE) -C ../dep` call
-   - Repo/package failures: check idempotency (file targets, exit codes)
-   - On success: all modules installed, services enabled
+| Section                           | Purpose                                    |
+| --------------------------------- | ------------------------------------------ |
+| `[settings]`                      | Mise behavior config                       |
+| `[tools]`                         | Versioned dev tool binaries                |
+| `[env]`                           | Sources `env.sh` via `_.source`            |
+| `[settings.dotfiles]`             | Dotfiles root config                       |
+| `[dotfiles]`                      | Config symlinks (~46 entries)              |
+| `[bootstrap.packages]`            | dnf, brew-cask (fonts), flatpak packages   |
+| `[bootstrap.hooks.*]`             | Pre/post hooks for packages and tools      |
+| `[bootstrap.files]`               | Privileged files (sudoers, sshd config)    |
+| `[bootstrap.services]`            | System services (sshd, docker, tailscaled) |
+| `[bootstrap.mise_shell_activate]` | Fish shell activation                      |
+| `[tasks.*]`                       | Imperative setup scripts                   |
 
-3. **Post-install** (interactive, service logins):
-   - Run `make bootstrap-post`
-   - Guides user through: `gh auth login`, `sudo tailscale up`, `gcloud auth login`
-   - Verify each service: `gh auth status`, `tailscale status`, `gcloud auth list`
+## Key Design Decisions
 
-**Key principles**:
+- **`env.sh` is permanent**: KDE and systemd don't run mise. They need env
+- **`[bootstrap.linux.systemd.units]`** creates `dev.mise.*` units. Can't
+- **`[bootstrap.services]`** is system-level only (not `--user`).
+- **`[bootstrap.files]`** needs `replace = true` to convert existing symlinks
+- **`github:` backend** for GitHub release tools (replaces deprecated `ubi:`).
+- **Fish login shell** uses a stable symlink at `/usr/local/bin/fish` pointing
+- **Neovim as vim/vi**: Remove vim-enhanced/vim-minimal RPMs, symlink in
+- **Fonts**: `brew-cask:font-*` on Linux installs to `~/.local/share/fonts`
 
-- Never skip failures. Diagnose, fix in the Makefile, re-run.
-- Fixes go into the module, not one-off shell commands
-- After bootstrap completes, `make install` must be re-runnable and idempotent
-
-## Package Management
-
-- **Preference**: RPM > Flatpak > Manual.
-- **Repos**: Terra > COPR > RPM Fusion.
-
-## Workflow: Updates
-
-**Trigger**: "Let's bump versions" -> Agents must check ALL tools.
-
-1.  **Start Clean**:
-    - Top-level repo: ensure the working tree is committed before changing versions.
-    - Top-level repo: `jj git fetch --remote origin`
-    - Top-level repo: if `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
-    - `.agents/`: if external skills may be updated, `cd .agents`
-    - `.agents/`: ensure the working tree is committed before updating skills
-    - `.agents/`: `jj git fetch --remote origin`
-    - `.agents/`: if `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
-
-2.  **Discover**:
-    - Run `make discover` to get all latest versions in one shot.
-    - Output format: `# ./<dir>` headers followed by `variable_name=latest_version` lines.
-    - On upstream failure: `variable_name=UNKNOWN`. Fix the module's `discover` target.
-    - Compare output against current `version :=` values in each Makefile.
-    - For modules without a `discover` target (slack, zoom): fall back to manual discovery via `# Discovery:` URL.
-
-3.  **Validate**:
-    - For archive-based tools: `curl -I <url>` to ensure assets exist.
-    - For `go install` tools: Ensure the version string is valid for the module.
-
-4.  **Apply**: Update version variables in `Makefile`. No trailing whitespace.
-
-5.  **Verify**: For **every** bumped module, before push/PR:
-    - `make -C <dir>` then `<tool> --version` (or module-specific check in `<dir>/AGENTS.md`)
-    - **CRITICAL**: Makefile pin alone does not update installed binaries; `curl -I` is not a substitute
-    - For `codex/`: run `make -C codex codex-config-diff`
-    - If `codex/config.toml` changed: run `make -C codex codex-config-sync`
-
-6.  **External Skills** (in `.agents/skills/`):
-    - Check: `npx skills check -g`
-    - Update: `npx skills update -g`, or re-add individual skills:
-      ```
-      npx skills add anthropics/skills -s skill-creator -y -g --copy
-      npx skills add vercel-labs/agent-browser -s agent-browser -y -g --copy
-      npx skills add anthropics/claude-plugins-official -s claude-md-improver -y -g --copy
-      ```
-    - `-g` writes to `~/.agents/` which symlinks to `.agents/` in this repo
-    - Lock file: `.agents/.skill-lock.json` (v3 format)
-    - Commit in `.agents/`: `jj describe -m "feat(skills): update external skills"`
-
-7.  **Commit**: `feat(<dir>): bump versions`.
-    - List specific tool bumps in the commit body.
-    - **Optional**: Include release notes/changelog link in body if easily fetchable.
-
-## Commit style
+## Commit Style
 
 - Follow Conventional Commits.
-- **CRITICAL**: Header MUST be <= 50 chars. Verify before committing.
-- **Template**: `feat(scope): description`.
+- **Header MUST be <= 50 chars.** Verify before committing.
+- Template: `feat(scope): description`.
 
 ## jj
 
-- Use jj for all version control operations
-- Remote read operations are allowed (`jj git fetch`, release/API queries, cloning)
-- Do not push to the remote repo, leave this to the user
+- Use jj for all version control operations.
+- Remote read operations are allowed.
+- Do not push to the remote repo; leave this to the user.
 
 ## Nested Workspaces
-
-- **Pattern**: Use ignored nested workspaces for independent inner repos (no submodules).
-- **Setup**: Add directory to `.gitignore`, then `jj git clone <url> <path>`.
-- **Workflow**: `cd` into the nested directory to perform `jj` operations. They are fully independent of the parent workspace.
 
 ### .agents/ (github.com/odsod/agents)
 
 - **Purpose**: Agent skills (tmux, skill-creator, etc.)
-- **Install**: `make install` clones if `.agents/.jj` is absent.
-- **Update**:
-  - `cd .agents`
-  - Ensure the working tree is committed before starting work
-  - `jj git fetch --remote origin`
-  - If `jj log -r '@ & ~descendants(main@origin)' --no-graph` is non-empty, run `jj rebase -d main@origin`
-  - Only then start the `.agents` update work
-- **Skills Lock**:
-  - Lock file: `.agents/.skill-lock.json`
-  - Always use `-g` for shared skills. Without it, creates public `skills-lock.json`.
-  - Never commit `skills-lock.json` in this repo
-  - Install: `npx skills add <source> ... -g -y --copy`
-  - Update: `make -C .agents update-skills`
-  - List: `npx skills list -g --json`
+- **Install**: `mise bootstrap` clones if `.agents/.jj` is absent.
+- **Update**: See global AGENTS.md for workflow.
 
-## Maintaining This File
+## Home Folder
 
-- **Format**: Headers + bullets - No paragraphs.
-- **Style**: Concise, direct, action-oriented. No filler or pleasantries.
-- **Commit Format**: `docs: update AGENTS.md`. Use `git commit --amend` for small tweaks.
+See "File System" in `.agents/AGENTS.md` for the standard directory layout.

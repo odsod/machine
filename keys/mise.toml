@@ -1,0 +1,45 @@
+[tasks.install]
+description = "Build, install, and enable odsod-keys"
+depends = ["build", "install-service"]
+run = """
+sudo systemctl daemon-reload
+sudo systemctl enable --now odsod-keys.service
+"""
+
+[tasks.build]
+description = "Compile and install odsod-keys binary"
+run = """
+sudo dnf install -y -q gcc kernel-headers
+gcc -O2 -Wall -Wextra -Werror -o odsod-keys odsod-keys.c
+sudo install -m 0755 odsod-keys /usr/local/bin/odsod-keys
+rm odsod-keys
+"""
+
+[tasks.install-service]
+description = "Install systemd service file"
+run = "sudo cp -f odsod-keys.service /etc/systemd/system/odsod-keys.service"
+
+[tasks.deploy]
+description = "Build, install, and restart"
+depends = ["build", "install-service"]
+run = "sudo systemctl restart odsod-keys.service"
+
+[tasks.status]
+description = "Show service status"
+run = "systemctl status odsod-keys.service"
+
+[tasks.log]
+description = "Follow service logs"
+run = "journalctl -u odsod-keys.service -f"
+
+[tasks.stop]
+description = "Stop the service"
+run = "sudo systemctl stop odsod-keys.service"
+
+[tasks.uninstall]
+description = "Disable and remove everything"
+run = """
+sudo systemctl disable --now odsod-keys.service 2>/dev/null || true
+sudo rm -f /usr/local/bin/odsod-keys /etc/systemd/system/odsod-keys.service
+sudo systemctl daemon-reload
+"""

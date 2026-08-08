@@ -1,0 +1,19 @@
+[vars]
+version = "b10327"
+model = "Qwen3.5-9B-Q5_K_M.gguf"
+model_url = "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q5_K_M.gguf"
+embed_model = "Qwen3-Embedding-0.6B-Q8_0.gguf"
+embed_model_url = "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/Qwen3-Embedding-0.6B-Q8_0.gguf"
+port = "8179"
+embed_port = "8180"
+
+[tasks.discover]
+description = "Show latest llama.cpp release version"
+run = """
+curl -sI https://github.com/ggml-org/llama.cpp/releases/latest \
+  | grep -i ^location: | grep -oP '/\\K[a-z][0-9]+' || echo UNKNOWN
+"""
+
+[tasks.clean]
+description = "Remove source tree"
+run = "rm -rf llama.cpp-{{vars.version}}"

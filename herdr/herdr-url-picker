@@ -19,7 +19,7 @@ if test -z "$raw_text"
 end
 
 set urls (printf '%s\n' $raw_text | \
-    grep -oP 'https?://[a-zA-Z0-9][a-zA-Z0-9._%+~:/?#@!$&()*,;=-]*[a-zA-Z0-9/=_~#)-]' | \
+    grep -oP 'https?://[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+(?:[:/][a-zA-Z0-9._%+~:/?#@!$&()*,;=-]*[a-zA-Z0-9/=_~#)-])?' | \
     tac | \
     awk '!seen[$0]++')
 
