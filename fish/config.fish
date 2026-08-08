@@ -93,12 +93,17 @@ function ssh-refresh
     end
 end
 
+fish_add_path --global $HOME/.local/share/mise/shims
+
 status is-interactive; or return
 set -q CURSOR_AGENT; and return
 
-if test -x "$HOME/.local/bin/mise"
-    "$HOME/.local/bin/mise" activate fish | source
+if command -q mise
+    mise activate fish | source
 end
+
+starship init fish | source
+fzf --fish | source
 
 abbr -a vim nvim
 abbr -a vi nvim

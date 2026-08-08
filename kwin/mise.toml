@@ -1,0 +1,33 @@
+[tasks.install]
+description = "Install KWin script package and configure"
+depends = ["install-package", "enable-plugin", "configure"]
+run = "echo '[kwin] Done'"
+
+[tasks.install-package]
+description = "Install Plasma KWin script package"
+run = "kpackagetool6 --type=KWin/Script --install . 2>/dev/null || kpackagetool6 --type=KWin/Script --upgrade ."
+
+[tasks.enable-plugin]
+description = "Enable KWin plugin"
+run = """
+kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled false
+qdbus-qt6 org.kde.KWin /KWin reconfigure
+sleep 1
+kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled true
+qdbus-qt6 org.kde.KWin /KWin reconfigure
+"""
+
+[tasks.configure]
+description = "Configure KWin window focus policy"
+run = """
+kwriteconfig6 --file kwinrc --group Windows --key FocusPolicy FocusFollowsMouse
+qdbus-qt6 org.kde.KWin /KWin reconfigure
+"""
+
+[tasks.uninstall]
+description = "Uninstall Plasma KWin script package"
+run = "kpackagetool6 --type=KWin/Script --remove odsod"
+
+[tasks.tail]
+description = "Tail KWin dbus service log"
+run = "journalctl --user -f -t odsod-kwin-dbus-service"

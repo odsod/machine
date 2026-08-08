@@ -1,0 +1,97 @@
+[tasks.install]
+description = "Install Google Endpoint Verification"
+depends = ["install-files", "enable-service"]
+run = "echo '[endpoint-verification] Done'"
+
+[tasks.install-files]
+description = "Download, extract, and install helper files"
+run = """
+packages_url="https://packages.cloud.google.com/apt/dists/endpoint-verification/main/binary-amd64/Packages"
+apt_base_url="https://packages.cloud.google.com/apt"
+data_dir="$HOME/.local/share/odsod/machine/data/endpoint-verification"
+install_prefix="/opt/google/endpoint-verification"
+
+entry=$(curl -fsSL "$packages_url" | awk '
+  BEGIN { RS = ""; FS = "\\n" }
+  /(^|\\n)Package: endpoint-verification(\\n|$)/ {
+    version = ""; filename = ""; sha256 = ""
+    for (i = 1; i <= NF; i++) {
+      if ($i ~ /^Version: /) version = substr($i, 10)
+      if ($i ~ /^Filename: /) filename = substr($i, 11)
+      if ($i ~ /^SHA256: /) sha256 = substr($i, 9)
+    }
+    print version "\t" filename "\t" sha256
+  }' | sort -V | tail -1)
+
+version=$(echo "$entry" | cut -f1)
+filename=$(echo "$entry" | cut -f2)
+sha256=$(echo "$entry" | cut -f3)
+package_url="${apt_base_url}/${filename}"
+version_dir="${data_dir}/${version}"
+extract_dir="${version_dir}/extract"
+package="${version_dir}/package.deb"
+
+if [ -f "${extract_dir}/.extracted" ]; then
+  echo "[endpoint-verification] Already at version ${version}"
+else
+  echo "[endpoint-verification] Downloading ${package_url}..."
+  mkdir -p "$version_dir"
+  curl -fsSL "$package_url" -o "$package"
+  printf '%s  %s\n' "$sha256" "$package" | sha256sum -c
+
+  echo "[endpoint-verification] Extracting..."
+  rm -rf "$extract_dir"
+  mkdir -p "$extract_dir"
+  cd "$extract_dir" && ar x "$package"
+  tar -C "$extract_dir" -xzf "${extract_dir}/data.tar.gz"
+  touch "${extract_dir}/.extracted"
+fi
+
+echo "[endpoint-verification] Installing files..."
+sudo install -d -m 0755 \
+  ${install_prefix}/bin \
+  ${install_prefix}/var/lib \
+  /etc/opt/chrome/native-messaging-hosts \
+  /lib/systemd/system
+
+if command -v selinuxenabled >/dev/null && selinuxenabled; then
+  sudo chcon -t var_lib_t ${install_prefix}/var ${install_prefix}/var/lib
+fi
+
+sudo install -m 0755 \
+  "${extract_dir}/opt/google/endpoint-verification/bin/apihelper" \
+  ${install_prefix}/bin/apihelper
+sudo install -m 0755 "{{config_root}}/endpoint-verification/device_state.sh" \
+  ${install_prefix}/bin/device_state.sh
+sudo install -m 0644 \
+  "${extract_dir}/etc/opt/chrome/native-messaging-hosts/com.google.endpoint_verification.api_helper.json" \
+  /etc/opt/chrome/native-messaging-hosts/com.google.endpoint_verification.api_helper.json
+sudo install -m 0644 \
+  "${extract_dir}/lib/systemd/system/endpoint-verification.service" \
+  /lib/systemd/system/endpoint-verification.service
+"""
+
+[tasks.enable-service]
+description = "Enable endpoint-verification systemd service"
+run = """
+sudo systemctl daemon-reload
+sudo systemctl enable endpoint-verification.service
+sudo systemctl restart endpoint-verification.service
+"""
+
+[tasks.verify]
+description = "Verify device state output"
+run = """
+echo '--- device_state.sh init ---'
+sudo /opt/google/endpoint-verification/bin/device_state.sh init
+echo '--- device_state.sh ---'
+/opt/google/endpoint-verification/bin/device_state.sh
+"""
+
+[tasks.discover]
+description = "Show latest available version"
+run = """
+curl -fsSL "https://packages.cloud.google.com/apt/dists/endpoint-verification/main/binary-amd64/Packages" \
+  | awk 'BEGIN { RS = ""; FS = "\\n" } /(^|\\n)Package: endpoint-verification(\\n|$)/ { for (i = 1; i <= NF; i++) if ($i ~ /^Version: /) print substr($i, 10) }' \
+  | sort -V | tail -1
+"""

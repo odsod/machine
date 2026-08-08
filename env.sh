@@ -23,9 +23,7 @@ export GOOGLE_GENAI_USE_VERTEXAI=true
 export GOOGLE_CLOUD_PROJECT="way-platform-ai"
 export GOOGLE_CLOUD_LOCATION="eu"
 
-# go
-export GOROOT="$HOME/.local/share/odsod/machine/go"
-export PATH="$GOROOT/bin:$PATH"
+# go — GOPATH/bin for `go install`-ed binaries (mise manages GOROOT)
 export PATH="$HOME/go/bin:$PATH"
 
 # java
@@ -39,13 +37,6 @@ export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
 
 # neovim
 export EDITOR="nvim"
-
-# npm
-export PATH="$HOME/.local/share/npm/bin:$PATH"
-
-# pnpm
-export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="$PNPM_HOME:$PATH"
 
 # rust
 export RUSTUP_HOME="$HOME/.rustup"
@@ -80,4 +71,4 @@ if command -v lspci >/dev/null 2>&1 && \
 fi
 
 # machine
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
