@@ -274,7 +274,7 @@ root = "{{config_root}}"
 
 # Flatpak
 "flatpak:com.spotify.Client" = "latest"
-"flatpak-user:hu.irl.cameractrls" = "latest"
+"flatpak:hu.irl.cameractrls" = "latest"
 
 [bootstrap.hooks.pre-packages]
 run = """
@@ -357,7 +357,7 @@ state = "running"
 enabled = true
 
 [bootstrap.repos]
-".agents" = { url = "git@github.com:odsod/agents.git" }
+"~/Code/github.com/odsod/machine/.agents" = { url = "git@github.com:odsod/agents.git" }
 
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"
