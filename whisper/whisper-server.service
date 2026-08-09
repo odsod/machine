@@ -1,6 +1,8 @@
 [Unit]
 Description=whisper-server (GPU-accelerated speech-to-text)
 After=default.target
+ConditionPathExists=@MODEL_PATH@
+ConditionPathExists=@VAD_MODEL_PATH@
 
 [Service]
 Type=simple

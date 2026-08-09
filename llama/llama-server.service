@@ -1,6 +1,7 @@
 [Unit]
 Description=llama-server (GPU-accelerated LLM inference)
 After=default.target
+ConditionPathExists=@MODEL_PATH@
 
 [Service]
 Type=simple

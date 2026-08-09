@@ -1,6 +1,7 @@
 [Unit]
 Description=llama-server (embedding model)
 After=default.target
+ConditionPathExists=@MODEL_PATH@
 
 [Service]
 Type=simple

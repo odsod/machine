@@ -1,0 +1,13 @@
+modelRoles:
+  default: opencode-go/deepseek-v4-flash
+  smol: opencode-go/deepseek-v4-flash
+tools:
+  approvalMode: yolo
+compaction:
+  enabled: true
+startup:
+  quiet: true
+symbolPreset: nerd
+theme:
+  dark: odsod
+setupVersion: 1
