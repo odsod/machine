@@ -1,0 +1,12 @@
+modelRoles:
+  default: opencode-go/qwen3.8-max
+  smol: opencode-go/deepseek-v4-flash
+
+tools:
+  approvalMode: yolo
+
+compaction:
+  enabled: true
+
+startup:
+  quiet: true
