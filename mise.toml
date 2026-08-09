@@ -46,6 +46,7 @@ nvim_path="$(mise where neovim)/bin/nvim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
+opencode = "1.18.15"
 ruff = "0.16.2"
 starship = "1.26.0"
 usage = "latest"
@@ -134,6 +135,11 @@ root = "{{config_root}}"
 
 # Claude
 "~/.claude/settings.json" = "claude/settings.json"
+
+# OpenCode
+"~/.config/opencode/opencode.json" = "opencode/opencode.json"
+"~/.config/opencode/tui.json" = "opencode/tui.json"
+"~/.config/opencode/plugins/odsod-hooks.js" = "opencode/plugins/odsod-hooks.js"
 
 # Gemini
 "~/.gemini/settings.json" = "gemini/settings.json"
