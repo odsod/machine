@@ -11,7 +11,7 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="b10327"
+VERSION="b10336"
 MODEL="Qwen3.5-9B-Q5_K_M.gguf"
 MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/${MODEL}"
 EMBED_MODEL="Qwen3-Embedding-0.6B-Q8_0.gguf"
@@ -46,12 +46,14 @@ cmake --build build --target llama-server -j"$(nproc)"
 
 if [ ! -f "${DATA_DIR}/llama/${MODEL}" ]; then
   echo "[llama] Downloading model..."
-  curl -fL "$MODEL_URL" --create-dirs -o "${DATA_DIR}/llama/${MODEL}"
+  curl -fL "$MODEL_URL" --create-dirs -o "${DATA_DIR}/llama/${MODEL}.tmp"
+  mv "${DATA_DIR}/llama/${MODEL}.tmp" "${DATA_DIR}/llama/${MODEL}"
 fi
 
 if [ ! -f "${DATA_DIR}/llama/${EMBED_MODEL}" ]; then
   echo "[llama] Downloading embedding model..."
-  curl -fL "$EMBED_MODEL_URL" --create-dirs -o "${DATA_DIR}/llama/${EMBED_MODEL}"
+  curl -fL "$EMBED_MODEL_URL" --create-dirs -o "${DATA_DIR}/llama/${EMBED_MODEL}.tmp"
+  mv "${DATA_DIR}/llama/${EMBED_MODEL}.tmp" "${DATA_DIR}/llama/${EMBED_MODEL}"
 fi
 
 echo "[llama] Installing systemd user services..."
