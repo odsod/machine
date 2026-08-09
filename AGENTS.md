@@ -26,11 +26,13 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
-- **Tools**: `mise outdated` shows available updates, `mise upgrade` applies them.
-- **Desktop apps** (Slack, Zoom, Cursor, Zed, Yaak, SoapUI): update version
-  variables in `tasks/setup-desktop-apps.sh`.
-- **GPU services** (llama, whisper): update version variables in
-  `tasks/setup-gpu-services.sh`.
+- **mise tools**: `mise outdated` shows available updates, `mise upgrade` applies them.
+- **Desktop apps** (Slack, Zoom, Cursor, Zed, Yaak, SoapUI, Obsidian): update
+  `version` variable in corresponding `[tasks."setup:*"]` section in `mise.toml`.
+- **GPU services** (llama, whisper): update `VERSION` in
+  `tasks/setup-llama.sh` / `tasks/setup-whisper.sh`.
+- **Fonts** (Inter, Iosevka, Nerd Fonts): update `VERSION` in corresponding
+  `[tasks."setup:font-*"]` section in `mise.toml`.
 
 ### Bumping mise itself
 

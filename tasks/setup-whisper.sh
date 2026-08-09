@@ -46,12 +46,14 @@ cmake --build build --target whisper-server -j"$(nproc)"
 
 if [ ! -f "${DATA_DIR}/whisper/${MODEL}" ]; then
   echo "[whisper] Downloading model..."
-  curl -fL "$MODEL_URL" --create-dirs -o "${DATA_DIR}/whisper/${MODEL}"
+  curl -fL "$MODEL_URL" --create-dirs -o "${DATA_DIR}/whisper/${MODEL}.tmp"
+  mv "${DATA_DIR}/whisper/${MODEL}.tmp" "${DATA_DIR}/whisper/${MODEL}"
 fi
 
 if [ ! -f "${DATA_DIR}/whisper/${VAD_MODEL}" ]; then
   echo "[whisper] Downloading VAD model..."
-  curl -fL "$VAD_MODEL_URL" --create-dirs -o "${DATA_DIR}/whisper/${VAD_MODEL}"
+  curl -fL "$VAD_MODEL_URL" --create-dirs -o "${DATA_DIR}/whisper/${VAD_MODEL}.tmp"
+  mv "${DATA_DIR}/whisper/${VAD_MODEL}.tmp" "${DATA_DIR}/whisper/${VAD_MODEL}"
 fi
 
 echo "[whisper] Installing systemd user service..."
