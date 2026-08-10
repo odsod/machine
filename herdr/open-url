@@ -1,0 +1,140 @@
+#!/usr/bin/env fish
+#
+# open-url — Open a URL in the browser on the machine the user is sitting at.
+#
+# When called from an interactive desktop session (DISPLAY/WAYLAND_DISPLAY set),
+# opens the URL locally via xdg-open.
+#
+# When called from a herdr server with a remote client attached (herdr --remote),
+# detects the remote client's host via tailscale and opens the URL there over SSH.
+# This handles the case where xdg-open would otherwise fire on the wrong machine.
+#
+# When called via SSH on a machine with a KDE desktop session but no DISPLAY in
+# the current env (e.g. non-interactive SSH), inherits the display environment
+# from the running plasmashell process.
+#
+# Usage:
+#   open-url <url>
+
+# ---------------------------------------------------------------------------
+# Helper: open URL using the local desktop session
+# ---------------------------------------------------------------------------
+
+function _open_url_local
+    set -l url $argv[1]
+
+    # If display env is already available, open directly.
+    if test -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY"
+        setsid xdg-open "$url" &>/dev/null &
+        return 0
+    end
+
+    # Non-interactive session (e.g. incoming SSH): inherit display env from
+    # the running KDE desktop session (plasmashell has DISPLAY + WAYLAND_DISPLAY).
+    set -l plasma_pid (pgrep -u (id -u) plasmashell | head -1)
+    if test -z "$plasma_pid"
+        echo "open-url: no desktop session found (no plasmashell process)" >&2
+        return 1
+    end
+
+    set -l env_file /proc/$plasma_pid/environ
+    if not test -r "$env_file"
+        echo "open-url: cannot read $env_file" >&2
+        return 1
+    end
+
+    # Export the display-related variables into this process.
+    for line in (cat "$env_file" | tr '\0' '\n' | string match -r '^(DISPLAY|WAYLAND_DISPLAY|XDG_RUNTIME_DIR|DBUS_SESSION_BUS_ADDRESS)=.*')
+        set -l parts (string split -m1 '=' "$line")
+        set -gx $parts[1] $parts[2]
+    end
+
+    setsid xdg-open "$url" &>/dev/null &
+    return 0
+end
+
+# ---------------------------------------------------------------------------
+# Helper: check if this machine is serving an inbound herdr --remote attach
+# ---------------------------------------------------------------------------
+
+function _open_url_has_inbound_bridge
+    # A server-side bridge is spawned by sshd-session (someone SSH'd into this
+    # machine to attach). A client-side bridge is spawned by herdr itself.
+    # Only the server-side case means "open on the remote client's machine".
+    for pid in (pgrep -f "herdr remote-client-bridge" 2>/dev/null)
+        set -l ppid (awk '/^PPid:/{print $2}' /proc/$pid/status 2>/dev/null)
+        set -l parent_comm (cat /proc/$ppid/comm 2>/dev/null)
+        if test "$parent_comm" = sshd-session
+            return 0
+        end
+    end
+    return 1
+end
+
+# ---------------------------------------------------------------------------
+# Helper: detect the tailscale hostname of the herdr remote-attach client
+# ---------------------------------------------------------------------------
+
+function _open_url_detect_remote_client
+    # Find established SSH connections to local port 22 from /proc/net/tcp.
+    # Format: local_addr remote_addr state ... (hex, little-endian on x86_64)
+    set -l connections (awk '$2 ~ /:0016$/ && $4 == "01" {print $3}' /proc/net/tcp 2>/dev/null)
+    if test -z "$connections"
+        return 1
+    end
+
+    # Decode each peer IP and look it up in tailscale.
+    set -l ts_json (tailscale status --json 2>/dev/null)
+    if test -z "$ts_json"
+        return 1
+    end
+
+    for conn in $connections
+        set -l hex_ip (string split ":" "$conn")[1]
+
+        # /proc/net/tcp stores IPv4 in little-endian on x86_64.
+        set -l b1 (printf '%d' 0x(string sub -s 7 -l 2 "$hex_ip"))
+        set -l b2 (printf '%d' 0x(string sub -s 5 -l 2 "$hex_ip"))
+        set -l b3 (printf '%d' 0x(string sub -s 3 -l 2 "$hex_ip"))
+        set -l b4 (printf '%d' 0x(string sub -s 1 -l 2 "$hex_ip"))
+        set -l ip "$b1.$b2.$b3.$b4"
+
+        # Check if this IP belongs to a tailscale peer.
+        set -l host (echo "$ts_json" | jq -r --arg ip "$ip" \
+            '.Peer[] | select(.TailscaleIPs[]? == $ip) | .HostName // empty')
+        if test -n "$host"
+            echo "$host"
+            return 0
+        end
+    end
+
+    return 1
+end
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+set -l url $argv[1]
+
+if test -z "$url"
+    echo "Usage: open-url <url>" >&2
+    exit 1
+end
+
+# Routing decision: if this machine is serving a herdr --remote attach (i.e. a
+# remote-client-bridge exists whose parent is sshd-session), open the URL on
+# the attached client's machine instead of locally.
+# Skip routing when called recursively via SSH (OPEN_URL_LOCAL=1).
+if test -z "$OPEN_URL_LOCAL"; and _open_url_has_inbound_bridge
+    set -l remote_host (_open_url_detect_remote_client)
+    if test -n "$remote_host"
+        # SSH to the remote client and run open-url there. OPEN_URL_LOCAL=1
+        # prevents infinite recursion if that machine also has inbound bridges.
+        ssh -o BatchMode=yes -o ConnectTimeout=3 "$remote_host" "OPEN_URL_LOCAL=1 open-url '$url'" &>/dev/null
+        or _open_url_local "$url"
+        exit $status
+    end
+end
+
+_open_url_local "$url"

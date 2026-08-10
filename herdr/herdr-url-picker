@@ -37,5 +37,5 @@ set selected_url (printf '%s\n' $urls | fzf \
     --bind='j:down,k:up')
 
 if test -n "$selected_url"
-    setsid xdg-open "$selected_url" &>/dev/null
+    open-url "$selected_url"
 end
