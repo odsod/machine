@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+PROFILE_DIR="$HOME/.local/share/odsod/machine/agent-browser/profile"
+PORT=9223
+
+# If already running, just bring it up (exit for KWin to handle focus)
+if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
+  exit 0
+fi
+
+exec google-chrome \
+  --user-data-dir="$PROFILE_DIR" \
+  --disable-extensions \
+  --remote-debugging-port="$PORT" \
+  --class=AgentBrowser \
+  about:blank
