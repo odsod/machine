@@ -4,14 +4,42 @@ set -eu
 PROFILE_DIR="$HOME/.local/share/odsod/machine/agent-browser/profile"
 PORT=9223
 
-# If already running, just bring it up (exit for KWin to handle focus)
-if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
-  exit 0
-fi
+start_browser() {
+  if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
+    return 0
+  fi
+  google-chrome \
+    --user-data-dir="$PROFILE_DIR" \
+    --disable-extensions \
+    --remote-debugging-port="$PORT" \
+    --class=AgentBrowser \
+    about:blank &
+  # Wait for CDP to be ready
+  for _ in $(seq 1 30); do
+    if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.2
+  done
+  echo "Timed out waiting for Chrome CDP on port $PORT" >&2
+  exit 1
+}
 
-exec google-chrome \
-  --user-data-dir="$PROFILE_DIR" \
-  --disable-extensions \
-  --remote-debugging-port="$PORT" \
-  --class=AgentBrowser \
-  about:blank
+case "${1:-}" in
+  connect)
+    start_browser
+    exec agent-browser connect "$PORT"
+    ;;
+  *)
+    # Launch only (for KWin focus-or-launch)
+    if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
+      exit 0
+    fi
+    exec google-chrome \
+      --user-data-dir="$PROFILE_DIR" \
+      --disable-extensions \
+      --remote-debugging-port="$PORT" \
+      --class=AgentBrowser \
+      about:blank
+    ;;
+esac
