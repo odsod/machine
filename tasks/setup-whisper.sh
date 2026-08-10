@@ -29,7 +29,8 @@ sudo dnf install -y -q \
   rocblas-devel \
   rocm-hip
 
-if [ ! -d "$SRC" ]; then
+if [ ! -f "$SRC/CMakeLists.txt" ]; then
+  rm -rf "$SRC"
   echo "[whisper] Downloading source..."
   curl -fL "https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
 fi
