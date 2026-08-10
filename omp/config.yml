@@ -10,3 +10,8 @@ compaction:
 
 startup:
   quiet: true
+
+symbolPreset: nerd
+
+theme:
+  dark: odsod
