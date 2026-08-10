@@ -6,10 +6,60 @@
         "region": "eu-north-1",
         "profile": "bedrock"
       }
+    },
+    "cursor-acp": {
+      "name": "Cursor",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://127.0.0.1:32124/v1"
+      },
+      "models": {
+        "auto": {
+          "name": "Auto"
+        },
+        "claude-opus-5-thinking-high": {
+          "name": "Opus 5 Thinking"
+        },
+        "claude-opus-4-8-thinking-high": {
+          "name": "Opus 4.8 Thinking"
+        },
+        "claude-fable-5-thinking-high": {
+          "name": "Fable 5 Thinking (NO ZDR)"
+        },
+        "claude-sonnet-5-thinking-high": {
+          "name": "Sonnet 5 Thinking"
+        },
+        "gpt-5.6-sol-high": {
+          "name": "GPT-5.6 Sol"
+        },
+        "gpt-5.5-high": {
+          "name": "GPT-5.5"
+        },
+        "gpt-5.4-high": {
+          "name": "GPT-5.4"
+        },
+        "gpt-5.3-codex": {
+          "name": "Codex 5.3"
+        },
+        "gemini-3.6-flash-high": {
+          "name": "Gemini 3.6 Flash"
+        },
+        "composer-2.5": {
+          "name": "Composer 2.5"
+        },
+        "composer-2.5-fast": {
+          "name": "Composer 2.5 Fast"
+        },
+        "gemini-3.1-pro": {
+          "name": "Gemini 3.1 Pro"
+        }
+      }
     }
   },
   "model": "amazon-bedrock/eu.anthropic.claude-opus-4-6-v1",
   "small_model": "amazon-bedrock/eu.anthropic.claude-haiku-4-5-20251001-v1:0",
   "permission": "allow",
-  "autoupdate": false
+  "autoupdate": false,
+  "lsp": true,
+  "plugin": ["cursor-acp"]
 }
