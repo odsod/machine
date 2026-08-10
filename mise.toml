@@ -160,6 +160,7 @@ root = "{{config_root}}"
 
 # Agent Browser
 "~/.config/agent-browser/config.json" = "agent-browser/config.json"
+"~/.local/bin/agent-browser-odsod" = "agent-browser/agent-browser-odsod"
 
 # uv
 "~/.config/uv/uv.toml" = "uv/uv.toml"

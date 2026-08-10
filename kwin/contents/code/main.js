@@ -286,33 +286,11 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] agent-browser (work)", "KWin", ""],
+    actionId: ["kwin", "[odsod] agent-browser", "KWin", ""],
     key: "Meta+1",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--user-data-dir=/home/odsod/.local/share/odsod/machine/agent-browser/profiles/work_profile_data",
-      "--disable-extensions",
-      "--remote-debugging-port=9223",
-      "--class=AgentBrowserWork",
-      "about:blank",
-    ],
-    resourceClass: "AgentBrowserWork",
-  },
-
-  {
-    actionId: ["kwin", "[odsod] agent-browser (personal)", "KWin", ""],
-    key: "Meta+2",
-    kind: "app",
-    command: [
-      "google-chrome",
-      "--user-data-dir=/home/odsod/.local/share/odsod/machine/agent-browser/profiles/personal_profile_data",
-      "--disable-extensions",
-      "--remote-debugging-port=9222",
-      "--class=AgentBrowserPersonal",
-      "about:blank",
-    ],
-    resourceClass: "AgentBrowserPersonal",
+    command: ["agent-browser-odsod"],
+    resourceClass: "AgentBrowser",
   },
 ];
 
