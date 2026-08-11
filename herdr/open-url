@@ -9,9 +9,8 @@
 # detects the remote client's host via tailscale and opens the URL there over SSH.
 # This handles the case where xdg-open would otherwise fire on the wrong machine.
 #
-# When called via SSH on a machine with a KDE desktop session but no DISPLAY in
-# the current env (e.g. non-interactive SSH), inherits the display environment
-# from the running plasmashell process.
+# When called via SSH on a machine without display env, launches xdg-open via
+# systemd-run --user which inherits the full desktop session context.
 #
 # Usage:
 #   open-url <url>
@@ -29,28 +28,10 @@ function _open_url_local
         return 0
     end
 
-    # Non-interactive session (e.g. incoming SSH): inherit display env from
-    # the running KDE desktop session (plasmashell has DISPLAY + WAYLAND_DISPLAY).
-    set -l plasma_pid (pgrep -u (id -u) plasmashell | head -1)
-    if test -z "$plasma_pid"
-        echo "open-url: no desktop session found (no plasmashell process)" >&2
-        return 1
-    end
-
-    set -l env_file /proc/$plasma_pid/environ
-    if not test -r "$env_file"
-        echo "open-url: cannot read $env_file" >&2
-        return 1
-    end
-
-    # Export the display-related variables into this process.
-    for line in (cat "$env_file" | tr '\0' '\n' | string match -r '^(DISPLAY|WAYLAND_DISPLAY|XDG_RUNTIME_DIR|DBUS_SESSION_BUS_ADDRESS)=.*')
-        set -l parts (string split -m1 '=' "$line")
-        set -gx $parts[1] $parts[2]
-    end
-
-    setsid xdg-open "$url" &>/dev/null &
-    return 0
+    # Non-interactive session (e.g. incoming SSH): run via systemd user session
+    # which has full desktop context (Wayland, D-Bus, XDG_RUNTIME_DIR).
+    systemd-run --user --no-block --quiet xdg-open "$url" &>/dev/null
+    return $status
 end
 
 # ---------------------------------------------------------------------------
