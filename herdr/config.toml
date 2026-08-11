@@ -105,7 +105,7 @@ description = "Clone Repository"
 # Jujutsu status
 [[keys.command]]
 key = "prefix+ctrl+g"
-command = "jj status"
+command = "herdr pane rename $HERDR_PANE_ID jj 2>/dev/null; jj status"
 type = "popup"
 width = "85%"
 height = "85%"

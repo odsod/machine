@@ -2,6 +2,8 @@
 
 set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
 
+test -n "$HERDR_PANE_ID"; and herdr pane rename "$HERDR_PANE_ID" clone 2>/dev/null
+
 command -q fzf; or exit 0
 
 # --- Shared fzf helpers ---
