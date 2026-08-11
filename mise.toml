@@ -378,6 +378,15 @@ login_shell = "/usr/local/bin/fish"
 [bootstrap.hooks.post-tools]
 run = "mise run setup:fish-shell"
 
+[tasks.apply]
+description = "Apply config changes pulled from another tree: full convergence"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+cd "$repo"
+mise bootstrap --yes
+mise reshim
+"""
+
 [tasks.bootstrap]
 description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
 depends = [

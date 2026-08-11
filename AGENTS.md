@@ -33,6 +33,21 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
   `tasks/setup-llama.sh` / `tasks/setup-whisper.sh`.
 - **Fonts** (Inter, Iosevka, Nerd Fonts): update `VERSION` in corresponding
   `[tasks."setup:font-*"]` section in `mise.toml`.
+- **After any tool change**: run `mise reshim` to regenerate shim wrappers.
+  Shims drift out of sync when tools are added, removed, or upgraded. The
+  activated shell bypasses shims, so breakage only surfaces in non-activated
+  contexts (IDEs, cron, systemd).
+
+## Workflow: Applying Changes from Another Machine
+
+After pulling commits that changed `mise.toml`:
+
+```
+mise run apply
+```
+
+Runs full `mise bootstrap --yes` (packages, services, files, dotfiles,
+tools, desktop apps) then regenerates shims.
 
 ### Bumping mise itself
 
