@@ -12,12 +12,14 @@ if test -z "$ws_id"
     if test -z "$pane_id"
         return 1
     end
+    herdr pane rename "$pane_id" recorder
     herdr pane send-text "$pane_id" "recorder run
 "
     set -l transcript ~/Vaults/odsod/raw/transcripts/(date +%Y-%m-%d)-recorder.md
     set -l right_id (herdr pane split "$pane_id" --direction right --ratio 0.5 2>/dev/null \
         | jq -r '.result.pane.pane_id' 2>/dev/null)
     if test -n "$right_id"
+        herdr pane rename "$right_id" transcript
         herdr pane send-text "$right_id" "tail -f $transcript 2>/dev/null || begin; echo 'waiting for transcript...'; sleep 2; exec tail -f $transcript; end
 "
     end
