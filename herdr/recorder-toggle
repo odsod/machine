@@ -2,17 +2,34 @@
 
 set -l ws_label recording
 
-set -l ws_id (herdr workspace list 2>/dev/null \
-    | jq -r ".result.workspaces[] | select(.label == \"$ws_label\") | .workspace_id" 2>/dev/null)
+set -l ws_json (herdr workspace list 2>/dev/null)
+set -l ws_id (echo $ws_json | jq -r ".result.workspaces[] | select(.label == \"$ws_label\") | .workspace_id" 2>/dev/null)
 
-if test -n "$ws_id"
-    herdr workspace close "$ws_id"
-else
-    herdr workspace create --label "$ws_label" --focus
-    set -l pane_id (herdr pane current 2>/dev/null \
-        | jq -r '.result.pane.pane_id' 2>/dev/null)
-    if test -n "$pane_id"
-        herdr pane send-text "$pane_id" "recorder run
+if test -z "$ws_id"
+    # Create workspace with recorder in left pane, transcript tail in right
+    set -l create_json (herdr workspace create --label "$ws_label" --focus 2>/dev/null)
+    set -l pane_id (echo $create_json | jq -r '.result.root_pane.pane_id' 2>/dev/null)
+    if test -z "$pane_id"
+        return 1
+    end
+    herdr pane send-text "$pane_id" "recorder run
 "
+    set -l transcript ~/Vaults/odsod/raw/transcripts/(date +%Y-%m-%d)-recorder.md
+    set -l right_id (herdr pane split "$pane_id" --direction right --ratio 0.5 2>/dev/null \
+        | jq -r '.result.pane.pane_id' 2>/dev/null)
+    if test -n "$right_id"
+        herdr pane send-text "$right_id" "tail -f $transcript 2>/dev/null || begin; echo 'waiting for transcript...'; sleep 2; exec tail -f $transcript; end
+"
+    end
+else
+    # Toggle: if focused, switch away; otherwise focus it
+    set -l is_focused (echo $ws_json | jq -r ".result.workspaces[] | select(.workspace_id == \"$ws_id\") | .focused" 2>/dev/null)
+    if test "$is_focused" = true
+        set -l other_id (echo $ws_json | jq -r "[.result.workspaces[] | select(.label != \"$ws_label\")] | .[0].workspace_id" 2>/dev/null)
+        if test -n "$other_id"
+            herdr workspace focus "$other_id"
+        end
+    else
+        herdr workspace focus "$ws_id"
     end
 end
