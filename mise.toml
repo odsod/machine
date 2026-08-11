@@ -1,6 +1,5 @@
 [settings]
 idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
-minimum_release_age = "3d"
 pin = true
 trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
 
@@ -17,7 +16,7 @@ output = "prefix"
 run_auto_install = true
 
 [tools]
-"aqua:jdx/mise" = "2026.8.3"
+"aqua:jdx/mise" = "2026.8.4"
 
 # Languages
 go = "1.26.5"
@@ -31,7 +30,7 @@ python = "3.12"
 
 # Core CLI tools
 buf = "1.72.0"
-claude = "2.1.226"
+claude = "2.1.227"
 codex = "0.147.0"
 eza = "0.23.5"
 fzf = "0.74.2"
@@ -46,11 +45,11 @@ nvim_path="$(mise where neovim)/bin/nvim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
-opencode = "1.18.15"
+opencode = "1.18.16"
 "github:can1357/oh-my-pi" = { version = "17.2.12", exe = "omp" }
 ruff = "0.16.2"
 starship = "1.26.0"
-usage = "latest"
+usage = "5.1.0"
 
 # Language servers and linters
 lua-language-server = "3.19.0"
@@ -60,17 +59,17 @@ stylua = "2.5.2"
 
 # npm tools
 "npm:@typescript/native-preview" = "7.0.0-dev.20260707.2"
-"npm:agent-browser" = "0.33.2"
+"npm:agent-browser" = "0.34.0"
 "npm:bash-language-server" = "5.6.0"
 "npm:defuddle" = "0.19.2"
-"npm:oxfmt" = "0.62.0"
-"npm:oxlint" = "1.77.0"
-"npm:pnpm" = "11.20.0"
+"npm:oxfmt" = "0.63.0"
+"npm:oxlint" = "1.78.0"
+"npm:pnpm" = "11.21.0"
 "npm:typescript" = "7.0.2"
 "npm:yaml-language-server" = "1.24.0"
 
 # Tools via GitHub releases
-"github:backnotprop/plannotator" = "0.26.4"
+"github:backnotprop/plannotator" = "0.26.8"
 "github:dmmulroy/jj-starship" = "0.7.1"
 "github:Feel-ix-343/markdown-oxide" = "0.25.12"
 "github:fish-shell/fish-shell" = { version = "4.8.1", exe = "fish" }
@@ -80,8 +79,8 @@ stylua = "2.5.2"
 "github:traefik/yaegi" = "0.16.1"
 
 # Desktop/infra tools
-antigravity-cli = "1.1.11"
-awscli = "2.36.19"
+antigravity-cli = "1.1.12"
+awscli = "2.36.20"
 fx = "39.2.0"
 gcloud = "579.0.0"
 herdr = "0.8.0"
@@ -90,7 +89,7 @@ spacectl = "1.24.0"
 
 # Python tools (via pipx backend)
 "pipx:idasen" = "0.13.1"
-"pipx:ty" = "0.0.69"
+"pipx:ty" = "0.0.70"
 
 [env]
 _.source = "{{config_root}}/env.sh"
@@ -240,7 +239,7 @@ root = "{{config_root}}"
 "dnf:jq" = "latest"
 "dnf:kdialog" = "latest"
 "dnf:keepassxc" = "latest"
-"dnf:kwallet-pam" = "latest"
+"dnf:pam-kwallet" = "latest"
 "dnf:maven" = "latest"
 "dnf:mesa-dri-drivers" = "latest"
 "dnf:mesa-vulkan-drivers" = "latest"
@@ -497,7 +496,7 @@ fi
 [tasks."setup:obsidian"]
 description = "Install Obsidian AppImage, CLI, and vault config"
 run = """
-version="1.13.4"
+version="1.13.6"
 data_dir="$HOME/.local/share/odsod/machine/data/obsidian/${version}"
 app="${data_dir}/app.AppImage"
 cli="${data_dir}/obsidian-cli"
