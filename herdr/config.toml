@@ -19,10 +19,10 @@ text = "#ECEFF4" # nord6: primary text
 subtext0 = "#D8DEE9" # nord4: slightly muted primary text
 mauve = "#B48EAD" # nord15: aurora purple, branch names when active
 green = "#81A1C1" # nord9 blue: git ahead, idle/done state
-yellow = "#88C0D0" # nord8 frost: working state
+yellow = "#EBCB8B" # nord13: working state (amber, no attention needed)
 red = "#BF616A" # nord11: blocked state, git behind
-blue = "#81A1C1" # nord9: notifications, done dot
-teal = "#8FBCBB" # nord7: done (unseen) state
+blue = "#5E81AC" # nord10: notifications, done dot (darker blue)
+teal = "#5E81AC" # nord10: done (unseen) state (darker blue)
 peach = "#D08770" # nord12: aurora orange (unused currently)
 [terminal]
 new_cwd = "follow"
@@ -126,4 +126,3 @@ type = "popup"
 width = 80
 height = 20
 description = "URL Picker"
-

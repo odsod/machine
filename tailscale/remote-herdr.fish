@@ -18,4 +18,4 @@ set -l host (echo $status_json \
 
 test -n "$host"; or exit 0
 
-herdr --remote "$host"
+herdr --remote "$host" --remote-keybindings server
