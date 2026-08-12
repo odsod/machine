@@ -191,6 +191,7 @@ root = "{{config_root}}"
 # Scripts (not tool binaries; repo-local scripts symlinked to PATH)
 "~/.local/bin/clone-repo" = "herdr/clone-repo"
 "~/.local/bin/start-workspace" = "herdr/start-workspace"
+"~/.local/bin/remove-jj-workspace" = "herdr/remove-jj-workspace"
 "~/.local/bin/recorder-toggle-herdr" = "herdr/recorder-toggle"
 "~/.local/bin/herdr-url-picker" = "herdr/herdr-url-picker"
 "~/.local/bin/open-url" = "herdr/open-url"
