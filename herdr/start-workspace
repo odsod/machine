@@ -31,7 +31,7 @@ end
 
 function _fzf_pick_or_query --argument-names prompt
     fzf --prompt="$prompt> " --height=100% --reverse \
-        --print-query --bind='tab:replace-query,enter:print-query+accept'
+        --bind='tab:replace-query,enter:accept-or-print-query'
 end
 
 function _handle_fzf_status --argument-names status_code prompt
@@ -46,31 +46,17 @@ function _handle_fzf_status --argument-names status_code prompt
     end
 end
 
-function _handle_pick_or_query_status --argument-names status_code prompt raw_value
-    switch "$status_code"
-        case 0
-            return 0
-        case 1
-            set -l value (_first_non_empty_line $raw_value)
-            test -n "$value"; and return 0
-            return 1
-        case 130
-            return 1
-        case '*'
-            echo "$prompt picker failed (fzf exit $status_code)" >&2
-            exit 1
-    end
-end
 
-function _first_non_empty_line
+function _last_non_empty_line
+    set -l value
     for line in $argv
         set line (string trim -- "$line")
         if test -n "$line"
-            printf '%s\n' "$line"
-            return 0
+            set value "$line"
         end
     end
-    return 1
+    test -n "$value"; or return 1
+    printf '%s\n' "$value"
 end
 
 function _status_show --argument-names msg
@@ -151,9 +137,9 @@ function _select_or_create_dir --argument-names base_dir prompt
 
     set -l chosen (printf '%s\n' $dirs | _fzf_pick_or_query "$prompt")
     set -l status_code $status
-    _handle_pick_or_query_status "$status_code" "$prompt" "$chosen"; or return 1
+    _handle_fzf_status "$status_code" "$prompt"; or return 1
 
-    set -l dir_name (_first_non_empty_line $chosen)
+    set -l dir_name (_last_non_empty_line $chosen)
     test -n "$dir_name"; or return 1
 
     set -l target_dir "$base_dir/$dir_name"
@@ -270,19 +256,19 @@ function select_agent
 
     switch "$agent_choice"
         case codex
-            set -g agent_cmd codex
+            set -g agent_kind codex
             set -g agent_bin codex
         case agy
-            set -g agent_cmd agy
+            set -g agent_kind agy
             set -g agent_bin agy
         case gemini
-            set -g agent_cmd gemini
+            set -g agent_kind gemini
             set -g agent_bin gemini
         case claude
-            set -g agent_cmd claude
+            set -g agent_kind claude
             set -g agent_bin claude
         case cursor
-            set -g agent_cmd "cursor agent"
+            set -g agent_kind cursor
             set -g agent_bin cursor
         case '*'
             echo "Unknown agent selection: $agent_choice" >&2
@@ -302,19 +288,55 @@ function _launch_workspace
     set -l label $argv[1]
     set -l cwd $argv[2]
 
-    set -l ws_id (herdr workspace list 2>/dev/null \
-        | jq -r ".result.workspaces[] | select(.label == \"$label\") | .workspace_id" 2>/dev/null)
+    set -l workspace_json (herdr workspace list 2>/dev/null | string collect)
+    test $status -eq 0; or _fail "Failed to list Herdr workspaces."
 
-    if test -n "$ws_id"
-        herdr workspace focus "$ws_id"
+    set -l label_ids (printf '%s\n' "$workspace_json" \
+        | jq -r --arg label "$label" \
+            '.result.workspaces[] | select(.label == $label) | .workspace_id' 2>/dev/null)
+    test $status -eq 0; or _fail "Failed to parse Herdr workspaces."
+
+    set -l matching_ids
+    for candidate_id in $label_ids
+        set -l pane_json (herdr pane list --workspace "$candidate_id" 2>/dev/null | string collect)
+        test $status -eq 0; or continue
+
+        set -l cwd_match (printf '%s\n' "$pane_json" \
+            | jq -r --arg cwd "$cwd" '
+                if any((.result.panes // [])[];
+                    .cwd == $cwd or .foreground_cwd == $cwd or
+                    ((.cwd // "") | startswith($cwd + "/")) or
+                    ((.foreground_cwd // "") | startswith($cwd + "/")))
+                then "1" else "" end
+            ' 2>/dev/null)
+        test $status -eq 0; or continue
+        test "$cwd_match" = 1; and set -a matching_ids "$candidate_id"
+    end
+
+    if test (count $matching_ids) -gt 1
+        _fail "Multiple Herdr workspaces match $label at $cwd."
+    else if test (count $matching_ids) -eq 1
+        herdr workspace focus "$matching_ids[1]"
+        or _fail "Failed to focus Herdr workspace $matching_ids[1]."
     else
-        herdr workspace create --cwd "$cwd" --label "$label" --focus
-        set -l pane_id (herdr pane current 2>/dev/null \
-            | jq -r '.result.pane.pane_id' 2>/dev/null)
-        if test -n "$pane_id"
-            herdr pane send-text "$pane_id" "$agent_cmd
-"
-        end
+        set -l created (herdr workspace create --cwd "$cwd" --label "$label" --focus 2>/dev/null \
+            | string collect)
+        test $status -eq 0; or _fail "Failed to create Herdr workspace $label."
+
+        set -l created_ids (printf '%s\n' "$created" \
+            | jq -r '[.result.workspace.workspace_id, .result.root_pane.pane_id] | @tsv' 2>/dev/null)
+        test $status -eq 0; or _fail "Failed to parse the created Herdr workspace."
+        set created_ids (string split (printf '\t') -- "$created_ids")
+        test (count $created_ids) -eq 2; or _fail "Created Herdr workspace returned incomplete IDs."
+
+        set -l ws_id "$created_ids[1]"
+        set -l pane_id "$created_ids[2]"
+        set -l agent_name (string lower -- "$agent_kind-$ws_id" \
+            | string replace -ar '[^a-z0-9_-]' '-')
+        set agent_name (string sub -l 32 -- "$agent_name")
+
+        herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id"
+        or _fail "Failed to start $agent_kind in Herdr workspace $label."
     end
 end
 
@@ -438,15 +460,15 @@ if test "$space_type" = Workspace
         set -l decorated (_build_bookmark_lines "$workspace_base" "$repo_path" $suggestion_bookmarks)
         set bookmark_input (printf '%s\n' $decorated \
             | fzf --prompt="Bookmark> " --height=100% --reverse \
-                --print-query --bind='tab:transform-query(echo {} | cut -c23-),enter:print-query+accept' \
+                --bind='tab:transform-query(echo {} | cut -c23-),enter:accept-or-print-query' \
                 --with-nth=2..)
     else
         set bookmark_input (printf '\n' | _fzf_pick_or_query Bookmark)
     end
     set status_code $status
-    _handle_pick_or_query_status "$status_code" Bookmark "$bookmark_input"; or exit 0
+    _handle_fzf_status "$status_code" Bookmark; or exit 0
 
-    set -l raw_line (_first_non_empty_line $bookmark_input)
+    set -l raw_line (_last_non_empty_line $bookmark_input)
     if string match -rq '^\d+_\d+ ' -- "$raw_line"
         set selected_bookmark (string sub -s 23 -- "$raw_line")
     else
@@ -496,6 +518,13 @@ if test "$space_type" = Workspace
             echo "Path exists but is not a jj workspace: $workspace_path" >&2
             _trace "workspace: existing path is not jj workspace"
             echo "Move/remove that directory and retry." >&2
+            exit 1
+        end
+        jj -R "$workspace_path" workspace update-stale >/dev/null 2>&1
+        or begin
+            _status_clear
+            echo "Failed to refresh stale workspace at $workspace_path" >&2
+            _trace "workspace: existing workspace update-stale failed"
             exit 1
         end
     else

@@ -23,7 +23,16 @@ end
 set urls (printf '%s\n' $raw_text | \
     grep -oP 'https?://[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)+(?:[:/][a-zA-Z0-9._%+~:/?#@!$&()*,;=-]*[a-zA-Z0-9/=_~#)-])?' | \
     tac | \
-    awk '!seen[$0]++')
+    awk '{
+        url = $0
+        opens = gsub(/\(/, "&", url)
+        closes = gsub(/\)/, "&", url)
+        while (closes > opens && url ~ /\)$/) {
+            sub(/\)$/, "", url)
+            closes--
+        }
+        if (!seen[url]++) print url
+    }')
 
 if test -z "$urls"
     echo "No URLs found in active pane." >&2

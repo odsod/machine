@@ -1,0 +1,167 @@
+#!/usr/bin/env fish
+
+function _fail --argument-names msg
+    echo "$msg" >&2
+    exit 1
+end
+
+function _relative_time --argument-names epoch
+    set -l now (date +%s)
+    set -l diff (math "$now - $epoch")
+    if test $diff -lt 60
+        printf '%ds ago' $diff
+    else if test $diff -lt 3600
+        printf '%dm ago' (math "floor($diff / 60)")
+    else if test $diff -lt 86400
+        printf '%dh ago' (math "floor($diff / 3600)")
+    else if test $diff -lt 604800
+        printf '%dd ago' (math "floor($diff / 86400)")
+    else
+        printf '%dw ago' (math "floor($diff / 604800)")
+    end
+end
+
+function _load_open_dirs
+    set -l pane_json (herdr pane list 2>/dev/null | string collect)
+    test $status -eq 0
+        or _fail "Could not read Herdr panes. No workspace was removed."
+
+    set -l parsed_dirs (printf '%s\n' "$pane_json" \
+        | jq -r '.result.panes[] | [.cwd, .foreground_cwd] | .[] | select(type == "string" and length > 0)' 2>/dev/null)
+    test $status -eq 0
+        or _fail "Could not parse Herdr panes. No workspace was removed."
+    set -g open_dirs $parsed_dirs
+end
+
+function _path_is_open --argument-names workspace_path
+    for open_dir in $open_dirs
+        set -l canonical_open (realpath -m -- "$open_dir" 2>/dev/null)
+        if test "$canonical_open" = "$workspace_path"
+            return 0
+        end
+        if string match -q -- "$workspace_path/*" "$canonical_open"
+            return 0
+        end
+    end
+    return 1
+end
+
+for dependency in fd fzf gio herdr jj jq realpath
+    command -q "$dependency"
+        or _fail "$dependency is required but not found in PATH."
+end
+
+set -l workspace_base "$HOME/Workspaces"
+if set -q REMOVE_JJ_WORKSPACE_ROOT
+    set workspace_base "$REMOVE_JJ_WORKSPACE_ROOT"
+end
+
+test -d "$workspace_base"
+    or _fail "Workspace directory not found: $workspace_base"
+
+set workspace_base (realpath -m -- "$workspace_base")
+_load_open_dirs
+
+set -l candidates
+for jj_dir in (fd --hidden --no-ignore --type d '^\.jj$' "$workspace_base" 2>/dev/null)
+    set -l workspace_path (realpath -m -- (dirname "$jj_dir"))
+    string match -q -- "$workspace_base/*" "$workspace_path"; or continue
+
+    set -l workspace_name (jj --ignore-working-copy -R "$workspace_path" workspace list \
+        -T 'if(self.target().current_working_copy(), self.name(), "") ++ "\n"' \
+        2>/dev/null | string match -rv '^$' | head -n1)
+    test -n "$workspace_name"; or continue
+
+    set -l default_root (jj --ignore-working-copy -R "$workspace_path" \
+        workspace root --name default 2>/dev/null)
+    test -n "$default_root"; or continue
+    set default_root (realpath -m -- "$default_root")
+
+    if test "$workspace_name" = default; or test "$workspace_path" = "$default_root"
+        continue
+    end
+
+    jj --ignore-working-copy -R "$workspace_path" log -r @ --no-graph --limit 1 >/dev/null 2>&1
+    or begin
+        echo "Skipping unreadable jj workspace: $workspace_path" >&2
+        continue
+    end
+
+    set -l empty_flag (jj --ignore-working-copy -R "$workspace_path" log -r @ \
+        --no-graph -T 'if(empty, "1", "0")' 2>/dev/null | string collect)
+    test -n "$empty_flag"; or continue
+
+    set -l state clean
+    test "$empty_flag" = 1; or set state changes
+    _path_is_open "$workspace_path"; and set state open
+
+    set -l age (_relative_time (stat -c '%Y' "$workspace_path"))
+    set -l repo_name (basename "$default_root")
+    set -a candidates (printf '%s\t%s\t%s\t%s\t%s\n' \
+        "$workspace_path" "$age" "$state" "$repo_name" "$workspace_name")
+end
+
+if test (count $candidates) -eq 0
+    echo "No removable jj workspaces found in $workspace_base."
+    exit 0
+end
+
+set -l selection (printf '%s\n' $candidates \
+    | fzf --prompt='Remove> ' --height=100% --reverse \
+        --delimiter='\t' --with-nth=2.. \
+        --header='AGE  STATE  REPO  WORKSPACE')
+set -l fzf_status $status
+switch "$fzf_status"
+    case 0
+    case 1 130
+        exit 0
+    case '*'
+        _fail "Workspace picker failed (fzf exit $fzf_status)."
+end
+
+test -n "$selection"; or exit 0
+set -l fields (string split (printf '\t') -- "$selection")
+test (count $fields) -eq 5
+    or _fail "Could not parse selected workspace."
+
+set -l workspace_path (realpath -m -- "$fields[1]")
+set -l workspace_name "$fields[5]"
+string match -q -- "$workspace_base/*" "$workspace_path"
+    or _fail "Refusing to remove a path outside $workspace_base."
+
+set -l default_root (jj --ignore-working-copy -R "$workspace_path" \
+    workspace root --name default 2>/dev/null)
+test -n "$default_root"
+    or _fail "Could not determine the default checkout for $workspace_name."
+set default_root (realpath -m -- "$default_root")
+
+if test "$workspace_name" = default; or test "$workspace_path" = "$default_root"
+    _fail "Refusing to remove the default jj workspace."
+end
+
+_load_open_dirs
+_path_is_open "$workspace_path"
+and _fail "Close the Herdr workspace for $workspace_name before removing it."
+
+echo "Workspace: $workspace_name"
+echo "Path:      $workspace_path"
+echo
+jj -R "$workspace_path" status --no-pager
+or _fail "Could not snapshot $workspace_name. No workspace was removed."
+echo
+
+read -l -P "Move this workspace to trash? [y/N] " confirmation
+string match -rqi '^y(es)?$' -- "$confirmation"; or exit 0
+
+gio trash "$workspace_path"
+or _fail "Failed to move $workspace_path to trash."
+
+jj --ignore-working-copy -R "$default_root" workspace forget "$workspace_name"
+or begin
+    echo "Moved $workspace_path to trash, but failed to forget jj workspace '$workspace_name'." >&2
+    echo "The directory can be restored with: gio trash --list" >&2
+    exit 1
+end
+
+echo "Removed jj workspace '$workspace_name'."
+echo "The bookmark and commits were kept."

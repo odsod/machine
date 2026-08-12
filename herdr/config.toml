@@ -29,6 +29,7 @@ new_cwd = "follow"
 
 [ui]
 prompt_new_workspace_name = true
+confirm_close = true
 mouse_scroll_lines = 3
 agent_panel_sort = "spaces"
 tab_bar_position = "top"
@@ -77,6 +78,7 @@ rename_tab = "prefix+ctrl+m"
 
 # Workspace navigation
 goto = "prefix+ctrl+f"
+close_workspace = "prefix+ctrl+y"
 
 # Copy mode
 copy_mode = "prefix+ctrl+r"
@@ -92,6 +94,15 @@ type = "popup"
 width = 72
 height = 28
 description = "Session Picker"
+
+# Remove closed jj workspace
+[[keys.command]]
+key = "prefix+ctrl+p"
+command = "remove-jj-workspace"
+type = "popup"
+width = 90
+height = "80%"
+description = "Remove jj Workspace"
 
 # Clone repo popup
 [[keys.command]]
