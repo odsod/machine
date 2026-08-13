@@ -8,8 +8,8 @@
 
 ## Development
 
-- `make install-package && make enable-plugin`: Reload after editing `main.js`
-- `make tail`: Stream debug logs from the DBus service
+- `mise run -C kwin install-package && mise run -C kwin enable-plugin`: Reload after editing `main.js`
+- `mise run -C kwin tail`: Stream debug logs from the DBus service
 - `Meta+W`: Recorder note popup (`recorder-note` via kdialog)
 - `Meta+;`: Debug shortcut — dumps all window `resourceName`/`resourceClass` to journal
 

@@ -6,18 +6,19 @@
 - `~/.codex/config.toml` - Live config used and mutated by Codex trust prompts
 - `sync-config.py` - Sync shared keys from `config.toml` into `~/.codex/config.toml`
 
-## Targets
+## Tasks
 
-- `make -C codex` - Install binary, initialize `~/.codex/config.toml` once if missing
-- `make -C codex codex-config-diff` - Show pending shared-config changes against the live config
-- `make -C codex codex-config-sync` - Apply shared-config changes while preserving `[projects."..."]` trust entries from the live config
+- Binary: `[tools] codex` in root `mise.toml`
+- `mise run setup:codex` - Apply shared-config changes while preserving
+  `[projects."..."]` trust entries from the live config
+- `mise run codex:diff` - Show pending shared-config changes against the live config
 
 ## Workflow
 
 - Let Codex trust prompts write directly to `~/.codex/config.toml`
 - Keep repo-managed defaults in `config.toml`
-- Run `make -C codex codex-config-sync` after changes to `config.toml`
-- Run `make -C codex codex-config-diff` before syncing when reviewing drift
+- Run `mise run setup:codex` after changes to `config.toml`
+- Run `mise run codex:diff` before syncing when reviewing drift
 
 ## Constraints
 

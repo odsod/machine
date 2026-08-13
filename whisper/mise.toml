@@ -9,8 +9,8 @@ port = "8178"
 [tasks.discover]
 description = "Show latest whisper.cpp release version"
 run = """
-curl -sI https://github.com/ggerganov/whisper.cpp/releases/latest \
-  | grep -i ^location: | grep -oP '/v\\K[0-9][0-9.]*' || echo UNKNOWN
+curl -sIL https://github.com/ggml-org/whisper.cpp/releases/latest \
+  | grep -i ^location: | grep -oP '/v\\K[0-9][0-9.]*' | tail -1 || echo UNKNOWN
 """
 
 [tasks.clean]

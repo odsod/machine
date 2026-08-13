@@ -17,25 +17,25 @@ KDE's modifier-only shortcut detection. See `AGENTS.md` for the full analysis.
 ## Install
 
 ```bash
-make -C keys
+mise run -C keys install
 ```
 
 ## Usage
 
 ```bash
-make -C keys deploy    # rebuild + install + restart
-make -C keys restart   # restart without rebuild
-make -C keys stop      # stop (restores raw keyboard)
-make -C keys log       # tail service logs
-make -C keys status    # check service state
-make -C keys uninstall # remove binary + service
+mise run -C keys deploy     # rebuild + install + restart
+sudo systemctl restart odsod-keys.service  # restart without rebuild
+mise run -C keys stop       # stop (restores raw keyboard)
+mise run -C keys log        # tail service logs
+mise run -C keys status     # check service state
+mise run -C keys uninstall  # remove binary + service
 ```
 
 ## Tuning
 
 Constants in `odsod-keys.c`:
 
-| Constant | Default | Purpose |
-|----------|---------|---------|
-| `HOLD_THRESHOLD_NS` | 150ms | Min hold time before keypress resolves as Meta combo |
-| `TAP_TIMEOUT_NS` | 350ms | Max press duration to register as space tap |
+| Constant            | Default | Purpose                                              |
+| ------------------- | ------- | ---------------------------------------------------- |
+| `HOLD_THRESHOLD_NS` | 150ms   | Min hold time before keypress resolves as Meta combo |
+| `TAP_TIMEOUT_NS`    | 350ms   | Max press duration to register as space tap          |

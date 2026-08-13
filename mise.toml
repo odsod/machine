@@ -1,6 +1,7 @@
 [settings]
 idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
-pin = true
+lockfile = true
+pin = false
 trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
 
 [settings.python]
@@ -16,80 +17,80 @@ output = "prefix"
 run_auto_install = true
 
 [tools]
-"aqua:jdx/mise" = "2026.8.4"
+"aqua:jdx/mise" = "latest"
 
-# Languages
-go = "1.26.5"
+# Languages: major prefixes, not latest (avoids silent 24→26 / 3.12→3.14)
+go = "1.26"
 node = "24"
 python = "3.12"
 
 # Go tools
-"go:golang.org/x/tools/gopls" = "0.23.0"
-"go:honnef.co/go/tools/cmd/staticcheck" = "2026.1"
-"go:mvdan.cc/gofumpt" = "0.11.0"
+"go:golang.org/x/tools/gopls" = "latest"
+"go:honnef.co/go/tools/cmd/staticcheck" = "latest"
+"go:mvdan.cc/gofumpt" = "latest"
 
 # Core CLI tools
-buf = "1.72.0"
-claude = "2.1.227"
-codex = "0.147.0"
-eza = "0.23.5"
-fzf = "0.74.2"
-gemini = "0.54.4"
-gh = "2.97.0"
-hyperfine = "1.20.0"
-jj = "0.44.0"
-neovim = { version = "0.12.4", postinstall = """
+buf = "latest"
+claude = "latest"
+codex = "latest"
+eza = "latest"
+fzf = "latest"
+gemini = "latest"
+gh = "latest"
+hyperfine = "latest"
+jj = "latest"
+neovim = { version = "latest", postinstall = """
 sudo dnf remove -y vim-enhanced vim-minimal 2>/dev/null || true
 nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
 nvim_path="$(mise where neovim)/bin/nvim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
-opencode = "1.18.16"
-"github:can1357/oh-my-pi" = { version = "17.2.12", exe = "omp" }
-ruff = "0.16.2"
-starship = "1.26.0"
-usage = "5.1.0"
+opencode = "latest"
+"github:can1357/oh-my-pi" = { version = "latest", exe = "omp" }
+ruff = "latest"
+starship = "latest"
+usage = "latest"
 
 # Language servers and linters
-lua-language-server = "3.19.0"
-shellcheck = "0.11.0"
-shfmt = "3.13.1"
-stylua = "2.5.2"
+lua-language-server = "latest"
+shellcheck = "latest"
+shfmt = "latest"
+stylua = "latest"
 
 # npm tools
 "npm:@typescript/native-preview" = "7.0.0-dev.20260707.2"
-"npm:agent-browser" = "0.34.0"
-"npm:bash-language-server" = "5.6.0"
-"npm:defuddle" = "0.19.2"
-"npm:oxfmt" = "0.63.0"
-"npm:oxlint" = "1.78.0"
-"npm:pnpm" = "11.21.0"
-"npm:typescript" = "7.0.2"
-"npm:yaml-language-server" = "1.24.0"
+"npm:agent-browser" = "latest"
+"npm:bash-language-server" = "latest"
+"npm:defuddle" = "latest"
+"npm:oxfmt" = "latest"
+"npm:oxlint" = "latest"
+"npm:pnpm" = "latest"
+"npm:typescript" = "latest"
+"npm:yaml-language-server" = "latest"
 
 # Tools via GitHub releases
-"github:backnotprop/plannotator" = "0.26.8"
-"github:dmmulroy/jj-starship" = "0.7.1"
-"github:Feel-ix-343/markdown-oxide" = "0.25.12"
-"github:fish-shell/fish-shell" = { version = "4.8.1", exe = "fish" }
-"github:googleworkspace/cli" = { version = "0.22.5", exe = "gws" }
-"github:ludviglundgren/qbittorrent-cli" = { version = "2.3.0", exe = "qbt" }
-"github:odsod/recorder" = "2026.8.1"
-"github:traefik/yaegi" = "0.16.1"
+"github:backnotprop/plannotator" = "latest"
+"github:dmmulroy/jj-starship" = "latest"
+"github:Feel-ix-343/markdown-oxide" = "latest"
+"github:fish-shell/fish-shell" = { version = "latest", exe = "fish" }
+"github:googleworkspace/cli" = { version = "latest", exe = "gws" }
+"github:ludviglundgren/qbittorrent-cli" = { version = "latest", exe = "qbt" }
+"github:odsod/recorder" = "latest"
+"github:traefik/yaegi" = "latest"
 
 # Desktop/infra tools
-antigravity-cli = "1.1.12"
-awscli = "2.36.20"
-fx = "39.2.0"
-gcloud = "579.0.0"
-herdr = "0.8.0"
-jwt = "6.2.0"
-spacectl = "1.24.0"
+antigravity-cli = "latest"
+awscli = "latest"
+fx = "latest"
+gcloud = "latest"
+herdr = "latest"
+jwt = "latest"
+spacectl = "latest"
 
 # Python tools (via pipx backend)
-"pipx:idasen" = "0.13.1"
-"pipx:ty" = "0.0.70"
+"pipx:idasen" = "latest"
+"pipx:ty" = "latest"
 
 [env]
 _.source = "{{config_root}}/env.sh"
