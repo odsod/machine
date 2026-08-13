@@ -12,7 +12,7 @@
 - Discover the latest package from Google's apt index:
 
   ```bash
-  make -C endpoint-verification discover
+  mise run -C endpoint-verification discover
   ```
 
 - Download and verify the `.deb` with the upstream `SHA256` from the package index.
@@ -47,7 +47,7 @@
   ```
 
 - Fedora SELinux blocks `init_t` from creating files under `/opt` labeled `usr_t`.
-- The Makefile labels only the writable state directory:
+- The install-files task labels only the writable state directory:
 
   ```bash
   sudo chcon -t var_lib_t \
@@ -60,7 +60,7 @@
 - Run full install + verification:
 
   ```bash
-  make -C endpoint-verification
+  mise run -C endpoint-verification
   ```
 
 - Run focused checks after script edits:
@@ -68,7 +68,7 @@
   ```bash
   shellcheck endpoint-verification/device_state.sh
   sh -n endpoint-verification/device_state.sh
-  make -C endpoint-verification verify
+  mise run -C endpoint-verification verify
   systemctl status endpoint-verification.service --no-pager
   ```
 
@@ -175,7 +175,7 @@ File at https://issues.chromium.org/ against component
 
 ## Gotchas
 
-- `make -C endpoint-verification` restarts the oneshot service instead of only enabling it.
+- `mise run -C endpoint-verification` restarts the oneshot service instead of only enabling it.
 - Restart is required because `RemainAfterExit=yes` otherwise leaves stale `device_attrs`.
 - Run `verify` with installed files; the Chrome extension reads the `/opt` helper path.
 - Do not install the Mozilla native messaging manifest unless Firefox support is intentionally added.

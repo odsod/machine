@@ -31,6 +31,7 @@ Three independent overload handlers:
 ### capslock / leftctrl → ctrl/esc
 
 Simple overload:
+
 - Press → emit `Ctrl down` immediately
 - Release < 250ms with no intervening key → emit `Esc` tap
 - Release after intervening key → just `Ctrl up`
@@ -65,23 +66,23 @@ the application launcher trigger entirely.
 
 ## Key constants
 
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `HOLD_THRESHOLD_NS` | 150ms | Rollover protection window |
-| `TAP_TIMEOUT_NS` | 350ms | Max duration for space tap |
-| `MAX_QUEUE` | 16 | Event buffer during PENDING state |
-| `MAX_DEVICES` | 32 | Maximum simultaneous keyboards |
+| Constant            | Value | Purpose                           |
+| ------------------- | ----- | --------------------------------- |
+| `HOLD_THRESHOLD_NS` | 150ms | Rollover protection window        |
+| `TAP_TIMEOUT_NS`    | 350ms | Max duration for space tap        |
+| `MAX_QUEUE`         | 16    | Event buffer during PENDING state |
+| `MAX_DEVICES`       | 32    | Maximum simultaneous keyboards    |
 
 ## Development workflow
 
 ```bash
-make -C keys build     # compile only (verify)
-make -C keys deploy    # build + install + restart service
-make -C keys log       # tail journalctl output
-make -C keys stop      # stop service (raw keyboard restored)
+mise run -C keys build     # compile only (verify)
+mise run -C keys deploy    # build + install + restart service
+mise run -C keys log       # tail journalctl output
+mise run -C keys stop      # stop service (raw keyboard restored)
 ```
 
-After editing `odsod-keys.c`, run `make -C keys deploy` to test changes.
+After editing `odsod-keys.c`, run `mise run -C keys deploy` to test changes.
 If the keyboard becomes unresponsive, the service can be stopped via SSH
 or from another machine.
 

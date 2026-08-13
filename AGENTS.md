@@ -15,7 +15,8 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
 - **`env.sh`**: Permanent. Single source of truth for environment variables.
 - **`tasks/`**: Shell scripts for imperative setup that can't be declarative
 - **Topic directories** (`fish/`, `neovim/`, `ghostty/`, etc.): Config source
-- **Exception directories** (keep Makefiles):
+- **Nested `mise.toml`**: `llama/`, `whisper/`, `keys/`, `kwin/`,
+  `endpoint-verification/` — local tasks via `mise run -C <dir> <task>`
 
 ## Provisioning
 
@@ -26,21 +27,28 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
-- **mise tools**: `mise outdated` shows available updates, `mise upgrade` applies them.
+- **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:
+  `node = "24"`, `python = "3.12"`, `go = "1.26"`). Exact versions live in
+  `mise.lock`. `mise upgrade` installs newer matches and rewrites the lockfile.
+  Do not use `mise upgrade --bump` (that would change `node = "24"` to `"26"`).
+  `npm:@typescript/native-preview` has no `latest`; keep the dated pin.
+  `mise lock --global` needs `GITHUB_TOKEN` (e.g. `gh auth token`) or GitHub
+  rate-limits leave platforms missing. Commit `mise.lock`. After installs,
+  `mise reshim`.
 - **Desktop apps** (Slack, Zoom, Cursor, Zed, Yaak, SoapUI, Obsidian): update
-  `version` variable in corresponding `[tasks."setup:*"]` section in `mise.toml`.
-- **GPU services** (llama, whisper): update `VERSION` in
-  `tasks/setup-llama.sh` / `tasks/setup-whisper.sh`.
+  `version` in the corresponding `[tasks."setup:*"]` section in `mise.toml`.
+  Cursor also needs the production URL hash (see `cursor/AGENTS.md`).
+- **GPU services** (llama, whisper): `mise run -C llama discover` /
+  `mise run -C whisper discover`, then update `VERSION` in
+  `tasks/setup-*.sh` and `[vars]` in the topic `mise.toml`.
 - **Fonts** (Inter, Iosevka, Nerd Fonts): update `VERSION` in corresponding
   `[tasks."setup:font-*"]` section in `mise.toml`.
-- **After any tool change**: run `mise reshim` to regenerate shim wrappers.
-  Shims drift out of sync when tools are added, removed, or upgraded. The
-  activated shell bypasses shims, so breakage only surfaces in non-activated
-  contexts (IDEs, cron, systemd).
+- **endpoint-verification**: `mise run -C endpoint-verification discover`
+  (install always fetches latest; discover is informational).
 
 ## Workflow: Applying Changes from Another Machine
 
-After pulling commits that changed `mise.toml`:
+After pulling commits that changed `mise.toml` or `mise.lock`:
 
 ```
 mise run apply
@@ -60,7 +68,8 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
    - Does it replace something imperative in our tasks/?
    - Does it simplify an existing section?
    - Does it enable removing a hook or script?
-4. Update `mise` version in `[tools]` and `min_version` at top of mise.toml
+4. `mise upgrade aqua:jdx/mise` updates `mise.lock`; do not pin a version
+   in `[tools]` (`"aqua:jdx/mise" = "latest"`)
 5. Apply any config simplifications identified in step 3
 
 ## Adding Things

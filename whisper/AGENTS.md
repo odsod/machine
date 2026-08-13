@@ -4,8 +4,9 @@ GPU-accelerated speech-to-text server (whisper.cpp + ROCm/HIP).
 
 ## VRAM Profiles
 
-Active model is set via `model :=` in the Makefile. After changing, run
-`make install-service` and `systemctl --user restart whisper-server`.
+Active model is set via `MODEL` in `tasks/setup-whisper.sh` and `model` in
+`whisper/mise.toml` `[vars]`. After changing, run `mise run setup:whisper` and
+`systemctl --user restart whisper-server`.
 
 | Model                     | VRAM   | Quality | Swedish                     | Speed      |
 | ------------------------- | ------ | ------- | --------------------------- | ---------- |
@@ -20,7 +21,11 @@ Active model is set via `model :=` in the Makefile. After changing, run
 ## Download additional models
 
 ```bash
-make download-model MODEL=ggml-large-v3-turbo.bin
+# Latest tag:
+mise run -C whisper discover
+# Extra model into ~/.local/share/odsod/machine/data/whisper/:
+curl -fL -o ~/.local/share/odsod/machine/data/whisper/ggml-large-v3-turbo.bin \
+  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
 ```
 
 ## Server Flags

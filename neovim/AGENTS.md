@@ -15,7 +15,7 @@
 
 ## Full Mount Symlink
 
-- Make target: `~/.config/nvim`
+- Dotfile: `~/.config/nvim` → `neovim/` (`[dotfiles]` in root `mise.toml`)
 - Behavior: remove existing target and symlink `neovim/` as a whole
 - Rationale:
   - no per-file symlink maintenance
@@ -74,16 +74,12 @@
 
 ## Commands
 
-- Install/symlink/plugins:
+- Config is a `[dotfiles]` symlink. Binary and plugin sync run from the
+  neovim `postinstall` hook in root `mise.toml`.
+- Sync/update plugins:
 
 ```sh
-make -C neovim
-```
-
-- Sync/update plugins only:
-
-```sh
-make -C neovim install-plugins
+nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
 ```
 
 - Startup validation:

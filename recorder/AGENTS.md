@@ -6,20 +6,21 @@ Installation and configuration for the [recorder](https://github.com/odsod/recor
 
 - **Repo**: `github.com/odsod/recorder`
 - **Local checkout**: `~/Code/github.com/odsod/recorder`
-- **Install method**: Prebuilt GitHub Release (calver)
+- **Install method**: Prebuilt GitHub Release (calver) via `[tools]`
 
 ## Install
 
+Binary: `"github:odsod/recorder"` in root `mise.toml`.
+Config and scripts: `[dotfiles]` entries.
+
 ```bash
-make -C recorder install          # full: deps + binary + config + scripts
-make -C recorder install-tool     # rebuild binary only
+mise install github:odsod/recorder
 ```
 
 ## Structure
 
 ```
 recorder/
-├── Makefile            # Installation targets
 ├── AGENTS.md           # This file
 ├── config.json         # Shared config (symlinked to ~/.config/recorder/)
 ├── recorder-toggle     # Fish script — tmux session manager
@@ -62,6 +63,6 @@ Symlinked to `~/.config/recorder/config.json`. Single config works on all hosts 
 ## Version Bumps
 
 1. Get latest version from `https://github.com/odsod/recorder/releases/latest`
-2. Update `version :=` in `Makefile`
-3. `make -C recorder install-tool`
+2. Update `"github:odsod/recorder"` in `[tools]`
+3. `mise install github:odsod/recorder` and `mise reshim`
 4. Verify: `recorder run`

@@ -4,8 +4,9 @@ GPU-accelerated LLM inference server (llama.cpp + ROCm/HIP).
 
 ## VRAM Profiles
 
-Active model is set via `model :=` in the Makefile. After changing, run
-`make install-service` and `systemctl --user restart llama-server`.
+Active model is set via `MODEL` in `tasks/setup-llama.sh` and `model` in
+`llama/mise.toml` `[vars]`. After changing, run `mise run setup:llama` and
+`systemctl --user restart llama-server`.
 
 | Model                    | VRAM   | Quality | Swedish        | Speed |
 | ------------------------ | ------ | ------- | -------------- | ----- |
@@ -21,7 +22,11 @@ Active model is set via `model :=` in the Makefile. After changing, run
 ## Download additional models
 
 ```bash
-make download-model URL=https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf
+# Latest tag:
+mise run -C llama discover
+# Extra GGUF into ~/.local/share/odsod/machine/data/llama/:
+curl -fL -o ~/.local/share/odsod/machine/data/llama/Qwen3.5-9B-Q4_K_M.gguf \
+  https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf
 ```
 
 ## Ports

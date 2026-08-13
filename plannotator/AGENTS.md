@@ -2,9 +2,9 @@
 
 ## Version Bumps
 
-- The plugin (hooks + commands) comes from a shallow clone of the upstream
-  repo at `~/.claude/plugins/marketplaces/plannotator/`.
-- On version bump: the Makefile auto-re-clones at the new tag (sentinel file).
+- Binary: `"github:backnotprop/plannotator"` in root `mise.toml`.
+- Wrappers in this directory are `[dotfiles]` shims onto the mise install.
+- On version bump: update the `[tools]` pin, then `mise install` / `mise reshim`.
 - Check if the set of slash commands has changed:
   ```
   gh api repos/backnotprop/plannotator/contents/apps/hook/commands --jq '.[].name'
