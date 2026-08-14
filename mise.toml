@@ -507,7 +507,7 @@ fi
 [tasks."setup:obsidian"]
 description = "Install Obsidian AppImage, CLI, and vault config"
 run = """
-version="1.13.6"
+version="1.13.7"
 data_dir="$HOME/.local/share/odsod/machine/data/obsidian/${version}"
 app="${data_dir}/app.AppImage"
 cli="${data_dir}/obsidian-cli"
@@ -540,16 +540,16 @@ jq --arg path "$HOME/Vaults/odsod" \
 [tasks."setup:cursor"]
 description = "Install Cursor editor"
 run = """
-version="3.15.6"
+version="3.15.19"
 if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; then
-  sudo dnf install -y "https://downloads.cursor.com/production/a1f686545fd0ce8917bbd2449f733551a9bce420/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
+  sudo dnf install -y "https://downloads.cursor.com/production/de07bee81cefe43461ebf4f40c3d2d78d15052aa/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
 fi
 """
 
 [tasks."setup:zed"]
 description = "Install Zed editor"
 run = """
-version="1.14.2"
+version="1.15.0"
 data_dir="$HOME/.local/share/odsod/machine/data/zed/${version}/zed.app"
 if [ ! -d "$data_dir" ]; then
   mkdir -p "$(dirname "$data_dir")"
