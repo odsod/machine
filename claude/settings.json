@@ -17,7 +17,7 @@
     "commit": "",
     "pr": ""
   },
-  "model": "eu.anthropic.claude-opus-4-6-v1[1m]",
+  "model": "eu.anthropic.claude-opus-5[1m]",
   "hooks": {
     "PreToolUse": [],
     "PostToolUse": [
@@ -48,7 +48,7 @@
     "lua-lsp@claude-plugins-official": true,
     "plannotator@plannotator": true
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark"
