@@ -40,43 +40,43 @@ url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1
 url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/513797718"
 
 [[tools."aqua:jdx/mise"]]
-version = "2026.8.5"
+version = "2026.8.6"
 backend = "aqua:jdx/mise"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64"]
-checksum = "sha256:0927679e8a95d1f4ef99357159d59d6788ba8fc2103d88b40cce0d65d2109b90"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511518809"
+checksum = "sha256:3580495d1f70e7fbb213226262d0d2ba324b154f566722747f9fe59170e4eed2"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006615"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64-musl"]
-checksum = "sha256:0927679e8a95d1f4ef99357159d59d6788ba8fc2103d88b40cce0d65d2109b90"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511518809"
+checksum = "sha256:3580495d1f70e7fbb213226262d0d2ba324b154f566722747f9fe59170e4eed2"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006615"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64"]
-checksum = "sha256:0e766621c2a1c07d9d2bb645dff26692c7c2dace107059412b2ee5d87ff0779a"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511519071"
+checksum = "sha256:e761c8b69fd3908a778b3244d53428687de6bbf74fd0c003d3c289105df6b73c"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006730"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64-musl"]
-checksum = "sha256:0e766621c2a1c07d9d2bb645dff26692c7c2dace107059412b2ee5d87ff0779a"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511519071"
+checksum = "sha256:e761c8b69fd3908a778b3244d53428687de6bbf74fd0c003d3c289105df6b73c"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006730"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-arm64"]
-checksum = "sha256:85983a9b88e36ba3211bcb4b2e5f81ea8d27708527d9100cde865e92f48a3ec2"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511519152"
+checksum = "sha256:14ef21d1313d3b69986ac6976877d7ffb41df71f4fb9e8e4b57761cffaffca3b"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006763"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-x64"]
-checksum = "sha256:1c44e614184f1a33cc95385c6189209b04e0b6fe8de851bdafd9d1807fd58dde"
-url = "https://github.com/jdx/mise/releases/download/v2026.8.5/mise-v2026.8.5-macos-x64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/511519171"
+checksum = "sha256:925d242515338975071daab9e23bcf5803a0eafa2b8e9b4f78f61af5b4c865d5"
+url = "https://github.com/jdx/mise/releases/download/v2026.8.6/mise-v2026.8.6-macos-x64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/515006781"
 provenance = "minisign"
 
 [[tools.awscli]]
@@ -149,27 +149,26 @@ url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/480772631"
 provenance = "minisign"
 
 [[tools.claude]]
-version = "2.1.232"
+version = "2.1.233"
 backend = "aqua:anthropics/claude-code"
 
 [tools.claude."platforms.linux-arm64"]
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/linux-arm64/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/linux-arm64/claude"
 
 [tools.claude."platforms.linux-arm64-musl"]
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/linux-arm64-musl/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/linux-arm64-musl/claude"
 
 [tools.claude."platforms.linux-x64"]
-checksum = "blake3:410a1df5d1138a334df6f4d0ac15d2ad39cb1bf173aea3a894c5c9345620b0fc"
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/linux-x64/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/linux-x64/claude"
 
 [tools.claude."platforms.linux-x64-musl"]
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/linux-x64-musl/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/linux-x64-musl/claude"
 
 [tools.claude."platforms.macos-arm64"]
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/darwin-arm64/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/darwin-arm64/claude"
 
 [tools.claude."platforms.macos-x64"]
-url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.232/darwin-x64/claude"
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.233/darwin-x64/claude"
 
 [[tools.codex]]
 version = "0.147.0"
@@ -477,43 +476,43 @@ url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/
 provenance = "github-attestations"
 
 [[tools."github:can1357/oh-my-pi"]]
-version = "17.3.3"
+version = "17.3.4"
 backend = "github:can1357/oh-my-pi"
 
 [tools."github:can1357/oh-my-pi"."platforms.linux-arm64"]
-checksum = "sha256:b2e8ae942cbd8aee2cabea62c96166753ca9b258c1314897ab81ef8f18fd090e"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-linux-arm64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905541"
+checksum = "sha256:8e27e7bfe49fc0f33f6cb0b50128ab85fe5403330d1dfb5bb34cf1f7422cdce8"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-linux-arm64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436060"
 
 [tools."github:can1357/oh-my-pi"."platforms.linux-arm64-musl"]
-checksum = "sha256:7c0f6dc89e96372d2da7089715bb1ae6fa849b31aca39501d2b243e37552bca0"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-linux-musl-arm64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905540"
+checksum = "sha256:612eb3af82c3d49e6cfc31289083483f8f37d7312805451cbed9cedcdf7cbd17"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-linux-musl-arm64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436057"
 
 [tools."github:can1357/oh-my-pi"."platforms.linux-x64"]
-checksum = "sha256:25d642d35cf07a6b94336da94fa6d69b7a0a8b2f1b865ccf92e770ba37aaa606"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-linux-x64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905538"
+checksum = "sha256:3fce4b25628064b0cd7bfbc6245ecdada331750ed4b341aca6bd29ba4478aab5"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-linux-x64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436056"
 
 [tools."github:can1357/oh-my-pi"."platforms.linux-x64-musl"]
-checksum = "sha256:01e14beb77886187cab982d4c7e7e338da387350a9221c3f29cd69953a3589a2"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-linux-musl-x64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905543"
+checksum = "sha256:13f908b56315835f01c3f0cec0dd7f0761d2cb7492970b54b28cd70e2693a33c"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-linux-musl-x64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436065"
 
 [tools."github:can1357/oh-my-pi"."platforms.macos-arm64"]
-checksum = "sha256:21ecb52103ac745736fe0af897dea83d924f3464a1d01e9bdb3d6a9cfb4b37a8"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-darwin-arm64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905544"
+checksum = "sha256:76a6c22f8ba4ba319e3d528adcd921949e0338f2b13042721e64b990f6fffe16"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-darwin-arm64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436058"
 
 [tools."github:can1357/oh-my-pi"."platforms.macos-x64"]
-checksum = "sha256:8704fd58e8ec2ace980600110073ea50af5483d8eb46981c095e388c962d4843"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-darwin-x64"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905542"
+checksum = "sha256:cc295533c32d1e5dc1febe8c5972c1235e41b9614318bec57441d03c475f70c1"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-darwin-x64"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436061"
 
 [tools."github:can1357/oh-my-pi"."platforms.windows-x64"]
-checksum = "sha256:d93303124a94fa7fa4d75f57f6133af42644fc139e2e4769e03f48d8608b7ba0"
-url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.3/omp-windows-x64.exe"
-url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/513905537"
+checksum = "sha256:10b985678aeed0609d5a66257fb77b55abad7f7c6c18ce671033bac13a72bc02"
+url = "https://github.com/can1357/oh-my-pi/releases/download/v17.3.4/omp-windows-x64.exe"
+url_api = "https://api.github.com/repos/can1357/oh-my-pi/releases/assets/514436062"
 
 [[tools."github:dmmulroy/jj-starship"]]
 version = "0.7.1"
@@ -1033,7 +1032,7 @@ version = "1.78.0"
 backend = "npm:oxlint"
 
 [[tools."npm:pnpm"]]
-version = "11.21.0"
+version = "11.22.0"
 backend = "npm:pnpm"
 
 [[tools."npm:typescript"]]
@@ -1088,7 +1087,7 @@ version = "0.13.1"
 backend = "pipx:idasen"
 
 [[tools."pipx:ty"]]
-version = "0.0.71"
+version = "0.0.72"
 backend = "pipx:ty"
 
 [[tools.python]]
