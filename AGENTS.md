@@ -39,8 +39,8 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
   `version` in the corresponding `[tasks."setup:*"]` section in `mise.toml`.
   Cursor also needs the production URL hash (see `cursor/AGENTS.md`).
 - **GPU services** (llama, whisper): `mise run -C llama discover` /
-  `mise run -C whisper discover`, then update `VERSION` in
-  `tasks/setup-*.sh` and `[vars]` in the topic `mise.toml`.
+  `mise run -C whisper discover`, then update `version` in `[vars]` in the
+  topic `mise.toml`. The setup scripts read it from there (single source).
 - **Fonts** (Inter, Iosevka, Nerd Fonts): update `VERSION` in corresponding
   `[tasks."setup:font-*"]` section in `mise.toml`.
 - **endpoint-verification**: `mise run -C endpoint-verification discover`

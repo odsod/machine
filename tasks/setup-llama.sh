@@ -11,7 +11,7 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="b10488"
+VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/llama/mise.toml")"
 MODEL="Qwen3.5-9B-Q5_K_M.gguf"
 MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/${MODEL}"
 EMBED_MODEL="Qwen3-Embedding-0.6B-Q8_0.gguf"
