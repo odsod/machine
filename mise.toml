@@ -550,7 +550,7 @@ fi
 [tasks."setup:zed"]
 description = "Install Zed editor"
 run = """
-version="1.15.1"
+version="1.16.1"
 data_dir="$HOME/.local/share/odsod/machine/data/zed/${version}/zed.app"
 if [ ! -d "$data_dir" ]; then
   mkdir -p "$(dirname "$data_dir")"
