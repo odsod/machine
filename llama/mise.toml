@@ -1,5 +1,5 @@
 [vars]
-version = "b10507"
+version = "b10520"
 model = "Qwen3.5-9B-Q5_K_M.gguf"
 model_url = "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q5_K_M.gguf"
 embed_model = "Qwen3-Embedding-0.6B-Q8_0.gguf"
