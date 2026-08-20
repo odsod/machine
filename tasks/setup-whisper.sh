@@ -11,7 +11,7 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="1.9.2"
+VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/whisper/mise.toml")"
 MODEL="ggml-large-v3.bin"
 MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/${MODEL}"
 VAD_MODEL="ggml-silero-v6.2.0.bin"
@@ -32,7 +32,7 @@ sudo dnf install -y -q \
 if [ ! -f "$SRC/CMakeLists.txt" ]; then
   rm -rf "$SRC"
   echo "[whisper] Downloading source..."
-  curl -fL "https://github.com/ggerganov/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
+  curl -fL "https://github.com/ggerganov/whisper.cpp/archive/refs/tags/${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
 fi
 
 echo "[whisper] Building whisper-server with ROCm/HIP..."
