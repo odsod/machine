@@ -1,7 +1,5 @@
 #!/usr/bin/env fish
 
-set -x PATH $HOME/.local/bin /usr/local/bin /usr/bin /bin $PATH
-
 test -n "$HERDR_PANE_ID"; and herdr pane rename "$HERDR_PANE_ID" workspace 2>/dev/null
 
 command -q fzf; or exit 0
@@ -288,8 +286,8 @@ function _launch_workspace
     set -l label $argv[1]
     set -l cwd $argv[2]
 
-    set -l workspace_json (herdr workspace list 2>/dev/null | string collect)
-    test $status -eq 0; or _fail "Failed to list Herdr workspaces."
+    set -l workspace_json (herdr workspace list 2>&1 | string collect)
+    test $status -eq 0; or _fail "Failed to list Herdr workspaces: $workspace_json"
 
     set -l label_ids (printf '%s\n' "$workspace_json" \
         | jq -r --arg label "$label" \
