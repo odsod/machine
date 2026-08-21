@@ -4,7 +4,10 @@ set -g test_dir (path resolve (dirname (status filename)))
 set -g start_script (path resolve "$test_dir/../start-workspace")
 set -g test_root (mktemp -d)
 set -g real_fish (status fish-path)
-set -g real_jj (command -s jj)
+# Resolve past the mise shim: under the stubbed HOME the shim cannot find its
+# tool and falls back to `jj` on PATH, which is the stub, recursing forever.
+set -g real_jj (mise which jj 2>/dev/null)
+test -n "$real_jj"; or set -g real_jj (command -s jj)
 
 function cleanup --on-event fish_exit
     rm -rf "$test_root"
