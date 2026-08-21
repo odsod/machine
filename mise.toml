@@ -137,6 +137,7 @@ root = "{{config_root}}"
 
 # Claude
 "~/.claude/settings.json" = "claude/settings.json"
+"~/.claude/output-styles/Empathic.md" = "claude/output-styles/Empathic.md"
 
 # OpenCode
 "~/.config/opencode/opencode.json" = "opencode/opencode.json"
