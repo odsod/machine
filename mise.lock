@@ -353,13 +353,6 @@ url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-581.0.0
 [tools.gcloud."platforms.windows-x64"]
 url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-581.0.0-windows-x86_64-bundled-python.zip"
 
-[[tools.gemini]]
-version = "0.56.0"
-backend = "npm:@google/gemini-cli"
-
-[tools.gemini.options]
-allow_builds = '["@github/keytar", "node-pty"]'
-
 [[tools.gh]]
 version = "2.97.0"
 backend = "aqua:cli/cli"
