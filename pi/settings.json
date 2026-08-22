@@ -1,0 +1,7 @@
+{
+  "defaultProvider": "google-vertex",
+  "defaultModel": "gemini-3.5-flash-lite",
+  "theme": "nord-dark",
+  "quietStartup": true,
+  "lastChangelogVersion": "0.84.2"
+}

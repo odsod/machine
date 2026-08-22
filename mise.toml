@@ -48,7 +48,7 @@ ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
 opencode = "latest"
-"github:can1357/oh-my-pi" = { version = "latest", exe = "omp" }
+pi = "latest"
 ruff = "latest"
 starship = "latest"
 usage = "latest"
@@ -144,10 +144,9 @@ root = "{{config_root}}"
 "~/.config/opencode/tui.json" = "opencode/tui.json"
 "~/.config/opencode/plugins/odsod-hooks.js" = "opencode/plugins/odsod-hooks.js"
 
-# Oh My Pi
-"~/.omp/agent/config.yml" = "omp/config.yml"
-"~/.omp/agent/hooks/post-tool.ts" = "omp/hooks/post-tool.ts"
-"~/.omp/agent/themes/odsod.json" = "omp/themes/odsod.json"
+# Pi
+"~/.pi/agent/settings.json" = "pi/settings.json"
+"~/.pi/agent/themes/nord-dark.json" = "pi/themes/nord-dark.json"
 
 # Gemini
 "~/.gemini/settings.json" = "gemini/settings.json"
