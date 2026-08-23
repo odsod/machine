@@ -150,9 +150,11 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 - **Apps that rewrite their own config**: Antigravity writes `model` and
   `trustedWorkspaces` into its settings at runtime, so the symlink gets
   replaced by a real file. Before `mise bootstrap --force-dotfiles`, copy the
-  live file back into the repo, or those edits are lost. Cursor's
-  `cli-config.json` stays unsymlinked because the live file holds `authInfo`
-  and auth cache keys, which must not reach this public repo.
+  live file back into the repo, or those edits are lost. Never copy
+  `trustedWorkspaces` back: it holds workspace paths that name private repos and
+  branches, and this repo is public. Drop the key and let Antigravity re-prompt.
+  Cursor's `cli-config.json` stays unsymlinked because the live file holds
+  `authInfo` and auth cache keys, which must not reach this public repo.
 
 ## Commit Style
 
