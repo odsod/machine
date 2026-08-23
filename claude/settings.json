@@ -49,6 +49,7 @@
     "plannotator@plannotator": true
   },
   "effortLevel": "high",
+  "outputStyle": "Empathic",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark"
