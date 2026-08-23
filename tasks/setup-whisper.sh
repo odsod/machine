@@ -32,7 +32,7 @@ sudo dnf install -y -q \
 if [ ! -f "$SRC/CMakeLists.txt" ]; then
   rm -rf "$SRC"
   echo "[whisper] Downloading source..."
-  curl -fL "https://github.com/ggerganov/whisper.cpp/archive/refs/tags/${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
+  curl -fL "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
 fi
 
 echo "[whisper] Building whisper-server with ROCm/HIP..."

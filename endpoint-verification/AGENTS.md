@@ -9,13 +9,18 @@
 
 ## Approach
 
-- Discover the latest package from Google's apt index:
+- Pin `version`, `deb`, and `sha256` in `[vars]`. Install downloads that exact
+  pool file, so the result is reproducible across machines.
+- Discover the latest package from Google's apt index, printed as a paste-ready
+  `[vars]` block:
 
   ```bash
   mise run -C endpoint-verification discover
   ```
 
-- Download and verify the `.deb` with the upstream `SHA256` from the package index.
+- Verify the download against the pinned `SHA256`. The pool keeps delisted
+  builds, and the filename carries a per-build hash, so all three values move
+  together.
 - Extract with `ar x` and `tar -xzf data.tar.gz` into:
 
   ```bash
