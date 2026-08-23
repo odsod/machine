@@ -19,14 +19,8 @@
       }
     ]
   },
+  "model": "Gemini 3.7 Flash (Medium)",
   "notifications": true,
   "showFeedbackSurvey": false,
-  "trustedWorkspaces": [
-    "/home/odsod/Code/github.com/odsod/machine",
-    "/home/odsod/Vaults/odsod",
-    "/home/odsod/Workspaces/github.com/way-platform/main/adk-rest",
-    "/home/odsod/Workspaces/github.com/way-platform/main/investigate-mapon-multi",
-    "/home/odsod/Workspaces/github.com/way-platform/main/mobilisights-kafka"
-  ],
   "verbosity": "low"
 }
