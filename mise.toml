@@ -17,6 +17,23 @@ show_tools = false
 output = "prefix"
 run_auto_install = true
 
+[vars]
+inter_version = "4.1"
+iosevka_version = "34.8.1"
+nerd_fonts_version = "3.5.1"
+
+slack_version = "4.51.180"
+zoom_version = "7.1.5.4332"
+obsidian_version = "1.13.7"
+zed_version = "1.16.1"
+yaak_version = "2026.6.0"
+soap_ui_version = "5.10.0"
+
+# Cursor RPMs live behind a per-release production hash. Both values come from
+# one `mise run discover` row and must be bumped together.
+cursor_version = "3.17.8"
+cursor_hash = "2fdd31c9f33f7fbe501f2d57772dc5bf64b63621"
+
 [tools]
 "aqua:jdx/mise" = "latest"
 
@@ -380,6 +397,22 @@ login_shell = "/usr/local/bin/fish"
 [bootstrap.hooks.post-tools]
 run = "mise run setup:fish-shell"
 
+[tasks.discover]
+description = "Compare every pinned version with the latest upstream release"
+env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_ZED = "{{vars.zed_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+exec "$repo/tasks/discover.sh"
+"""
+
+[tasks.clean]
+description = "Remove installed payloads and source trees other than the pinned versions"
+env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_ZED = "{{vars.zed_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+exec "$repo/tasks/clean.sh"
+"""
+
 [tasks.apply]
 description = "Apply config changes pulled from another tree: full convergence"
 run = """
@@ -422,10 +455,10 @@ gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null 
 [tasks."setup:font-inter"]
 description = "Install Inter font from GitHub releases"
 run = """
-VERSION=4.1
+VERSION={{vars.inter_version}}
 DATA_DIR="$HOME/.local/share/odsod/machine/data/inter/$VERSION"
 FONT_DIR="$HOME/.local/share/fonts"
-if [ -f "$FONT_DIR/inter.ttc" ]; then exit 0; fi
+if [ "$(readlink "$FONT_DIR/inter.ttc" 2>/dev/null || true)" = "$DATA_DIR/Inter.ttc" ]; then exit 0; fi
 echo "[font-inter] Installing Inter $VERSION..."
 mkdir -p "$DATA_DIR" "$FONT_DIR"
 curl -L "https://github.com/rsms/inter/releases/download/v${VERSION}/Inter-${VERSION}.zip" -o "$DATA_DIR/archive.zip"
@@ -437,10 +470,10 @@ fc-cache -f
 [tasks."setup:font-iosevka"]
 description = "Install Iosevka SS08 font from GitHub releases"
 run = """
-VERSION=34.8.0
+VERSION={{vars.iosevka_version}}
 DATA_DIR="$HOME/.local/share/odsod/machine/data/iosevka/$VERSION"
 FONT_DIR="$HOME/.local/share/fonts"
-if [ -d "$FONT_DIR/iosevka" ]; then exit 0; fi
+if [ "$(readlink "$FONT_DIR/iosevka" 2>/dev/null || true)" = "$DATA_DIR" ]; then exit 0; fi
 echo "[font-iosevka] Installing Iosevka SS08 $VERSION..."
 mkdir -p "$DATA_DIR" "$FONT_DIR"
 curl -L "https://github.com/be5invis/Iosevka/releases/download/v${VERSION}/PkgTTC-IosevkaSS08-${VERSION}.zip" -o "$DATA_DIR/iosevka.zip"
@@ -452,10 +485,10 @@ fc-cache -f
 [tasks."setup:font-nerd"]
 description = "Install IosevkaTerm Nerd Font from GitHub releases"
 run = """
-VERSION=3.5.0
+VERSION={{vars.nerd_fonts_version}}
 DATA_DIR="$HOME/.local/share/odsod/machine/data/nerd-fonts/$VERSION"
 FONT_DIR="$HOME/.local/share/fonts"
-if [ -d "$FONT_DIR/nerd-fonts" ]; then exit 0; fi
+if [ "$(readlink "$FONT_DIR/nerd-fonts" 2>/dev/null || true)" = "$DATA_DIR" ]; then exit 0; fi
 echo "[font-nerd] Installing IosevkaTerm Nerd Font $VERSION..."
 mkdir -p "$DATA_DIR" "$FONT_DIR"
 curl -L "https://github.com/ryanoasis/nerd-fonts/releases/download/v${VERSION}/IosevkaTerm.zip" -o "$DATA_DIR/font.zip"
@@ -488,7 +521,7 @@ fi
 [tasks."setup:slack"]
 description = "Install Slack desktop client"
 run = """
-version="4.51.180"
+version="{{vars.slack_version}}"
 build="${version}-0.1.el8"
 if ! rpm -q "slack-${build}.x86_64" >/dev/null 2>&1; then
   sudo dnf install -y "https://downloads.slack-edge.com/desktop-releases/linux/x64/${version}/slack-${build}.x86_64.rpm"
@@ -498,7 +531,7 @@ fi
 [tasks."setup:zoom"]
 description = "Install Zoom desktop client"
 run = """
-version="7.1.5.4332"
+version="{{vars.zoom_version}}"
 if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
   sudo dnf install -y "https://zoom.us/client/${version}/zoom_x86_64.rpm"
 fi
@@ -507,7 +540,7 @@ fi
 [tasks."setup:obsidian"]
 description = "Install Obsidian AppImage, CLI, and vault config"
 run = """
-version="1.13.7"
+version="{{vars.obsidian_version}}"
 data_dir="$HOME/.local/share/odsod/machine/data/obsidian/${version}"
 app="${data_dir}/app.AppImage"
 cli="${data_dir}/obsidian-cli"
@@ -540,16 +573,16 @@ jq --arg path "$HOME/Vaults/odsod" \
 [tasks."setup:cursor"]
 description = "Install Cursor editor"
 run = """
-version="3.16.29"
+version="{{vars.cursor_version}}"
 if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; then
-  sudo dnf install -y "https://downloads.cursor.com/production/6246455961129c32969845e00aa25d87ae926ec9/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
+  sudo dnf install -y "https://downloads.cursor.com/production/{{vars.cursor_hash}}/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
 fi
 """
 
 [tasks."setup:zed"]
 description = "Install Zed editor"
 run = """
-version="1.16.1"
+version="{{vars.zed_version}}"
 data_dir="$HOME/.local/share/odsod/machine/data/zed/${version}/zed.app"
 if [ ! -d "$data_dir" ]; then
   mkdir -p "$(dirname "$data_dir")"
@@ -569,7 +602,7 @@ ln -fsT "${data_dir}/share/icons/hicolor/512x512/apps/zed.png" \
 [tasks."setup:yaak"]
 description = "Install Yaak API client"
 run = """
-version="2026.6.0"
+version="{{vars.yaak_version}}"
 if ! rpm -q "yaak-${version}" >/dev/null 2>&1; then
   sudo dnf install -y "https://github.com/mountain-loop/yaak/releases/download/v${version}/yaak-${version}-1.x86_64.rpm"
 fi
@@ -578,7 +611,7 @@ fi
 [tasks."setup:soap-ui"]
 description = "Install SoapUI"
 run = """
-version="5.10.0"
+version="{{vars.soap_ui_version}}"
 data_dir="$HOME/.local/share/odsod/machine/data/soap-ui/${version}/SoapUI-${version}"
 if [ ! -d "$data_dir" ]; then
   mkdir -p "$(dirname "$data_dir")"

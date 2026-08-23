@@ -1,3 +1,10 @@
+[vars]
+# The apt pool keeps delisted builds, so pinning filename and checksum makes
+# this install reproducible. All three values come from `mise run discover`.
+version = "1765828494702-842239260"
+deb = "pool/endpoint-verification/endpoint-verification_1765828494702-842239260_amd64_3bcef7ad4e9e6bf8b16dae869190fca7.deb"
+sha256 = "2ea825143fd56a10d6ae3a3f2719cd47833479f7dd3faa6eed7f62ce2d0ac664"
+
 [tasks.install]
 description = "Install Google Endpoint Verification"
 depends = ["install-files", "enable-service"]
@@ -6,27 +13,12 @@ run = "echo '[endpoint-verification] Done'"
 [tasks.install-files]
 description = "Download, extract, and install helper files"
 run = """
-packages_url="https://packages.cloud.google.com/apt/dists/endpoint-verification/main/binary-amd64/Packages"
-apt_base_url="https://packages.cloud.google.com/apt"
+version="{{vars.version}}"
+sha256="{{vars.sha256}}"
+package_url="https://packages.cloud.google.com/apt/{{vars.deb}}"
 data_dir="$HOME/.local/share/odsod/machine/data/endpoint-verification"
 install_prefix="/opt/google/endpoint-verification"
 
-entry=$(curl -fsSL "$packages_url" | awk '
-  BEGIN { RS = ""; FS = "\\n" }
-  /(^|\\n)Package: endpoint-verification(\\n|$)/ {
-    version = ""; filename = ""; sha256 = ""
-    for (i = 1; i <= NF; i++) {
-      if ($i ~ /^Version: /) version = substr($i, 10)
-      if ($i ~ /^Filename: /) filename = substr($i, 11)
-      if ($i ~ /^SHA256: /) sha256 = substr($i, 9)
-    }
-    print version "\t" filename "\t" sha256
-  }' | sort -V | tail -1)
-
-version=$(echo "$entry" | cut -f1)
-filename=$(echo "$entry" | cut -f2)
-sha256=$(echo "$entry" | cut -f3)
-package_url="${apt_base_url}/${filename}"
 version_dir="${data_dir}/${version}"
 extract_dir="${version_dir}/extract"
 package="${version_dir}/package.deb"
@@ -89,9 +81,20 @@ echo '--- device_state.sh ---'
 """
 
 [tasks.discover]
-description = "Show latest available version"
+description = "Show latest available version as [vars] to paste"
 run = """
 curl -fsSL "https://packages.cloud.google.com/apt/dists/endpoint-verification/main/binary-amd64/Packages" \
-  | awk 'BEGIN { RS = ""; FS = "\\n" } /(^|\\n)Package: endpoint-verification(\\n|$)/ { for (i = 1; i <= NF; i++) if ($i ~ /^Version: /) print substr($i, 10) }' \
-  | sort -V | tail -1
+  | awk '
+    BEGIN { RS = ""; FS = "\\n" }
+    /(^|\\n)Package: endpoint-verification(\\n|$)/ {
+      version = ""; filename = ""; sha256 = ""
+      for (i = 1; i <= NF; i++) {
+        if ($i ~ /^Version: /) version = substr($i, 10)
+        if ($i ~ /^Filename: /) filename = substr($i, 11)
+        if ($i ~ /^SHA256: /) sha256 = substr($i, 9)
+      }
+      print version "\t" filename "\t" sha256
+    }' \
+  | sort -V | tail -1 \
+  | awk -F'\t' '{ printf "version = \\"%s\\"\\ndeb = \\"%s\\"\\nsha256 = \\"%s\\"\\n", $1, $2, $3 }'
 """

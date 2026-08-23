@@ -1,5 +1,5 @@
 [vars]
-version = "b4938"
+version = "1.9.2"
 model = "ggml-large-v3.bin"
 model_url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin"
 vad_model = "ggml-silero-v6.2.0.bin"
@@ -7,12 +7,20 @@ vad_model_url = "https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-s
 port = "8178"
 
 [tasks.discover]
-description = "Show latest whisper.cpp release version"
+description = "Show latest stable whisper.cpp release version"
 run = """
-curl -sIL https://github.com/ggml-org/whisper.cpp/releases/latest \
-  | grep -i ^location: | grep -oP '/tag/\\K[^/?]+' | tail -1 || echo UNKNOWN
+gh api 'repos/ggml-org/whisper.cpp/releases?per_page=30' \
+  --jq 'first(.[] | select(.prerelease == false) | .tag_name | select(test("^v[0-9]"))) | sub("^v"; "")' \
+  || echo UNKNOWN
 """
 
 [tasks.clean]
-description = "Remove source tree"
-run = "rm -rf whisper.cpp-{{vars.version}}"
+description = "Remove source trees other than the pinned version"
+run = """
+for dir in whisper.cpp-*; do
+  if [ -d "$dir" ] && [ "$dir" != "whisper.cpp-{{vars.version}}" ]; then
+    echo "[clean] Removing $dir"
+    rm -rf "$dir"
+  fi
+done
+"""

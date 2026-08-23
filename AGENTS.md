@@ -27,6 +27,17 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
+Start with `mise run discover`. It prints one row per pinned thing with the
+pinned version, the latest upstream release, and `ok` / `BUMP` / `?`, then runs
+`mise outdated` for `[tools]`. It reads GitHub through `gh api`, so `gh auth
+status` must show a login. A `?` means the probe matched nothing, which usually
+means upstream changed its release scheme: fix the probe in `tasks/discover.sh`
+before trusting the row.
+
+- **Fonts and desktop apps** (Inter, Iosevka, Nerd Fonts, Slack, Zoom, Cursor,
+  Zed, Yaak, SoapUI, Obsidian): edit `[vars]` in `mise.toml`. Nothing else
+  holds a version. Cursor needs `cursor_hash` bumped with `cursor_version`; both
+  values come from the same `discover` rows (see `cursor/AGENTS.md`).
 - **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:
   `node = "24"`, `python = "3.12"`, `go = "1.26"`). Exact versions live in
   `mise.lock`. `mise upgrade` installs newer matches and rewrites the lockfile.
@@ -35,16 +46,40 @@ instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
   `mise lock --global` needs `GITHUB_TOKEN` (e.g. `gh auth token`) or GitHub
   rate-limits leave platforms missing. Commit `mise.lock`. After installs,
   `mise reshim`.
-- **Desktop apps** (Slack, Zoom, Cursor, Zed, Yaak, SoapUI, Obsidian): update
-  `version` in the corresponding `[tasks."setup:*"]` section in `mise.toml`.
-  Cursor also needs the production URL hash (see `cursor/AGENTS.md`).
-- **GPU services** (llama, whisper): `mise run -C llama discover` /
-  `mise run -C whisper discover`, then update `version` in `[vars]` in the
-  topic `mise.toml`. The setup scripts read it from there (single source).
-- **Fonts** (Inter, Iosevka, Nerd Fonts): update `VERSION` in corresponding
-  `[tasks."setup:font-*"]` section in `mise.toml`.
+- **GPU services** (llama, whisper): update `version` in `[vars]` in the topic
+  `mise.toml`. The setup scripts read it from there (single source). Both pin
+  the newest non-prerelease semver tag, not a `bNNNN` nightly, and the setup
+  scripts add the `v` prefix because GitHub source tarballs drop it. Both repos
+  also publish `bNNNN` build tags, and `/releases/latest` has pointed at one of
+  those, so `discover` filters on release shape instead. After a bump, restart
+  the user services: the setup scripts rewrite the units but do not restart an
+  already-running service.
 - **endpoint-verification**: `mise run -C endpoint-verification discover`
-  (install always fetches latest; discover is informational).
+  prints `version`, `deb`, and `sha256` as a paste-ready `[vars]` block. All
+  three move together: the filename carries a per-build hash, and install
+  verifies the checksum.
+- **Obsidian**: some tags ship an Android APK only. `discover` reports the
+  newest release that has a desktop AppImage, so trust that row over the tag.
+
+### After editing pins
+
+Editing `[vars]` changes nothing on disk. Run these in order.
+
+1. `mise run bootstrap` installs the new fonts, desktop apps, and GPU builds.
+   Use `mise run apply` instead for full convergence including dotfiles.
+2. Restart any GPU service whose version moved:
+   `systemctl --user restart llama-server llama-embed whisper-server`.
+3. `mise run clean` last, never first. It deletes the source tree the running
+   service still points at. Old versions accumulate under
+   `~/.local/share/odsod/machine/data` and as `llama.cpp-*` / `whisper.cpp-*`
+   source trees, and it keeps only the pinned ones.
+4. Verify: `mise run discover` shows every row `ok`, `mise bootstrap --dry-run`
+   reports no work, and each service answers on its port, for example
+   `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8179/health`.
+
+If `mise bootstrap` stops with "refusing to overwrite existing files", an app
+has replaced its dotfile symlink with a real file. Copy the live file into the
+repo before using `--force-dotfiles`, or its runtime edits are lost.
 
 ## Workflow: Applying Changes from Another Machine
 
@@ -83,12 +118,14 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 | New systemd system service | Add to `[bootstrap.services]`                          |
 | New privileged file        | Add to `[bootstrap.files]`                             |
 | Complex imperative setup   | Add script to `tasks/`, wire into `[tasks]`            |
+| New pinned desktop app     | Add `<app>_version` to `[vars]`, probe in `discover`   |
 
 ## mise.toml Sections
 
 | Section                           | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
 | `[settings]`                      | Mise behavior config                       |
+| `[vars]`                          | Pinned font and desktop app versions       |
 | `[tools]`                         | Versioned dev tool binaries                |
 | `[env]`                           | Sources `env.sh` via `_.source`            |
 | `[settings.dotfiles]`             | Dotfiles root config                       |
@@ -110,6 +147,12 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 - **Fish login shell** uses a stable symlink at `/usr/local/bin/fish` pointing
 - **Neovim as vim/vi**: Remove vim-enhanced/vim-minimal RPMs, symlink in
 - **Fonts**: `brew-cask:font-*` on Linux installs to `~/.local/share/fonts`
+- **Apps that rewrite their own config**: Antigravity writes `model` and
+  `trustedWorkspaces` into its settings at runtime, so the symlink gets
+  replaced by a real file. Before `mise bootstrap --force-dotfiles`, copy the
+  live file back into the repo, or those edits are lost. Cursor's
+  `cli-config.json` stays unsymlinked because the live file holds `authInfo`
+  and auth cache keys, which must not reach this public repo.
 
 ## Commit Style
 

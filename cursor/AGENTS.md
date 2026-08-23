@@ -25,26 +25,20 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
 
 **Bump workflow** (update version and URL hash together):
 
-1. Discover:
-
-   ```bash
-   curl -sI https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest
-   ```
-
-   `Location` is the production URL. Version is the `cursor-<version>.el8`
-   segment.
-
-2. Copy both into `[tasks."setup:cursor"]` in `mise.toml`:
-   - `version="…"`
-   - the `https://downloads.cursor.com/production/<hash>/...` RPM URL
-3. Validate: `curl -I '<rpm_url>'` — expect `HTTP/2 200`
+1. `mise run discover` prints both values as the `cursor` and `cursor-hash`
+   rows. Both read the `Location` header of
+   `https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest`.
+2. Copy both into `[vars]` in `mise.toml`:
+   - `cursor_version = "…"`
+   - `cursor_hash = "…"`
+3. Validate the assembled URL: `curl -I '<rpm_url>'` — expect `HTTP/2 200`
 4. Install: `mise run setup:cursor`
 5. Verify: `rpm -q cursor` and `/usr/bin/cursor --version`
 
 **Idempotency**
 
 - Install is skipped when `rpm -q --qf '%{VERSION}' cursor` matches `version`
-- Never bump `version` without updating the production URL from discover
+- Never bump `cursor_version` without `cursor_hash` from the same discover run
 
 ## Workflow
 

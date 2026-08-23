@@ -33,7 +33,7 @@ sudo dnf install -y -q \
 if [ ! -f "$SRC/CMakeLists.txt" ]; then
   rm -rf "$SRC"
   echo "[llama] Downloading source..."
-  curl -fL "https://github.com/ggml-org/llama.cpp/archive/refs/tags/${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/llama"
+  curl -fL "https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/llama"
 fi
 
 echo "[llama] Building llama-server with ROCm/HIP..."
