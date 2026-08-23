@@ -87,10 +87,3 @@ nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
 ```sh
 nvim --headless '+qa'
 ```
-
-## Skills
-
-- Neovim changes: use `neovim` skill
-  - `.agents/skills/neovim/SKILL.md`
-- CLAUDE/GEMINI memory maintenance: use `claude-md-improver` skill
-  - `.agents/skills/claude-md-improver/SKILL.md`

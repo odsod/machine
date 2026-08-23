@@ -1,7 +1,7 @@
 # Agent Instructions
 
 Project-specific instructions for the `machine` repo. Global agent
-instructions live in `.agents/AGENTS.md`. Do not duplicate them here.
+instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 ## Principles
 
@@ -166,14 +166,26 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 - Remote read operations are allowed.
 - Do not push to the remote repo; leave this to the user.
 
-## Nested Workspaces
+## Agents
 
-### .agents/ (github.com/odsod/agents)
+`AGENTS.md` is the real file and `CLAUDE.md` is a symlink onto it, never a second
+copy. The same holds for skills: `.agents/skills` is real, `.claude/skills` links
+to it.
 
-- **Purpose**: Agent skills (tmux, skill-creator, etc.)
-- **Install**: `mise bootstrap` clones if `.agents/.jj` is absent.
-- **Update**: See global AGENTS.md for workflow.
+- `agents/` is the source for `~/.agents`: the instruction file every agent loads
+  and the skills that apply in every repo (`herdr`). `[dotfiles]` links it to
+  `~/.agents` and links its `AGENTS.md` to the names Claude, Codex and Gemini
+  look for.
+- The `~/.claude/skills` link exists because Claude Code reads only its own
+  directories. Cursor reads the `.agents` paths itself, so it needs no link.
+- A skill only about this repo goes in `.agents/skills/`, with a
+  `.claude/skills` symlink beside it. There are none; add one only when a real
+  procedure has proved itself, not to record what a source repo already explains.
+- `mise run update-skills` pulls new upstream releases of the vendored global
+  skills and rewrites `agents/.skill-lock.json`.
+- This repo is public. Keep employer names, private repo names and account
+  identifiers out of `agents/AGENTS.md`; they belong in that employer's own repo.
 
 ## Home Folder
 
-See "File System" in `.agents/AGENTS.md` for the standard directory layout.
+See "Layout" in `agents/AGENTS.md` for the standard directory layout.
