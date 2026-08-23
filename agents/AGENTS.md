@@ -41,6 +41,7 @@ Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
 
 Terminal mux is Herdr (`HERDR_ENV=1`). Load `/herdr` only when asked to inspect panes.
+Load `/agent-team` when asked to compose or run a multi-agent team.
 
 ## Skills
 
@@ -48,8 +49,8 @@ Terminal mux is Herdr (`HERDR_ENV=1`). Load `/herdr` only when asked to inspect 
 name is a symlink onto them, never a second copy: `CLAUDE.md` → `AGENTS.md`,
 `.claude/skills` → `.agents/skills`. Read and edit the `.agents` path.
 
-`~/.agents/skills/` holds only skills that apply in every repo, and only `herdr`
-qualifies. A skill about one repo belongs in that repo's own `.agents/skills/`.
+`~/.agents/skills/` holds only skills that apply in every repo: `herdr` and
+`agent-team`. A skill about one repo belongs in that repo's own `.agents/skills/`.
 Install a skill where it is needed rather than everywhere.
 
 ## Version control
