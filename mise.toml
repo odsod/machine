@@ -155,6 +155,14 @@ root = "{{config_root}}"
 "~/.claude/settings.json" = "claude/settings.json"
 "~/.claude/output-styles/Empathic.md" = "claude/output-styles/Empathic.md"
 
+# Agents: one instruction file and one global skills dir, shared by every agent.
+# Cursor reads ~/.agents/skills itself; Claude Code needs ~/.claude/skills.
+"~/.agents" = "agents"
+"~/.claude/CLAUDE.md" = "agents/AGENTS.md"
+"~/.claude/skills" = "agents/skills"
+"~/.codex/AGENTS.md" = "agents/AGENTS.md"
+"~/.gemini/GEMINI.md" = "agents/AGENTS.md"
+
 # OpenCode
 "~/.config/opencode/opencode.json" = "opencode/opencode.json"
 "~/.config/opencode/tui.json" = "opencode/tui.json"
@@ -388,9 +396,6 @@ enabled = true
 state = "running"
 enabled = true
 
-[bootstrap.repos]
-"~/Code/github.com/odsod/machine/.agents" = { url = "git@github.com:odsod/agents.git" }
-
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"
 
@@ -403,6 +408,14 @@ env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevk
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/discover.sh"
+"""
+
+[tasks.update-skills]
+description = "Update the vendored global agent skills to their latest upstream release"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+cd "$repo/agents"
+exec npx --yes skills update
 """
 
 [tasks.clean]

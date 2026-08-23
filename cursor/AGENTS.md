@@ -49,5 +49,6 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
 ## Constraints
 
 - Do not symlink `~/.cursor/cli-config.json` — merge preserves machine-local cache
-- Shared skills: `~/.cursor/skills` → `.agents/skills` (installed by `.agents`)
+- Do not symlink `~/.cursor/skills`: Cursor reads `~/.agents/skills` and a repo's
+  `.agents/skills` itself, so a Cursor-specific copy only duplicates them
 - Hook paths in `hooks.json` are relative to `~/.cursor/`
