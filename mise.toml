@@ -25,14 +25,14 @@ nerd_fonts_version = "3.5.1"
 slack_version = "4.51.180"
 zoom_version = "7.1.5.4332"
 obsidian_version = "1.13.7"
-zed_version = "1.16.1"
+zed_version = "1.17.2"
 yaak_version = "2026.6.0"
 soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.17.8"
-cursor_hash = "2fdd31c9f33f7fbe501f2d57772dc5bf64b63621"
+cursor_version = "3.17.19"
+cursor_hash = "ae3a2b7231dd56194447fe4570dfdc61640b1e9a"
 
 [tools]
 "aqua:jdx/mise" = "latest"
