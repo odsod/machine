@@ -162,6 +162,7 @@ root = "{{config_root}}"
 "~/.claude/skills" = "agents/skills"
 "~/.codex/AGENTS.md" = "agents/AGENTS.md"
 "~/.gemini/GEMINI.md" = "agents/AGENTS.md"
+"~/.pi/agent/AGENTS.md" = "agents/AGENTS.md"
 
 # OpenCode
 "~/.config/opencode/opencode.json" = "opencode/opencode.json"
