@@ -10,6 +10,31 @@ end
 
 functions -q source_env_sh; and not set -q ODSOD_MACHINE; and source_env_sh
 
+# Work around https://github.com/herdrdev/herdr/issues/2448.
+# Remove this refresh and the xdg-open shim after
+# https://github.com/herdrdev/herdr/pull/2854 ships in stable Herdr.
+function desktop-env-refresh
+    test "$HERDR_ENV" = 1; or return 0
+    command -q systemctl; or return 0
+
+    set -l manager_env (systemctl --user show-environment 2>/dev/null); or return 0
+    set -l names \
+        DISPLAY WAYLAND_DISPLAY XAUTHORITY \
+        XDG_RUNTIME_DIR XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE \
+        DESKTOP_SESSION DBUS_SESSION_BUS_ADDRESS \
+        KDE_FULL_SESSION KDE_SESSION_VERSION QT_WAYLAND_RECONNECT
+
+    for name in $names
+        set -l line (string match "$name=*" $manager_env)
+        if test -n "$line"
+            set -gx $name (string replace "$name=" "" -- $line)
+        else
+            set -e $name
+        end
+    end
+end
+desktop-env-refresh
+
 # Stabilize SSH agent socket for tmux session persistence.
 # Remote SSH sessions should keep their forwarded agent; local desktop shells
 # should fall back to the user ssh-agent socket if a forwarded one is absent.
