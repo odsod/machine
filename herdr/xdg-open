@@ -1,0 +1,9 @@
+#!/usr/bin/env fish
+
+# Work around https://github.com/herdrdev/herdr/issues/2448 for existing panes.
+# Remove this shim after https://github.com/herdrdev/herdr/pull/2854 ships.
+if test -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY"
+    exec /usr/bin/xdg-open $argv
+end
+
+systemd-run --user --wait --collect --quiet --same-dir -- /usr/bin/xdg-open $argv
