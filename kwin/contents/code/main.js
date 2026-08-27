@@ -178,14 +178,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] zed", "KWin", ""],
-    key: "Meta+Z",
-    kind: "app",
-    command: ["zed"],
-    resourceClass: "dev.zed.Zed",
-  },
-
-  {
     actionId: ["kwin", "[odsod] emojis", "KWin", ""],
     key: "Meta+,",
     kind: "app",

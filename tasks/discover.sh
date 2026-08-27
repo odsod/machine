@@ -53,7 +53,6 @@ pinned_var() {
 row inter "$PINNED_INTER" "$(gh_tag rsms/inter)"
 row iosevka "$PINNED_IOSEVKA" "$(gh_tag be5invis/Iosevka)"
 row nerd-fonts "$PINNED_NERD_FONTS" "$(gh_tag ryanoasis/nerd-fonts)"
-row zed "$PINNED_ZED" "$(gh_tag zed-industries/zed)"
 row yaak "$PINNED_YAAK" "$(gh_tag mountain-loop/yaak)"
 
 # The newest Obsidian tag is sometimes Android only, so take the newest release
