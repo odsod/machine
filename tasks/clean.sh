@@ -21,7 +21,6 @@ prune inter "$PINNED_INTER"
 prune iosevka "$PINNED_IOSEVKA"
 prune nerd-fonts "$PINNED_NERD_FONTS"
 prune obsidian "$PINNED_OBSIDIAN"
-prune zed "$PINNED_ZED"
 prune soap-ui "$PINNED_SOAP_UI"
 
 mise run -C "$REPO_DIR/llama" clean

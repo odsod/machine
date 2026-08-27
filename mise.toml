@@ -25,7 +25,6 @@ nerd_fonts_version = "3.5.1"
 slack_version = "4.51.180"
 zoom_version = "7.1.5.4332"
 obsidian_version = "1.13.7"
-zed_version = "1.17.2"
 yaak_version = "2026.6.0"
 soap_ui_version = "5.10.0"
 
@@ -140,10 +139,6 @@ root = "{{config_root}}"
 
 # JJ
 "~/.config/jj/config.toml" = "jj/config.toml"
-
-# Zed
-"~/.config/zed/settings.json" = "zed/settings.json"
-"~/.config/zed/keymap.json" = "zed/keymap.json"
 
 # Cursor
 "~/.config/Cursor/User/settings.json" = "cursor/settings.json"
@@ -407,7 +402,7 @@ run = "mise run setup:fish-shell"
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_ZED = "{{vars.zed_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
+env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/discover.sh"
@@ -423,7 +418,7 @@ exec npx --yes skills update
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
-env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_ZED = "{{vars.zed_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
+env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/clean.sh"
@@ -450,7 +445,6 @@ depends = [
   "setup:zoom",
   "setup:obsidian",
   "setup:cursor",
-  "setup:zed",
   "setup:yaak",
   "setup:soap-ui",
   "setup:llama",
@@ -593,26 +587,6 @@ version="{{vars.cursor_version}}"
 if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; then
   sudo dnf install -y "https://downloads.cursor.com/production/{{vars.cursor_hash}}/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
 fi
-"""
-
-[tasks."setup:zed"]
-description = "Install Zed editor"
-run = """
-version="{{vars.zed_version}}"
-data_dir="$HOME/.local/share/odsod/machine/data/zed/${version}/zed.app"
-if [ ! -d "$data_dir" ]; then
-  mkdir -p "$(dirname "$data_dir")"
-  curl -fsSL "https://github.com/zed-industries/zed/releases/download/v${version}/zed-linux-x86_64.tar.gz" | tar -xz -C "$(dirname "$data_dir")"
-fi
-ln -fsT "${data_dir}/bin/zed" "$HOME/.local/bin/zed"
-mkdir -p "$HOME/.local/share/applications" "$HOME/.local/share/icons/hicolor/512x512/apps"
-desktop_file=$(find "${data_dir}/share/applications" -name "*.desktop" | head -1)
-if [ -n "$desktop_file" ]; then
-  sed "s|Icon=zed|Icon=${data_dir}/share/icons/hicolor/512x512/apps/zed.png|; s|Exec=zed|Exec=${data_dir}/bin/zed|" \
-    "$desktop_file" > "$HOME/.local/share/applications/zed.desktop"
-fi
-ln -fsT "${data_dir}/share/icons/hicolor/512x512/apps/zed.png" \
-  "$HOME/.local/share/icons/hicolor/512x512/apps/zed.png"
 """
 
 [tasks."setup:yaak"]

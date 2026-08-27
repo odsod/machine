@@ -35,7 +35,7 @@ means upstream changed its release scheme: fix the probe in `tasks/discover.sh`
 before trusting the row.
 
 - **Fonts and desktop apps** (Inter, Iosevka, Nerd Fonts, Slack, Zoom, Cursor,
-  Zed, Yaak, SoapUI, Obsidian): edit `[vars]` in `mise.toml`. Nothing else
+  Yaak, SoapUI, Obsidian): edit `[vars]` in `mise.toml`. Nothing else
   holds a version. Cursor needs `cursor_hash` bumped with `cursor_version`; both
   values come from the same `discover` rows (see `cursor/AGENTS.md`).
 - **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:
