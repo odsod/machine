@@ -10,7 +10,7 @@ embed_port = "8180"
 [tasks.discover]
 description = "Show latest stable llama.cpp release version"
 run = """
-gh api 'repos/ggml-org/llama.cpp/releases?per_page=30' \
+gh api 'repos/ggml-org/llama.cpp/releases?per_page=100' \
   --jq 'first(.[] | select(.prerelease == false) | .tag_name | select(test("^v[0-9]"))) | sub("^v"; "")' \
   || echo UNKNOWN
 """
