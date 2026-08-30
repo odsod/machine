@@ -3,6 +3,20 @@ set -uo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
+# Stop before duplicating work that an open PR may already be doing (a bump PR
+# from another machine, or one still open from this machine).
+REPO="$(git config --get remote.origin.url | sed 's#.*github.com/##; s#\.git$##')"
+if [ -n "$REPO" ]; then
+  open_prs="$(gh pr list --state open "--repo=$REPO" 2>/dev/null)"
+  if [ -n "$open_prs" ]; then
+    echo "Aborting: unmerged PRs on $REPO:" >&2
+    echo "$open_prs" | sed 's/^/  /' >&2
+    echo 'Merge or close them first. Rebase onto the fresh trunk, then rerun:' >&2
+    echo '  jj git fetch --remote origin && jj rebase -o main@origin' >&2
+    exit 1
+  fi
+fi
+
 # mise reads GITHUB_TOKEN; gh reads the keyring. Without this bridge `mise
 # outdated` runs unauthenticated and GitHub rate-limits most tool lookups.
 if [ -z "${GITHUB_TOKEN:-}" ]; then
