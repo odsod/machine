@@ -10,8 +10,13 @@ embed_port = "8180"
 [tasks.discover]
 description = "Show latest stable llama.cpp release version"
 run = """
-gh api 'repos/ggml-org/llama.cpp/releases?per_page=100' \
-  --jq 'first(.[] | select(.prerelease == false) | .tag_name | select(test("^v[0-9]"))) | sub("^v"; "")' \
+# Nightly bNNNN releases bury the semver tags past any fixed window,
+# so list tags and version-sort instead of scanning recent releases.
+git ls-remote --tags https://github.com/ggml-org/llama.cpp.git 'refs/tags/v*' \
+  | grep -v '\\^{}$' \
+  | sed 's#.*refs/tags/v##' \
+  | sort -V \
+  | tail -1 \
   || echo UNKNOWN
 """
 

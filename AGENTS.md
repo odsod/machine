@@ -27,7 +27,13 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
-Start with `mise run discover`. It prints one row per pinned thing with the
+Start with `mise run discover`. Before probing anything it refuses to run while
+any PR is open on the remote: the bump work may already be half-done in that PR,
+from this machine or another. When it aborts, list the PRs with `gh pr list`, then
+merge or close them. Pull the result before rerunning:
+`jj git fetch --remote origin && jj rebase -o main@origin`.
+
+The task then prints one row per pinned thing with the
 pinned version, the latest upstream release, and `ok` / `BUMP` / `?`, then runs
 `mise outdated` for `[tools]`. It reads GitHub through `gh api`, so `gh auth
 status` must show a login. A `?` means the probe matched nothing, which usually
