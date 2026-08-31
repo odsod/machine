@@ -128,6 +128,9 @@ root = "{{config_root}}"
 # Git
 "~/.gitconfig" = "git/gitconfig"
 
+# PipeWire
+"~/.config/pipewire/pipewire.conf.d/50-no-raop.conf" = "pipewire/50-no-raop.conf"
+
 # Neovim
 "~/.config/nvim" = "neovim"
 
