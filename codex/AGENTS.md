@@ -2,26 +2,31 @@
 
 ## Files
 
-- `config.toml` - Shared base config committed to the repo
-- `~/.codex/config.toml` - Live config used and mutated by Codex trust prompts
-- `sync-config.py` - Sync shared keys from `config.toml` into `~/.codex/config.toml`
+- `config.toml` - Shared base config committed to the repo; the single source
+  of truth
+- `~/.codex/config.toml` - Live config written by Codex trust prompts and
+  runtime state
 
 ## Tasks
 
 - Binary: `[tools] codex` in root `mise.toml`
-- `mise run setup:codex` - Apply shared-config changes while preserving
-  `[projects."..."]` trust entries from the live config
-- `mise run codex:diff` - Show pending shared-config changes against the live config
+- `mise run setup:codex` - Check drift between live and repo config; fails
+  `mise run apply`/`bootstrap` until resolved
+- `mise run codex:diff` - Show the drift diff
+- `mise run codex:resolve` - Resolve drift by overwriting the live config with
+  the repo config
 
 ## Workflow
 
 - Let Codex trust prompts write directly to `~/.codex/config.toml`
 - Keep repo-managed defaults in `config.toml`
-- Run `mise run setup:codex` after changes to `config.toml`
-- Run `mise run codex:diff` before syncing when reviewing drift
+- `mise run codex:diff` to review drift, `mise run codex:resolve` to resolve
+- Trust is never granted standing in the base config; jj workspaces create
+  fresh directories, so each one should prompt for trust
 
 ## Constraints
 
-- `sync-config.py` preserves only the live `projects` table
-- Local edits outside `projects` in `~/.codex/config.toml` are overwritten on sync
-- Do not reintroduce a symlink from `~/.codex/config.toml` to `config.toml`
+- Resolve drops runtime state (per-project trust entries, `hooks.state`
+  hash, NUX counters); Codex re-prompts for the current directory and the
+  hook on next use
+- Do not reintroduce a symlink or a merge script

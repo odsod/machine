@@ -663,17 +663,30 @@ grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
 """
 
 [tasks."setup:codex"]
-description = "Sync codex config (preserves trusted dirs and hook state)"
+description = "Check codex config drift (fails until resolved)"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-python3 "$repo/codex/sync-config.py" sync --base "$repo/codex/config.toml" --target "$HOME/.codex/config.toml"
+if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
+  echo "[codex] Resolve with: mise run codex:resolve"
+  exit 1
+fi
 """
 
 [tasks."codex:diff"]
 description = "Show diff between repo codex config and live config"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-python3 "$repo/codex/sync-config.py" diff --base "$repo/codex/config.toml" --target "$HOME/.codex/config.toml"
+diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml" || true
+"""
+
+[tasks."codex:resolve"]
+description = "Resolve codex config drift by overwriting the live config"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
+  echo "[codex] Applying repo config over live config"
+fi
+install -m 600 "$repo/codex/config.toml" "$HOME/.codex/config.toml"
 """
 
 [tasks."setup:cursor-cli"]
