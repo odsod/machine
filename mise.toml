@@ -25,7 +25,7 @@ nerd_fonts_version = "3.5.1"
 slack_version = "4.51.180"
 zoom_version = "7.1.5.4332"
 obsidian_version = "1.13.7"
-yaak_version = "2026.6.0"
+yaak_version = "2026.7.0"
 soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
