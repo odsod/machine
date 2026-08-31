@@ -21,6 +21,8 @@ cursor-style-blink = true
 cursor-click-to-move = true
 mouse-hide-while-typing = true
 copy-on-select = true
+# Allow nvim OSC 52 clipboard writes without a permission prompt
+clipboard-write = allow
 selection-clear-on-typing = true
 focus-follows-mouse = true
 
