@@ -451,8 +451,8 @@ depends = [
   "setup:kde-fonts",
   "setup:kwallet",
   "setup:keyboard",
-  "setup:codex",
-  "setup:antigravity",
+  "codex:check",
+  "antigravity:check",
   "setup:cursor-cli",
 ]
 run = """
@@ -662,7 +662,7 @@ grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
   /usr/share/X11/xkb/rules/evdev.xml
 """
 
-[tasks."setup:codex"]
+[tasks."codex:check"]
 description = "Check codex config drift (fails until resolved)"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
@@ -670,13 +670,6 @@ if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
   echo "[codex] Resolve with: mise run codex:resolve"
   exit 1
 fi
-"""
-
-[tasks."codex:diff"]
-description = "Show diff between repo codex config and live config"
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml" || true
 """
 
 [tasks."codex:resolve"]
@@ -689,7 +682,7 @@ fi
 install -m 600 "$repo/codex/config.toml" "$HOME/.codex/config.toml"
 """
 
-[tasks."setup:antigravity"]
+[tasks."antigravity:check"]
 description = "Check antigravity config drift (fails until resolved)"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
@@ -697,13 +690,6 @@ if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/se
   echo "[antigravity] Resolve with: mise run antigravity:resolve"
   exit 1
 fi
-"""
-
-[tasks."antigravity:diff"]
-description = "Show diff between repo antigravity config and live config"
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json" || true
 """
 
 [tasks."antigravity:resolve"]

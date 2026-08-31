@@ -157,7 +157,7 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
   `trustedWorkspaces` into its settings at runtime, and Cursor's live
   `cli-config.json` holds `authInfo` and auth cache keys; none of that may
   reach this public repo. Their live files are plain files, not symlinks.
-  `setup:antigravity` and `setup:codex` gate `mise run apply`: they fail
+  `antigravity:check` and `codex:check` gate `mise run apply`: they fail
   with a diff while runtime state drifts. `antigravity:resolve` and
   `codex:resolve` overwrite the live file with the repo copy, dropping
   private runtime state and letting the app re-prompt.
