@@ -170,7 +170,6 @@ root = "{{config_root}}"
 
 # Gemini
 "~/.gemini/settings.json" = "gemini/settings.json"
-"~/.gemini/antigravity-cli/settings.json" = "antigravity/settings.json"
 "~/.gemini/policies/machine.toml" = "antigravity/policies.toml"
 
 # Herdr
@@ -453,6 +452,7 @@ depends = [
   "setup:kwallet",
   "setup:keyboard",
   "setup:codex",
+  "setup:antigravity",
   "setup:cursor-cli",
 ]
 run = """
@@ -687,6 +687,33 @@ if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
   echo "[codex] Applying repo config over live config"
 fi
 install -m 600 "$repo/codex/config.toml" "$HOME/.codex/config.toml"
+"""
+
+[tasks."setup:antigravity"]
+description = "Check antigravity config drift (fails until resolved)"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json"; then
+  echo "[antigravity] Resolve with: mise run antigravity:resolve"
+  exit 1
+fi
+"""
+
+[tasks."antigravity:diff"]
+description = "Show diff between repo antigravity config and live config"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json" || true
+"""
+
+[tasks."antigravity:resolve"]
+description = "Resolve antigravity config drift by overwriting the live config"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json"; then
+  echo "[antigravity] Applying repo config over live config"
+fi
+install -m 600 "$repo/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
 """
 
 [tasks."setup:cursor-cli"]
