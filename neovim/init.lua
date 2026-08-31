@@ -4,6 +4,7 @@ vim.loader.enable()
 vim.g.mapleader = " "
 
 require("odsod.plugins").setup()
+require("odsod.core.clipboard").setup()
 require("odsod.lsp").setup()
 require("odsod.ui.statusline").setup()
 require("odsod.core.diagnostics").setup()
