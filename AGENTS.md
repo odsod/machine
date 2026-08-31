@@ -154,13 +154,13 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 - **Neovim as vim/vi**: Remove vim-enhanced/vim-minimal RPMs, symlink in
 - **Fonts**: `brew-cask:font-*` on Linux installs to `~/.local/share/fonts`
 - **Apps that rewrite their own config**: Antigravity writes `model` and
-  `trustedWorkspaces` into its settings at runtime, so the symlink gets
-  replaced by a real file. Before `mise bootstrap --force-dotfiles`, copy the
-  live file back into the repo, or those edits are lost. Never copy
-  `trustedWorkspaces` back: it holds workspace paths that name private repos and
-  branches, and this repo is public. Drop the key and let Antigravity re-prompt.
-  Cursor's `cli-config.json` stays unsymlinked because the live file holds
-  `authInfo` and auth cache keys, which must not reach this public repo.
+  `trustedWorkspaces` into its settings at runtime, and Cursor's live
+  `cli-config.json` holds `authInfo` and auth cache keys; none of that may
+  reach this public repo. Their live files are plain files, not symlinks.
+  `setup:antigravity` and `setup:codex` gate `mise run apply`: they fail
+  with a diff while runtime state drifts. `antigravity:resolve` and
+  `codex:resolve` overwrite the live file with the repo copy, dropping
+  private runtime state and letting the app re-prompt.
 
 ## Commit Style
 
