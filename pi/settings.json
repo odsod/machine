@@ -3,5 +3,5 @@
   "defaultModel": "deepseek-v4-flash",
   "theme": "nord-dark",
   "quietStartup": true,
-  "lastChangelogVersion": "0.84.2"
+  "lastChangelogVersion": "0.84.4"
 }
