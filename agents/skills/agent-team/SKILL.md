@@ -30,12 +30,12 @@ Add an agent when either dimension fails here. Add none when both pass. Drop or 
 | Kind     | Default model             | Give it                                                | Do not give it alone                    | Context reset                         |
 | -------- | ------------------------- | ------------------------------------------------------ | --------------------------------------- | ------------------------------------- |
 | `claude` | Opus 5                    | orchestrate, design, architecture, careful review      | bulk or multimodal grind                | `/compact`, then `/clear`             |
-| `agy`    | Gemini 3.7 Flash (Medium) | throughput, parallel subagents, multimodal, large text | unsupervised design or merge            | `/clear` only (no user compact)       |
+| `agy`    | Gemini 3.8 Flash (Medium) | throughput, parallel subagents, multimodal, large text | unsupervised design or merge            | `/clear` only (no user compact)       |
 | `pi`     | DeepSeek V4 Flash         | fast coding; quality is OK with a reviewer             | design or review without a second agent | `/new`                                |
 | `cursor` | Grok 4.6                  | write; lead when Opus is wordy or stuck in one frame   | long-horizon orchestrate                | restart the agent if the pane is junk |
 | `cursor` | Composer 2.5              | fast coding, tighter than DeepSeek V4 Flash            | architecture                            | restart the agent if the pane is junk |
 
-`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude → Opus 5, agy → Gemini 3.7 Flash Medium, pi → DeepSeek V4 Flash.
+`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude → Opus 5, agy → Gemini 3.8 Flash Medium, pi → DeepSeek V4 Flash.
 
 - Default: Opus 5 orchestrates; this pane keeps design and review; pi takes mechanical implement when it would burn that window.
 - Write (`AGENTS.md`, API docs): Grok 4.6.
