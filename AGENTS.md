@@ -71,16 +71,24 @@ before trusting the row.
 
 Editing `[vars]` changes nothing on disk. Run these in order.
 
-1. `mise run bootstrap` installs the new fonts, desktop apps, and GPU builds.
-   Use `mise run apply` instead for full convergence including dotfiles.
+1. `mise run apply` converges packages, services, dotfiles, tools, and desktop
+   apps. This command must always run and succeed before you finish a bump.
+   If it stops on `codex:check` or `antigravity:check`:
+   - Inspect the diff first.
+   - Integrate any intentional config changes (model, effort, preferences) back
+     into the repo config. Never keep workspace paths or runtime state.
+   - Run the resolve task (`mise run codex:resolve` or
+     `mise run antigravity:resolve`).
+   - Re-run `mise run apply` until it succeeds.
 2. Restart any GPU service whose version moved:
    `systemctl --user restart llama-server llama-embed whisper-server`.
 3. `mise run clean` last, never first. It deletes the source tree the running
    service still points at. Old versions accumulate under
    `~/.local/share/odsod/machine/data` and as `llama.cpp-*` / `whisper.cpp-*`
    source trees, and it keeps only the pinned ones.
-4. Verify: `mise run discover` shows every row `ok`, `mise bootstrap --dry-run`
-   reports no work, and each service answers on its port, for example
+4. Verify: `mise run discover` shows every row `ok`, `mise run apply` succeeds
+   with zero errors, `mise bootstrap --dry-run` reports no work, and each
+   service answers on its port, for example
    `curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8179/health`.
 
 If `mise bootstrap` stops with "refusing to overwrite existing files", an app
@@ -158,9 +166,11 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
   `cli-config.json` holds `authInfo` and auth cache keys; none of that may
   reach this public repo. Their live files are plain files, not symlinks.
   `antigravity:check` and `codex:check` gate `mise run apply`: they fail
-  with a diff while runtime state drifts. `antigravity:resolve` and
-  `codex:resolve` overwrite the live file with the repo copy, dropping
-  private runtime state and letting the app re-prompt.
+  with a diff while runtime state drifts. Inspect the diff first. Integrate
+  any intentional settings back into the repo config. Never keep workspace
+  paths or runtime state. `antigravity:resolve` and `codex:resolve` overwrite
+  the live file with the repo copy, dropping private runtime state and letting
+  the app re-prompt.
 
 ## Commit Style
 
