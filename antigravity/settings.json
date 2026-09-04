@@ -22,5 +22,5 @@
   "model": "Gemini 3.8 Flash (High)",
   "notifications": true,
   "showFeedbackSurvey": false,
-  "verbosity": "low"
+  "verbosity": "high"
 }

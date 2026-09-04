@@ -19,7 +19,9 @@
 
 - Let Codex trust prompts write directly to `~/.codex/config.toml`
 - Keep repo-managed defaults in `config.toml`
-- `mise run codex:check` shows the drift; `mise run codex:resolve` fixes it
+- `mise run codex:check` shows the drift. Read the diff first. Integrate any
+  intentional settings back into `config.toml`. Do not keep workspace paths or
+  runtime state. Run `mise run codex:resolve` to sync the rest.
 - Trust is never granted standing in the base config; jj workspaces create
   fresh directories, so each one should prompt for trust
 
