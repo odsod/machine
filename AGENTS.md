@@ -48,7 +48,6 @@ before trusting the row.
   `node = "24"`, `python = "3.12"`, `go = "1.26"`). Exact versions live in
   `mise.lock`. `mise upgrade` installs newer matches and rewrites the lockfile.
   Do not use `mise upgrade --bump` (that would change `node = "24"` to `"26"`).
-  `npm:@typescript/native-preview` has no `latest`; keep the dated pin.
   `mise lock --global` needs `GITHUB_TOKEN` (e.g. `gh auth token`) or GitHub
   rate-limits leave platforms missing. Commit `mise.lock`. After installs,
   `mise reshim`.
