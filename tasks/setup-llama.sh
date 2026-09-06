@@ -14,10 +14,7 @@ fi
 VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/llama/mise.toml")"
 MODEL="Qwen3.5-9B-Q5_K_M.gguf"
 MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/${MODEL}"
-EMBED_MODEL="Qwen3-Embedding-0.6B-Q8_0.gguf"
-EMBED_MODEL_URL="https://huggingface.co/Qwen/Qwen3-Embedding-0.6B-GGUF/resolve/main/${EMBED_MODEL}"
 PORT="8179"
-EMBED_PORT="8180"
 SRC="$REPO_DIR/llama/llama.cpp-${VERSION}"
 BUILD="$SRC/build"
 
@@ -51,12 +48,6 @@ if [ ! -f "${DATA_DIR}/llama/${MODEL}" ]; then
   mv "${DATA_DIR}/llama/${MODEL}.tmp" "${DATA_DIR}/llama/${MODEL}"
 fi
 
-if [ ! -f "${DATA_DIR}/llama/${EMBED_MODEL}" ]; then
-  echo "[llama] Downloading embedding model..."
-  curl -fL "$EMBED_MODEL_URL" --create-dirs -o "${DATA_DIR}/llama/${EMBED_MODEL}.tmp"
-  mv "${DATA_DIR}/llama/${EMBED_MODEL}.tmp" "${DATA_DIR}/llama/${EMBED_MODEL}"
-fi
-
 echo "[llama] Installing systemd user services..."
 mkdir -p "$HOME/.config/systemd/user"
 sed \
@@ -64,13 +55,11 @@ sed \
   -e "s|@MODEL_PATH@|${DATA_DIR}/llama/${MODEL}|" \
   -e "s|@PORT@|${PORT}|" \
   "$REPO_DIR/llama/llama-server.service" > "$HOME/.config/systemd/user/llama-server.service"
-sed \
-  -e "s|@SERVER_BIN@|${BUILD}/bin/llama-server|" \
-  -e "s|@MODEL_PATH@|${DATA_DIR}/llama/${EMBED_MODEL}|" \
-  -e "s|@PORT@|${EMBED_PORT}|" \
-  "$REPO_DIR/llama/llama-embed.service" > "$HOME/.config/systemd/user/llama-embed.service"
+if systemctl --user is-active --quiet llama-embed.service 2>/dev/null; then
+  systemctl --user disable --now llama-embed.service 2>/dev/null || true
+fi
+rm -f "$HOME/.config/systemd/user/llama-embed.service"
 systemctl --user daemon-reload
 systemctl --user enable --now llama-server.service
-systemctl --user enable --now llama-embed.service
 
 echo "[llama] Done"
