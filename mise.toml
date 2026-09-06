@@ -31,8 +31,8 @@ soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.19.7"
-cursor_hash = "90de2327392570a5f5f625c656c6749d228e6437"
+cursor_version = "3.19.13"
+cursor_hash = "dd066f332fcea7382764400fde902f61920648d5"
 
 [tools]
 "aqua:jdx/mise" = "latest"
@@ -76,7 +76,6 @@ shfmt = "latest"
 stylua = "latest"
 
 # npm tools
-"npm:@typescript/native-preview" = "7.0.0-dev.20260707.2"
 "npm:agent-browser" = "latest"
 "npm:bash-language-server" = "latest"
 "npm:defuddle" = "latest"
