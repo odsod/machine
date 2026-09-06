@@ -80,7 +80,7 @@ Editing `[vars]` changes nothing on disk. Run these in order.
      `mise run antigravity:resolve`).
    - Re-run `mise run apply` until it succeeds.
 2. Restart any GPU service whose version moved:
-   `systemctl --user restart llama-server llama-embed whisper-server`.
+   `systemctl --user restart llama-server whisper-server`.
 3. `mise run clean` last, never first. It deletes the source tree the running
    service still points at. Old versions accumulate under
    `~/.local/share/odsod/machine/data` and as `llama.cpp-*` / `whisper.cpp-*`

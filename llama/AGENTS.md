@@ -31,14 +31,7 @@ curl -fL -o ~/.local/share/odsod/machine/data/llama/Qwen3.5-9B-Q4_K_M.gguf \
 
 ## Ports
 
-- `8179` — OpenAI-compatible `/v1/chat/completions` (chat model)
-- `8180` — OpenAI-compatible `/v1/embeddings` (embedding model)
-
-## Obsidian Copilot config
-
-- Chat model: Add Custom Model → provider "3rd party (openai format)" → Base URL `http://localhost:8179/v1`
-- Embedding model: Add Custom Model → provider "3rd party (openai format)" → Base URL `http://localhost:8180/v1`
-- Enable "Semantic Search" toggle in QA settings, run "Index vault" command
+- `8179`: OpenAI-compatible `/v1/chat/completions` (chat model)
 
 ## OpenWhispr config
 
@@ -49,36 +42,27 @@ curl -fL -o ~/.local/share/odsod/machine/data/llama/Qwen3.5-9B-Q4_K_M.gguf \
 
 ### High-spec (default)
 
-| Component                         | VRAM         |
-| --------------------------------- | ------------ |
-| whisper-server (large-v3)         | 3.1 GB       |
-| llama-server (Qwen3.5-9B Q5)      | 6.3 GB       |
-| llama-embed (Qwen3-Embed 0.6B Q8) | 0.8 GB       |
-| KV cache (32k chat + 2k embed)    | ~3 GB        |
-| Desktop/browsers                  | ~3 GB        |
-| **Total**                         | **~16.2 GB** |
+| Component                    | VRAM         |
+| ---------------------------- | ------------ |
+| whisper-server (large-v3)    | 3.1 GB       |
+| llama-server (Qwen3.5-9B Q5) | 6.3 GB       |
+| KV cache (32k chat)          | ~3 GB        |
+| Desktop/browsers             | ~3 GB        |
+| **Total**                    | **~15.4 GB** |
 
 ### Low-spec (fallback if VRAM-constrained)
 
-| Component                         | VRAM         |
-| --------------------------------- | ------------ |
-| whisper-server (large-v3-turbo)   | 1.6 GB       |
-| llama-server (Qwen3-8B Q4)        | 5.0 GB       |
-| llama-embed (Qwen3-Embed 0.6B Q8) | 0.8 GB       |
-| KV cache (32k chat + 2k embed)    | ~2 GB        |
-| Desktop/browsers                  | ~3 GB        |
-| **Total**                         | **~12.4 GB** |
-
-### Embedding ctx-size
-
-The embed service uses `--ctx-size 2048` — sufficient for typical RAG
-chunks and far cheaper than the chat model's 32k. Using 32k for embeddings
-wastes ~3 GB on an unused KV cache and causes desktop/browser stutter from
-VRAM pressure.
+| Component                       | VRAM         |
+| ------------------------------- | ------------ |
+| whisper-server (large-v3-turbo) | 1.6 GB       |
+| llama-server (Qwen3-8B Q4)      | 5.0 GB       |
+| KV cache (32k chat)             | ~2 GB        |
+| Desktop/browsers                | ~3 GB        |
+| **Total**                       | **~11.6 GB** |
 
 If desktop apps stutter during inference, switch to the low-spec models.
 The AMD GPU driver pages inactive VRAM to system RAM (GTT) under pressure,
-so the system won't crash — but inference latency increases when pages are
+so the system won't crash, but inference latency increases when pages are
 evicted and reloaded.
 
 ## Roadmap
@@ -91,14 +75,6 @@ evicted and reloaded.
 - **Saves**: ~1.5 GB VRAM on dGPU (no compositor/browser textures)
 - **Trade-off**: Intel RPL-S GT1 lacks H.264/HEVC VA-API decode (only JPEG/VP9/MPEG2). YouTube (VP9) still hardware-decodes; other video software-decodes or needs explicit routing to dGPU VA-API
 - **Prerequisite**: Physical cable swap + BIOS change
-
-### Move embedding to CPU
-
-- **Goal**: Free dGPU VRAM by running the tiny embed model on CPU
-- **How**: Set `--n-gpu-layers 0` in `llama-embed.service`
-- **Effect**: Model runs entirely on i9-14900 (24 cores, AVX2/AVX-VNNI)
-- **Saves**: ~1.0 GB VRAM
-- **Trade-off**: Latency ~25ms (GPU) → ~50-100ms (CPU). Acceptable — embedding is async background work (RAG indexing)
 
 ### Quantized KV cache for chat model
 
