@@ -1014,46 +1014,6 @@ backend = "npm:typescript"
 [[tools."npm:yaml-language-server"]]
 version = "1.24.0"
 backend = "npm:yaml-language-server"
-
-[[tools.opencode]]
-version = "1.18.29"
-backend = "aqua:anomalyco/opencode"
-
-[tools.opencode."platforms.linux-arm64"]
-checksum = "sha256:70baf769395ca4e7a68924026530c390eace194f3b7e4919d4efcb2aa2eed3c0"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047606"
-
-[tools.opencode."platforms.linux-arm64-musl"]
-checksum = "sha256:9b9044ede6449dc34888b85f0a51be5777a5886fe5e1cbd67898b13f8a5bec04"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047667"
-
-[tools.opencode."platforms.linux-x64"]
-checksum = "sha256:ea800b7ff56226b70952126c9fc1e2517ca4c4b5682fd9d3f9e87449697a1194"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047604"
-
-[tools.opencode."platforms.linux-x64-musl"]
-checksum = "sha256:294bfa0f4647e0fc5d3edceed94e8dc1047757975689f4269aadb91d6774f9ed"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047608"
-
-[tools.opencode."platforms.macos-arm64"]
-checksum = "sha256:fe764f7f360c584a83e18dd5f23fb1a6b2725f5ee8854b0252fe558f7798e946"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-darwin-arm64.zip"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047483"
-
-[tools.opencode."platforms.macos-x64"]
-checksum = "sha256:9858853e7bacdbbd22c2d70c377e009dc4b354dd04f5588705411e7afb89fd2d"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-darwin-x64.zip"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545047583"
-
-[tools.opencode."platforms.windows-x64"]
-checksum = "sha256:b32618aa3d1415f6e4f473aec248edef25759203fb707d7d968359d86d4a35ee"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.18.29/opencode-windows-x64.zip"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/545049819"
-
 [[tools.pi]]
 version = "0.85.1"
 backend = "aqua:earendil-works/pi"
