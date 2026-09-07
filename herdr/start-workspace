@@ -247,7 +247,7 @@ end
 # --- Agent selection ---
 
 function select_agent
-    set agent_choice (printf '%s\n' claude codex cursor agy gemini \
+    set agent_choice (printf '%s\n' claude codex cursor agy pi \
         | _fzf_pick_compact Agent)
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
@@ -259,9 +259,9 @@ function select_agent
         case agy
             set -g agent_kind agy
             set -g agent_bin agy
-        case gemini
-            set -g agent_kind gemini
-            set -g agent_bin gemini
+        case pi
+            set -g agent_kind pi
+            set -g agent_bin pi
         case claude
             set -g agent_kind claude
             set -g agent_bin claude
@@ -333,8 +333,8 @@ function _launch_workspace
             | string replace -ar '[^a-z0-9_-]' '-')
         set agent_name (string sub -l 32 -- "$agent_name")
 
-        herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id"
-        or _fail "Failed to start $agent_kind in Herdr workspace $label."
+        herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" >/dev/null 2>&1 &
+        disown
     end
 end
 
