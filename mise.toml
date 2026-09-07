@@ -63,7 +63,6 @@ nvim_path="$(mise where neovim)/bin/nvim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
-opencode = "latest"
 pi = "latest"
 ruff = "latest"
 starship = "latest"
@@ -161,11 +160,6 @@ root = "{{config_root}}"
 "~/.codex/AGENTS.md" = "agents/AGENTS.md"
 "~/.gemini/GEMINI.md" = "agents/AGENTS.md"
 "~/.pi/agent/AGENTS.md" = "agents/AGENTS.md"
-
-# OpenCode
-"~/.config/opencode/opencode.json" = "opencode/opencode.json"
-"~/.config/opencode/tui.json" = "opencode/tui.json"
-"~/.config/opencode/plugins/odsod-hooks.js" = "opencode/plugins/odsod-hooks.js"
 
 # Pi
 "~/.pi/agent/settings.json" = "pi/settings.json"
