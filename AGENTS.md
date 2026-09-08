@@ -23,6 +23,7 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 - **Bootstrap**: `mise bootstrap --yes` provisions the full machine.
 - **Fresh machine**:
 - **Status check**: `mise bootstrap status --missing`
+- **Execution plan**: `mise bootstrap plan`
 - **Dry run**: `mise bootstrap --dry-run`
 
 ## Workflow: Version Bumping
@@ -40,10 +41,11 @@ status` must show a login. A `?` means the probe matched nothing, which usually
 means upstream changed its release scheme: fix the probe in `tasks/discover.sh`
 before trusting the row.
 
-- **Fonts and desktop apps** (Inter, Iosevka, Nerd Fonts, Slack, Zoom, Cursor,
-  Yaak, SoapUI, Obsidian): edit `[vars]` in `mise.toml`. Nothing else
-  holds a version. Cursor needs `cursor_hash` bumped with `cursor_version`; both
-  values come from the same `discover` rows (see `cursor/AGENTS.md`).
+- **Desktop apps** (Slack, Zoom, Cursor, Yaak, SoapUI, Obsidian): edit `[vars]`
+  in `mise.toml`. Nothing else holds an app version. Cursor needs `cursor_hash`
+  bumped with `cursor_version`; both values come from the same `discover` rows
+  (see `cursor/AGENTS.md`). Fonts use `brew-cask:font-*` under
+  `[bootstrap.packages]` and update via package bootstrap.
 - **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:
   `node = "24"`, `python = "3.12"`, `go = "1.26"`). Exact versions live in
   `mise.lock`. `mise upgrade` installs newer matches and rewrites the lockfile.
@@ -126,6 +128,7 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 | -------------------------- | ------------------------------------------------------ |
 | New dev tool binary        | `mise use <tool>` (adds to `[tools]`)                  |
 | New system package         | Add `"dnf:<pkg>" = "latest"` to `[bootstrap.packages]` |
+| New font                   | Add `"brew-cask:font-<name>" = "latest"` to `[bootstrap.packages]` |
 | New config symlink         | Add entry to `[dotfiles]`                              |
 | New env var                | Add to `env.sh` (picked up by mise, KDE, systemd)      |
 | New systemd system service | Add to `[bootstrap.services]`                          |
@@ -138,14 +141,16 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 | Section                           | Purpose                                    |
 | --------------------------------- | ------------------------------------------ |
 | `[settings]`                      | Mise behavior config                       |
-| `[vars]`                          | Pinned font and desktop app versions       |
+| `[vars]`                          | Pinned desktop app versions                |
 | `[tools]`                         | Versioned dev tool binaries                |
-| `[env]`                           | Sources `env.sh` via `_.source`            |
+| `[env]`                           | Sources `env.sh` via `_.source`, sets repo |
 | `[settings.dotfiles]`             | Dotfiles root config                       |
-| `[dotfiles]`                      | Config symlinks (~46 entries)              |
+| `[dotfiles]`                      | Config symlinks and inline dotfiles        |
 | `[bootstrap.packages]`            | dnf, brew-cask (fonts), flatpak packages   |
 | `[bootstrap.hooks.*]`             | Pre/post hooks for packages and tools      |
-| `[bootstrap.files]`               | Privileged files (sudoers, sshd config)    |
+| `[bootstrap.files]`               | Privileged files (sudoers, sshd, xkb)      |
+| `[bootstrap.groups]`              | System group declarations                  |
+| `[bootstrap.users]`               | System user accounts and group memberships |
 | `[bootstrap.services]`            | System services (sshd, docker, tailscaled) |
 | `[bootstrap.mise_shell_activate]` | Fish shell activation                      |
 | `[tasks.*]`                       | Imperative setup scripts                   |
@@ -159,7 +164,7 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 - **`github:` backend** for GitHub release tools (replaces deprecated `ubi:`).
 - **Fish login shell** uses a stable symlink at `/usr/local/bin/fish` pointing
 - **Neovim as vim/vi**: Remove vim-enhanced/vim-minimal RPMs, symlink in
-- **Fonts**: `brew-cask:font-*` on Linux installs to `~/.local/share/fonts`
+- **Fonts**: `brew-cask:font-*` installs directly to `~/.local/share/fonts` without Homebrew.
 - **Apps that rewrite their own config**: Antigravity writes `model` and
   `trustedWorkspaces` into its settings at runtime, and Cursor's live
   `cli-config.json` holds `authInfo` and auth cache keys; none of that may

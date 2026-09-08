@@ -64,9 +64,6 @@ pinned_var() {
   sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/$1/mise.toml"
 }
 
-row inter "$PINNED_INTER" "$(gh_tag rsms/inter)"
-row iosevka "$PINNED_IOSEVKA" "$(gh_tag be5invis/Iosevka)"
-row nerd-fonts "$PINNED_NERD_FONTS" "$(gh_tag ryanoasis/nerd-fonts)"
 row yaak "$PINNED_YAAK" "$(gh_tag mountain-loop/yaak)"
 
 # The newest Obsidian tag is sometimes Android only, so take the newest release
@@ -103,7 +100,7 @@ row endpoint-verification "$(pinned_var endpoint-verification)" \
 printf 'NAME\tPINNED\tLATEST\tSTATUS\n%b' "$rows" | column -t -s "$(printf '\t')"
 
 echo
-echo "Pins for fonts and desktop apps live in [vars] in mise.toml."
+echo "Pins for desktop apps live in [vars] in mise.toml."
 echo "llama, whisper, and endpoint-verification pin in their own mise.toml."
 echo "Paste-ready endpoint-verification pins: mise run -C endpoint-verification discover"
 echo

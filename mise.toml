@@ -19,10 +19,6 @@ output = "prefix"
 run_auto_install = true
 
 [vars]
-inter_version = "4.1"
-iosevka_version = "34.8.1"
-nerd_fonts_version = "3.5.1"
-
 slack_version = "4.52.155"
 zoom_version = "7.1.5.4332"
 obsidian_version = "1.13.7"
@@ -108,7 +104,8 @@ spacectl = "latest"
 "pipx:ty" = "latest"
 
 [env]
-_.source = "{{config_root}}/env.sh"
+_.source = "{{ config_source | canonicalize | dirname }}/env.sh"
+REPO_DIR = "{{ config_source | canonicalize | dirname }}"
 
 [settings.dotfiles]
 root = "{{config_root}}"
@@ -188,6 +185,7 @@ root = "{{config_root}}"
 # KDE
 "~/.config/mimeapps.list" = "kde/mimeapps.list"
 "~/.config/fontconfig/fonts.conf" = "kde/fonts.conf"
+"~/.config/kwalletrc" = { content = "[Wallet]\nEnabled=true\nFirst Use=false\n" }
 
 # PostgreSQL
 "~/.psqlrc" = "postgresql/psqlrc"
@@ -309,6 +307,11 @@ root = "{{config_root}}"
 "flatpak:com.spotify.Client" = "latest"
 "flatpak:hu.irl.cameractrls" = "latest"
 
+# Fonts (native brew-cask extraction to ~/.local/share/fonts)
+"brew-cask:font-inter" = "latest"
+"brew-cask:font-iosevka-ss08" = "latest"
+"brew-cask:font-iosevka-term-nerd-font" = "latest"
+
 [bootstrap.hooks.pre-packages]
 run = """
 # RPM Fusion (free + nonfree)
@@ -354,10 +357,18 @@ if ! dnf repolist --enabled | grep -q google-chrome; then
 fi
 """
 
+[bootstrap.groups.docker]
+system = true
+
+[bootstrap.groups.wireshark]
+system = true
+
+[bootstrap.users.odsod]
+group = "odsod"
+groups = ["docker", "wireshark"]
+
 [bootstrap.hooks.post-packages]
 run = """
-sudo groupadd -f docker && sudo usermod -aG docker $(whoami)
-sudo groupadd -f wireshark && sudo usermod -aG wireshark $(whoami)
 systemctl --user enable syncthing.service
 uv generate-shell-completion fish > ~/.config/fish/completions/uv.fish
 uvx --generate-shell-completion fish > ~/.config/fish/completions/uvx.fish
@@ -377,9 +388,16 @@ mode = "0644"
 replace = true
 notify = ["sshd"]
 
+[bootstrap.files."/usr/share/X11/xkb/symbols/odsod"]
+source = "keyboard/odsod"
+owner = "root"
+group = "root"
+mode = "0644"
+
 [bootstrap.services.sshd]
 state = "running"
 enabled = true
+on_change = "reload_or_restart"
 
 [bootstrap.services.docker]
 state = "running"
@@ -401,33 +419,25 @@ run = "mise run fish:setup"
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-exec "$repo/tasks/discover.sh"
-"""
+env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
+run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.update-skills]
 description = "Update the vendored global agent skills to their latest upstream release"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-cd "$repo/agents"
+cd "$REPO_DIR/agents"
 exec npx --yes skills update
 """
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
-env = { PINNED_INTER = "{{vars.inter_version}}", PINNED_IOSEVKA = "{{vars.iosevka_version}}", PINNED_NERD_FONTS = "{{vars.nerd_fonts_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-exec "$repo/tasks/clean.sh"
-"""
+env = { PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
+run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
 description = "Apply config changes pulled from another tree: full convergence"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-cd "$repo"
+cd "$REPO_DIR"
 mise bootstrap --yes
 mise reshim
 """
@@ -435,9 +445,6 @@ mise reshim
 [tasks.bootstrap]
 description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
 depends = [
-  "font-inter:setup",
-  "font-iosevka:setup",
-  "font-nerd:setup",
   "media:setup",
   "graphics:setup",
   "slack:setup",
@@ -449,7 +456,6 @@ depends = [
   "llama:setup",
   "whisper:setup",
   "kde:setup-fonts",
-  "kwallet:setup",
   "keyboard:setup",
   "herdr:sync-machines",
   "codex:check",
@@ -461,51 +467,6 @@ echo "[bootstrap] Verifying auth services..."
 gh auth status 2>/dev/null || echo "  → Run: gh auth login"
 tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
 gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
-"""
-
-[tasks."font-inter:setup"]
-description = "Install Inter font from GitHub releases"
-run = """
-VERSION={{vars.inter_version}}
-DATA_DIR="$HOME/.local/share/odsod/machine/data/inter/$VERSION"
-FONT_DIR="$HOME/.local/share/fonts"
-if [ "$(readlink "$FONT_DIR/inter.ttc" 2>/dev/null || true)" = "$DATA_DIR/Inter.ttc" ]; then exit 0; fi
-echo "[font-inter] Installing Inter $VERSION..."
-mkdir -p "$DATA_DIR" "$FONT_DIR"
-curl -L "https://github.com/rsms/inter/releases/download/v${VERSION}/Inter-${VERSION}.zip" -o "$DATA_DIR/archive.zip"
-unzip -o "$DATA_DIR/archive.zip" -d "$DATA_DIR"
-ln -fsT "$DATA_DIR/Inter.ttc" "$FONT_DIR/inter.ttc"
-fc-cache -f
-"""
-
-[tasks."font-iosevka:setup"]
-description = "Install Iosevka SS08 font from GitHub releases"
-run = """
-VERSION={{vars.iosevka_version}}
-DATA_DIR="$HOME/.local/share/odsod/machine/data/iosevka/$VERSION"
-FONT_DIR="$HOME/.local/share/fonts"
-if [ "$(readlink "$FONT_DIR/iosevka" 2>/dev/null || true)" = "$DATA_DIR" ]; then exit 0; fi
-echo "[font-iosevka] Installing Iosevka SS08 $VERSION..."
-mkdir -p "$DATA_DIR" "$FONT_DIR"
-curl -L "https://github.com/be5invis/Iosevka/releases/download/v${VERSION}/PkgTTC-IosevkaSS08-${VERSION}.zip" -o "$DATA_DIR/iosevka.zip"
-unzip -o "$DATA_DIR/iosevka.zip" -d "$DATA_DIR"
-ln -fsT "$DATA_DIR" "$FONT_DIR/iosevka"
-fc-cache -f
-"""
-
-[tasks."font-nerd:setup"]
-description = "Install IosevkaTerm Nerd Font from GitHub releases"
-run = """
-VERSION={{vars.nerd_fonts_version}}
-DATA_DIR="$HOME/.local/share/odsod/machine/data/nerd-fonts/$VERSION"
-FONT_DIR="$HOME/.local/share/fonts"
-if [ "$(readlink "$FONT_DIR/nerd-fonts" 2>/dev/null || true)" = "$DATA_DIR" ]; then exit 0; fi
-echo "[font-nerd] Installing IosevkaTerm Nerd Font $VERSION..."
-mkdir -p "$DATA_DIR" "$FONT_DIR"
-curl -L "https://github.com/ryanoasis/nerd-fonts/releases/download/v${VERSION}/IosevkaTerm.zip" -o "$DATA_DIR/font.zip"
-unzip -o "$DATA_DIR/font.zip" -d "$DATA_DIR"
-ln -fsT "$DATA_DIR" "$FONT_DIR/nerd-fonts"
-fc-cache -f
 """
 
 [tasks."media:setup"]
@@ -569,8 +530,7 @@ if [ ! -f "$cli" ]; then
   rm -rf /tmp/squashfs-root
 fi
 ln -fsT "$data_dir" "$HOME/.local/share/odsod/machine/data/obsidian/current"
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-install -m 755 "$repo/obsidian/obsidian-wrapper.sh" "$HOME/.local/bin/obsidian"
+install -m 755 "$REPO_DIR/obsidian/obsidian-wrapper.sh" "$HOME/.local/bin/obsidian"
 
 mkdir -p "$HOME/.config/obsidian"
 config="$HOME/.config/obsidian/obsidian.json"
@@ -613,17 +573,11 @@ ln -fsT "${data_dir}/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
 
 [tasks."llama:setup"]
 description = "Build and install llama.cpp GPU inference service"
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-exec "$repo/tasks/setup-llama.sh"
-"""
+run = 'exec "$REPO_DIR/tasks/setup-llama.sh"'
 
 [tasks."whisper:setup"]
 description = "Build and install whisper.cpp GPU speech-to-text service"
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-exec "$repo/tasks/setup-whisper.sh"
-"""
+run = 'exec "$REPO_DIR/tasks/setup-whisper.sh"'
 
 [tasks."fish:setup"]
 description = "Install mise-managed fish to stable path"
@@ -644,20 +598,13 @@ kwriteconfig6 --group "General" --key "XftAntialias" "true"
 kwriteconfig6 --group "General" --key "XftHintStyle" "hintslight"
 kwriteconfig6 --group "General" --key "XftSubPixel" "none"
 kwriteconfig6 --group "WM" --key "activeFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+fc-cache -f
 """
 
-[tasks."kwallet:setup"]
-description = "Configure KWallet"
-run = """
-mkdir -p ~/.config
-printf '%s\n' '[Wallet]' 'Enabled=true' 'First Use=false' > ~/.config/kwalletrc
-"""
 
 [tasks."keyboard:setup"]
-description = "Install custom XKB keyboard layout"
+description = "Register custom XKB keyboard layout"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-sudo cp "$repo/keyboard/odsod" /usr/share/X11/xkb/symbols/odsod
 grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
   sudo sed -i 's#</layoutList>#<layout><configItem><name>odsod</name><languageList><iso639Id>eng</iso639Id></languageList></configItem></layout></layoutList>#' \
   /usr/share/X11/xkb/rules/evdev.xml
@@ -666,8 +613,7 @@ grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
 [tasks."codex:check"]
 description = "Check codex config drift (fails until resolved)"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
+if ! diff -u "$HOME/.codex/config.toml" "$REPO_DIR/codex/config.toml"; then
   echo "[codex] Resolve with: mise run codex:resolve"
   exit 1
 fi
@@ -676,18 +622,16 @@ fi
 [tasks."codex:resolve"]
 description = "Resolve codex config drift by overwriting the live config"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-if ! diff -u "$HOME/.codex/config.toml" "$repo/codex/config.toml"; then
+if ! diff -u "$HOME/.codex/config.toml" "$REPO_DIR/codex/config.toml"; then
   echo "[codex] Applying repo config over live config"
 fi
-install -m 600 "$repo/codex/config.toml" "$HOME/.codex/config.toml"
+install -m 600 "$REPO_DIR/codex/config.toml" "$HOME/.codex/config.toml"
 """
 
 [tasks."antigravity:check"]
 description = "Check antigravity config drift (fails until resolved)"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json"; then
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
   echo "[antigravity] Resolve with: mise run antigravity:resolve"
   exit 1
 fi
@@ -696,27 +640,22 @@ fi
 [tasks."antigravity:resolve"]
 description = "Resolve antigravity config drift by overwriting the live config"
 run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$repo/antigravity/settings.json"; then
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
   echo "[antigravity] Applying repo config over live config"
 fi
-install -m 600 "$repo/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
+install -m 600 "$REPO_DIR/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
 """
 
 [tasks."cursor:setup-cli"]
 description = "Seed cursor CLI config from repo template"
 run = """
 if [ ! -f "$HOME/.cursor/cli-config.json" ]; then
-  repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
   mkdir -p "$HOME/.cursor"
-  cp "$repo/cursor/cli-config.json" "$HOME/.cursor/cli-config.json"
+  cp "$REPO_DIR/cursor/cli-config.json" "$HOME/.cursor/cli-config.json"
 fi
 """
 
 [tasks."herdr:sync-machines"]
 description = "Sync Tailscale peers to Herdr machine catalog"
-run = """
-repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
-exec "$repo/tasks/setup-herdr-machines.sh"
-"""
+run = 'exec "$REPO_DIR/tasks/setup-herdr-machines.sh"'
 
