@@ -47,11 +47,12 @@ function write_stubs --argument-names home
         '    case "Workspace> "' \
         '        head -n1' \
         '    case "Bookmark> "' \
+        '        set -l bm_lines (cat)' \
+        '        test -n "$FZF_BOOKMARK_LOG"; and printf "%s\n" $bm_lines > "$FZF_BOOKMARK_LOG"' \
         '        if test "$FZF_BOOKMARK_MODE" = typed' \
-        '            cat >/dev/null' \
         '            echo typed' \
         '        else' \
-        '            head -n1' \
+        '            echo "$bm_lines[1]"' \
         '        end' \
         '    case "Agent> "' \
         '        if test -n "$FZF_AGENT_CHOICE"' \
@@ -124,8 +125,9 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
     set -l herdr_log "$home/herdr.log"
     set -l ssh_log "$home/ssh.log"
     set -l fzf_log "$home/fzf.log"
+    set -l bookmark_log "$home/bookmark.log"
     set -l system_path (string join : $PATH)
-    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log"
+    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log" "$bookmark_log"
 
     set -l original_dir "$PWD"
     cd "$home"
@@ -141,6 +143,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "HERDR_LOG=$herdr_log" \
         "SSH_LOG=$ssh_log" \
         "FZF_LOG=$fzf_log" \
+        "FZF_BOOKMARK_LOG=$bookmark_log" \
         "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
         "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
         "FZF_AGENT_CHOICE=$FZF_AGENT_CHOICE" \
@@ -153,6 +156,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
     set -g launcher_log "$herdr_log"
     set -g launcher_ssh_log "$ssh_log"
     set -g launcher_fzf_log "$fzf_log"
+    set -g launcher_bookmark_log "$bookmark_log"
 end
 
 setup_case existing
@@ -313,5 +317,45 @@ set -l new_remote_path "$case_home/Workspaces/github.com/acme/repo/new-remote"
 run_launcher "$case_home" "$case_repo" existing 0 "$new_remote_path"
 test (jj --ignore-working-copy -R "$case_repo" workspace root --name new-remote) = "$new_remote_path"
 or fail "launcher did not pick newer remote bookmark over older local workspace"
+
+# --- Deduplication test ---
+
+setup_case deduplicate_synced_bookmarks
+env GIT_COMMITTER_DATE="2024-01-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "synced commit" --date "2024-01-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+jj -R "$case_repo" bookmark set synced-feature -r @- >/dev/null 2>&1
+git -C "$case_repo" update-ref refs/remotes/origin/synced-feature HEAD
+jj -R "$case_repo" git import >/dev/null 2>&1
+
+env GIT_COMMITTER_DATE="2024-02-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "origin commit" --date "2024-02-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+git -C "$case_repo" update-ref refs/remotes/origin/diverged-feature HEAD
+jj -R "$case_repo" git import >/dev/null 2>&1
+
+env GIT_COMMITTER_DATE="2024-03-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "local commit" --date "2024-03-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+jj -R "$case_repo" bookmark set diverged-feature -r @- >/dev/null 2>&1
+
+env GIT_COMMITTER_DATE="2024-04-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "remote only commit" --date "2024-04-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+git -C "$case_repo" update-ref refs/remotes/origin/remote-only HEAD
+jj -R "$case_repo" git import >/dev/null 2>&1
+
+jj -R "$case_repo" bookmark delete main >/dev/null 2>&1
+
+set -l expected_path "$case_home/Workspaces/github.com/acme/repo/remote-only"
+run_launcher "$case_home" "$case_repo" existing 0 "$expected_path"
+
+set -l bm_content (string collect < "$launcher_bookmark_log")
+string match -q "*synced-feature*" "$bm_content"
+or fail "synced-feature missing from bookmark prompt"
+not string match -q "*synced-feature@origin*" "$bm_content"
+or fail "synced-feature@origin should have been deduplicated"
+string match -q "*diverged-feature*" "$bm_content"
+or fail "diverged-feature missing from bookmark prompt"
+string match -q "*diverged-feature@origin*" "$bm_content"
+or fail "diverged-feature@origin missing from bookmark prompt"
+string match -q "*remote-only@origin*" "$bm_content"
+or fail "remote-only@origin missing from bookmark prompt"
 
 echo "start-workspace tests passed"
