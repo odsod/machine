@@ -45,7 +45,9 @@ function write_stubs --argument-names home
         '    case "Space> "' \
         '        echo Workspace' \
         '    case "Workspace> "' \
-        '        head -n1' \
+        '        set -l ws_lines (cat)' \
+        '        test -n "$FZF_WORKSPACE_LOG"; and printf "%s\n" $ws_lines > "$FZF_WORKSPACE_LOG"' \
+        '        printf "%s\n" "$ws_lines[1]"' \
         '    case "Bookmark> "' \
         '        set -l bm_lines (cat)' \
         '        test -n "$FZF_BOOKMARK_LOG"; and printf "%s\n" $bm_lines > "$FZF_BOOKMARK_LOG"' \
@@ -126,8 +128,9 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
     set -l ssh_log "$home/ssh.log"
     set -l fzf_log "$home/fzf.log"
     set -l bookmark_log "$home/bookmark.log"
+    set -l workspace_log "$home/workspace.log"
     set -l system_path (string join : $PATH)
-    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log" "$bookmark_log"
+    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log" "$bookmark_log" "$workspace_log"
 
     set -l original_dir "$PWD"
     cd "$home"
@@ -144,6 +147,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "SSH_LOG=$ssh_log" \
         "FZF_LOG=$fzf_log" \
         "FZF_BOOKMARK_LOG=$bookmark_log" \
+        "FZF_WORKSPACE_LOG=$workspace_log" \
         "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
         "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
         "FZF_AGENT_CHOICE=$FZF_AGENT_CHOICE" \
@@ -157,6 +161,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
     set -g launcher_ssh_log "$ssh_log"
     set -g launcher_fzf_log "$fzf_log"
     set -g launcher_bookmark_log "$bookmark_log"
+    set -g launcher_workspace_log "$workspace_log"
 end
 
 setup_case existing
@@ -358,4 +363,38 @@ or fail "diverged-feature@origin missing from bookmark prompt"
 string match -q "*remote-only@origin*" "$bm_content"
 or fail "remote-only@origin missing from bookmark prompt"
 
+# --- Deep repo ignored test ---
+
+setup_case deep_repo_ignored
+mkdir -p "$case_home/Code/github.com/acme/nested/subrepo/.git"
+jj -R "$case_repo" bookmark set feature -r @ >/dev/null
+set -l target_path "$case_home/Workspaces/github.com/acme/repo/feature"
+run_launcher "$case_home" "$case_repo" existing 0 "$target_path"
+
+set -l disc_repos (string split \n (string trim (string collect < "$launcher_workspace_log")))
+not contains -- "github.com/acme/nested/subrepo" $disc_repos
+or fail "nested repo at depth 5 should be ignored"
+contains -- "github.com/acme/repo" $disc_repos
+or fail "standard repo at depth 3 should be discovered"
+
+# --- Non-blocking fetch test ---
+
+setup_case slow_fetch_non_blocking
+printf '%s\n' \
+    "#!$real_fish --no-config" \
+    'if contains -- "fetch" $argv' \
+    '    sleep 2' \
+    'end' \
+    'command "$REAL_JJ" $argv' >"$case_home/.local/bin/jj"
+chmod +x "$case_home/.local/bin/jj"
+
+jj -R "$case_repo" bookmark set local-feature -r @ >/dev/null 2>&1
+set -l target_path "$case_home/Workspaces/github.com/acme/repo/local-feature"
+set -l start_ts (date +%s)
+run_launcher "$case_home" "$case_repo" existing 0 "$target_path"
+set -l end_ts (date +%s)
+test (math "$end_ts - $start_ts") -lt 2
+or fail "launcher blocked on background fetch for local bookmark"
+
 echo "start-workspace tests passed"
+

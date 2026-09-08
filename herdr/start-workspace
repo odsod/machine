@@ -73,8 +73,8 @@ function _workspace_label --argument-names base suffix
     end
 end
 
-function _relative_time --argument-names epoch
-    set -l now (date +%s)
+function _relative_time --argument-names epoch now
+    test -n "$now"; or set now (date +%s)
     set -l diff (math "$now - $epoch")
     if test $diff -lt 60
         printf '%ds ago' $diff
@@ -93,6 +93,7 @@ function _build_bookmark_lines --argument-names workspace_base repo_path
     set -l bookmarks $argv[3..-1]
     set -l max_epoch 9999999999
     set -l age_width 9
+    set -l now (date +%s)
 
     set -l epoch_map (_jj_repo "$repo_path" log --no-graph -r 'bookmarks() | remote_bookmarks()' \
         -T 'concat(local_bookmarks.map(|b| b.name() ++ " " ++ committer.timestamp().format("%s") ++ "\n").join(""), remote_bookmarks.filter(|b| b.remote() == "origin").map(|b| b.name() ++ "@origin " ++ committer.timestamp().format("%s") ++ "\n").join(""))' \
@@ -124,7 +125,7 @@ function _build_bookmark_lines --argument-names workspace_base repo_path
 
         if test -n "$epoch"
             set -l inverted (math "$max_epoch - $epoch")
-            set -l age (string pad -r -w $age_width -- (_relative_time $epoch))
+            set -l age (string pad -r -w $age_width -- (_relative_time $epoch $now))
             printf '0_%010d %s%s\n' $inverted "$age" "$bm"
         else
             set -l spacer (string pad -r -w $age_width -- "")
@@ -182,9 +183,9 @@ end
 function discover_repos
     if command -q fd
         set -l repos
-        for git_path in (fd --hidden --follow --glob '.git' --search-path "$HOME/Code" 2>/dev/null)
-            set -l repo_dir (dirname "$git_path")
-            set -l rel (string replace -r "^$HOME/Code/" "" -- "$repo_dir")
+        for git_path in (fd --hidden --no-follow -d 4 --min-depth 4 -g '.git' "$HOME/Code" 2>/dev/null)
+            set -l repo_dir (path dirname "$git_path")
+            set -l rel (string replace "$HOME/Code/" "" -- "$repo_dir")
             if string match -rq '^[^/]+/[^/]+/[^/]+$' -- "$rel"
                 set -a repos "$rel"
             end
@@ -655,7 +656,10 @@ if test "$space_type" = Workspace
         set bookmark_input (printf '\n' | _fzf_pick_or_query Bookmark)
     end
     set status_code $status
-    _handle_fzf_status "$status_code" Bookmark; or exit 0
+    _handle_fzf_status "$status_code" Bookmark; or begin
+        kill $fetch_pid 2>/dev/null
+        exit 0
+    end
 
     set -l raw_line (_last_non_empty_line $bookmark_input)
     if string match -rq '^\d+_\d+ ' -- "$raw_line"
@@ -725,13 +729,10 @@ if test "$space_type" = Workspace
             exit 1
         end
 
-        wait $fetch_pid 2>/dev/null
-        set -l fetch_status $status
-        if test $fetch_status -ne 0
-            _trace "workspace: background fetch skipped or timed out status=$fetch_status"
-        end
-
         if test -n "$selected_remote_ref"
+            if not _jj_repo "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
+                wait $fetch_pid 2>/dev/null
+            end
             _jj_repo "$repo_path" log -r "$selected_remote_ref" --no-graph --limit 1 >/dev/null 2>&1
             or begin
                 _status_clear
@@ -755,7 +756,12 @@ if test "$space_type" = Workspace
             else if _jj_repo "$repo_path" log -r 'main' --no-graph --limit 1 >/dev/null 2>&1
                 set base_rev 'main'
             else
-                set base_rev '@'
+                wait $fetch_pid 2>/dev/null
+                if _jj_repo "$repo_path" log -r 'main@origin' --no-graph --limit 1 >/dev/null 2>&1
+                    set base_rev 'main@origin'
+                else
+                    set base_rev '@'
+                end
             end
         end
         _trace "workspace: creating with base_rev=$base_rev path=$workspace_path"
