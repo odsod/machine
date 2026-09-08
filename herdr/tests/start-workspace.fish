@@ -293,4 +293,25 @@ or fail "ssh was not called with expected target and command when using --machin
 set -e HERDR_MACHINES_JSON
 set -e FZF_MACHINE_CHOICE
 
+# --- Age sorting test ---
+
+setup_case sort_by_age
+env GIT_COMMITTER_DATE="2020-01-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "old local" --date "2020-01-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+jj -R "$case_repo" bookmark set old-local -r @- >/dev/null 2>&1
+set -l old_ws "$case_home/Workspaces/github.com/acme/repo/old-local"
+mkdir -p "$old_ws"
+touch -d "2020-01-01 00:00:00" "$old_ws"
+
+env GIT_COMMITTER_DATE="2025-01-01T00:00:00Z" git -C "$case_repo" commit --allow-empty -m "new remote" --date "2025-01-01T00:00:00Z" >/dev/null 2>&1
+jj -R "$case_repo" git import >/dev/null 2>&1
+git -C "$case_repo" update-ref refs/remotes/origin/new-remote HEAD
+jj -R "$case_repo" git import >/dev/null 2>&1
+jj -R "$case_repo" bookmark delete main >/dev/null 2>&1
+
+set -l new_remote_path "$case_home/Workspaces/github.com/acme/repo/new-remote"
+run_launcher "$case_home" "$case_repo" existing 0 "$new_remote_path"
+test (jj --ignore-working-copy -R "$case_repo" workspace root --name new-remote) = "$new_remote_path"
+or fail "launcher did not pick newer remote bookmark over older local workspace"
+
 echo "start-workspace tests passed"
