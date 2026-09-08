@@ -338,6 +338,78 @@ function _launch_workspace
     end
 end
 
+# --- Machine helpers ---
+
+function _get_remote_machines
+    command -q herdr; or return 0
+    command -q jq; or return 0
+    herdr machine list --json 2>/dev/null \
+        | jq -r '.[] | select(.enabled == true) | .label' 2>/dev/null
+end
+
+function _get_machine_target --argument-names label
+    command -q herdr; or return 1
+    command -q jq; or return 1
+    herdr machine list --json 2>/dev/null \
+        | jq -r --arg label "$label" '.[] | select(.label == $label) | .target' 2>/dev/null
+end
+
+function _get_machine_session --argument-names label
+    command -q herdr; or return 1
+    command -q jq; or return 1
+    herdr machine list --json 2>/dev/null \
+        | jq -r --arg label "$label" '.[] | select(.label == $label) | .session // empty' 2>/dev/null
+end
+
+# --- Machine selection ---
+
+set -l chosen_machine ""
+for i in (seq (count $argv))
+    switch "$argv[$i]"
+        case --local
+            set chosen_machine Local
+        case --machine
+            set -l next_idx (math "$i + 1")
+            if test $next_idx -le (count $argv)
+                set chosen_machine "$argv[$next_idx]"
+            end
+    end
+end
+
+if test -z "$chosen_machine"
+    set -l available_machines Local
+    for m in (_get_remote_machines)
+        test -n "$m"; and set -a available_machines "$m"
+    end
+
+    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine)
+    set -l status_code $status
+    _handle_fzf_status "$status_code" Machine; or exit 0
+    set chosen_machine (string trim -- "$chosen_machine")
+end
+
+test -n "$chosen_machine"; or exit 0
+_trace "machine: selected $chosen_machine"
+
+if test "$chosen_machine" != Local
+    set -l target (_get_machine_target "$chosen_machine")
+    test -n "$target"; or set target "$chosen_machine"
+    set -l session (_get_machine_session "$chosen_machine")
+    set -l cmd "start-workspace --local"
+    if test -n "$session" -a "$session" != default
+        set cmd "env HERDR_SESSION=$session $cmd"
+    end
+    _trace "machine: connecting to $target with $cmd"
+    ssh -q -t "$target" "$cmd"
+    set -l ssh_status $status
+    if test $ssh_status -ne 0
+        echo "Failed to start workspace on $chosen_machine (SSH exit $ssh_status)." >&2
+        sleep 2
+        exit $ssh_status
+    end
+    exit 0
+end
+
 # --- Type selection ---
 
 set space_type (printf '%s\n' Workspace Code Activity Project Vault \
