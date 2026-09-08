@@ -40,7 +40,7 @@ tab_bar_right = [{ type = "zoom" }, { type = "hostname" }, { type = "datetime", 
 tab_bar_right_separator = " · "
 
 [ui.sidebar.agents]
-rows = [["state_icon", "machine", "workspace", "tab"], ["terminal_title_stripped"]]
+rows = [["state_icon", "workspace", "machine", "tab"], ["terminal_title_stripped"]]
 
 [ui.toast]
 delivery = "terminal"
