@@ -451,6 +451,7 @@ depends = [
   "codex:check",
   "antigravity:check",
   "setup:cursor-cli",
+  "herdr:sync-machines",
 ]
 run = """
 echo "[bootstrap] Verifying auth services..."
@@ -707,4 +708,11 @@ if [ ! -f "$HOME/.cursor/cli-config.json" ]; then
   mkdir -p "$HOME/.cursor"
   cp "$repo/cursor/cli-config.json" "$HOME/.cursor/cli-config.json"
 fi
+"""
+
+[tasks."herdr:sync-machines"]
+description = "Sync Tailscale peers to Herdr machine catalog"
+run = """
+repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
+exec "$repo/tasks/setup-herdr-machines.sh"
 """
