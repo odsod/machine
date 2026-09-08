@@ -95,33 +95,40 @@ function _build_bookmark_lines --argument-names workspace_base repo_path
     set -l age_width 9
 
     set -l epoch_map (_jj_repo "$repo_path" log --no-graph -r 'bookmarks() | remote_bookmarks()' \
-        -T 'concat(separate("\n", bookmarks.map(|b| b ++ " " ++ committer.timestamp().format("%s")), remote_bookmarks.map(|b| b ++ " " ++ committer.timestamp().format("%s"))), "\n")' \
+        -T 'concat(local_bookmarks.map(|b| b.name() ++ " " ++ committer.timestamp().format("%s") ++ "\n").join(""), remote_bookmarks.filter(|b| b.remote() == "origin").map(|b| b.name() ++ "@origin " ++ committer.timestamp().format("%s") ++ "\n").join(""))' \
         2>/dev/null | sed '/^$/d')
 
     for bm in $bookmarks
         set -l ws_dir "$workspace_base/$bm"
+        set -l mtime ""
         if test -d "$ws_dir"
-            set -l mtime (stat -c '%Y' "$ws_dir")
-            set -l inverted (math "$max_epoch - $mtime")
-            set -l age (string pad -r -w $age_width -- (_relative_time $mtime))
+            set mtime (stat -c '%Y' "$ws_dir" 2>/dev/null)
+        end
+
+        set -l matched (string match -r --groups-only "^"(string escape --style=regex -- "$bm")' (\d+)$' $epoch_map)
+        set -l commit_epoch ""
+        for ts in $matched
+            if test -z "$commit_epoch" -o "$ts" -gt "$commit_epoch"
+                set commit_epoch "$ts"
+            end
+        end
+
+        set -l epoch ""
+        if test -n "$mtime" -a -n "$commit_epoch"
+            set epoch (math "max($mtime, $commit_epoch)")
+        else if test -n "$mtime"
+            set epoch "$mtime"
+        else if test -n "$commit_epoch"
+            set epoch "$commit_epoch"
+        end
+
+        if test -n "$epoch"
+            set -l inverted (math "$max_epoch - $epoch")
+            set -l age (string pad -r -w $age_width -- (_relative_time $epoch))
             printf '0_%010d %s%s\n' $inverted "$age" "$bm"
         else
-            set -l commit_epoch ""
-            for entry in $epoch_map
-                set -l parts (string split ' ' -- "$entry")
-                if test "$parts[1]" = "$bm"
-                    set commit_epoch $parts[2]
-                    break
-                end
-            end
-            if test -n "$commit_epoch"
-                set -l inverted (math "$max_epoch - $commit_epoch")
-                set -l age (string pad -r -w $age_width -- (_relative_time $commit_epoch))
-                printf '1_%010d %s%s\n' $inverted "$age" "$bm"
-            else
-                set -l spacer (string pad -r -w $age_width -- "")
-                printf '2_0000000000 %s%s\n' "$spacer" "$bm"
-            end
+            set -l spacer (string pad -r -w $age_width -- "")
+            printf '1_0000000000 %s%s\n' "$spacer" "$bm"
         end
     end | sort
 end
