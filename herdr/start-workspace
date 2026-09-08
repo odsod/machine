@@ -459,6 +459,14 @@ end
 
 # --- Machine helpers ---
 
+function _get_local_hostname
+    if test -n "$HERDR_TEST_HOSTNAME"
+        echo "$HERDR_TEST_HOSTNAME"
+    else
+        prompt_hostname
+    end
+end
+
 function _get_remote_machines
     command -q herdr; or return 0
     command -q jq; or return 0
@@ -482,11 +490,12 @@ end
 
 # --- Machine selection ---
 
+set -l local_host (_get_local_hostname)
 set -l chosen_machine ""
 for i in (seq (count $argv))
     switch "$argv[$i]"
         case --local
-            set chosen_machine Local
+            set chosen_machine "$local_host"
         case --machine
             set -l next_idx (math "$i + 1")
             if test $next_idx -le (count $argv)
@@ -496,7 +505,7 @@ for i in (seq (count $argv))
 end
 
 if test -z "$chosen_machine"
-    set -l available_machines Local
+    set -l available_machines "$local_host"
     for m in (_get_remote_machines)
         test -n "$m"; and set -a available_machines "$m"
     end
@@ -508,12 +517,13 @@ if test -z "$chosen_machine"
 end
 
 test -n "$chosen_machine"; or exit 0
-_trace "machine: selected $chosen_machine"
 
-if test "$chosen_machine" != Local
-    set -l target (_get_machine_target "$chosen_machine")
-    test -n "$target"; or set target "$chosen_machine"
-    set -l session (_get_machine_session "$chosen_machine")
+if test "$chosen_machine" != "$local_host" -a "$chosen_machine" != Local
+    set -l remote_label "$chosen_machine"
+    _trace "machine: selected remote $remote_label"
+    set -l target (_get_machine_target "$remote_label")
+    test -n "$target"; or set target "$remote_label"
+    set -l session (_get_machine_session "$remote_label")
     set -l cmd "start-workspace --local"
     if test -n "$session" -a "$session" != default
         set cmd "env HERDR_SESSION=$session $cmd"
@@ -522,12 +532,14 @@ if test "$chosen_machine" != Local
     ssh -q -t "$target" "$cmd"
     set -l ssh_status $status
     if test $ssh_status -ne 0
-        echo "Failed to start workspace on $chosen_machine (SSH exit $ssh_status)." >&2
+        echo "Failed to start workspace on $remote_label (SSH exit $ssh_status)." >&2
         sleep 2
         exit $ssh_status
     end
     exit 0
 end
+
+_trace "machine: selected local $local_host"
 
 # --- Type selection ---
 
