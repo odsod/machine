@@ -28,19 +28,32 @@ function write_stubs --argument-names home
         'test -f "$FZF_COUNT_FILE"; and read count < "$FZF_COUNT_FILE"' \
         'set count (math "$count + 1")' \
         'printf "%s\n" "$count" > "$FZF_COUNT_FILE"' \
-        'switch "$count"' \
-        '    case 1' \
+        'set -l prompt_arg ""' \
+        'for arg in $argv' \
+        '    if string match -q -- "--prompt=*" "$arg"' \
+        '        set prompt_arg (string replace -- "--prompt=" "" "$arg")' \
+        '    end' \
+        'end' \
+        'test -n "$FZF_LOG"; and echo "$prompt_arg" >> "$FZF_LOG"' \
+        'switch "$prompt_arg"' \
+        '    case "Machine> "' \
+        '        if test -n "$FZF_MACHINE_CHOICE"' \
+        '            echo "$FZF_MACHINE_CHOICE"' \
+        '        else' \
+        '            echo Local' \
+        '        end' \
+        '    case "Space> "' \
         '        echo Workspace' \
-        '    case 2' \
+        '    case "Workspace> "' \
         '        head -n1' \
-        '    case 3' \
+        '    case "Bookmark> "' \
         '        if test "$FZF_BOOKMARK_MODE" = typed' \
         '            cat >/dev/null' \
         '            echo typed' \
         '        else' \
         '            head -n1' \
         '        end' \
-        '    case 4' \
+        '    case "Agent> "' \
         '        echo codex' \
         '    case "*"' \
         '        exit 2' \
@@ -51,6 +64,12 @@ function write_stubs --argument-names home
         'printf "%s\n" (string join " " -- $argv) >> "$HERDR_LOG"' \
         'set -l command_line (string join " " -- $argv)' \
         'switch "$command_line"' \
+        '    case "machine list --json"' \
+        '        if test -n "$HERDR_MACHINES_JSON"' \
+        '            printf "%s\n" "$HERDR_MACHINES_JSON"' \
+        '        else' \
+        '            printf "[]\n"' \
+        '        end' \
         '    case "workspace list"' \
         '        if test "$HERDR_EXISTING" = 1' \
         '            printf "{\"result\":{\"workspaces\":[{\"label\":\"repo/feature\",\"workspace_id\":\"wExisting\"}]}}\\n"' \
@@ -71,10 +90,15 @@ function write_stubs --argument-names home
         "#!$real_fish --no-config" \
         'command "$REAL_JJ" $argv' > "$stub_bin/jj"
 
+    printf '%s\n' \
+        "#!$real_fish --no-config" \
+        'printf "%s\n" (string join " " -- $argv) >> "$SSH_LOG"' \
+        'exit 0' > "$stub_bin/ssh"
+
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' > "$stub_bin/codex"
     printf '%s\n' "#!$real_fish --no-config" 'exit 1' > "$stub_bin/timeout"
     chmod +x "$stub_bin/fzf" "$stub_bin/herdr" "$stub_bin/jj" \
-        "$stub_bin/codex" "$stub_bin/timeout"
+        "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/timeout"
 end
 
 function setup_case --argument-names name
@@ -86,11 +110,13 @@ function setup_case --argument-names name
     or fail "could not initialize launcher test repo"
 end
 
-function run_launcher --argument-names home repo mode existing expected_cwd
+function run_launcher --argument-names home repo mode existing expected_cwd extra_args
     set -l count_file "$home/fzf-count"
     set -l herdr_log "$home/herdr.log"
+    set -l ssh_log "$home/ssh.log"
+    set -l fzf_log "$home/fzf.log"
     set -l system_path (string join : $PATH)
-    rm -f "$count_file" "$herdr_log"
+    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log"
 
     set -l original_dir "$PWD"
     cd "$home"
@@ -104,13 +130,19 @@ function run_launcher --argument-names home repo mode existing expected_cwd
         "HERDR_EXISTING=$existing" \
         "EXPECTED_CWD=$expected_cwd" \
         "HERDR_LOG=$herdr_log" \
+        "SSH_LOG=$ssh_log" \
+        "FZF_LOG=$fzf_log" \
+        "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
+        "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
         HERDR_PANE_ID= \
-        "$real_fish" --no-config "$start_script" >/dev/null
+        "$real_fish" --no-config "$start_script" (string split " " -- "$extra_args") >/dev/null
     set -l launcher_status $status
     cd "$original_dir"
     test $launcher_status -eq 0; or fail "launcher failed in $mode mode"
 
     set -g launcher_log "$herdr_log"
+    set -g launcher_ssh_log "$ssh_log"
+    set -g launcher_fzf_log "$fzf_log"
 end
 
 setup_case existing
@@ -123,6 +155,8 @@ set -l existing_log "$launcher_log"
 
 test (jj --ignore-working-copy -R "$existing_repo" workspace root --name feature) = "$existing_path"
 or fail "existing bookmark selection created the wrong workspace"
+string match -q '*Machine>*' (string collect < "$launcher_fzf_log")
+or fail "launcher did not prompt for machine when only local"
 string match -q '*workspace create*--label repo/feature*' (string collect < "$existing_log")
 or fail "launcher did not create the existing bookmark workspace"
 string match -q '*agent start codex-wcase --kind codex --pane wCase:p1*' \
@@ -143,5 +177,65 @@ set -l typed_path "$typed_home/Workspaces/github.com/acme/repo/typed"
 run_launcher "$typed_home" "$typed_repo" typed 0 "$typed_path"
 test (jj --ignore-working-copy -R "$typed_repo" workspace root --name typed) = "$typed_path"
 or fail "typed bookmark selection created the wrong workspace"
+
+# --- Remote machine tests ---
+
+setup_case remote_default
+set -g HERDR_MACHINES_JSON '[{"id":"m1","label":"remote-box","target":"remote.lan","session":"default","enabled":true}]'
+set -g FZF_MACHINE_CHOICE "remote-box"
+run_launcher "$case_home" "$case_repo" existing 0 "$case_home/dummy"
+test -f "$launcher_ssh_log"
+or fail "ssh was not invoked for remote machine"
+string match -q -- '*-q -t remote.lan start-workspace --local*' (string collect < "$launcher_ssh_log")
+or fail "ssh was not called with expected target and command"
+
+setup_case remote_custom_session
+set -g HERDR_MACHINES_JSON '[{"id":"m2","label":"custom-box","target":"custom.lan","session":"work","enabled":true}]'
+set -g FZF_MACHINE_CHOICE "custom-box"
+run_launcher "$case_home" "$case_repo" existing 0 "$case_home/dummy"
+string match -q -- '*-q -t custom.lan env HERDR_SESSION=work start-workspace --local*' (string collect < "$launcher_ssh_log")
+or fail "ssh was not called with session environment variable"
+
+setup_case remote_pick_local
+set -g HERDR_MACHINES_JSON '[{"id":"m1","label":"remote-box","target":"remote.lan","session":"default","enabled":true}]'
+set -g FZF_MACHINE_CHOICE "Local"
+jj -R "$case_repo" bookmark set feature -r @ >/dev/null
+set -l local_pick_path "$case_home/Workspaces/github.com/acme/repo/feature"
+run_launcher "$case_home" "$case_repo" existing 0 "$local_pick_path"
+test ! -f "$launcher_ssh_log"
+or fail "ssh should not have been invoked when picking Local"
+string match -q '*workspace create*--label repo/feature*' (string collect < "$launcher_log")
+or fail "launcher did not create workspace locally after picking Local"
+
+setup_case skip_machine_flag
+set -g HERDR_MACHINES_JSON '[{"id":"m1","label":"remote-box","target":"remote.lan","session":"default","enabled":true}]'
+set -g FZF_MACHINE_CHOICE "invalid-should-not-be-called"
+jj -R "$case_repo" bookmark set feature -r @ >/dev/null
+set -l flag_pick_path "$case_home/Workspaces/github.com/acme/repo/feature"
+run_launcher "$case_home" "$case_repo" existing 0 "$flag_pick_path" "--local"
+test ! -f "$launcher_ssh_log"
+or fail "ssh should not have been invoked with --local flag"
+if test -f "$launcher_fzf_log"
+    string match -q '*Machine>*' (string collect < "$launcher_fzf_log")
+    and fail "launcher prompted for machine when --local flag was passed"
+end
+string match -q '*workspace create*--label repo/feature*' (string collect < "$launcher_log")
+or fail "launcher did not create workspace locally with --local flag"
+
+setup_case machine_arg_remote
+set -g HERDR_MACHINES_JSON '[{"id":"m1","label":"remote-box","target":"remote.lan","session":"default","enabled":true}]'
+set -g FZF_MACHINE_CHOICE "invalid-should-not-be-called"
+run_launcher "$case_home" "$case_repo" existing 0 "$case_home/dummy" "--machine remote-box"
+test -f "$launcher_ssh_log"
+or fail "ssh was not invoked with --machine flag"
+if test -f "$launcher_fzf_log"
+    string match -q '*Machine>*' (string collect < "$launcher_fzf_log")
+    and fail "launcher prompted for machine when --machine flag was passed"
+end
+string match -q -- '*-q -t remote.lan start-workspace --local*' (string collect < "$launcher_ssh_log")
+or fail "ssh was not called with expected target and command when using --machine"
+
+set -e HERDR_MACHINES_JSON
+set -e FZF_MACHINE_CHOICE
 
 echo "start-workspace tests passed"
