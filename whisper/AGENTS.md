@@ -5,7 +5,7 @@ GPU-accelerated speech-to-text server (whisper.cpp + ROCm/HIP).
 ## VRAM Profiles
 
 Active model is set via `MODEL` in `tasks/setup-whisper.sh` and `model` in
-`whisper/mise.toml` `[vars]`. After changing, run `mise run setup:whisper` and
+`whisper/mise.toml` `[vars]`. After changing, run `mise run whisper:setup` and
 `systemctl --user restart whisper-server`.
 
 | Model                     | VRAM   | Quality | Swedish                     | Speed      |

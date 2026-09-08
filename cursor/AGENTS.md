@@ -8,8 +8,8 @@
 
 ## Tasks
 
-- `mise run setup:cursor` - Install the Cursor RPM
-- `mise run setup:cursor-cli` - Seed `~/.cursor/cli-config.json` if missing
+- `mise run cursor:setup` - Install the Cursor RPM
+- `mise run cursor:setup-cli` - Seed `~/.cursor/cli-config.json` if missing
 - IDE settings, keybindings, and hooks are `[dotfiles]` symlinks
 
 ## Version bumps
@@ -32,7 +32,7 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
    - `cursor_version = "…"`
    - `cursor_hash = "…"`
 3. Validate the assembled URL: `curl -I '<rpm_url>'` — expect `HTTP/2 200`
-4. Install: `mise run setup:cursor`
+4. Install: `mise run cursor:setup`
 5. Verify: `rpm -q cursor` and `/usr/bin/cursor --version`
 
 **Idempotency**
@@ -43,7 +43,7 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
 ## Workflow
 
 - Keep repo-managed defaults in `cli-config.json`
-- `setup:cursor-cli` only seeds a missing live config; it does not merge
+- `cursor:setup-cli` only seeds a missing live config; it does not merge
 - Model picker, auth, and cache fields live only in `~/.cursor/cli-config.json`
 
 ## Constraints
