@@ -3,7 +3,7 @@
   "altScreenMode": "always",
   "enableTelemetry": false,
   "gcp": {
-    "location": "global",
+    "location": "eu",
     "project": "way-platform-ai"
   },
   "hooks": {
