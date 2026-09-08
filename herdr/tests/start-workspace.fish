@@ -33,7 +33,7 @@ function write_stubs --argument-names home
         '    if string match -q -- "--prompt=*" "$arg"' \
         '        set prompt_arg (string replace -- "--prompt=" "" "$arg")' \
         '    end' \
-        'end' \
+        end \
         'test -n "$FZF_LOG"; and echo "$prompt_arg" >> "$FZF_LOG"' \
         'switch "$prompt_arg"' \
         '    case "Machine> "' \
@@ -54,10 +54,14 @@ function write_stubs --argument-names home
         '            head -n1' \
         '        end' \
         '    case "Agent> "' \
-        '        echo codex' \
+        '        if test -n "$FZF_AGENT_CHOICE"' \
+        '            echo "$FZF_AGENT_CHOICE"' \
+        '        else' \
+        '            echo codex' \
+        '        end' \
         '    case "*"' \
         '        exit 2' \
-        'end' > "$stub_bin/fzf"
+        end >"$stub_bin/fzf"
 
     printf '%s\n' \
         "#!$real_fish --no-config" \
@@ -84,21 +88,26 @@ function write_stubs --argument-names home
         '        printf "{\"result\":{\"type\":\"ok\"}}\\n"' \
         '    case "*"' \
         '        exit 1' \
-        'end' > "$stub_bin/herdr"
+        end >"$stub_bin/herdr"
 
     printf '%s\n' \
         "#!$real_fish --no-config" \
-        'command "$REAL_JJ" $argv' > "$stub_bin/jj"
+        'command "$REAL_JJ" $argv' >"$stub_bin/jj"
 
     printf '%s\n' \
         "#!$real_fish --no-config" \
         'printf "%s\n" (string join " " -- $argv) >> "$SSH_LOG"' \
-        'exit 0' > "$stub_bin/ssh"
+        'exit 0' >"$stub_bin/ssh"
 
-    printf '%s\n' "#!$real_fish --no-config" 'exit 0' > "$stub_bin/codex"
-    printf '%s\n' "#!$real_fish --no-config" 'exit 1' > "$stub_bin/timeout"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/codex"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/claude"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/cursor"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/agy"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/pi"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 1' >"$stub_bin/timeout"
     chmod +x "$stub_bin/fzf" "$stub_bin/herdr" "$stub_bin/jj" \
-        "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/timeout"
+        "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/claude" \
+        "$stub_bin/cursor" "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/timeout"
 end
 
 function setup_case --argument-names name
@@ -134,6 +143,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "FZF_LOG=$fzf_log" \
         "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
         "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
+        "FZF_AGENT_CHOICE=$FZF_AGENT_CHOICE" \
         HERDR_PANE_ID= \
         "$real_fish" --no-config "$start_script" (string split " " -- "$extra_args") >/dev/null
     set -l launcher_status $status
@@ -162,6 +172,10 @@ or fail "launcher did not create the existing bookmark workspace"
 string match -q '*agent start codex-wcase --kind codex --pane wCase:p1*' \
     (string collect < "$existing_log")
 or fail "launcher did not use returned Herdr IDs for agent startup"
+test -f "$existing_home/.codex/config.toml"
+or fail "launcher did not create codex config"
+grep -qF "[projects.\"$existing_path\"]" "$existing_home/.codex/config.toml"
+or fail "launcher did not trust workspace in codex config"
 
 run_launcher "$existing_home" "$existing_repo" existing 1 "$existing_path"
 set existing_log "$launcher_log"
@@ -177,6 +191,47 @@ set -l typed_path "$typed_home/Workspaces/github.com/acme/repo/typed"
 run_launcher "$typed_home" "$typed_repo" typed 0 "$typed_path"
 test (jj --ignore-working-copy -R "$typed_repo" workspace root --name typed) = "$typed_path"
 or fail "typed bookmark selection created the wrong workspace"
+
+# --- Auto-trust harness tests ---
+
+for agent in claude cursor agy pi
+    setup_case "trust_$agent"
+    set -l t_home "$case_home"
+    set -l t_repo "$case_repo"
+    jj -R "$t_repo" bookmark set feature -r @ >/dev/null
+    set -l t_path "$t_home/Workspaces/github.com/acme/repo/feature"
+    set -g FZF_AGENT_CHOICE "$agent"
+    run_launcher "$t_home" "$t_repo" existing 0 "$t_path"
+    set -l t_log "$launcher_log"
+
+    switch "$agent"
+        case claude
+            test -f "$t_home/.claude.json"
+            or fail "claude trust file not created"
+            jq -e --arg p "$t_path" '.projects[$p].hasTrustDialogAccepted == true' "$t_home/.claude.json" >/dev/null
+            or fail "claude trust entry missing"
+        case cursor
+            set -l slug (echo "$t_path" | string replace -r '^/' '' | string replace -ra '[^a-zA-Z0-9]+' '-')
+            test -f "$t_home/.cursor/projects/$slug/.workspace-trusted"
+            or fail "cursor workspace-trusted file not created"
+            jq -e --arg p "$t_path" '.workspacePath == $p' "$t_home/.cursor/projects/$slug/.workspace-trusted" >/dev/null
+            or fail "cursor workspacePath mismatch"
+            string match -q '*agent start cursor-wcase --kind cursor --pane wCase:p1 -- --trust*' \
+                (string collect < "$t_log")
+            or fail "cursor agent not started with --trust flag"
+        case agy
+            test -f "$t_home/.gemini/antigravity-cli/settings.json"
+            or fail "agy settings file not created"
+            jq -e --arg p "$t_path" '(.trustedWorkspaces // []) | index($p) != null' "$t_home/.gemini/antigravity-cli/settings.json" >/dev/null
+            or fail "agy trustedWorkspaces missing path"
+        case pi
+            test -f "$t_home/.pi/agent/trust.json"
+            or fail "pi trust.json not created"
+            jq -e --arg p "$t_path" '.[$p] == true' "$t_home/.pi/agent/trust.json" >/dev/null
+            or fail "pi trust entry missing"
+    end
+end
+set -e FZF_AGENT_CHOICE
 
 # --- Remote machine tests ---
 

@@ -280,6 +280,112 @@ function select_agent
     end
 end
 
+# --- Workspace trust ---
+
+function _trust_claude --argument-names cwd
+    command -q jq; or return 0
+    set -l claude_file "$HOME/.claude.json"
+    mkdir -p (dirname "$claude_file")
+    if test -f "$claude_file"
+        set -l tmp (mktemp)
+        if jq --arg cwd "$cwd" \
+                '.projects = ((.projects // {}) | .[$cwd] = ((.[$cwd] // {}) | .hasTrustDialogAccepted = true))' \
+                "$claude_file" >"$tmp" 2>/dev/null
+            mv "$tmp" "$claude_file"
+        else
+            rm -f "$tmp"
+        end
+    else
+        jq -n --arg cwd "$cwd" \
+            '{"projects": {($cwd): {"hasTrustDialogAccepted": true}}}' >"$claude_file" 2>/dev/null
+    end
+end
+
+function _trust_codex --argument-names cwd
+    set -l codex_file "$HOME/.codex/config.toml"
+    mkdir -p (dirname "$codex_file")
+    if not test -f "$codex_file"; or not grep -qF "[projects.\"$cwd\"]" "$codex_file" 2>/dev/null
+        printf '\n[projects."%s"]\ntrust_level = "trusted"\n' "$cwd" >>"$codex_file"
+    end
+end
+
+function _trust_cursor --argument-names cwd
+    command -q jq; or return 0
+    set -l slug (echo "$cwd" | string replace -r '^/' '' | string replace -ra '[^a-zA-Z0-9]+' '-')
+    set -l cursor_dir "$HOME/.cursor/projects/$slug"
+    mkdir -p "$cursor_dir"
+    set -l ts (date -u +'%Y-%m-%dT%H:%M:%S.000Z')
+    jq -n --arg ts "$ts" --arg cwd "$cwd" \
+        '{"trustedAt": $ts, "workspacePath": $cwd, "trustMethod": "cli-flag"}' >"$cursor_dir/.workspace-trusted" 2>/dev/null
+end
+
+function _trust_agy --argument-names cwd
+    command -q jq; or return 0
+    set -l agy_file "$HOME/.gemini/antigravity-cli/settings.json"
+    mkdir -p (dirname "$agy_file")
+    if test -f "$agy_file"
+        set -l tmp (mktemp)
+        if jq --arg cwd "$cwd" \
+                '.trustedWorkspaces = (((.trustedWorkspaces // []) + [$cwd]) | unique)' \
+                "$agy_file" >"$tmp" 2>/dev/null
+            mv "$tmp" "$agy_file"
+        else
+            rm -f "$tmp"
+        end
+    else
+        jq -n --arg cwd "$cwd" \
+            '{"trustedWorkspaces": [$cwd]}' >"$agy_file" 2>/dev/null
+    end
+
+    set -l gemini_file "$HOME/.gemini/trustedFolders.json"
+    if test -f "$gemini_file"
+        set -l tg (mktemp)
+        if jq --arg cwd "$cwd" '.[$cwd] = "TRUST_FOLDER"' "$gemini_file" >"$tg" 2>/dev/null
+            mv "$tg" "$gemini_file"
+        else
+            rm -f "$tg"
+        end
+    end
+end
+
+function _trust_pi --argument-names cwd
+    command -q jq; or return 0
+    set -l pi_file "$HOME/.pi/agent/trust.json"
+    mkdir -p (dirname "$pi_file")
+    if test -f "$pi_file"
+        set -l tmp (mktemp)
+        if jq --arg cwd "$cwd" \
+                '.[$cwd] = true' \
+                "$pi_file" >"$tmp" 2>/dev/null
+            mv "$tmp" "$pi_file"
+        else
+            rm -f "$tmp"
+        end
+    else
+        jq -n --arg cwd "$cwd" \
+            '{($cwd): true}' >"$pi_file" 2>/dev/null
+    end
+end
+
+function _trust_workspace --argument-names agent_kind cwd
+    test -n "$cwd"; or return 0
+    test -n "$agent_kind"; or return 0
+    set cwd (string trim -r -c / -- "$cwd")
+
+    switch "$agent_kind"
+        case claude claude-code
+            _trust_claude "$cwd"
+        case codex
+            _trust_codex "$cwd"
+        case cursor cursor-agent
+            _trust_cursor "$cwd"
+        case agy antigravity antigravity-cli
+            _trust_agy "$cwd"
+        case pi
+            _trust_pi "$cwd"
+    end
+end
+
 # --- Workspace launcher ---
 
 function _launch_workspace
@@ -333,7 +439,12 @@ function _launch_workspace
             | string replace -ar '[^a-z0-9_-]' '-')
         set agent_name (string sub -l 32 -- "$agent_name")
 
-        herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" >/dev/null 2>&1 &
+        _trust_workspace "$agent_kind" "$cwd"
+
+        set -l agent_extra
+        test "$agent_kind" = cursor; and set agent_extra -- --trust
+
+        herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" $agent_extra >/dev/null 2>&1 &
         disown
     end
 end
