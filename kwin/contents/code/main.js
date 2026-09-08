@@ -68,19 +68,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] remote-terminal", "KWin", ""],
-    key: "Meta+N",
-    kind: "app",
-    command: [
-      "ghostty",
-      "--class=com.mitchellh.ghostty.remote",
-      "-e",
-      "remote-herdr",
-    ],
-    resourceClass: "com.mitchellh.ghostty.remote",
-  },
-
-  {
     actionId: ["kwin", "[odsod] recorder-note", "KWin", ""],
     key: "Meta+W",
     kind: "command",
