@@ -393,8 +393,12 @@ enabled = true
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"
 
+[bootstrap.mise_shell_activate]
+shell = "/usr/local/bin/fish"
+run = "mise run fish:setup"
+
 [bootstrap.hooks.post-tools]
-run = "mise run setup:fish-shell"
+run = "mise run fish:setup"
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
@@ -432,26 +436,26 @@ mise reshim
 [tasks.bootstrap]
 description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
 depends = [
-  "setup:font-inter",
-  "setup:font-iosevka",
-  "setup:font-nerd",
-  "setup:media",
-  "setup:graphics",
-  "setup:slack",
-  "setup:zoom",
-  "setup:obsidian",
-  "setup:cursor",
-  "setup:yaak",
-  "setup:soap-ui",
-  "setup:llama",
-  "setup:whisper",
-  "setup:kde-fonts",
-  "setup:kwallet",
-  "setup:keyboard",
+  "font-inter:setup",
+  "font-iosevka:setup",
+  "font-nerd:setup",
+  "media:setup",
+  "graphics:setup",
+  "slack:setup",
+  "zoom:setup",
+  "obsidian:setup",
+  "cursor:setup",
+  "yaak:setup",
+  "soap-ui:setup",
+  "llama:setup",
+  "whisper:setup",
+  "kde:setup-fonts",
+  "kwallet:setup",
+  "keyboard:setup",
+  "herdr:sync-machines",
   "codex:check",
   "antigravity:check",
-  "setup:cursor-cli",
-  "herdr:sync-machines",
+  "cursor:setup-cli",
 ]
 run = """
 echo "[bootstrap] Verifying auth services..."
@@ -460,7 +464,7 @@ tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
 gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
 """
 
-[tasks."setup:font-inter"]
+[tasks."font-inter:setup"]
 description = "Install Inter font from GitHub releases"
 run = """
 VERSION={{vars.inter_version}}
@@ -475,7 +479,7 @@ ln -fsT "$DATA_DIR/Inter.ttc" "$FONT_DIR/inter.ttc"
 fc-cache -f
 """
 
-[tasks."setup:font-iosevka"]
+[tasks."font-iosevka:setup"]
 description = "Install Iosevka SS08 font from GitHub releases"
 run = """
 VERSION={{vars.iosevka_version}}
@@ -490,7 +494,7 @@ ln -fsT "$DATA_DIR" "$FONT_DIR/iosevka"
 fc-cache -f
 """
 
-[tasks."setup:font-nerd"]
+[tasks."font-nerd:setup"]
 description = "Install IosevkaTerm Nerd Font from GitHub releases"
 run = """
 VERSION={{vars.nerd_fonts_version}}
@@ -505,14 +509,14 @@ ln -fsT "$DATA_DIR" "$FONT_DIR/nerd-fonts"
 fc-cache -f
 """
 
-[tasks."setup:media"]
+[tasks."media:setup"]
 description = "Install media codecs (ffmpeg swap, group upgrade)"
 run = """
 sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
 sudo dnf group upgrade -y multimedia
 """
 
-[tasks."setup:graphics"]
+[tasks."graphics:setup"]
 description = "Install GPU-conditional graphics drivers"
 run = """
 if lspci -nn | grep -qi 'intel.*vga\\|vga.*intel'; then
@@ -526,7 +530,7 @@ if lspci -nn | grep -qi 'amd.*vga\\|vga.*amd\\|advanced micro devices.*vga\\|vga
 fi
 """
 
-[tasks."setup:slack"]
+[tasks."slack:setup"]
 description = "Install Slack desktop client"
 run = """
 version="{{vars.slack_version}}"
@@ -536,7 +540,7 @@ if ! rpm -q "slack-${build}.x86_64" >/dev/null 2>&1; then
 fi
 """
 
-[tasks."setup:zoom"]
+[tasks."zoom:setup"]
 description = "Install Zoom desktop client"
 run = """
 version="{{vars.zoom_version}}"
@@ -545,7 +549,7 @@ if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
 fi
 """
 
-[tasks."setup:obsidian"]
+[tasks."obsidian:setup"]
 description = "Install Obsidian AppImage, CLI, and vault config"
 run = """
 version="{{vars.obsidian_version}}"
@@ -578,7 +582,7 @@ jq --arg path "$HOME/Vaults/odsod" \
   "$config" > "$config.tmp" && mv "$config.tmp" "$config"
 """
 
-[tasks."setup:cursor"]
+[tasks."cursor:setup"]
 description = "Install Cursor editor"
 run = """
 version="{{vars.cursor_version}}"
@@ -587,7 +591,7 @@ if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; t
 fi
 """
 
-[tasks."setup:yaak"]
+[tasks."yaak:setup"]
 description = "Install Yaak API client"
 run = """
 version="{{vars.yaak_version}}"
@@ -596,7 +600,7 @@ if ! rpm -q "yaak-${version}" >/dev/null 2>&1; then
 fi
 """
 
-[tasks."setup:soap-ui"]
+[tasks."soap-ui:setup"]
 description = "Install SoapUI"
 run = """
 version="{{vars.soap_ui_version}}"
@@ -608,28 +612,28 @@ fi
 ln -fsT "${data_dir}/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
 """
 
-[tasks."setup:llama"]
+[tasks."llama:setup"]
 description = "Build and install llama.cpp GPU inference service"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/setup-llama.sh"
 """
 
-[tasks."setup:whisper"]
+[tasks."whisper:setup"]
 description = "Build and install whisper.cpp GPU speech-to-text service"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/setup-whisper.sh"
 """
 
-[tasks."setup:fish-shell"]
+[tasks."fish:setup"]
 description = "Install mise-managed fish to stable path"
 run = """
 fish_path="$(mise where github:fish-shell/fish-shell)/fish"
 sudo install -m 0755 "$fish_path" /usr/local/bin/fish
 """
 
-[tasks."setup:kde-fonts"]
+[tasks."kde:setup-fonts"]
 description = "Configure KDE system fonts"
 run = """
 kwriteconfig6 --group "General" --key "font" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
@@ -643,14 +647,14 @@ kwriteconfig6 --group "General" --key "XftSubPixel" "none"
 kwriteconfig6 --group "WM" --key "activeFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 """
 
-[tasks."setup:kwallet"]
+[tasks."kwallet:setup"]
 description = "Configure KWallet"
 run = """
 mkdir -p ~/.config
 printf '%s\n' '[Wallet]' 'Enabled=true' 'First Use=false' > ~/.config/kwalletrc
 """
 
-[tasks."setup:keyboard"]
+[tasks."keyboard:setup"]
 description = "Install custom XKB keyboard layout"
 run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
@@ -700,7 +704,7 @@ fi
 install -m 600 "$repo/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
 """
 
-[tasks."setup:cursor-cli"]
+[tasks."cursor:setup-cli"]
 description = "Seed cursor CLI config from repo template"
 run = """
 if [ ! -f "$HOME/.cursor/cli-config.json" ]; then
@@ -716,3 +720,4 @@ run = """
 repo="$(dirname "$(readlink -f ~/.config/mise/config.toml)")"
 exec "$repo/tasks/setup-herdr-machines.sh"
 """
+

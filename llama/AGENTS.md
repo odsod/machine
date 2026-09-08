@@ -5,7 +5,7 @@ GPU-accelerated LLM inference server (llama.cpp + ROCm/HIP).
 ## VRAM Profiles
 
 Active model is set via `MODEL` in `tasks/setup-llama.sh` and `model` in
-`llama/mise.toml` `[vars]`. After changing, run `mise run setup:llama` and
+`llama/mise.toml` `[vars]`. After changing, run `mise run llama:setup` and
 `systemctl --user restart llama-server`.
 
 | Model                    | VRAM   | Quality | Swedish        | Speed |
