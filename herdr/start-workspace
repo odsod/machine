@@ -637,7 +637,8 @@ if test "$space_type" = Workspace
     set -l fetch_pid $last_pid
 
     set local_bookmarks (_jj_repo "$repo_path" bookmark list -T 'self.name() ++ "\n"' 2>/dev/null | sed '/^$/d' | sort -u)
-    set remote_bookmarks (_jj_repo "$repo_path" bookmark list --all-remotes -T 'if(self.remote() == "origin", self.name() ++ "@origin", "") ++ "\n"' 2>/dev/null \
+    set remote_bookmarks (_jj_repo "$repo_path" log --no-graph -r 'remote_bookmarks(remote=origin)' \
+        -T 'remote_bookmarks.filter(|rb| rb.remote() == "origin" && !local_bookmarks.any(|lb| lb.name() == rb.name())).map(|b| b.name() ++ "@origin\n").join("")' 2>/dev/null \
         | sed '/^$/d' \
         | sort -u)
     set suggestion_bookmarks (printf '%s\n' $local_bookmarks $remote_bookmarks | sed '/^$/d' | sort -u)
