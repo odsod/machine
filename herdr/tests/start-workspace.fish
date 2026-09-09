@@ -238,6 +238,9 @@ for agent in claude cursor agy pi
             or fail "agy settings file not created"
             jq -e --arg p "$t_path" '(.trustedWorkspaces // []) | index($p) != null' "$t_home/.gemini/antigravity-cli/settings.json" >/dev/null
             or fail "agy trustedWorkspaces missing path"
+            string match -q '*agent start agy-wcase --kind agy --pane wCase:p1*' \
+                (string collect < "$t_log")
+            or fail "agy agent not started with expected arguments"
         case pi
             test -f "$t_home/.pi/agent/trust.json"
             or fail "pi trust.json not created"
