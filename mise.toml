@@ -155,7 +155,7 @@ root = "{{config_root}}"
 "~/.claude/CLAUDE.md" = "agents/AGENTS.md"
 "~/.claude/skills" = "agents/skills"
 "~/.codex/AGENTS.md" = "agents/AGENTS.md"
-"~/.gemini/GEMINI.md" = "agents/AGENTS.md"
+"~/.gemini/AGENTS.md" = "agents/AGENTS.md"
 "~/.pi/agent/AGENTS.md" = "agents/AGENTS.md"
 
 # Pi
