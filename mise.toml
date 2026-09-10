@@ -107,6 +107,9 @@ spacectl = "latest"
 "http:soap-ui" = { version = "{{vars.soap_ui_version}}", url = "https://dl.eviware.com/soapuios/{{vars.soap_ui_version}}/SoapUI-{{vars.soap_ui_version}}-linux-bin.tar.gz", strip_components = 1, bin_path = "bin", postinstall = """
 ln -fsT "$(mise where http:soap-ui)/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
 """ }
+"http:obsidian" = { version = "{{vars.obsidian_version}}", url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v{{vars.obsidian_version}}/Obsidian-{{vars.obsidian_version}}.AppImage", postinstall = """
+ln -fsT "$(mise where http:obsidian)/Obsidian-{{vars.obsidian_version}}.AppImage" "$HOME/.local/bin/obsidian-app"
+""" }
 
 [env]
 _.source = "{{ config_source | canonicalize | dirname }}/env.sh"
@@ -225,6 +228,7 @@ root = "{{config_root}}"
 "~/.local/bin/plannotator-browser" = "plannotator/plannotator-browser"
 "~/.local/bin/recorder-toggle" = "recorder/recorder-toggle"
 "~/.local/bin/recorder-note" = "recorder/recorder-note"
+"~/.local/bin/obsidian" = "obsidian/obsidian-wrapper.sh"
 
 [bootstrap.packages]
 # Core system tools
@@ -445,7 +449,6 @@ exec npx --yes skills update
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
-env = { PINNED_OBSIDIAN = "{{vars.obsidian_version}}" }
 run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
@@ -463,7 +466,6 @@ depends = [
   "graphics:setup",
   "slack:setup",
   "zoom:setup",
-  "obsidian:setup",
   "cursor:setup",
   "yaak:setup",
   "llama:setup",
@@ -520,38 +522,6 @@ version="{{vars.zoom_version}}"
 if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
   sudo dnf install -y "https://zoom.us/client/${version}/zoom_x86_64.rpm"
 fi
-"""
-
-[tasks."obsidian:setup"]
-description = "Install Obsidian AppImage, CLI, and vault config"
-run = """
-version="{{vars.obsidian_version}}"
-data_dir="$HOME/.local/share/odsod/machine/data/obsidian/${version}"
-app="${data_dir}/app.AppImage"
-cli="${data_dir}/obsidian-cli"
-
-if [ ! -f "$app" ]; then
-  mkdir -p "$data_dir"
-  curl -fsSL "https://github.com/obsidianmd/obsidian-releases/releases/download/v${version}/Obsidian-${version}.AppImage" -o "$app"
-  chmod +x "$app"
-fi
-ln -fsT "$app" "$HOME/.local/bin/obsidian-app"
-
-if [ ! -f "$cli" ]; then
-  cd /tmp && "$app" --appimage-extract obsidian-cli >/dev/null 2>&1
-  install -m 755 /tmp/squashfs-root/obsidian-cli "$cli"
-  rm -rf /tmp/squashfs-root
-fi
-ln -fsT "$data_dir" "$HOME/.local/share/odsod/machine/data/obsidian/current"
-install -m 755 "$REPO_DIR/obsidian/obsidian-wrapper.sh" "$HOME/.local/bin/obsidian"
-
-mkdir -p "$HOME/.config/obsidian"
-config="$HOME/.config/obsidian/obsidian.json"
-[ -f "$config" ] || echo '{}' > "$config"
-jq --arg path "$HOME/Vaults/odsod" \
-  'if (.vaults // {} | to_entries | map(select(.value.path == $path)) | length) == 0
-   then .vaults.odsod = {"path": $path, "open": true} else . end | .cli = true' \
-  "$config" > "$config.tmp" && mv "$config.tmp" "$config"
 """
 
 [tasks."cursor:setup"]

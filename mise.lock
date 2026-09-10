@@ -785,6 +785,32 @@ checksum = "sha256:b4508c445de1c1a68c760a01735da2aba2fa214b2aafd4b07f732e49b2a64
 url = "https://github.com/herdrdev/herdr/releases/download/v0.9.0/herdr-windows-x86_64.zip"
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/549270164"
 
+[[tools."http:obsidian"]]
+version = "1.13.7"
+backend = "http:obsidian"
+
+[tools."http:obsidian"."platforms.linux-arm64"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.linux-arm64-musl"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.linux-x64"]
+checksum = "blake3:227d8fb7f220b8f39611d9aa749211acfe6846127f66fa6080a1a0d01aceeb9c"
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.linux-x64-musl"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.macos-arm64"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.macos-x64"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
+[tools."http:obsidian"."platforms.windows-x64"]
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v1.13.7/Obsidian-1.13.7.AppImage"
+
 [[tools."http:soap-ui"]]
 version = "5.10.0"
 backend = "http:soap-ui"
