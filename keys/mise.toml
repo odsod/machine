@@ -8,6 +8,8 @@ sudo systemctl enable --now odsod-keys.service
 
 [tasks.build]
 description = "Compile and install odsod-keys binary"
+sources = ["odsod-keys.c"]
+outputs = ["/usr/local/bin/odsod-keys"]
 run = """
 sudo dnf install -y -q gcc kernel-headers
 gcc -O2 -Wall -Wextra -Werror -o odsod-keys odsod-keys.c
