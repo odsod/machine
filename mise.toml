@@ -103,6 +103,11 @@ spacectl = "latest"
 "pipx:idasen" = "latest"
 "pipx:ty" = "latest"
 
+# HTTP archive tools
+"http:soap-ui" = { version = "{{vars.soap_ui_version}}", url = "https://dl.eviware.com/soapuios/{{vars.soap_ui_version}}/SoapUI-{{vars.soap_ui_version}}-linux-bin.tar.gz", strip_components = 1, bin_path = "bin", postinstall = """
+ln -fsT "$(mise where http:soap-ui)/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
+""" }
+
 [env]
 _.source = "{{ config_source | canonicalize | dirname }}/env.sh"
 REPO_DIR = "{{ config_source | canonicalize | dirname }}"
@@ -440,7 +445,7 @@ exec npx --yes skills update
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
-env = { PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}" }
+env = { PINNED_OBSIDIAN = "{{vars.obsidian_version}}" }
 run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
@@ -461,7 +466,6 @@ depends = [
   "obsidian:setup",
   "cursor:setup",
   "yaak:setup",
-  "soap-ui:setup",
   "llama:setup",
   "whisper:setup",
   "kde:setup-fonts",
@@ -566,18 +570,6 @@ version="{{vars.yaak_version}}"
 if ! rpm -q "yaak-${version}" >/dev/null 2>&1; then
   sudo dnf install -y "https://github.com/mountain-loop/yaak/releases/download/v${version}/yaak-${version}-1.x86_64.rpm"
 fi
-"""
-
-[tasks."soap-ui:setup"]
-description = "Install SoapUI"
-run = """
-version="{{vars.soap_ui_version}}"
-data_dir="$HOME/.local/share/odsod/machine/data/soap-ui/${version}/SoapUI-${version}"
-if [ ! -d "$data_dir" ]; then
-  mkdir -p "$(dirname "$data_dir")"
-  curl -fsSL "https://dl.eviware.com/soapuios/${version}/SoapUI-${version}-linux-bin.tar.gz" | tar -xz -C "$(dirname "$data_dir")"
-fi
-ln -fsT "${data_dir}/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
 """
 
 [tasks."llama:setup"]

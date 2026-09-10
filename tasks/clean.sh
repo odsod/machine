@@ -18,7 +18,6 @@ prune() {
 }
 
 prune obsidian "$PINNED_OBSIDIAN"
-prune soap-ui "$PINNED_SOAP_UI"
 
 mise run -C "$REPO_DIR/llama" clean
 mise run -C "$REPO_DIR/whisper" clean
