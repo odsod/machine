@@ -438,53 +438,6 @@ checksum = "sha256:876c5d448abd44211f14d8d611e91b2152f6e3aec98702da976489891bab8
 url = "https://github.com/Feel-ix-343/markdown-oxide/releases/download/v0.25.12/markdown-oxide-v0.25.12-x86_64-pc-windows-gnu.zip"
 url_api = "https://api.github.com/repos/Feel-ix-343/markdown-oxide/releases/assets/460776177"
 
-[[tools."github:backnotprop/plannotator"]]
-version = "0.27.13"
-backend = "github:backnotprop/plannotator"
-
-[tools."github:backnotprop/plannotator"."platforms.linux-arm64"]
-checksum = "sha256:8460ac0b8a0fbac492835c364bd24d2e0f0ddd71709fef811759c5108d32db52"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-linux-arm64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261651"
-provenance = "github-attestations"
-
-[tools."github:backnotprop/plannotator"."platforms.linux-arm64-musl"]
-checksum = "sha256:8460ac0b8a0fbac492835c364bd24d2e0f0ddd71709fef811759c5108d32db52"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-linux-arm64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261651"
-provenance = "github-attestations"
-
-[tools."github:backnotprop/plannotator"."platforms.linux-x64"]
-checksum = "sha256:d736ac28e097ef0ce23a8eaa76f7cfeba5598786406ae73c3f617b2e31bb9c40"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-linux-x64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261648"
-provenance = "github-attestations"
-provenance_verified = true
-
-[tools."github:backnotprop/plannotator"."platforms.linux-x64-musl"]
-checksum = "sha256:d736ac28e097ef0ce23a8eaa76f7cfeba5598786406ae73c3f617b2e31bb9c40"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-linux-x64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261648"
-provenance = "github-attestations"
-
-[tools."github:backnotprop/plannotator"."platforms.macos-arm64"]
-checksum = "sha256:7942044b8cd049adfb2d58812f021861d1f3a0351ad0e1cc595652562a66251c"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-darwin-arm64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261654"
-provenance = "github-attestations"
-
-[tools."github:backnotprop/plannotator"."platforms.macos-x64"]
-checksum = "sha256:2c7357c86461478d267bc145508a71c2c9fef78da9c7b9da82a36f88087f3fb5"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-darwin-x64"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261650"
-provenance = "github-attestations"
-
-[tools."github:backnotprop/plannotator"."platforms.windows-x64"]
-checksum = "sha256:43ee52184ec5a79dd5f3aa9e51716e1a6dfbf7ba046b76a6a63c9596d63ccc65"
-url = "https://github.com/backnotprop/plannotator/releases/download/v0.27.13/plannotator-win32-x64.exe"
-url_api = "https://api.github.com/repos/backnotprop/plannotator/releases/assets/554261626"
-provenance = "github-attestations"
-
 [[tools."github:dmmulroy/jj-starship"]]
 version = "0.7.4"
 backend = "github:dmmulroy/jj-starship"

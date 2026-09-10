@@ -52,10 +52,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] calendar", "KWin", ""],
     key: "Meta+C",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--app=https://calendar.google.com",
-    ],
+    command: ["google-chrome", "--app=https://calendar.google.com"],
     resourceClassIncludes: "calendar.google.com",
   },
 
@@ -94,10 +91,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] linear", "KWin", ""],
     key: "Meta+I",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--app=https://linear.app",
-    ],
+    command: ["google-chrome", "--app=https://linear.app"],
     resourceClassIncludes: "linear.app",
     noBorder: true,
   },
@@ -106,10 +100,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] mail", "KWin", ""],
     key: "Meta+F",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--app=https://mail.google.com",
-    ],
+    command: ["google-chrome", "--app=https://mail.google.com"],
     resourceClassIncludes: "mail.google.com",
   },
 
@@ -147,11 +138,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] spotify", "KWin", ""],
     key: "Meta+.",
     kind: "app",
-    command: [
-      "flatpak",
-      "run",
-      "com.spotify.Client",
-    ],
+    command: ["flatpak", "run", "com.spotify.Client"],
     resourceClass: "spotify",
     noBorder: true,
   },
@@ -184,9 +171,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] chrome", "KWin", ""],
     key: "Meta+G",
     kind: "app",
-    command: [
-      "google-chrome",
-    ],
+    command: ["google-chrome"],
     resourceClass: "google-chrome",
   },
 
@@ -211,10 +196,7 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] discord", "KWin", ""],
     key: "Meta+Y",
     kind: "app",
-    command: [
-      "google-chrome",
-      "--app=https://discord.com",
-    ],
+    command: ["google-chrome", "--app=https://discord.com"],
     resourceClassIncludes: "discord.com",
     noBorder: true,
   },
@@ -231,9 +213,9 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] debug", "KWin", ""],
     key: "Meta+;",
     kind: "callback",
-    callback: function() {
+    callback: function () {
       log("printing debug output");
-      workspace.stackingOrder.forEach(function(window) {
+      workspace.stackingOrder.forEach(function (window) {
         log("resourceName[", window.resourceName, "]", "resourceClass[", window.resourceClass, "]");
       });
     },
@@ -256,15 +238,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] plannotator", "KWin", ""],
-    key: "Meta+P",
-    kind: "app",
-    command: [],
-    resourceClass: "Plannotator",
-    noBorder: true,
-  },
-
-  {
     actionId: ["kwin", "[odsod] agent-browser", "KWin", ""],
     key: "Meta+1",
     kind: "app",
@@ -279,15 +252,13 @@ function matchesShortcut(window, shortcut) {
   } else if (shortcut.resourceClass) {
     return window.resourceClass.toString() === shortcut.resourceClass;
   } else if (shortcut.resourceClassIncludes) {
-    return window.resourceClass
-      .toString()
-      .includes(shortcut.resourceClassIncludes);
+    return window.resourceClass.toString().includes(shortcut.resourceClassIncludes);
   }
   return false;
 }
 
 function findWindow(shortcut) {
-  return workspace.stackingOrder.find(function(window) {
+  return workspace.stackingOrder.find(function (window) {
     return matchesShortcut(window, shortcut);
   });
 }
@@ -308,42 +279,37 @@ function log(...args) {
     "/",
     "io.github.odsod.kwin.Service",
     "log",
-    JSON.stringify(args)
+    JSON.stringify(args),
   );
 }
 
-shortcuts.forEach(function(shortcut) {
+shortcuts.forEach(function (shortcut) {
   if (shortcut.kind === "builtin") {
     return;
   }
   log("registering shortcut", shortcut.actionId[1]);
-  registerShortcut(
-    shortcut.actionId[1],
-    shortcut.actionId[3],
-    shortcut.key,
-    function() {
-      log("handling shortcut", shortcut.actionId[1]);
-      if (shortcut.kind === "callback") {
-        shortcut.callback();
+  registerShortcut(shortcut.actionId[1], shortcut.actionId[3], shortcut.key, function () {
+    log("handling shortcut", shortcut.actionId[1]);
+    if (shortcut.kind === "callback") {
+      shortcut.callback();
+      return;
+    }
+    if (shortcut.kind === "app") {
+      var window = findWindow(shortcut);
+      if (window) {
+        if (window.minimized) {
+          window.minimized = false;
+          workspace.activeWindow = window;
+        } else if (workspace.activeWindow != window) {
+          workspace.activeWindow = window;
+        } else {
+          window.minimized = true;
+        }
         return;
       }
-      if (shortcut.kind === "app") {
-        var window = findWindow(shortcut);
-        if (window) {
-          if (window.minimized) {
-            window.minimized = false;
-            workspace.activeWindow = window;
-          } else if (workspace.activeWindow != window) {
-            workspace.activeWindow = window;
-          } else {
-            window.minimized = true;
-          }
-          return;
-        }
-      }
-      runCommand(shortcut);
-    },
-  );
+    }
+    runCommand(shortcut);
+  });
 });
 
 callDBus(
@@ -352,13 +318,13 @@ callDBus(
   "io.github.odsod.kwin.Service",
   "configure_shortcuts",
   JSON.stringify(shortcuts),
-  function() {
+  function () {
     log("shortcuts configured");
   },
 );
 
 function applyWindowRules(window) {
-  shortcuts.forEach(function(shortcut) {
+  shortcuts.forEach(function (shortcut) {
     if (!matchesShortcut(window, shortcut)) {
       return;
     }

@@ -81,7 +81,6 @@ stylua = "latest"
 "npm:yaml-language-server" = "latest"
 
 # Tools via GitHub releases
-"github:backnotprop/plannotator" = "latest"
 "github:dmmulroy/jj-starship" = "latest"
 "github:Feel-ix-343/markdown-oxide" = "latest"
 "github:fish-shell/fish-shell" = { version = "latest", exe = "fish" }
@@ -224,8 +223,6 @@ root = "{{config_root}}"
 "~/.local/bin/jj-workflow" = "jj/workflow.fish"
 "~/.local/bin/odsod-kwin-dbus-service.py" = "kwin/odsod-kwin-dbus-service.py"
 "~/.local/share/dbus-1/services/io.github.odsod.kwin.service" = "kwin/io.github.odsod.kwin.service"
-"~/.local/bin/plannotator" = "plannotator/plannotator"
-"~/.local/bin/plannotator-browser" = "plannotator/plannotator-browser"
 "~/.local/bin/recorder-toggle" = "recorder/recorder-toggle"
 "~/.local/bin/recorder-note" = "recorder/recorder-note"
 "~/.local/bin/obsidian" = "obsidian/obsidian-wrapper.sh"
