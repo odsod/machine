@@ -1,5 +1,5 @@
 model = "gpt-6-astra"
-model_reasoning_effort = "low"
+model_reasoning_effort = "medium"
 personality = "pragmatic"
 web_search = "live"
 approval_policy = "never"

@@ -27,8 +27,8 @@ soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.19.13"
-cursor_hash = "dd066f332fcea7382764400fde902f61920648d5"
+cursor_version = "3.19.19"
+cursor_hash = "6496ea8a068aebfcd21990e70ff522e9abf10c8c"
 
 [tools]
 "aqua:jdx/mise" = "latest"
