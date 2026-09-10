@@ -6,4 +6,9 @@ if test -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY"
     exec /usr/bin/xdg-open $argv
 end
 
+set -l desktop_run (status dirname)/desktop-run
+if test -x "$desktop_run"
+    exec "$desktop_run" /usr/bin/xdg-open $argv
+end
+
 systemd-run --user --wait --collect --quiet --same-dir -- /usr/bin/xdg-open $argv
