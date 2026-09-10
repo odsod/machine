@@ -17,16 +17,6 @@ if [ -n "$REPO" ]; then
   fi
 fi
 
-# mise reads GITHUB_TOKEN; gh reads the keyring. Without this bridge `mise
-# outdated` runs unauthenticated and GitHub rate-limits most tool lookups.
-if [ -z "${GITHUB_TOKEN:-}" ]; then
-  token="$(gh auth token 2>/dev/null)"
-  if [ -n "$token" ]; then
-    export GITHUB_TOKEN="$token"
-  else
-    echo "warning: gh is not logged in; mise outdated may be rate-limited" >&2
-  fi
-fi
 
 rows=""
 
