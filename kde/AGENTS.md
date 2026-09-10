@@ -13,15 +13,15 @@ KDE Plasma desktop configuration.
 
 Two layers:
 
-- **`fonts.conf`** — fontconfig rules applied to all apps (GTK, Qt, Firefox, etc.)
-- **`mise run kde:setup-fonts`** — KDE-specific font selection via `kwriteconfig6` (writes to `~/.config/kdeglobals`)
+- **`fonts.conf`**: fontconfig rules applied to all apps (GTK, Qt, Firefox, etc.)
+- **`mise run kde:setup-fonts`**: KDE-specific font selection via `kwriteconfig6` (writes to `~/.config/kdeglobals`)
 
 ### Design Decisions
 
 - **`rgba=none` + `lcdfilter=lcdnone`**: Subpixel rendering is broken on Wayland (windows can rotate/scale arbitrarily). Grayscale antialiasing is correct.
-- **`hintslight`**: Best tradeoff — snaps stems to pixel grid without distorting glyph shapes.
-- **`embeddedbitmap=false`**: Bitmaps look terrible on high-DPI; forces outline rendering for all fonts.
-- **Font families**: Inter (UI), Iosevka SS08 (monospace) — installed by `font-inter:setup` and `font-iosevka:setup`.
+- **`hintslight`**: Best tradeoff. Snaps stems to pixel grid without distorting glyph shapes.
+- **`embeddedbitmap=false`**: Bitmaps look terrible on high-DPI. Forces outline rendering for all fonts.
+- **Font families**: Inter (UI), Iosevka SS08 (monospace). Installed via `brew-cask` packages in `mise.toml`.
 
 ### Verifying
 
