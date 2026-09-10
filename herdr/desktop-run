@@ -7,4 +7,20 @@ if test (count $argv) -eq 0
     exit 2
 end
 
-systemd-run --user --collect --quiet --same-dir -- $argv
+if command -q systemctl
+    set -l manager_env (systemctl --user show-environment 2>/dev/null)
+    set -l names \
+        DISPLAY WAYLAND_DISPLAY XAUTHORITY \
+        XDG_RUNTIME_DIR XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE \
+        DESKTOP_SESSION DBUS_SESSION_BUS_ADDRESS \
+        KDE_FULL_SESSION KDE_SESSION_VERSION QT_WAYLAND_RECONNECT
+
+    for name in $names
+        set -l line (string match "$name=*" $manager_env)
+        if test -n "$line"
+            set -gx $name (string replace "$name=" "" -- $line)
+        end
+    end
+end
+
+exec $argv

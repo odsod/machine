@@ -13,8 +13,36 @@ functions -q source_env_sh; and not set -q ODSOD_MACHINE; and source_env_sh
 # Work around https://github.com/herdrdev/herdr/issues/2448.
 # Remove this refresh and the xdg-open shim after
 # https://github.com/herdrdev/herdr/pull/2854 ships in stable Herdr.
-function desktop-env-refresh
+function desktop-env-refresh --on-event fish_prompt
     test "$HERDR_ENV" = 1; or return 0
+
+    set -l runtime_dir (test -n "$XDG_RUNTIME_DIR"; and echo "$XDG_RUNTIME_DIR"; or echo "/run/user/"(id -u))
+
+    # Short-circuit if current session socket is still valid.
+    if test -n "$WAYLAND_DISPLAY" -a -S "$runtime_dir/$WAYLAND_DISPLAY"
+        return 0
+    end
+    if test -n "$DISPLAY"
+        set -l disp_num (string replace -r '^:?([0-9]+).*' '$1' -- "$DISPLAY")
+        if test -S "/tmp/.X11-unix/X$disp_num"
+            return 0
+        end
+    end
+
+    # If neither is set, and no graphical socket exists on the host, do nothing.
+    if test -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY"
+        set -l wayland_socks $runtime_dir/wayland-*
+        set -l x11_socks /tmp/.X11-unix/X*
+        set -l has_socket 0
+        for s in $wayland_socks $x11_socks
+            if test -S "$s"
+                set has_socket 1
+                break
+            end
+        end
+        test $has_socket -eq 1; or return 0
+    end
+
     command -q systemctl; or return 0
 
     set -l manager_env (systemctl --user show-environment 2>/dev/null); or return 0
@@ -85,6 +113,7 @@ function _ssh_auth_sock_source
 end
 
 function ssh-refresh
+    desktop-env-refresh
     refresh_ssh_auth_sock
     if not set -q SSH_AUTH_SOCK[1]
         echo "no live ssh agent found" >&2
