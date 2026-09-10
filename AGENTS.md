@@ -152,7 +152,6 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 | `[bootstrap.groups]`              | System group declarations                  |
 | `[bootstrap.users]`               | System user accounts and group memberships |
 | `[bootstrap.services]`            | System services (sshd, docker, tailscaled) |
-| `[bootstrap.mise_shell_activate]` | Fish shell activation                      |
 | `[tasks.*]`                       | Imperative setup scripts                   |
 
 ## Key Design Decisions

@@ -410,10 +410,6 @@ enabled = true
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"
 
-[bootstrap.mise_shell_activate]
-shell = "/usr/local/bin/fish"
-run = "mise run fish:setup"
-
 [bootstrap.hooks.post-tools]
 run = "mise run fish:setup"
 
