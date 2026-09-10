@@ -394,6 +394,14 @@ owner = "root"
 group = "root"
 mode = "0644"
 
+[bootstrap.files."/etc/systemd/system/odsod-keys.service"]
+source = "keys/odsod-keys.service"
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+notify = ["odsod-keys"]
+
 [bootstrap.services.sshd]
 state = "running"
 enabled = true
@@ -406,6 +414,11 @@ enabled = true
 [bootstrap.services.tailscaled]
 state = "running"
 enabled = true
+
+[bootstrap.services.odsod-keys]
+state = "running"
+enabled = true
+on_change = "restart"
 
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"

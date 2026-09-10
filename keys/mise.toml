@@ -1,10 +1,7 @@
 [tasks.install]
-description = "Build, install, and enable odsod-keys"
-depends = ["build", "install-service"]
-run = """
-sudo systemctl daemon-reload
-sudo systemctl enable --now odsod-keys.service
-"""
+description = "Build and converge odsod-keys service"
+depends = ["build"]
+run = "mise bootstrap files services"
 
 [tasks.build]
 description = "Compile and install odsod-keys binary"
@@ -17,13 +14,9 @@ sudo install -m 0755 odsod-keys /usr/local/bin/odsod-keys
 rm odsod-keys
 """
 
-[tasks.install-service]
-description = "Install systemd service file"
-run = "sudo cp -f odsod-keys.service /etc/systemd/system/odsod-keys.service"
-
 [tasks.deploy]
-description = "Build, install, and restart"
-depends = ["build", "install-service"]
+description = "Build and restart service"
+depends = ["build"]
 run = "sudo systemctl restart odsod-keys.service"
 
 [tasks.status]

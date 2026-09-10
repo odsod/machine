@@ -151,7 +151,7 @@ mise is bootstrapped via COPR dnf package, then self-managed via `[tools]`.
 | `[bootstrap.files]`               | Privileged files (sudoers, sshd, xkb)      |
 | `[bootstrap.groups]`              | System group declarations                  |
 | `[bootstrap.users]`               | System user accounts and group memberships |
-| `[bootstrap.services]`            | System services (sshd, docker, tailscaled) |
+| `[bootstrap.services]`            | System services (sshd, docker, tailscaled, odsod-keys) |
 | `[tasks.*]`                       | Imperative setup scripts                   |
 
 ## Key Design Decisions
