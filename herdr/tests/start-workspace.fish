@@ -8,6 +8,7 @@ set -g real_fish (status fish-path)
 # tool and falls back to `jj` on PATH, which is the stub, recursing forever.
 set -g real_jj (mise which jj 2>/dev/null)
 test -n "$real_jj"; or set -g real_jj (command -s jj)
+set -g real_setsid (command -s setsid)
 
 function cleanup --on-event fish_exit
     rm -rf "$test_root"
@@ -110,6 +111,13 @@ function write_stubs --argument-names home
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/agy"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/pi"
     printf '%s\n' "#!$real_fish --no-config" 'exit 1' >"$stub_bin/timeout"
+    if test -n "$real_setsid"
+        printf '%s\n' \
+            "#!$real_fish --no-config" \
+            'test -n "$SETSID_LOG"; and printf "%s\n" (string join " " -- $argv) >> "$SETSID_LOG"' \
+            'exec '"$real_setsid"' $argv' >"$stub_bin/setsid"
+        chmod +x "$stub_bin/setsid"
+    end
     chmod +x "$stub_bin/fzf" "$stub_bin/herdr" "$stub_bin/jj" \
         "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/claude" \
         "$stub_bin/cursor" "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/timeout"
@@ -132,8 +140,9 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
     set -l bookmark_log "$home/bookmark.log"
     set -l workspace_log "$home/workspace.log"
     set -l machine_log "$home/machine.log"
+    set -l setsid_log "$home/setsid.log"
     set -l system_path (string join : $PATH)
-    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log" "$bookmark_log" "$workspace_log" "$machine_log"
+    rm -f "$count_file" "$herdr_log" "$ssh_log" "$fzf_log" "$bookmark_log" "$workspace_log" "$machine_log" "$setsid_log"
 
     set -l original_dir "$PWD"
     cd "$home"
@@ -148,6 +157,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "EXPECTED_CWD=$expected_cwd" \
         "HERDR_LOG=$herdr_log" \
         "SSH_LOG=$ssh_log" \
+        "SETSID_LOG=$setsid_log" \
         "FZF_LOG=$fzf_log" \
         "FZF_BOOKMARK_LOG=$bookmark_log" \
         "FZF_WORKSPACE_LOG=$workspace_log" \
@@ -163,6 +173,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
 
     set -g launcher_log "$herdr_log"
     set -g launcher_ssh_log "$ssh_log"
+    set -g launcher_setsid_log "$setsid_log"
     set -g launcher_fzf_log "$fzf_log"
     set -g launcher_bookmark_log "$bookmark_log"
     set -g launcher_workspace_log "$workspace_log"
@@ -241,6 +252,13 @@ for agent in claude cursor agy pi
             string match -q '*agent start agy-wcase --kind agy --pane wCase:p1*' \
                 (string collect < "$t_log")
             or fail "agy agent not started with expected arguments"
+            if test -n "$real_setsid"
+                test -f "$launcher_setsid_log"
+                or fail "setsid was not invoked"
+                string match -q -- '*-f nohup herdr agent start agy-wcase --kind agy --pane wCase:p1*' \
+                    (string collect < "$launcher_setsid_log")
+                or fail "setsid not called with -f nohup and expected arguments"
+            end
         case pi
             test -f "$t_home/.pi/agent/trust.json"
             or fail "pi trust.json not created"
