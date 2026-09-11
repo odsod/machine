@@ -344,16 +344,6 @@ function _trust_agy --argument-names cwd
         jq -n --arg cwd "$cwd" \
             '{"trustedWorkspaces": [$cwd]}' >"$agy_file" 2>/dev/null
     end
-
-    set -l gemini_file "$HOME/.gemini/trustedFolders.json"
-    if test -f "$gemini_file"
-        set -l tg (mktemp)
-        if jq --arg cwd "$cwd" '.[$cwd] = "TRUST_FOLDER"' "$gemini_file" >"$tg" 2>/dev/null
-            mv "$tg" "$gemini_file"
-        else
-            rm -f "$tg"
-        end
-    end
 end
 
 function _trust_pi --argument-names cwd
