@@ -442,12 +442,19 @@ function _launch_workspace
         set -l agent_extra
         test "$agent_kind" = cursor; and set agent_extra -- --trust
 
-        if command -q nohup
+        if command -q setsid
+            if command -q nohup
+                setsid -f nohup herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" $agent_extra </dev/null >/dev/null 2>&1
+            else
+                setsid -f herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" $agent_extra </dev/null >/dev/null 2>&1
+            end
+        else if command -q nohup
             nohup herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" $agent_extra </dev/null >/dev/null 2>&1 &
+            disown
         else
             herdr agent start "$agent_name" --kind "$agent_kind" --pane "$pane_id" $agent_extra </dev/null >/dev/null 2>&1 &
+            disown
         end
-        disown
     end
 end
 
