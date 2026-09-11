@@ -195,7 +195,7 @@ to it.
 
 - `agents/` is the source for `~/.agents`: the instruction file every agent loads
   and the skills that apply in every repo (`herdr`). `[dotfiles]` links it to
-  `~/.agents` and links its `AGENTS.md` to the names Claude, Codex and Gemini
+  `~/.agents` and links its `AGENTS.md` to the names Claude, Codex and Antigravity
   look for.
 - The `~/.claude/skills` link exists because Claude Code reads only its own
   directories. Cursor reads the `.agents` paths itself, so it needs no link.

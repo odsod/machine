@@ -169,8 +169,7 @@ root = "{{config_root}}"
 "~/.pi/agent/settings.json" = "pi/settings.json"
 "~/.pi/agent/themes/nord-dark.json" = "pi/themes/nord-dark.json"
 
-# Gemini
-"~/.gemini/settings.json" = "gemini/settings.json"
+# Antigravity
 "~/.gemini/policies/machine.toml" = "antigravity/policies.toml"
 
 # Herdr
