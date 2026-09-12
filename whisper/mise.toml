@@ -1,5 +1,5 @@
 [vars]
-version = "1.9.2"
+version = "1.9.4"
 model = "ggml-large-v3.bin"
 model_url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin"
 vad_model = "ggml-silero-v6.2.0.bin"
