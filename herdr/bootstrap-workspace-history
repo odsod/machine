@@ -1,0 +1,210 @@
+#!/usr/bin/env python3
+"""Seed the start-workspace repo usage log from existing local signals.
+
+start-workspace ranks repos by use. This command fills the log once from data
+already on the machine, so the ranking is useful on day one.
+
+Signals:
+  - Claude Code sessions under ~/.claude/projects
+  - Codex sessions under ~/.codex/sessions
+  - jj workspaces under ~/Workspaces
+  - fish history cd commands
+
+Each signal becomes an epoch<TAB>repo event in
+~/.local/state/odsod/machine/workspace-history.tsv.
+
+Run with no arguments for a dry run. Pass --apply to write.
+"""
+import argparse
+import datetime
+import glob
+import json
+import os
+import re
+import sys
+import time
+
+HOME = os.path.expanduser("~")
+LOG = os.path.join(HOME, ".local/state/odsod/machine/workspace-history.tsv")
+FISH_HISTORY = os.path.join(HOME, ".local/share/fish/*_history")
+WINDOW = 90 * 86400
+
+
+def discover_repos():
+    """Return host/org/repo paths under ~/Code, including hidden names."""
+    repos = set()
+    root = os.path.join(HOME, "Code")
+    for host in _dirs(root):
+        for org in _dirs(os.path.join(root, host)):
+            for repo in _dirs(os.path.join(root, host, org)):
+                repo_path = os.path.join(root, host, org, repo)
+                if os.path.exists(os.path.join(repo_path, ".git")):
+                    repos.add(f"{host}/{org}/{repo}")
+    return repos
+
+
+def _dirs(path):
+    try:
+        return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+    except OSError:
+        return []
+
+
+def repo_of(path, repos):
+    """Map a path under ~/Code or ~/Workspaces to its repo, else None."""
+    for base in (os.path.join(HOME, "Code"), os.path.join(HOME, "Workspaces")):
+        if path == base or path.startswith(base + os.sep):
+            candidate = "/".join(os.path.relpath(path, base).split(os.sep)[:3])
+            if candidate in repos:
+                return candidate
+    return None
+
+
+def slug(path):
+    return re.sub(r"[^a-zA-Z0-9]", "-", path)
+
+
+def claude_events(repos):
+    prefixes = []
+    for repo in repos:
+        prefixes.append((slug(os.path.join(HOME, "Code", repo)), repo))
+        prefixes.append((slug(os.path.join(HOME, "Workspaces", repo)), repo))
+
+    events = []
+    for project in glob.glob(os.path.join(HOME, ".claude/projects/*/")):
+        project_slug = os.path.basename(project.rstrip("/"))
+        best = None
+        for prefix, repo in prefixes:
+            if project_slug == prefix or project_slug.startswith(prefix + "-"):
+                if best is None or len(prefix) > best[0]:
+                    best = (len(prefix), repo)
+        if best is None:
+            continue
+        for session in glob.glob(os.path.join(project, "**", "*.jsonl"), recursive=True):
+            events.append((int(os.path.getmtime(session)), best[1]))
+    return events
+
+
+def codex_events(repos):
+    events = []
+    for session in glob.glob(os.path.join(HOME, ".codex/sessions/**/*.jsonl"), recursive=True):
+        cwd = None
+        try:
+            with open(session, errors="replace") as handle:
+                for line in handle:
+                    try:
+                        record = json.loads(line)
+                    except ValueError:
+                        continue
+                    if record.get("type") == "session_meta":
+                        cwd = (record.get("payload") or {}).get("cwd")
+                        break
+        except OSError:
+            continue
+        if cwd:
+            repo = repo_of(cwd, repos)
+            if repo:
+                events.append((int(os.path.getmtime(session)), repo))
+    return events
+
+
+def workspace_events(repos):
+    events = []
+    for repo in repos:
+        repo_dir = os.path.join(HOME, "Workspaces", repo)
+        for bookmark in _dirs(repo_dir):
+            path = os.path.join(repo_dir, bookmark)
+            events.append((_newest_mtime(path, 2), repo))
+    return events
+
+
+def _newest_mtime(path, depth):
+    try:
+        newest = int(os.path.getmtime(path))
+    except OSError:
+        return 0
+    if depth > 0:
+        for name in _dirs(path):
+            newest = max(newest, _newest_mtime(os.path.join(path, name), depth - 1))
+    return newest
+
+
+def fish_events(repos):
+    events = []
+    for history in glob.glob(FISH_HISTORY):
+        command = None
+        with open(history, errors="replace") as handle:
+            for line in handle:
+                match = re.match(r"-\s+cmd:\s*(.*)", line)
+                if match:
+                    command = match.group(1).strip()
+                    continue
+                match = re.match(r"\s+when:\s*(\d+)", line)
+                if match and command:
+                    if command.startswith("cd "):
+                        target = command.split()[-1].replace("~/", HOME + "/")
+                        if not target.startswith("/"):
+                            target = os.path.join(HOME, target)
+                        repo = repo_of(target.rstrip("/"), repos)
+                        if repo:
+                            events.append((int(match.group(1)), repo))
+                    command = None
+    return events
+
+
+def rank(events, repos, now):
+    score = {repo: 0 for repo in repos}
+    last = {repo: 0 for repo in repos}
+    for epoch, repo in events:
+        last[repo] = max(last[repo], epoch)
+        if now - epoch <= WINDOW:
+            score[repo] += 1
+    order = sorted(repos, key=lambda repo: (-score[repo], -last[repo], repo))
+    return order, score, last
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--apply", action="store_true", help="write the seed to the history file")
+    parser.add_argument("--force", action="store_true", help="append even if the history file is not empty")
+    args = parser.parse_args()
+
+    repos = discover_repos()
+    if not repos:
+        sys.exit("No repos found in ~/Code.")
+
+    now = int(time.time())
+    sources = {
+        "claude": claude_events(repos),
+        "codex": codex_events(repos),
+        "workspace": workspace_events(repos),
+        "fish": fish_events(repos),
+    }
+    events = [event for group in sources.values() for event in group]
+    order, score, last = rank(events, repos, now)
+
+    print(f"repos: {len(repos)}  events: {len(events)}")
+    for name, group in sources.items():
+        print(f"  {name:10} {len(group)}")
+    print()
+    print(f"{'repo':52} {'uses/90d':>8}  last")
+    for repo in order[:20]:
+        stamp = datetime.date.fromtimestamp(last[repo]).isoformat() if last[repo] else "-"
+        print(f"{repo:52} {score[repo]:>8}  {stamp}")
+
+    if not args.apply:
+        print("\n(dry run; pass --apply to write)")
+        return
+
+    if os.path.exists(LOG) and os.path.getsize(LOG) > 0 and not args.force:
+        sys.exit(f"Refusing to touch non-empty {LOG}; pass --force to append anyway.")
+
+    os.makedirs(os.path.dirname(LOG), exist_ok=True)
+    with open(LOG, "a") as handle:
+        for epoch, repo in sorted(events):
+            handle.write(f"{epoch}\t{repo}\n")
+    print(f"\nwrote {len(events)} events to {LOG}")
+
+
+if __name__ == "__main__":
+    main()
