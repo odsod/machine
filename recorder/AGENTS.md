@@ -23,7 +23,6 @@ mise install github:odsod/recorder
 recorder/
 ├── AGENTS.md           # This file
 ├── config.json         # Shared config (symlinked to ~/.config/recorder/)
-├── recorder-toggle     # Fish script — tmux session manager
 └── recorder-note       # Bash script — kdialog note popup
 ```
 
@@ -50,7 +49,7 @@ Symlinked to `~/.config/recorder/config.json`. Single config works on all hosts 
 
 ## Scripts
 
-- **`recorder-toggle`** — creates/switches a tmux session with recorder daemon + transcript tail
+- **`herdr/recorder-toggle`** — creates/switches a Herdr workspace with recorder daemon + transcript tail
 - **`recorder-note`** — KDE popup (kdialog) that appends a note to the active transcript
 
 ## Dependencies

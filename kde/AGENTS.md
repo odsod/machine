@@ -36,3 +36,11 @@ kreadconfig6 --group "General" --key "font"
 ## KWallet
 
 Enables KWallet + PAM auto-unlock (no password prompt on login).
+
+### Initialization (Plasma 6)
+
+If the wallet does not exist, initialize it via **KWalletManager** (`kwalletmanager6`):
+
+- **Wallet Name**: `kdewallet` (required for PAM)
+- **Encryption**: Blowfish (required for PAM)
+- **Password**: Login password (required for auto-unlock)

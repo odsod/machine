@@ -2,9 +2,11 @@
 
 ## Architecture
 
-- **KWin script** (`contents/code/main.js`): Registers Meta+key shortcuts, toggles app windows by `resourceClass`/`resourceName`
-- **DBus service** (`odsod-kwin-dbus-service.py`): Receives commands from KWin script, launches apps, logs debug output
-- **Shortcut kinds**: `builtin` (KWin native), `app` (focus-or-launch), `command` (fire-and-forget), `callback` (inline JS)
+Custom KWin script and companion DBus service for window management.
+
+- **KWin script** (`contents/code/main.js`): Registers Meta+key shortcuts, toggles app windows by `resourceClass`/`resourceName`, remaps default window actions, and strips borders via `noBorder`.
+- **DBus service** (`odsod-kwin-dbus-service.py`): User-space Python service (`io.github.odsod.kwin`) auto-activated via D-Bus. Launches apps via `subprocess.Popen`, binds/unbinds global shortcuts via `KGlobalAccel`, and forwards script logs to syslog.
+- **Shortcut kinds**: `builtin` (KWin native), `app` (focus-or-launch), `command` (fire-and-forget), `callback` (inline JS).
 
 ## Development
 
