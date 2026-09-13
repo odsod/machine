@@ -190,7 +190,7 @@ root = "{{config_root}}"
 
 # KDE
 "~/.config/mimeapps.list" = "kde/mimeapps.list"
-"~/.config/fontconfig/fonts.conf" = "kde/fonts.conf"
+"~/.config/fontconfig/conf.d/10-rendering.conf" = "kde/fonts.conf"
 "~/.config/kwalletrc" = { content = "[Wallet]\nEnabled=true\nFirst Use=false\n" }
 
 # PostgreSQL

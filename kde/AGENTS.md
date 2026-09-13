@@ -4,16 +4,16 @@ KDE Plasma desktop configuration.
 
 ## Managed Config
 
-| File            | Target                            | Purpose                                                         |
-| --------------- | --------------------------------- | --------------------------------------------------------------- |
-| `mimeapps.list` | `~/.config/mimeapps.list`         | Default app associations                                        |
-| `fonts.conf`    | `~/.config/fontconfig/fonts.conf` | Font rendering (grayscale AA, no subpixel, no embedded bitmaps) |
+| File            | Target                                          | Purpose                                                         |
+| --------------- | ----------------------------------------------- | --------------------------------------------------------------- |
+| `mimeapps.list` | `~/.config/mimeapps.list`                       | Default app associations                                        |
+| `fonts.conf`    | `~/.config/fontconfig/conf.d/10-rendering.conf` | Font rendering (grayscale AA, no subpixel, no embedded bitmaps) |
 
 ## Font Configuration
 
 Two layers:
 
-- **`fonts.conf`**: fontconfig rules applied to all apps (GTK, Qt, Firefox, etc.)
+- **`fonts.conf`**: fontconfig rendering rules in `conf.d/10-rendering.conf` applied to all apps (GTK, Qt, Firefox, etc.)
 - **`mise run kde:setup-fonts`**: KDE-specific font selection via `kwriteconfig6` (writes to `~/.config/kdeglobals`)
 
 ### Design Decisions
