@@ -1,9 +1,10 @@
 local M = {}
 
--- One clipboard path for copy: nvim emits OSC 52, and both ghostty and
--- herdr deliver it to the clipboard of the attached client, locally and
--- over remote attach. Paste reads the system clipboard when this session
--- has one. Herdr does not relay OSC 52 read queries, so in a remote pane
+-- System clipboard access goes through the + and * registers only; plain
+-- yanks stay in nvim. Copy: nvim emits OSC 52, and both ghostty and herdr
+-- deliver it to the clipboard of the attached client, locally and over
+-- remote attach. Paste reads the system clipboard when this session has
+-- one. Herdr does not relay OSC 52 read queries, so in a remote pane
 -- paste-by-register cannot work; use the terminal paste (ctrl+shift+v)
 -- there.
 function M.setup()
@@ -48,7 +49,6 @@ function M.setup()
       end,
     },
   }
-  vim.opt.clipboard = "unnamedplus"
 end
 
 return M
