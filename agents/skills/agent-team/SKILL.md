@@ -31,11 +31,11 @@ Add an agent when either dimension fails here. Add none when both pass. Drop or 
 | -------- | ------------------------- | ------------------------------------------------------ | --------------------------------------- | ------------------------------------- |
 | `claude` | Opus 5                    | orchestrate, design, architecture, careful review      | bulk or multimodal grind                | `/compact`, then `/clear`             |
 | `agy`    | Gemini 3.8 Flash (Medium) | throughput, parallel subagents, multimodal, large text | unsupervised design or merge            | `/clear` only (no user compact)       |
-| `pi`     | DeepSeek V4 Flash         | fast coding; quality is OK with a reviewer             | design or review without a second agent | `/new`                                |
+| `pi`     | DeepSeek V4.1 Flash       | fast coding; quality is OK with a reviewer             | design or review without a second agent | `/new`                                |
 | `cursor` | Grok 4.6                  | write; lead when Opus is wordy or stuck in one frame   | long-horizon orchestrate                | restart the agent if the pane is junk |
-| `cursor` | Composer 2.5              | fast coding, tighter than DeepSeek V4 Flash            | architecture                            | restart the agent if the pane is junk |
+| `cursor` | Composer 2.5              | fast coding, tighter than DeepSeek V4.1 Flash          | architecture                            | restart the agent if the pane is junk |
 
-`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude → Opus 5, agy → Gemini 3.8 Flash Medium, pi → DeepSeek V4 Flash.
+`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude to Opus 5, agy to Gemini 3.8 Flash Medium, pi to DeepSeek V4.1 Flash.
 
 - Default: Opus 5 orchestrates; this pane keeps design and review; pi takes mechanical implement when it would burn that window.
 - Write (`AGENTS.md`, API docs): Grok 4.6.
@@ -65,7 +65,11 @@ Assign these. They are not agent types. One agent may hold several. An outcome m
 test "${HERDR_ENV:-}" = 1
 ```
 
-If that fails, say you are not inside Herdr and stop. Discover pane and agent IDs per `/herdr`. Write them into the brief once. Do not re-resolve.
+If that fails, say you are not inside Herdr and stop. Discover pane and agent IDs per `/herdr`. Write them into the brief once. Do not re-resolve. Name this orchestrator pane:
+
+```bash
+herdr pane rename "$HERDR_PANE_ID" orchestrator
+```
 
 ## Flow
 
@@ -100,7 +104,7 @@ Done when: <command or proof that it holds>
 ## Members
 
 - orchestrator <pane-id> claude/opus-5 orchestrate, design, review
-- impl <pane-id> pi/deepseek-v4 implement # omit until you delegate
+- impl <pane-id> pi/deepseek-v4.1-flash implement # omit until you delegate
 
 ## Units
 
@@ -120,15 +124,34 @@ A delegated unit gets at most two fix cycles. Count them from the orchestrator p
 
 Skip while this pane is doing the unit. Skip until Done when is runnable.
 
+Choose pane or tab layout:
+
+- **Same tab:** Default for 1 or 2 workers. Split a wide pane right, a tall pane down.
+- **New tab:** Use a new tab when splits make panes too narrow or short, or for multi-agent groups (such as council or test runners).
+- **Workspaces and worktrees:** Do not create a workspace or worktree unless the user explicitly asks.
+
+To split in the same tab:
+
 ```bash
 herdr pane split --current --direction right --cwd "$PWD" --no-focus
+herdr pane rename <pane-id> impl
 herdr agent start impl --kind pi --pane <pane-id>
 herdr agent prompt impl "Implement <unit>. Write /tmp/agent-team/<slug>/impl.md. Stop when done." --wait --timeout 120000
 ```
 
+To create a new tab:
+
+```bash
+herdr tab create --label "<name-or-role>" --cwd "$PWD" --no-focus
+herdr pane rename <root-pane-id> <role>
+herdr agent start <name> --kind <kind> --pane <root-pane-id>
+```
+
+Always name each pane by role with `herdr pane rename <pane-id> <role>` right after creation.
+
 For a primed sibling (review, write, council), first prompt is: load `/agent-team`, your name, path to `brief.md`. Wait.
 
-Split a wide pane right, a tall pane down. Reuse an idle sibling of the right kind. Native model args only after `--`, and only if live `herdr agent start` help lists them. Do not create a workspace, tab, or worktree unless asked.
+Reuse an idle sibling of the right kind. Native model args only after `--`, and only if live `herdr agent start` help lists them.
 
 ### 4. Run
 
@@ -150,7 +173,7 @@ Implementer may make local `jj` commits. Nobody pushes unless asked.
 
 Default is above: solo, then maybe an implement sibling.
 
-**Council.** Prime them. N parallel panes. Each writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
+**Council.** Prime them. Create a dedicated tab: `herdr tab create --label council --cwd "$PWD" --no-focus`. Split `.result.root_pane` into parallel panes for each member. Rename each pane by role or hypothesis: `herdr pane rename <pane-id> <role>`. Each member writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
 
 **Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan Flash subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
 
