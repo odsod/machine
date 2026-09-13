@@ -19,7 +19,7 @@
       }
     ]
   },
-  "model": "Gemini 3.8 Flash (High)",
+  "model": "Gemini 3.8 Flash (Medium)",
   "notifications": true,
   "showFeedbackSurvey": false,
   "verbosity": "high"
