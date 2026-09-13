@@ -418,6 +418,40 @@ or fail "nested repo at depth 5 should be ignored"
 contains -- "github.com/acme/repo" $disc_repos
 or fail "standard repo at depth 3 should be discovered"
 
+# --- Repo frequency ranking tests ---
+
+setup_case rank_by_usage
+set -l rank_home "$case_home"
+set -l rank_other "$rank_home/Code/github.com/acme/other"
+mkdir -p "$rank_other"
+jj git init --colocate "$rank_other" >/dev/null 2>&1
+set -l rank_history "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
+mkdir -p (path dirname "$rank_history")
+set -l rank_now (date +%s)
+printf '%s\t%s\n' (math "$rank_now - 60") "github.com/acme/repo" > "$rank_history"
+printf '%s\t%s\n' (math "$rank_now - 120") "github.com/acme/repo" >> "$rank_history"
+printf '%s\t%s\n' (math "$rank_now - 60") "github.com/acme/other" >> "$rank_history"
+run_launcher "$rank_home" "$case_repo" existing 0 "$rank_home/dummy"
+set -l rank_lines (string split \n (string trim (string collect < "$launcher_workspace_log")))
+test "$rank_lines[1]" = "github.com/acme/repo"
+or fail "frequent repo was not ranked first"
+contains -- "github.com/acme/other" $rank_lines
+or fail "less used repo missing from ranked list"
+
+setup_case rank_without_history
+set -l rank_home "$case_home"
+set -l rank_other "$rank_home/Code/github.com/acme/other"
+mkdir -p "$rank_other"
+jj git init --colocate "$rank_other" >/dev/null 2>&1
+run_launcher "$rank_home" "$case_repo" existing 0 "$rank_home/dummy"
+set -l rank_lines (string split \n (string trim (string collect < "$launcher_workspace_log")))
+test "$rank_lines[1]" = "github.com/acme/other"
+or fail "without history, repos should stay alphabetical"
+test -f "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
+or fail "launcher did not record the repo pick"
+grep -qF (printf 'github.com/acme/other') "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
+or fail "recorded usage missing the picked repo"
+
 # --- Non-blocking fetch test ---
 
 setup_case slow_fetch_non_blocking
