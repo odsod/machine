@@ -210,13 +210,61 @@ function discover_repos
     end
 end
 
+function _workspace_history_file
+    printf '%s\n' "$HOME/.local/state/odsod/machine/workspace-history.tsv"
+end
+
+function _record_repo_use --argument-names repo_rel
+    test -n "$repo_rel"; or return 0
+    set -l history_file (_workspace_history_file)
+    mkdir -p (path dirname "$history_file")
+    or return 0
+    printf '%s\t%s\n' (date +%s) "$repo_rel" >> "$history_file"
+end
+
+function _rank_repos
+    set -l repos $argv
+    test (count $repos) -gt 0; or return 0
+
+    set -l history_file (_workspace_history_file)
+    if not test -r "$history_file"
+        printf '%s\n' $repos
+        return 0
+    end
+
+    set -l now (date +%s)
+    set -l window (math '90 * 86400')
+
+    printf '%s\n' $repos | awk -F '\t' -v now="$now" -v window="$window" -v hist="$history_file" '
+        {
+            known[$0] = 1
+            order[++n] = $0
+        }
+        END {
+            while ((getline line < hist) > 0) {
+                split(line, field, "\t")
+                ts = field[1] + 0
+                repo = field[2]
+                if (!(repo in known)) continue
+                if (ts > last[repo]) last[repo] = ts
+                if (now - ts <= window) score[repo]++
+            }
+            for (i = 1; i <= n; i++) {
+                r = order[i]
+                printf "%d\t%d\t%s\n", score[r] + 0, last[r] + 0, r
+            }
+        }
+    ' | sort -t (printf '\t') -k1,1nr -k2,2nr -k3,3 | cut -f3
+end
+
 function _pick_repo_rel --argument-names prompt
     set -l suggestions (discover_repos)
     if test (count $suggestions) -eq 0
         echo "No repos found in ~/Code." >&2
         return 1
     end
-    set -l picked (printf '%s\n' $suggestions | _fzf_pick_full "$prompt")
+    set -l ranked (_rank_repos $suggestions)
+    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt")
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
     test -n "$picked"; or return 1
@@ -614,6 +662,7 @@ end
 if test "$space_type" = Code
     set repo_rel (_pick_repo_rel Code)
     or exit 0
+    _record_repo_use "$repo_rel"
 
     select_agent; or exit 0
 
@@ -641,6 +690,7 @@ if test "$space_type" = Workspace
     _trace "workspace: begin"
     set repo_rel (_pick_repo_rel Workspace)
     or exit 0
+    _record_repo_use "$repo_rel"
 
     set repo_path "$HOME/Code/$repo_rel"
     set repo_parts (string split '/' -- $repo_rel)
