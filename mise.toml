@@ -64,6 +64,11 @@ ruff = "latest"
 starship = "latest"
 usage = "latest"
 
+# Python dependency graphs need uv >= 0.12.10; Fedora 44 ships 0.12.9, so dnf
+# cannot satisfy it. dnf:uv stays for the post-packages hook that runs before
+# tools are installed.
+uv = "latest"
+
 # Language servers and linters
 lua-language-server = "latest"
 shellcheck = "latest"
@@ -100,7 +105,10 @@ spacectl = "latest"
 
 # Python tools (via pipx backend)
 "pipx:idasen" = "latest"
-"pipx:ty" = "latest"
+
+# ty is a Rust binary. Its PyPI wheel ships .data/scripts, which mise's pipx
+# dependency-graph install rejects, so take the GitHub release instead.
+"aqua:astral-sh/ty" = "latest"
 
 # HTTP archive tools
 "http:soap-ui" = { version = "{{vars.soap_ui_version}}", url = "https://dl.eviware.com/soapuios/{{vars.soap_ui_version}}/SoapUI-{{vars.soap_ui_version}}-linux-bin.tar.gz", strip_components = 1, bin_path = "bin", postinstall = """
