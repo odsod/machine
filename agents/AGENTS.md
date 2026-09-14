@@ -32,6 +32,7 @@ Dev tools: mise via `odsod/machine` (`~/.local/share/mise/` shims). Don't instal
 
 Prefer: `rg` not grep, `fd` not find, `uv` not pip, `oxfmt` for JS/TS/JSON/YAML/HTML/CSS/MD,
 `magick`/`identify` for images. Timing: `hyperfine`. JWTs: `jwt decode`.
+PDFs: `pdftotext` for text, `pdftoppm` + `tesseract` for OCR.
 
 Web: `defuddle parse <url> --md --frontmatter -l en` first.
 Interactive/auth: `agent-browser-odsod connect`, then `agent-browser open|read|click`.

@@ -323,6 +323,13 @@ positions:
 "dnf:mullvad-browser" = "latest"
 "dnf:rustup" = "latest"
 
+# PDF decoding and OCR
+"dnf:poppler-utils" = "latest"
+"dnf:tesseract" = "latest"
+"dnf:tesseract-langpack-eng" = "latest"
+"dnf:tesseract-langpack-fin" = "latest"
+"dnf:tesseract-langpack-swe" = "latest"
+
 
 # Flatpak
 "flatpak:com.spotify.Client" = "latest"
