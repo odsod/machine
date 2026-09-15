@@ -649,18 +649,18 @@ url = "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v2.3.
 url_api = "https://api.github.com/repos/ludviglundgren/qbittorrent-cli/releases/assets/460628306"
 
 [[tools."github:odsod/recorder"]]
-version = "2026.8.1"
+version = "2026.9.0"
 backend = "github:odsod/recorder"
 
 [tools."github:odsod/recorder"."platforms.linux-x64"]
-checksum = "sha256:3dfe464f178a8c587905a69172636b982675e4016bcb21be57ac8726ceb593d2"
-url = "https://github.com/odsod/recorder/releases/download/v2026.8.1/recorder_2026.8.1_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/503649330"
+checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9159"
+url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
 
 [tools."github:odsod/recorder"."platforms.linux-x64-musl"]
-checksum = "sha256:3dfe464f178a8c587905a69172636b982675e4016bcb21be57ac8726ceb593d2"
-url = "https://github.com/odsod/recorder/releases/download/v2026.8.1/recorder_2026.8.1_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/503649330"
+checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9159"
+url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
 
 [[tools."github:traefik/yaegi"]]
 version = "0.16.1"
