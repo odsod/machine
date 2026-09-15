@@ -30,6 +30,7 @@
   },
   "promptVars": {
     "languages": ["Swedish", "English"],
+    "glossaryFile": "~/.config/recorder/glossary.md",
     "owner": {
       "role": "software engineer",
       "summaryFor": "a personal knowledge base inbox"
@@ -42,8 +43,8 @@
     ]
   },
   "prompts": {
-    "cleanup": "~/.config/recorder/prompts/cleanup.md",
-    "summarize": "~/.config/recorder/prompts/summarize.md",
-    "combine": "~/.config/recorder/prompts/combine.md"
+    "cleanup": "",
+    "summarize": "",
+    "combine": ""
   }
 }
