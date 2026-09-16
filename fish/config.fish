@@ -92,6 +92,13 @@ function refresh_ssh_auth_sock
 end
 refresh_ssh_auth_sock
 
+# Recover if this shell loaded before the ssh-agent socket existed. herdr panes
+# can start seconds ahead of socket activation and never re-check otherwise.
+function _ssh_auth_sock_recheck --on-event fish_prompt
+    set -q SSH_AUTH_SOCK[1]; and return
+    refresh_ssh_auth_sock
+end
+
 function _ssh_auth_sock_source
     set -l stable_sock "$HOME/.ssh/auth_sock"
     set -l runtime_sock "/run/user/"(id -u)"/ssh-agent.socket"
