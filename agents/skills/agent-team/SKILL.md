@@ -65,7 +65,7 @@ Assign these. They are not agent types. One agent may hold several. An outcome m
 test "${HERDR_ENV:-}" = 1
 ```
 
-If that fails, say you are not inside Herdr and stop. Discover pane and agent IDs per `/herdr`. Write them into the brief once. Do not re-resolve. Name this orchestrator pane:
+If that fails, say you are not inside Herdr and stop. Discover pane, agent, and workspace IDs (`$HERDR_PANE_ID`, `$HERDR_WORKSPACE_ID`) per `/herdr`. Write them into the brief once. Do not re-resolve. Name this orchestrator pane:
 
 ```bash
 herdr pane rename "$HERDR_PANE_ID" orchestrator
@@ -142,12 +142,12 @@ herdr agent prompt impl "Implement <unit>. Write /tmp/agent-team/<slug>/impl.md.
 To create a new tab:
 
 ```bash
-herdr tab create --label "<name-or-role>" --cwd "$PWD" --no-focus
+herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label "<name-or-role>" --cwd "$PWD" --no-focus
 herdr pane rename <root-pane-id> <role>
 herdr agent start <name> --kind <kind> --pane <root-pane-id>
 ```
 
-Always name each pane by role with `herdr pane rename <pane-id> <role>` right after creation.
+Always pass `--workspace "$HERDR_WORKSPACE_ID"`. Without it, Herdr attaches the tab to the focused workspace instead of this pane's workspace. Always name each pane by role with `herdr pane rename <pane-id> <role>` right after creation.
 
 For a primed sibling (review, write, council), first prompt is: load `/agent-team`, your name, path to `brief.md`. Wait.
 
@@ -173,7 +173,7 @@ Implementer may make local `jj` commits. Nobody pushes unless asked.
 
 Default is above: solo, then maybe an implement sibling.
 
-**Council.** Prime them. Create a dedicated tab: `herdr tab create --label council --cwd "$PWD" --no-focus`. Split `.result.root_pane` into parallel panes for each member. Rename each pane by role or hypothesis: `herdr pane rename <pane-id> <role>`. Each member writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
+**Council.** Prime them. Create a dedicated tab: `herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label council --cwd "$PWD" --no-focus`. Split `.result.root_pane` into parallel panes for each member. Rename each pane by role or hypothesis: `herdr pane rename <pane-id> <role>`. Each member writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
 
 **Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan Flash subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
 
