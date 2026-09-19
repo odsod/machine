@@ -1,7 +1,7 @@
 {
   "defaultProvider": "opencode-go",
   "defaultModel": "deepseek-v4.1-flash",
-  "theme": "nord-dark",
+  "theme": "nord-claude",
   "quietStartup": true,
   "lastChangelogVersion": "0.85.1"
 }
