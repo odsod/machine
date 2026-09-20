@@ -86,43 +86,43 @@ url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570964509"
 provenance = "github-attestations"
 
 [[tools."aqua:jdx/mise"]]
-version = "2026.9.11"
+version = "2026.9.12"
 backend = "aqua:jdx/mise"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64"]
-checksum = "sha256:fcebd8c5bd136a34e0ab01275b5770e1bc449badcb3e9cc7df315c3df5ccbb84"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505254"
+checksum = "sha256:22e7ecd3c6c84ef36e4d0c78c4eef49a79e3fb83aa88e091e2993fd9c9a3f8a1"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716683"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64-musl"]
-checksum = "sha256:fcebd8c5bd136a34e0ab01275b5770e1bc449badcb3e9cc7df315c3df5ccbb84"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505254"
+checksum = "sha256:22e7ecd3c6c84ef36e4d0c78c4eef49a79e3fb83aa88e091e2993fd9c9a3f8a1"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716683"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64"]
-checksum = "sha512:b1c2706545f8a75dee32cc2469e34f7b5a5294ecd0c2e2b7c8b6683d98af123b6851289a5521a3a627e6f67d0204339971896cd0a1a66abd801a00fe6759a905"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505628"
+checksum = "sha512:f141d097c5c3a08551094e212905a5876d337a9e4d68a2603cf20e1560537c024f2ea71783010717424f0912739f20c730f1de01fe98d5669251f1a0187d548f"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716975"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64-musl"]
-checksum = "sha256:3359332541856cbce37d3f9837093601c89649b83cd7d0dc6406331e30c00bf9"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505628"
+checksum = "sha256:1b2051d8d3efab4d9c85ceb59849a3eb052db24ad406a3901fd6b45374c56ebe"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716975"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-arm64"]
-checksum = "sha256:34e8296f932c1d6f3b84d924bbb9f2841336d7bee1c373005d479e13664cb6c0"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505719"
+checksum = "sha256:0f1c7f3e74d8c9ae82976e6990058f2bc68821acc6b4c37a68c206c836692419"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576717088"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-x64"]
-checksum = "sha256:46a67b050d53f1ee795353f8ff5ecfd79328a1f6415f4b3ede79ecda7223f969"
-url = "https://github.com/jdx/mise/releases/download/v2026.9.11/mise-v2026.9.11-macos-x64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/571505773"
+checksum = "sha256:22be38ec60632913143bf6a96b0aacfd895fdfe4ce4e8958e942f7bdb5a9185b"
+url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-macos-x64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576717141"
 provenance = "minisign"
 
 [[tools.awscli]]
@@ -1071,43 +1071,43 @@ version = "1.24.0"
 backend = "npm:yaml-language-server"
 
 [[tools.pi]]
-version = "0.86.0"
+version = "0.86.1"
 backend = "aqua:earendil-works/pi"
 
 [tools.pi."platforms.linux-arm64"]
-checksum = "sha256:f6ce943a175b05a2f5f8dda2e0edf6538f476208e1ed3a0026b82600df08f385"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640992"
+checksum = "sha256:3957cb7ac3ec84fe905f0f077c599fd3fecfbb886a93467dfebfacc108b8c3b7"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669037"
 
 [tools.pi."platforms.linux-arm64-musl"]
-checksum = "sha256:f6ce943a175b05a2f5f8dda2e0edf6538f476208e1ed3a0026b82600df08f385"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640992"
+checksum = "sha256:3957cb7ac3ec84fe905f0f077c599fd3fecfbb886a93467dfebfacc108b8c3b7"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669037"
 
 [tools.pi."platforms.linux-x64"]
-checksum = "sha256:afc6979293b95062c63fadee18b46b83089b244d67e1cb215cdca37ef9527caa"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640994"
+checksum = "sha256:2494f5587a8774a10296d00a7e504e7ad05596ca93e057cb89372c8b1a7f46a9"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669036"
 
 [tools.pi."platforms.linux-x64-musl"]
-checksum = "sha256:afc6979293b95062c63fadee18b46b83089b244d67e1cb215cdca37ef9527caa"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640994"
+checksum = "sha256:2494f5587a8774a10296d00a7e504e7ad05596ca93e057cb89372c8b1a7f46a9"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669036"
 
 [tools.pi."platforms.macos-arm64"]
-checksum = "sha256:9a84969c5365be16e593737b898e0ded756482c189bcfcd28e41a64f7f0314b0"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640996"
+checksum = "sha256:03bd097ad4540ae4c3d9c1b5b19c517047cda0f1506bfcb992b17308460b0383"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669040"
 
 [tools.pi."platforms.macos-x64"]
-checksum = "sha256:efbb5052e8f3de68d6882b002f639449dceeb56c61aa83ab08e3ff38581ac555"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575640993"
+checksum = "sha256:74b0262948651f70c6d85a52043985e8fce2c89f1cd3a6f08f81d9cc799ec4a4"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669038"
 
 [tools.pi."platforms.windows-x64"]
-checksum = "sha256:bbb55cb641b7cf888a43a5d953faa715f12de05c703893d9f8ff5f09f495051d"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.0/pi-windows-x64.zip"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/575641012"
+checksum = "sha256:b049d35a176fa5f4353d53ca90212320c031c9912b59efe95bb7985d52ed1507"
+url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-windows-x64.zip"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669072"
 
 [[tools."pipx:idasen"]]
 version = "0.13.1"
