@@ -498,6 +498,7 @@ depends = [
   "yaak:setup",
   "llama:setup",
   "whisper:setup",
+  "swap:setup",
   "kde:setup-fonts",
   "keyboard:setup",
   "herdr:sync-machines",
@@ -577,6 +578,10 @@ run = 'exec "$REPO_DIR/tasks/setup-llama.sh"'
 [tasks."whisper:setup"]
 description = "Build and install whisper.cpp GPU speech-to-text service"
 run = 'exec "$REPO_DIR/tasks/setup-whisper.sh"'
+
+[tasks."swap:setup"]
+description = "Create and enable the disk swap tier"
+run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
 
 [tasks."fish:setup"]
 description = "Install mise-managed fish to stable path"
