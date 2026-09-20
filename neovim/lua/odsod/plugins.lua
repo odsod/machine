@@ -43,10 +43,17 @@ function M.setup()
   require("Comment").setup({})
 
   -- Treesitter
-  require("nvim-treesitter").setup({
-    ensure_installed = { "go", "python", "lua", "bash", "json", "yaml", "markdown", "proto" },
-    highlight = { enable = true },
-    indent = { enable = true },
+  local ts = require("nvim-treesitter")
+  ts.setup()
+  ts.install({
+    "bash",
+    "go",
+    "json",
+    "lua",
+    "markdown",
+    "proto",
+    "python",
+    "yaml",
   })
 end
 
