@@ -431,6 +431,21 @@ owner = "root"
 group = "root"
 mode = "0644"
 
+[bootstrap.files."/etc/tmpfiles.d/tmp.conf"]
+content = """
+# Clear tmp directories separately, to make them easier to override.
+#
+# /tmp sits on the encrypted root btrfs, not tmpfs: tasks/setup-tmp.sh masks
+# tmp.mount. Keep one week of files. systemd-tmpfiles-clean.timer enforces the
+# age 15 minutes after boot and once a day.
+q /tmp 1777 root root 7d
+q /var/tmp 1777 root root 30d
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+
 [bootstrap.files."/etc/systemd/system/odsod-keys.service"]
 source = "keys/odsod-keys.service"
 owner = "root"
@@ -499,6 +514,7 @@ depends = [
   "llama:setup",
   "whisper:setup",
   "swap:setup",
+  "tmp:setup",
   "kde:setup-fonts",
   "keyboard:setup",
   "herdr:sync-machines",
@@ -582,6 +598,10 @@ run = 'exec "$REPO_DIR/tasks/setup-whisper.sh"'
 [tasks."swap:setup"]
 description = "Create and enable the disk swap tier"
 run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
+
+[tasks."tmp:setup"]
+description = "Move /tmp off tmpfs onto the encrypted root"
+run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
 
 [tasks."fish:setup"]
 description = "Install mise-managed fish to stable path"
