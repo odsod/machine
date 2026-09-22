@@ -40,49 +40,49 @@ url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1
 url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/573795004"
 
 [[tools."aqua:astral-sh/ty"]]
-version = "0.0.82"
+version = "0.0.83"
 backend = "aqua:astral-sh/ty"
 
 [tools."aqua:astral-sh/ty"."platforms.linux-arm64"]
-checksum = "sha256:ef2f1e2815c13870e7a307bdd492b116b5e2ad66e952e300c94f18d2d5fa96c7"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570963150"
+checksum = "sha256:0de6e6c215ba28579506488500a8fe91b868445de40f27bf022a4673feb6a5e0"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023279"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.linux-arm64-musl"]
-checksum = "sha256:e28c0e9269d3742a3edce752074f65acc84a2bd26534a79a18ec646d788d1800"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570963217"
+checksum = "sha256:fc48538601ca7f9462b8d583b65bca88aba35bbe98ced5e8e72ca08794310630"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023286"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.linux-x64"]
-checksum = "sha256:e446dd69dbb49443b0b1d731c296ba8eb2aa72b98ac0376433d6ae793c2e361a"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570964542"
+checksum = "sha256:dc1baa9f6135cb34712f4c7487dc8ce05fc91eb018360426eb78bba03c2e4d2e"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023441"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.linux-x64-musl"]
-checksum = "sha256:00aecda9e36c86a30890e58bae1543c8f72c78e76e6f0e0f08fac86701dff9cc"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570964570"
+checksum = "sha256:019ba29db7d14023d956d08fe413fe1795f0369aa501edff0d706504879c72b4"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023448"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.macos-arm64"]
-checksum = "sha256:7777fd0e16196cbfe19166888c963aa05bcd319137b40b7d90fc505a253b673e"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570963122"
+checksum = "sha256:963def3419d2558e5a057329dbbbd8de54da7d73af6668c6d7f472ceffebe2c8"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023255"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.macos-x64"]
-checksum = "sha256:e4d3ea9c822a01ef8b621db384aa724b46e94641c03d5f54e6ec0e5cd18a468e"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570964496"
+checksum = "sha256:4c1f6db572119a0e461895cd241a990ef616b30258394b02161b04d6a34d0911"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023421"
 provenance = "github-attestations"
 
 [tools."aqua:astral-sh/ty"."platforms.windows-x64"]
-checksum = "sha256:dcfbd112bdfc8e2349e78420cb8cd8a96d2445db4cfd0711e72adea207e656de"
-url = "https://github.com/astral-sh/ty/releases/download/0.0.82/ty-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/570964509"
+checksum = "sha256:a6ac68c919e869b97dfd2c67cafe82e6211f7cf818ba41f48eb4223fa0bac931"
+url = "https://github.com/astral-sh/ty/releases/download/0.0.83/ty-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/580023432"
 provenance = "github-attestations"
 
 [[tools."aqua:jdx/mise"]]
@@ -102,7 +102,7 @@ url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716683"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64"]
-checksum = "sha512:f141d097c5c3a08551094e212905a5876d337a9e4d68a2603cf20e1560537c024f2ea71783010717424f0912739f20c730f1de01fe98d5669251f1a0187d548f"
+checksum = "sha256:1b2051d8d3efab4d9c85ceb59849a3eb052db24ad406a3901fd6b45374c56ebe"
 url = "https://github.com/jdx/mise/releases/download/v2026.9.12/mise-v2026.9.12-linux-x64-musl.tar.gz"
 url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576716975"
 provenance = "minisign"
@@ -126,27 +126,26 @@ url_api = "https://api.github.com/repos/jdx/mise/releases/assets/576717141"
 provenance = "minisign"
 
 [[tools.awscli]]
-version = "2.36.49"
+version = "2.36.50"
 backend = "aqua:aws/aws-cli"
 
 [tools.awscli."platforms.linux-arm64"]
-url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.49.zip"
+url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.50.zip"
 
 [tools.awscli."platforms.linux-arm64-musl"]
-url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.49.zip"
+url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.50.zip"
 
 [tools.awscli."platforms.linux-x64"]
-checksum = "blake3:07403408a6f01f41fb3a0dd265e5d446f8f2c09eedfe0537cba8cc875a5323f3"
-url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.49.zip"
+url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.50.zip"
 
 [tools.awscli."platforms.linux-x64-musl"]
-url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.49.zip"
+url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.50.zip"
 
 [tools.awscli."platforms.macos-arm64"]
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.49.pkg"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.50.pkg"
 
 [tools.awscli."platforms.macos-x64"]
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.49.pkg"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.50.pkg"
 
 [[tools.buf]]
 version = "1.73.0"
@@ -1049,13 +1048,11 @@ version = "0.19.4"
 backend = "npm:defuddle"
 
 [[tools."npm:oxfmt"]]
-version = "0.68.0"
-aube = { path = ".mise/locks/npm-oxfmt/0.68.0", digest = "sha256:77b5f0babfeae0bf16bc5f66996d6554cbb5ab2b6c30ae27db057f3b5f111355" }
+version = "0.70.0"
 backend = "npm:oxfmt"
 
 [[tools."npm:oxlint"]]
-version = "1.83.0"
-aube = { path = ".mise/locks/npm-oxlint/1.83.0", digest = "sha256:d9375724bfe54a65ea2eeb2ad17961bd4ced6559d823651f3e1e44b007e247c5" }
+version = "1.85.0"
 backend = "npm:oxlint"
 
 [[tools."npm:pnpm"]]
@@ -1071,43 +1068,43 @@ version = "1.24.0"
 backend = "npm:yaml-language-server"
 
 [[tools.pi]]
-version = "0.86.1"
+version = "0.87.0"
 backend = "aqua:earendil-works/pi"
 
 [tools.pi."platforms.linux-arm64"]
-checksum = "sha256:3957cb7ac3ec84fe905f0f077c599fd3fecfbb886a93467dfebfacc108b8c3b7"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669037"
+checksum = "sha256:1770ab1f71f6fe90ef9c6e233220d8e1420d60ffaa6b5cf137eaf8409ac75907"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609761"
 
 [tools.pi."platforms.linux-arm64-musl"]
-checksum = "sha256:3957cb7ac3ec84fe905f0f077c599fd3fecfbb886a93467dfebfacc108b8c3b7"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669037"
+checksum = "sha256:1770ab1f71f6fe90ef9c6e233220d8e1420d60ffaa6b5cf137eaf8409ac75907"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609761"
 
 [tools.pi."platforms.linux-x64"]
-checksum = "sha256:2494f5587a8774a10296d00a7e504e7ad05596ca93e057cb89372c8b1a7f46a9"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669036"
+checksum = "sha256:f55d02652175cd3f22e6db8223c93ef97a087382abb51dc9ce130fc04de8f746"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609757"
 
 [tools.pi."platforms.linux-x64-musl"]
-checksum = "sha256:2494f5587a8774a10296d00a7e504e7ad05596ca93e057cb89372c8b1a7f46a9"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669036"
+checksum = "sha256:f55d02652175cd3f22e6db8223c93ef97a087382abb51dc9ce130fc04de8f746"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609757"
 
 [tools.pi."platforms.macos-arm64"]
-checksum = "sha256:03bd097ad4540ae4c3d9c1b5b19c517047cda0f1506bfcb992b17308460b0383"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669040"
+checksum = "sha256:fd0409795d03f89ad5d57a772f3a45cc23373e0e24148cd44a08d78109f6093e"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609760"
 
 [tools.pi."platforms.macos-x64"]
-checksum = "sha256:74b0262948651f70c6d85a52043985e8fce2c89f1cd3a6f08f81d9cc799ec4a4"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669038"
+checksum = "sha256:cd5bd2df345e4f22eee59098d52046420d2c7829687adb1932f65eace7a54852"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609758"
 
 [tools.pi."platforms.windows-x64"]
-checksum = "sha256:b049d35a176fa5f4353d53ca90212320c031c9912b59efe95bb7985d52ed1507"
-url = "https://github.com/earendil-works/pi/releases/download/v0.86.1/pi-windows-x64.zip"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/576669072"
+checksum = "sha256:c127cc14bfb3dc6bee8460bb1c353e2de5ba5743520ee740e41988f530d6e477"
+url = "https://github.com/earendil-works/pi/releases/download/v0.87.0/pi-windows-x64.zip"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/579609803"
 
 [[tools."pipx:idasen"]]
 version = "0.13.1"
@@ -1394,43 +1391,50 @@ url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.5.2/stylua-w
 url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/421902292"
 
 [[tools.usage]]
-version = "6.10.0"
+version = "6.11.0"
 backend = "aqua:jdx/usage"
 
 [tools.usage."platforms.linux-arm64"]
-checksum = "sha256:c18a027d38095db27f1c036fbb37a3d12ba26f74a1a1b78ac2c6ddc8ee9f0192"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-aarch64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574828531"
+checksum = "sha256:84fae7251a458d804d1b574ce2b46f483fa5859b773c4a8c5012d9d86c68e7c4"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579392789"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.linux-arm64-musl"]
-checksum = "sha256:c8de20229ecabee507abd1c6cbb9e78324ba2884ebdd4503dcba761919d372c2"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574831267"
+checksum = "sha256:e52a21f240c58890265e9c74f75e2d329f68220159abcf51aee0ef33f37e4990"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579392962"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.linux-x64"]
-checksum = "sha256:d0b853eed5db9ede04891fa6e31caed8bc802c3794e59043217b460a02965b24"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-x86_64-unknown-linux-gnu.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574831044"
+checksum = "sha256:2ebc293d1645a80e3b7c4d87cd2cca35d34c6582733260fe1d13e537bb3d1e2e"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579392440"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.linux-x64-musl"]
-checksum = "sha256:0e30e3f03633f1e052d348900ca03b7a056b1f8d2f3af04b1361c339053af467"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574831013"
+checksum = "sha256:bbc05d7cf1e3f5d7f00bf97217e910898b6914283e5a0cd8c2224c4ce3c49f31"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579391976"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.macos-arm64"]
-checksum = "sha256:f2c89cf9446b50c0129943e76a4a25188cbf42c116c66c7d3f913f5cc7d5123c"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-universal-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574832170"
+checksum = "sha256:0277664d5a7f615ec427cfc312e175684f027bf69e43e76964f086aaf5e51d3f"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-universal-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579396830"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.macos-x64"]
-checksum = "sha256:f2c89cf9446b50c0129943e76a4a25188cbf42c116c66c7d3f913f5cc7d5123c"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-universal-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574832170"
+checksum = "sha256:0277664d5a7f615ec427cfc312e175684f027bf69e43e76964f086aaf5e51d3f"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-universal-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579396830"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.windows-x64"]
-checksum = "sha256:0016fb4ad0aa2762ec089d3710fd540aaeded08e27d0046660a2eca143f976af"
-url = "https://github.com/jdx/usage/releases/download/v6.10.0/usage-x86_64-pc-windows-msvc.zip"
-url_api = "https://api.github.com/repos/jdx/usage/releases/assets/574834988"
+checksum = "sha256:49f78fdeb1678986a89fabffc10b9e01c1dee4d3f8f001cd245af0471df9d9be"
+url = "https://github.com/jdx/usage/releases/download/v6.11.0/usage-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/579397211"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [[tools.uv]]
 version = "0.12.17"

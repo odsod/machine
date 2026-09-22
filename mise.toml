@@ -20,7 +20,7 @@ run_auto_install = true
 
 [vars]
 slack_version = "4.52.155"
-zoom_version = "7.2.0.5705"
+zoom_version = "7.2.1.5760"
 obsidian_version = "1.13.7"
 yaak_version = "2026.8.0"
 soap_ui_version = "5.10.0"
