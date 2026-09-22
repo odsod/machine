@@ -15,7 +15,7 @@
     "commit": "",
     "pr": ""
   },
-  "model": "eu.anthropic.claude-opus-5[1m]",
+  "model": "eu.anthropic.claude-opus-5-5[1m]",
   "hooks": {
     "PreToolUse": [],
     "PostToolUse": [
@@ -46,7 +46,7 @@
     "lua-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
-  "outputStyle": "Empathic",
+  "outputStyle": "Concise",
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark"
