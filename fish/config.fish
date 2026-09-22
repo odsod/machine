@@ -13,7 +13,7 @@ functions -q source_env_sh; and not set -q ODSOD_MACHINE; and source_env_sh
 # Work around https://github.com/herdrdev/herdr/issues/2448.
 # Remove this refresh and the xdg-open shim after
 # https://github.com/herdrdev/herdr/pull/2854 ships in stable Herdr.
-function desktop-env-refresh --on-event fish_prompt
+function desktop-env-refresh --on-event fish_prompt --on-event fish_preexec
     test "$HERDR_ENV" = 1; or return 0
 
     set -l runtime_dir (test -n "$XDG_RUNTIME_DIR"; and echo "$XDG_RUNTIME_DIR"; or echo "/run/user/"(id -u))
