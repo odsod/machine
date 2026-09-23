@@ -166,7 +166,6 @@ context.properties = {
 
 # Claude
 "~/.claude/settings.json" = "claude/settings.json"
-"~/.claude/output-styles/Empathic.md" = "claude/output-styles/Empathic.md"
 
 # Agents: one instruction file and one global skills dir, shared by every agent.
 # Cursor reads ~/.agents/skills itself; Claude Code needs ~/.claude/skills.
