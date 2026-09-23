@@ -44,7 +44,7 @@ tab_bar_right_separator = " · "
 rows = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"]]
 
 [ui.toast]
-delivery = "terminal"
+delivery = "off"
 delay_seconds = 1
 
 [ui.sound]
