@@ -46,8 +46,12 @@ function write_stubs --argument-names home
         '            echo "$mach_lines[1]"' \
         '        end' \
         '    case "Space> "' \
-        '        echo Workspace' \
-        '    case "Workspace> "' \
+        '        if test -n "$FZF_SPACE_CHOICE"' \
+        '            echo "$FZF_SPACE_CHOICE"' \
+        '        else' \
+        '            echo Workspace' \
+        '        end' \
+        '    case "Workspace> " "Code> "' \
         '        set -l ws_lines (cat)' \
         '        test -n "$FZF_WORKSPACE_LOG"; and printf "%s\n" $ws_lines > "$FZF_WORKSPACE_LOG"' \
         '        printf "%s\n" "$ws_lines[1]"' \
@@ -165,6 +169,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
         "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
         "FZF_AGENT_CHOICE=$FZF_AGENT_CHOICE" \
+        "FZF_SPACE_CHOICE=$FZF_SPACE_CHOICE" \
         HERDR_PANE_ID= \
         "$real_fish" --no-config "$start_script" (string split " " -- "$extra_args") >/dev/null
     set -l launcher_status $status
@@ -451,6 +456,43 @@ test -f "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
 or fail "launcher did not record the repo pick"
 grep -qF (printf 'github.com/acme/other') "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
 or fail "recorded usage missing the picked repo"
+
+setup_case rank_code_and_workspace_shared
+set -l rank_home "$case_home"
+set -l rank_other "$rank_home/Code/github.com/acme/other"
+mkdir -p "$rank_other"
+jj git init --colocate "$rank_other" >/dev/null 2>&1
+set -l rank_history "$rank_home/.local/state/odsod/machine/workspace-history.tsv"
+mkdir -p (path dirname "$rank_history")
+set -l rank_now (date +%s)
+printf '%s\t%s\n' (math "$rank_now - 60") "github.com/acme/repo" > "$rank_history"
+printf '%s\t%s\n' (math "$rank_now - 120") "github.com/acme/repo" >> "$rank_history"
+printf '%s\t%s\n' (math "$rank_now - 60") "github.com/acme/other" >> "$rank_history"
+
+set -g FZF_SPACE_CHOICE Code
+run_launcher "$rank_home" "$case_repo" existing 0 "$case_repo"
+set -l code_rank_lines (string split \n (string trim (string collect < "$launcher_workspace_log")))
+test "$code_rank_lines[1]" = "github.com/acme/repo"
+or fail "frequent repo was not ranked first in Code picker"
+string match -q '*workspace create*--label acme/repo*' (string collect < "$launcher_log")
+or fail "Code launcher did not create workspace with expected label"
+
+# Verify Code pick recorded to shared history
+grep -qF (printf 'github.com/acme/repo') "$rank_history"
+or fail "Code pick did not write to workspace-history.tsv"
+
+# Add uses for acme/other so it has more uses than acme/repo
+printf '%s\t%s\n' (math "$rank_now + 10") "github.com/acme/other" >> "$rank_history"
+printf '%s\t%s\n' (math "$rank_now + 20") "github.com/acme/other" >> "$rank_history"
+printf '%s\t%s\n' (math "$rank_now + 30") "github.com/acme/other" >> "$rank_history"
+set -g FZF_SPACE_CHOICE Workspace
+jj -R "$rank_other" bookmark set feature -r @ >/dev/null
+run_launcher "$rank_home" "$case_repo" existing 0 "$rank_home/Workspaces/github.com/acme/other/feature"
+set -l ws_rank_lines (string split \n (string trim (string collect < "$launcher_workspace_log")))
+test "$ws_rank_lines[1]" = "github.com/acme/other"
+or fail "Workspace picker did not reflect shared repo usage ranking"
+set -e FZF_SPACE_CHOICE
+
 
 # --- Non-blocking fetch test ---
 
