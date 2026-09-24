@@ -19,10 +19,10 @@ output = "prefix"
 run_auto_install = true
 
 [vars]
-slack_version = "4.52.155"
+slack_version = "4.52.162"
 zoom_version = "7.2.1.5760"
 obsidian_version = "1.13.7"
-yaak_version = "2026.8.0"
+yaak_version = "2026.8.1"
 soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
@@ -34,9 +34,9 @@ cursor_hash = "c4730f7d93d787d9ab120af715999f0345ee5bc5"
 "aqua:jdx/mise" = "latest"
 
 # Languages: major prefixes, not latest (avoids silent 24→26 / 3.12→3.14)
-go = "1.26"
-node = "24"
-python = "3.12"
+go = "1.27"
+node = "26"
+python = "3.14"
 
 # Go tools
 "go:golang.org/x/tools/gopls" = "latest"
@@ -477,6 +477,10 @@ run = "mise run fish:setup"
 description = "Compare every pinned version with the latest upstream release"
 env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
+
+[tasks.bump]
+description = "Automatically bump pinned versions from upstream discovery"
+run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
 
 [tasks.update-skills]
 description = "Update the vendored global agent skills to their latest upstream release"

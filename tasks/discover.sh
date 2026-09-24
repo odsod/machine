@@ -62,7 +62,7 @@ redirect_location() {
 cursor_location="$(redirect_location https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest)"
 
 nested_discover() {
-  MISE_TASK_OUTPUT=quiet mise run -C "$REPO_DIR/$1" discover 2>/dev/null
+  mise run -C "$REPO_DIR/$1" --output interleave --quiet discover 2>/dev/null
 }
 
 pinned_var() {
