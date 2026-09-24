@@ -28,11 +28,16 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
-Start with `mise run discover`. Before probing anything it refuses to run while
-any PR is open on the remote: the bump work may already be half-done in that PR,
-from this machine or another. When it aborts, list the PRs with `gh pr list`, then
-merge or close them. Pull the result before rerunning:
-`jj git fetch --remote origin && jj rebase -o main@origin`.
+Run `mise run bump` to automatically discover, pre-flight verify, update pins,
+and run convergence for all desktop apps and endpoint-verification. Use
+`mise run bump --all` to include GPU services that compile from source, or
+`mise run bump <name>` for a single target. Pass `--dry-run` to preview updates.
+
+To inspect versions manually, start with `mise run discover`. Before probing
+anything it refuses to run while any PR is open on the remote: the bump work may
+already be half-done in that PR, from this machine or another. When it aborts,
+list the PRs with `gh pr list`, then merge or close them. Pull the result before
+rerunning: `jj git fetch --remote origin && jj rebase -o main@origin`.
 
 The task then prints one row per pinned thing with the
 pinned version, the latest upstream release, and `ok` / `BUMP` / `?`, then runs
