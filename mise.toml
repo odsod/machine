@@ -61,7 +61,6 @@ ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 """ }
 pi = "latest"
 ruff = "latest"
-starship = "latest"
 usage = "latest"
 
 # Python dependency graphs need uv >= 0.12.10; Fedora 44 ships 0.12.9, so dnf
@@ -86,7 +85,6 @@ stylua = "latest"
 "npm:yaml-language-server" = "latest"
 
 # Tools via GitHub releases
-"github:dmmulroy/jj-starship" = "latest"
 "github:Feel-ix-343/markdown-oxide" = "latest"
 "github:fish-shell/fish-shell" = { version = "latest", exe = "fish" }
 "github:googleworkspace/cli" = { version = "latest", exe = "gws" }
@@ -129,6 +127,7 @@ root = "{{config_root}}"
 # Fish
 "~/.config/fish/config.fish" = "fish/config.fish"
 "~/.config/fish/conf.d/00-env.fish" = "fish/env.fish"
+"~/.config/fish/conf.d/prompt.fish" = "fish/prompt.fish"
 "~/.config/fish/completions/aws.fish" = "fish/aws.fish"
 
 # Ghostty
@@ -148,9 +147,6 @@ context.properties = {
 
 # Neovim
 "~/.config/nvim" = "neovim"
-
-# Starship
-"~/.config/starship.toml" = "starship/starship.toml"
 
 # Btop
 "~/.config/btop/btop.conf" = "btop/btop.conf"
