@@ -19,7 +19,7 @@ output = "prefix"
 run_auto_install = true
 
 [vars]
-slack_version = "4.52.162"
+slack_version = "4.52.171"
 zoom_version = "7.2.1.5760"
 obsidian_version = "1.13.7"
 yaak_version = "2026.8.1"
@@ -27,8 +27,8 @@ soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.22.7"
-cursor_hash = "37076c6c3f9e253c0fa2305197e45befd13a2268"
+cursor_version = "3.22.12"
+cursor_hash = "3a92974361033b2051526321308c2740fe5912c5"
 
 [tools]
 "aqua:jdx/mise" = "latest"
@@ -302,6 +302,24 @@ positions:
 "dnf:python3-pip" = "latest"
 "dnf:python3-virtualenv" = "latest"
 "dnf:python3.12" = "latest"
+
+# CPython source-build dependencies. mise compiles under python-build when no
+# precompiled standalone build exists yet (python-build-standalone lags point
+# releases). These headers keep every optional module (ssl, zlib, ctypes,
+# sqlite3, lzma, bz2, dbm, readline, uuid, zstd, tkinter) in a source build.
+# `patch` is absent from Fedora's default set and stops the build at once.
+"dnf:bzip2-devel" = "latest"
+"dnf:gdbm-devel" = "latest"
+"dnf:libffi-devel" = "latest"
+"dnf:libuuid-devel" = "latest"
+"dnf:libzstd-devel" = "latest"
+"dnf:openssl-devel" = "latest"
+"dnf:patch" = "latest"
+"dnf:readline-devel" = "latest"
+"dnf:sqlite-devel" = "latest"
+"dnf:tk-devel" = "latest"
+"dnf:xz-devel" = "latest"
+"dnf:zlib-devel" = "latest"
 "dnf:qbittorrent" = "latest"
 "dnf:ripgrep" = "latest"
 "dnf:scrcpy" = "latest"
