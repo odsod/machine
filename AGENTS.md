@@ -87,6 +87,8 @@ Editing `[vars]` changes nothing on disk. Run these in order.
    - Run the resolve task (`mise run codex:resolve` or
      `mise run antigravity:resolve`).
    - Re-run `mise run apply` until it succeeds.
+   `mise run apply --force` resolves both configs and then converges in one
+   step. Use it only when the drift holds nothing worth keeping.
 2. Restart any GPU service whose version moved:
    `systemctl --user restart llama-server whisper-server`.
 3. `mise run clean` last, never first. It deletes the source tree the running
