@@ -513,11 +513,7 @@ run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
 description = "Apply config changes pulled from another tree: full convergence"
-run = """
-cd "$REPO_DIR"
-mise bootstrap --yes
-mise reshim
-"""
+run = 'exec "$REPO_DIR/tasks/apply.sh" "$@"'
 
 [tasks.bootstrap]
 description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
