@@ -497,7 +497,7 @@ env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_vers
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
-description = "Automatically bump pinned versions from upstream discovery"
+description = "Upgrade mise tools and bump every self-managed pin, then apply"
 run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
 
 [tasks.update-skills]
