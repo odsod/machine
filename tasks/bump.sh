@@ -25,33 +25,23 @@ if [ -n "$open_prs" ]; then
   exit 1
 fi
 
-all=0
 dry_run=0
-no_apply=0
 targets=()
 
 while [ $# -gt 0 ]; do
   case "$1" in
-  --all)
-    all=1
-    shift
-    ;;
   -n | --dry-run)
     dry_run=1
-    shift
-    ;;
-  --no-apply)
-    no_apply=1
     shift
     ;;
   -h | --help)
     echo "Usage: mise run bump [OPTIONS] [TARGETS...]"
     echo
+    echo "Upgrades [tools], bumps every self-managed pin, then runs apply."
+    echo
     echo "Options:"
-    echo "  --all        Include GPU services (llama, whisper) that compile from source"
-    echo "  -n, --dry-run Show what would be bumped without modifying files"
-    echo "  --no-apply   Update files without running mise run apply"
-    echo "  -h, --help   Show this help message"
+    echo "  -n, --dry-run  Preview bumps without changing files"
+    echo "  -h, --help     Show this help message"
     echo
     echo "Targets: yaak, obsidian, slack, zoom, cursor, soap-ui, endpoint-verification, llama, whisper"
     exit 0
@@ -67,11 +57,33 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ ${#targets[@]} -eq 0 ]; then
-  if [ "$all" -eq 1 ]; then
-    targets=(yaak obsidian slack zoom cursor soap-ui endpoint-verification llama whisper)
+# No targets means a full bump: every pin, including the GPU services, and the
+# mise-managed [tools]. An explicit target bumps only that pin.
+tools=1
+if [ ${#targets[@]} -gt 0 ]; then
+  tools=0
+else
+  targets=(yaak obsidian slack zoom cursor soap-ui endpoint-verification llama whisper)
+fi
+
+# 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
+# the point of a full bump. GITHUB_TOKEN keeps `mise lock` from dropping
+# platforms under GitHub rate limits.
+tools_changed=0
+if [ "$tools" -eq 1 ]; then
+  export GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}"
+  if [ "$dry_run" -eq 1 ]; then
+    echo "[bump] Tools that would be upgraded:"
+    mise upgrade --bump --dry-run -x http:obsidian -x http:soap-ui
   else
-    targets=(yaak obsidian slack zoom cursor soap-ui endpoint-verification)
+    before="$(git -C "$REPO_DIR" hash-object mise.lock mise.toml)"
+    echo "[bump] Upgrading mise tools..."
+    # http:obsidian and http:soap-ui pin a concrete version from [vars] and have
+    # no version_list_url, so mise cannot list their releases. Skip their upgrade
+    # check: the pins loop below owns both.
+    (cd "$REPO_DIR" && mise upgrade --bump -x http:obsidian -x http:soap-ui)
+    after="$(git -C "$REPO_DIR" hash-object mise.lock mise.toml)"
+    [ "$before" = "$after" ] || tools_changed=1
   fi
 fi
 
@@ -90,14 +102,14 @@ check_url() {
 }
 
 changed_count=0
-gpu_changed=0
+gpu_services=()
 
 bump_target() {
   local name="$1"
   local pinned=""
   local latest=""
   local check_target_url=""
-  local is_gpu=0
+  local gpu_service=""
 
   case "$name" in
   yaak)
@@ -158,13 +170,13 @@ bump_target() {
     pinned="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/llama/mise.toml")"
     latest="$(mise run -C "$REPO_DIR/llama" --output interleave --quiet discover | tail -1)"
     check_target_url="https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${latest}.tar.gz"
-    is_gpu=1
+    gpu_service="llama-server"
     ;;
   whisper)
     pinned="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/whisper/mise.toml")"
     latest="$(mise run -C "$REPO_DIR/whisper" --output interleave --quiet discover | tail -1)"
     check_target_url="https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${latest}.tar.gz"
-    is_gpu=1
+    gpu_service="whisper-server"
     ;;
   *)
     echo "Unknown target: $name" >&2
@@ -229,8 +241,8 @@ bump_target() {
   esac
 
   changed_count=$((changed_count + 1))
-  if [ "$is_gpu" -eq 1 ]; then
-    gpu_changed=1
+  if [ -n "$gpu_service" ]; then
+    gpu_services+=("$gpu_service")
   fi
 }
 
@@ -238,27 +250,22 @@ for target in "${targets[@]}"; do
   bump_target "$target"
 done
 
-if [ "$changed_count" -eq 0 ]; then
-  echo "[bump] All targets up to date."
-  exit 0
-fi
-
 if [ "$dry_run" -eq 1 ]; then
   echo "[bump] Dry run complete. $changed_count targets would be bumped."
   exit 0
 fi
 
-if [ "$no_apply" -eq 1 ]; then
-  echo "[bump] Updated pins for $changed_count targets. Skipped apply."
+if [ "$changed_count" -eq 0 ] && [ "$tools_changed" -eq 0 ]; then
+  echo "[bump] Everything up to date."
   exit 0
 fi
 
 echo "[bump] Applying updates..."
 mise run apply
 
-if [ "$gpu_changed" -eq 1 ]; then
-  echo "[bump] Restarting GPU user services..."
-  systemctl --user restart llama-server whisper-server 2>/dev/null || true
+if [ ${#gpu_services[@]} -gt 0 ]; then
+  echo "[bump] Restarting GPU user services: ${gpu_services[*]}"
+  systemctl --user restart "${gpu_services[@]}" 2>/dev/null || true
 fi
 
 echo "[bump] Cleaning old source trees and data..."

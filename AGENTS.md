@@ -28,10 +28,11 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 ## Workflow: Version Bumping
 
-Run `mise run bump` to automatically discover, pre-flight verify, update pins,
-and run convergence for all desktop apps and endpoint-verification. Use
-`mise run bump --all` to include GPU services that compile from source, or
-`mise run bump <name>` for a single target. Pass `--dry-run` to preview updates.
+Run `mise run bump` to upgrade `[tools]` with `mise upgrade --bump`, then
+discover, pre-flight verify, update every self-managed pin, and run
+convergence. That covers desktop apps, endpoint-verification, and the GPU
+services that compile from source. Pass `mise run bump <name>` to bump a single
+pin, or `--dry-run` to preview.
 
 To inspect versions manually, start with `mise run discover`. Before probing
 anything it refuses to run while any PR is open on the remote: the bump work may
@@ -52,12 +53,12 @@ before trusting the row.
   (see `cursor/AGENTS.md`). Fonts use `brew-cask:font-*` under
   `[bootstrap.packages]` and update via package bootstrap.
 - **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:
-  `node = "24"`, `python = "3.12"`, `go = "1.26"`). Exact versions live in
-  `mise.lock`. `mise upgrade` installs newer matches and rewrites the lockfile.
-  Do not use `mise upgrade --bump` (that would change `node = "24"` to `"26"`).
-  `mise lock --global` needs `GITHUB_TOKEN` (e.g. `gh auth token`) or GitHub
-  rate-limits leave platforms missing. Commit `mise.lock`. After installs,
-  `mise reshim`.
+  `node = "26"`, `python = "3.14"`, `go = "1.27"`). Exact versions live in
+  `mise.lock`. `mise run bump` runs `mise upgrade --bump`, so a full bump moves
+  those major prefixes and rewrites the lockfile. For a range-only upgrade by
+  hand, use `mise upgrade`. Both need `GITHUB_TOKEN` (e.g. `gh auth token`) or
+  GitHub rate-limits leave platforms missing. Commit `mise.lock`. After
+  installs, `mise reshim`.
 - **GPU services** (llama, whisper): update `version` in `[vars]` in the topic
   `mise.toml`. The setup scripts read it from there (single source). Both pin
   the newest non-prerelease semver tag, not a `bNNNN` nightly, and the setup

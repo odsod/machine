@@ -110,4 +110,10 @@ echo "llama, whisper, and endpoint-verification pin in their own mise.toml."
 echo "Paste-ready endpoint-verification pins: mise run -C endpoint-verification discover"
 echo
 echo "--- mise tools ---"
-mise outdated
+# http:obsidian and http:soap-ui pin a concrete version from [vars] and have no
+# version_list_url, so mise cannot list their releases and warns. The pins table
+# above already tracks both, so drop the benign lines.
+tools_out="$(mise outdated 2>&1)"
+tools_rc=$?
+printf '%s\n' "$tools_out" | grep -v 'Error getting latest version for http:' || true
+exit "$tools_rc"
