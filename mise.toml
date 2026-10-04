@@ -93,7 +93,9 @@ stylua = "latest"
 
 # Tools via GitHub releases
 "github:Feel-ix-343/markdown-oxide" = "latest"
-"github:fish-shell/fish-shell" = { version = "latest", exe = "fish" }
+"github:fish-shell/fish-shell" = { version = "latest", exe = "fish", postinstall = { when = "always", run = """
+sudo install -m 0755 "$(mise where github:fish-shell/fish-shell)/fish" /usr/local/bin/fish
+""" } }
 "github:googleworkspace/cli" = { version = "latest", exe = "gws" }
 "github:ludviglundgren/qbittorrent-cli" = { version = "latest", exe = "qbt" }
 "github:odsod/recorder" = "latest"
@@ -495,9 +497,6 @@ on_change = "restart"
 [bootstrap.user]
 login_shell = "/usr/local/bin/fish"
 
-[bootstrap.hooks.post-tools]
-run = "mise run fish:setup"
-
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
 env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}" }
@@ -622,13 +621,6 @@ run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
 [tasks."tmp:setup"]
 description = "Move /tmp off tmpfs onto the encrypted root"
 run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
-
-[tasks."fish:setup"]
-description = "Install mise-managed fish to stable path"
-run = """
-fish_path="$(mise where github:fish-shell/fish-shell)/fish"
-sudo install -m 0755 "$fish_path" /usr/local/bin/fish
-"""
 
 [tasks."kde:setup-fonts"]
 description = "Configure KDE system fonts"
