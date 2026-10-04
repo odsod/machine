@@ -1,6 +1,13 @@
 [settings]
 auto_update = true
-idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
+idiomatic_version_file_enable_tools = [
+  "go",
+  "java",
+  "node",
+  "python",
+  "ruby",
+  "terraform",
+]
 lockfile = true
 minimum_release_age = "0s"
 pin = false
