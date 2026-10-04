@@ -3,6 +3,8 @@
   "defaultModel": "deepseek-v4.1-flash",
   "theme": "nord-claude",
   "quietStartup": true,
-  "defaultTools": ["+codemode"],
-  "lastChangelogVersion": "1.0.0"
+  "defaultTools": [
+    "+codemode"
+  ],
+  "lastChangelogVersion": "1.0.2"
 }
