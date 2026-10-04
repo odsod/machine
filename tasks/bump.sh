@@ -260,6 +260,11 @@ if [ "$changed_count" -eq 0 ] && [ "$tools_changed" -eq 0 ]; then
   exit 0
 fi
 
+echo "[bump] Formatting configs..."
+while IFS= read -r config; do
+  (cd "$REPO_DIR/$(dirname "$config")" && mise fmt)
+done < <(git -C "$REPO_DIR" ls-files '*mise.toml')
+
 echo "[bump] Applying updates..."
 mise run apply
 
