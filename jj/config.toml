@@ -47,7 +47,10 @@ key = "~/.ssh/id_rsa.pub"
 sign-on-push = true
 
 [ui]
-editor = ["nvim"]
+# jj-editor-guard refuses to open an editor outside an interactive terminal,
+# so an agent that forgets -m gets an error instead of a hang. Interactive
+# sessions still launch $VISUAL/$EDITOR. Override with `JJ_EDITOR=nvim jj ...`.
+editor = ["jj-editor-guard"]
 default-command = ["log"]
 show-diff-on-description-edit = true
 pager = "delta"

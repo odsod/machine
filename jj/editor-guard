@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# jj editor guard, wired through `ui.editor`.
+#
+# jj runs this when a command needs a message but got no -m/--message. In a
+# non-interactive session, for example an AI agent, the editor would open and
+# wait forever for input that no one can type. Refuse instead, and name the
+# flags that supply the text.
+#
+# Interactive sessions still get $VISUAL/$EDITOR. Override explicitly with:
+#   JJ_EDITOR=nvim jj <command> ...
+
+set -u
+
+is_agent=""
+
+# Agents set a marker variable in the environment of their tool commands.
+for var in AI_AGENT CLAUDECODE CLAUDE_CODE_ENTRYPOINT PI_CODING_AGENT \
+  CURSOR_AGENT GEMINI_CLI CODEX_SANDBOX; do
+  if [ -n "${!var-}" ]; then
+    is_agent=1
+    break
+  fi
+done
+
+# Fall back to the process tree. An agent stays an ancestor even when it hands
+# a pty to the command, so this catches what a tty check misses.
+if [ -z "$is_agent" ]; then
+  pid=$PPID
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    [ -z "$pid" ] || [ "$pid" -le 1 ] && break
+    comm=$(cat "/proc/$pid/comm" 2>/dev/null) || break
+    case $comm in
+    pi | claude | codex | agy | antigravity | cursor-agent | gemini)
+      is_agent=1
+      break
+      ;;
+    herdr | systemd)
+      break
+      ;;
+    esac
+    pid=$(awk '/^PPid:/ {print $2}' "/proc/$pid/status" 2>/dev/null)
+  done
+fi
+
+if [ -n "$is_agent" ] || [ ! -t 0 ] || [ ! -t 1 ]; then
+  cat >&2 <<'EOF'
+jj tried to open an editor, but this session has no interactive terminal.
+If you meant to supply text, use the command's flag, for example:
+  jj squash -m "subject"
+  jj describe -m "subject"
+  jj commit -m "subject"
+  jj split -m "subject"
+To edit interactively anyway, run: JJ_EDITOR=nvim jj <command>
+EOF
+  exit 1
+fi
+
+exec "${VISUAL:-${EDITOR:-nvim}}" "$@"
