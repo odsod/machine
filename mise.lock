@@ -3,44 +3,44 @@
 lockfile_version = 3
 
 [[tools.antigravity-cli]]
-version = "1.2.16"
+version = "1.2.17"
 backend = "aqua:google-antigravity/antigravity-cli"
 specifiers = ["latest"]
 
 [tools.antigravity-cli."platforms.linux-arm64"]
-checksum = "sha256:a6d269d2764e5636ab2bcda73b78c587fe9d00ead767aa3974574229585ee0d3"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088308"
+checksum = "sha256:4a1af1bb91352b72f40fce373a028023bf0e47f5fceb3dfa48249816c0f0caec"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706242"
 
 [tools.antigravity-cli."platforms.linux-arm64-musl"]
-checksum = "sha256:a6d269d2764e5636ab2bcda73b78c587fe9d00ead767aa3974574229585ee0d3"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088308"
+checksum = "sha256:4a1af1bb91352b72f40fce373a028023bf0e47f5fceb3dfa48249816c0f0caec"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706242"
 
 [tools.antigravity-cli."platforms.linux-x64"]
-checksum = "sha256:d4247430e04cebdbe1ca93d9ccb483cd2f3daeb4cdb0ace5a71cd130e0bdab84"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_linux_x64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088306"
+checksum = "sha256:b0ed8a7c375b5af3af973f08a601e41aebb38bac7e80b922ab54d973a4275493"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706248"
 
 [tools.antigravity-cli."platforms.linux-x64-musl"]
-checksum = "sha256:d4247430e04cebdbe1ca93d9ccb483cd2f3daeb4cdb0ace5a71cd130e0bdab84"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_linux_x64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088306"
+checksum = "sha256:b0ed8a7c375b5af3af973f08a601e41aebb38bac7e80b922ab54d973a4275493"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_linux_x64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706248"
 
 [tools.antigravity-cli."platforms.macos-arm64"]
-checksum = "sha256:97b03ea3e90916e0c8a49edea615406f8ec69047dde17228a478c1854445d32a"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_mac_arm64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088396"
+checksum = "sha256:700b4c1f3544d547784baa0e4c727019ca7f34944d5269cd636e897a4d6320c6"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_mac_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706390"
 
 [tools.antigravity-cli."platforms.macos-x64"]
-checksum = "sha256:c1960f7ae5b4d741af21c17b39cbb280d7bd5973e3deca9aed41ad7cc16c5fa3"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_mac_x64.tar.gz"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088309"
+checksum = "sha256:fa91b60d8b8b074e78ed3c845ab7c5428be4b231290ca9a352a6ecc3756c5a0a"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_mac_x64.tar.gz"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706235"
 
 [tools.antigravity-cli."platforms.windows-x64"]
-checksum = "sha256:07882fb316a19a9cad68265fe9bb1c926f0b5084267d3dc198c0960189f77936"
-url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.16/agy_cli_windows_x64.zip"
-url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/607088403"
+checksum = "sha256:c31af7472fa87a8e6a95158eabc2b18cab236ef4e4cc53b9c7bbaae6e1747c16"
+url = "https://github.com/google-antigravity/antigravity-cli/releases/download/1.2.17/agy_cli_windows_x64.zip"
+url_api = "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/assets/611706397"
 
 [[tools."aqua:astral-sh/ty"]]
 version = "0.0.84"
@@ -90,44 +90,44 @@ url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/585999524"
 provenance = "github-attestations"
 
 [[tools."aqua:jdx/mise"]]
-version = "2026.10.1"
+version = "2026.10.3"
 backend = "aqua:jdx/mise"
 specifiers = ["latest"]
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64"]
-checksum = "sha256:1a68e659d939e67710546a09cf6d683b19d814ac261e5318a9ce91ab461bf06e"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914412"
+checksum = "sha256:0af3379b7a8060b047416576a746078daee3c9d2bf57fa8f6ba07d3cdf5f47aa"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612239985"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64-musl"]
-checksum = "sha256:1a68e659d939e67710546a09cf6d683b19d814ac261e5318a9ce91ab461bf06e"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914412"
+checksum = "sha256:0af3379b7a8060b047416576a746078daee3c9d2bf57fa8f6ba07d3cdf5f47aa"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612239985"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64"]
-checksum = "sha256:4b3980806c7b38623b927749eca2b5b6bf0f9d9613dac5c21648057cc872b613"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914636"
+checksum = "sha512:9c1db71f65c6e9ee454776df08588e5a34aad7c2b96087bd28996f3192b3b65337dbdb216706cbe2ede5c926101b15afc3cfe3ff9bb0bcf54b4fe303d94a453c"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612240541"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64-musl"]
-checksum = "sha256:4b3980806c7b38623b927749eca2b5b6bf0f9d9613dac5c21648057cc872b613"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914636"
+checksum = "sha256:23c45c76567f8f1e4cfc40efff3f19e3352d3745e6c25e74891102765d1cdc3c"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612240541"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-arm64"]
-checksum = "sha256:19b0ace2ffe420555d277c223f6eef252df3909f018c4faf1adf4a179b67c35a"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914746"
+checksum = "sha256:28ecc8640b0a28dab52817766f37fecfd898f1dff82e03f36fcb072e971f9246"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612240825"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-x64"]
-checksum = "sha256:70f0186533583e3e6bfc44b30b4497da10d5a5cfe487f23a642c21fb1e8d043c"
-url = "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-macos-x64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/607914787"
+checksum = "sha256:791b92b446729c53e6501acd2b84ea207f541659ca9d0480c9c70c291919a321"
+url = "https://github.com/jdx/mise/releases/download/v2026.10.3/mise-v2026.10.3-macos-x64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/612241007"
 provenance = "minisign"
 
 [[tools.awscli]]
@@ -1059,14 +1059,14 @@ backend = "npm:defuddle"
 specifiers = ["latest"]
 
 [[tools."npm:oxfmt"]]
-version = "0.71.0"
-aube = { path = ".mise/locks/npm-oxfmt/0.71.0", digest = "sha256:2b7bfb8c20b448ab9b5549e2e0a43049a897d50d995103408bbba2b0add2bcf0" }
+version = "0.72.0"
+aube = { path = ".mise/locks/npm-oxfmt/0.72.0", digest = "sha256:8cff19be82a82e83efe243f08fd8bf1a2a2f635f10384d070d7956209ddd9b44" }
 backend = "npm:oxfmt"
 specifiers = ["latest"]
 
 [[tools."npm:oxlint"]]
-version = "1.86.0"
-aube = { path = ".mise/locks/npm-oxlint/1.86.0", digest = "sha256:c8a39b595a1f17b68da832ab0c7f8556a4f7d46d4089b69fffe8b08559625f1e" }
+version = "1.87.0"
+aube = { path = ".mise/locks/npm-oxlint/1.87.0", digest = "sha256:fa3fe0a7d1858a740522115c9608e956f0759c35d487a1eb3822b98033a19d38" }
 backend = "npm:oxlint"
 specifiers = ["latest"]
 
@@ -1089,44 +1089,44 @@ backend = "npm:yaml-language-server"
 specifiers = ["latest"]
 
 [[tools.pi]]
-version = "1.0.2"
+version = "1.0.3"
 backend = "aqua:earendil-works/pi"
 specifiers = ["latest"]
 
 [tools.pi."platforms.linux-arm64"]
-checksum = "sha256:3321ccdc3ff38d6c52274bdab28246e06434618d1988a54e99cce45e535a013c"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828192"
+checksum = "sha256:d3093a79ac9e22ef430e2a73e002a3ddeb451de07b722b3aa53aa6a94eaa9edc"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958593"
 
 [tools.pi."platforms.linux-arm64-musl"]
-checksum = "sha256:3321ccdc3ff38d6c52274bdab28246e06434618d1988a54e99cce45e535a013c"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828192"
+checksum = "sha256:d3093a79ac9e22ef430e2a73e002a3ddeb451de07b722b3aa53aa6a94eaa9edc"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958593"
 
 [tools.pi."platforms.linux-x64"]
-checksum = "sha256:0d7687a6a9fcbaa88ff664cb6b28683ce9ee3e028931b55eb48a70ae9a285d18"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828196"
+checksum = "sha256:9b8c7ff523bd90881d1c1505168f0b9deb2c0357396b92b62f799550a48ff1ed"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958595"
 
 [tools.pi."platforms.linux-x64-musl"]
-checksum = "sha256:0d7687a6a9fcbaa88ff664cb6b28683ce9ee3e028931b55eb48a70ae9a285d18"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828196"
+checksum = "sha256:9b8c7ff523bd90881d1c1505168f0b9deb2c0357396b92b62f799550a48ff1ed"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958595"
 
 [tools.pi."platforms.macos-arm64"]
-checksum = "sha256:c2f035ea4adba87916f005c99515e3c91674b11d16ba75d95d0881e4781aa3bb"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828195"
+checksum = "sha256:7b1aa89ba13542f1aca61ebd63486d0417b5d2fefd5c41ededd8d083ab719b23"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958594"
 
 [tools.pi."platforms.macos-x64"]
-checksum = "sha256:d54be8df33ab6a2f3457bd7de37edc947050ac4a7f043456d37e03afd15684de"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828194"
+checksum = "sha256:769e0c1d599dbc8e63ac355957bec8e9832bff91f190d67432392e62ac552194"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958596"
 
 [tools.pi."platforms.windows-x64"]
-checksum = "sha256:37a2ee3c5222a73efc78b49f571748f11a74f4dbe160da3030a404da71f464e7"
-url = "https://github.com/earendil-works/pi/releases/download/v1.0.2/pi-windows-x64.zip"
-url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/608828204"
+checksum = "sha256:6cddc3d11210539faa7ba0188504813f2f3ae6d8f93a161d4145cc61a8bdd5de"
+url = "https://github.com/earendil-works/pi/releases/download/v1.0.3/pi-windows-x64.zip"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/611958636"
 
 [[tools."pipx:idasen"]]
 version = "0.13.1"
