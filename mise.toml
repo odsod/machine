@@ -26,16 +26,16 @@ output = "prefix"
 run_auto_install = true
 
 [vars]
-slack_version = "4.52.171"
+slack_version = "4.52.178"
 zoom_version = "7.2.1.5760"
-obsidian_version = "1.13.7"
+obsidian_version = "1.14.4"
 yaak_version = "2026.8.1"
 soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.23.12"
-cursor_hash = "2d29876d567da1607532b23bbf2cd5ddbca496fe"
+cursor_version = "3.23.23"
+cursor_hash = "2dac2428994fe34f12658d9ecad1541b98db2c04"
 
 [tools]
 "aqua:jdx/mise" = "latest"
