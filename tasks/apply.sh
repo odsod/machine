@@ -14,7 +14,7 @@ while [ $# -gt 0 ]; do
   -h | --help)
     echo "Usage: mise run apply [OPTIONS]"
     echo
-    echo "Apply config changes pulled from another tree: full convergence."
+    echo "Apply every current version and config in the repo: full convergence."
     echo
     echo "Options:"
     echo "  -f, --force  Overwrite the live codex and antigravity configs with"
@@ -44,3 +44,6 @@ fi
 
 mise bootstrap --yes
 mise reshim
+
+echo "[apply] Cleaning old source trees and data..."
+mise run clean

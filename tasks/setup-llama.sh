@@ -62,4 +62,13 @@ rm -f "$HOME/.config/systemd/user/llama-embed.service"
 systemctl --user daemon-reload
 systemctl --user enable --now llama-server.service
 
+# `enable --now` does not restart a running service, so a rebuilt binary would
+# sit unused. Restart only when the installed version actually moved.
+STAMP="$DATA_DIR/llama/.installed-version"
+if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ]; then
+  systemctl --user restart llama-server.service
+  mkdir -p "$DATA_DIR/llama"
+  printf '%s\n' "$VERSION" > "$STAMP"
+fi
+
 echo "[llama] Done"

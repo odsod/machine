@@ -504,7 +504,7 @@ env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_vers
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
-description = "Upgrade mise tools and bump every self-managed pin, then apply"
+description = "Upgrade mise tools and bump every self-managed pin"
 run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
 
 [tasks.update-skills]
@@ -519,7 +519,7 @@ description = "Remove installed payloads and source trees other than the pinned 
 run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
-description = "Apply config changes pulled from another tree: full convergence"
+description = "Apply every current version and config: full convergence"
 run = 'exec "$REPO_DIR/tasks/apply.sh" "$@"'
 
 [tasks.bootstrap]
