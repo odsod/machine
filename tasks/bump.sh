@@ -37,7 +37,8 @@ while [ $# -gt 0 ]; do
   -h | --help)
     echo "Usage: mise run bump [OPTIONS] [TARGETS...]"
     echo
-    echo "Upgrades [tools], bumps every self-managed pin, then runs apply."
+    echo "Upgrades [tools] and bumps every self-managed pin."
+    echo "Run: mise run apply"
     echo
     echo "Options:"
     echo "  -n, --dry-run  Preview bumps without changing files"
@@ -102,14 +103,12 @@ check_url() {
 }
 
 changed_count=0
-gpu_services=()
 
 bump_target() {
   local name="$1"
   local pinned=""
   local latest=""
   local check_target_url=""
-  local gpu_service=""
 
   case "$name" in
   yaak)
@@ -170,13 +169,11 @@ bump_target() {
     pinned="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/llama/mise.toml")"
     latest="$(mise run -C "$REPO_DIR/llama" --output interleave --quiet discover | tail -1)"
     check_target_url="https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${latest}.tar.gz"
-    gpu_service="llama-server"
     ;;
   whisper)
     pinned="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/whisper/mise.toml")"
     latest="$(mise run -C "$REPO_DIR/whisper" --output interleave --quiet discover | tail -1)"
     check_target_url="https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${latest}.tar.gz"
-    gpu_service="whisper-server"
     ;;
   *)
     echo "Unknown target: $name" >&2
@@ -241,9 +238,6 @@ bump_target() {
   esac
 
   changed_count=$((changed_count + 1))
-  if [ -n "$gpu_service" ]; then
-    gpu_services+=("$gpu_service")
-  fi
 }
 
 for target in "${targets[@]}"; do
@@ -265,16 +259,7 @@ while IFS= read -r config; do
   (cd "$REPO_DIR/$(dirname "$config")" && mise fmt)
 done < <(git -C "$REPO_DIR" ls-files '*mise.toml')
 
-echo "[bump] Applying updates..."
-mise run apply
-
-if [ ${#gpu_services[@]} -gt 0 ]; then
-  echo "[bump] Restarting GPU user services: ${gpu_services[*]}"
-  systemctl --user restart "${gpu_services[@]}" 2>/dev/null || true
-fi
-
-echo "[bump] Cleaning old source trees and data..."
-mise run clean
-
 echo "[bump] Verifying discovery..."
 mise run discover
+
+echo "[bump] Versions bumped. Run: mise run apply"

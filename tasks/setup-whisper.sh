@@ -68,4 +68,13 @@ sed \
 systemctl --user daemon-reload
 systemctl --user enable --now whisper-server.service
 
+# `enable --now` does not restart a running service, so a rebuilt binary would
+# sit unused. Restart only when the installed version actually moved.
+STAMP="$DATA_DIR/whisper/.installed-version"
+if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ]; then
+  systemctl --user restart whisper-server.service
+  mkdir -p "$DATA_DIR/whisper"
+  printf '%s\n' "$VERSION" > "$STAMP"
+fi
+
 echo "[whisper] Done"

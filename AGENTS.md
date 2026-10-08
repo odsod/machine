@@ -29,10 +29,12 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 ## Workflow: Version Bumping
 
 Run `mise run bump` to upgrade `[tools]` with `mise upgrade --bump`, then
-discover, pre-flight verify, update every self-managed pin, and run
-convergence. That covers desktop apps, endpoint-verification, and the GPU
-services that compile from source. Pass `mise run bump <name>` to bump a single
-pin, or `--dry-run` to preview.
+discover, pre-flight verify, and update every self-managed pin. That covers
+desktop apps, endpoint-verification, and the GPU services that compile from
+source. It writes only version files (`mise.toml`, the topic `mise.toml` files,
+and `mise.lock`) plus the tool installs that `mise upgrade` does. It does not
+apply config or run convergence. Run `mise run apply` for that. Pass
+`mise run bump <name>` to bump a single pin, or `--dry-run` to preview.
 
 To inspect versions manually, start with `mise run discover`. Before probing
 anything it refuses to run while any PR is open on the remote: the bump work may
@@ -64,9 +66,9 @@ before trusting the row.
   the newest non-prerelease semver tag, not a `bNNNN` nightly, and the setup
   scripts add the `v` prefix because GitHub source tarballs drop it. Both repos
   also publish `bNNNN` build tags, and `/releases/latest` has pointed at one of
-  those, so `discover` filters on release shape instead. After a bump, restart
-  the user services: the setup scripts rewrite the units but do not restart an
-  already-running service.
+  those, so `discover` filters on release shape instead. After a bump,
+  `mise run apply` rebuilds the service. Its setup script restarts a running
+  service only when the installed version moved.
 - **endpoint-verification**: `mise run -C endpoint-verification discover`
   prints `version`, `deb`, and `sha256` as a paste-ready `[vars]` block. All
   three move together: the filename carries a per-build hash, and install
@@ -79,7 +81,8 @@ before trusting the row.
 Editing `[vars]` changes nothing on disk. Run these in order.
 
 1. `mise run apply` converges packages, services, dotfiles, tools, and desktop
-   apps. This command must always run and succeed before you finish a bump.
+   apps, then runs `mise run clean`. `mise run bump` does not call it, so run it
+   yourself after every bump. It must succeed before you finish.
    If it stops on `codex:check` or `antigravity:check`:
    - Inspect the diff first.
    - Integrate any intentional config changes (model, effort, preferences) back
@@ -89,12 +92,13 @@ Editing `[vars]` changes nothing on disk. Run these in order.
    - Re-run `mise run apply` until it succeeds.
    `mise run apply --force` resolves both configs and then converges in one
    step. Use it only when the drift holds nothing worth keeping.
-2. Restart any GPU service whose version moved:
-   `systemctl --user restart llama-server whisper-server`.
-3. `mise run clean` last, never first. It deletes the source tree the running
-   service still points at. Old versions accumulate under
-   `~/.local/share/odsod/machine/data` and as `llama.cpp-*` / `whisper.cpp-*`
-   source trees, and it keeps only the pinned ones.
+2. Restarting a GPU service is automatic: `llama:setup` and `whisper:setup`
+   restart a running service when the installed version moved.
+3. `clean` runs at the end of `mise run apply`, never first. Clean deletes the
+   source tree the running service still points at, so never run it before the
+   rebuild. Old versions accumulate under `~/.local/share/odsod/machine/data`
+   and as `llama.cpp-*` / `whisper.cpp-*` source trees, and it keeps only the
+   pinned ones.
 4. Verify: `mise run discover` shows every row `ok`, `mise run apply` succeeds
    with zero errors, `mise bootstrap --dry-run` reports no work, and each
    service answers on its port, for example
