@@ -29,13 +29,13 @@ run_auto_install = true
 slack_version = "4.52.178"
 zoom_version = "7.2.1.5760"
 obsidian_version = "1.14.4"
-yaak_version = "2026.8.1"
+yaak_version = "2026.9.0"
 soap_ui_version = "5.10.0"
 
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.24.9"
-cursor_hash = "cd6d2a1f2e56e9841f0ed9c7c24542087b4e69be"
+cursor_version = "3.24.18"
+cursor_hash = "be4c9e5350d77747b42cd467cbd3370a753d464b"
 
 [tools]
 "aqua:jdx/mise" = "latest"
@@ -43,7 +43,7 @@ cursor_hash = "cd6d2a1f2e56e9841f0ed9c7c24542087b4e69be"
 # Languages: major prefixes, not latest (avoids silent 24→26 / 3.12→3.14)
 go = "1.27"
 node = "26"
-python = "3.14"
+python = "3.15"
 
 # Go tools
 "go:golang.org/x/tools/gopls" = "latest"
@@ -74,6 +74,8 @@ usage = "latest"
 # cannot satisfy it. dnf:uv stays for the post-packages hook that runs before
 # tools are installed.
 uv = "latest"
+# pipx installs pipx:idasen version-only, bypassing the locked dependency graph.
+pipx = "latest"
 
 # Language servers and linters
 lua-language-server = "latest"
@@ -111,7 +113,10 @@ jwt = "latest"
 spacectl = "latest"
 
 # Python tools (via pipx backend)
-"pipx:idasen" = "latest"
+# PyYAML ships no cp315 wheel, so idasen's locked dependency graph cannot replay
+# on Python 3.15. pipx builds the sdist instead. Drop uvx = false once PyYAML
+# ships a cp315 wheel and the graph locks again.
+"pipx:idasen" = { version = "latest", uvx = false }
 
 # ty is a Rust binary. Its PyPI wheel ships .data/scripts, which mise's pipx
 # dependency-graph install rejects, so take the GitHub release instead.
