@@ -30,12 +30,17 @@ function write_stubs --argument-names home
         'set count (math "$count + 1")' \
         'printf "%s\n" "$count" > "$FZF_COUNT_FILE"' \
         'set -l prompt_arg ""' \
+        'set -l query_arg ""' \
         'for arg in $argv' \
         '    if string match -q -- "--prompt=*" "$arg"' \
         '        set prompt_arg (string replace -- "--prompt=" "" "$arg")' \
         '    end' \
+        '    if string match -q -- "--query=*" "$arg"' \
+        '        set query_arg (string replace -- "--query=" "" "$arg")' \
+        '    end' \
         end \
         'test -n "$FZF_LOG"; and echo "$prompt_arg" >> "$FZF_LOG"' \
+        'test -n "$FZF_LOG"; and test -n "$query_arg"; and echo "query:$query_arg" >> "$FZF_LOG"' \
         'switch "$prompt_arg"' \
         '    case "Machine> "' \
         '        set -l mach_lines (cat)' \
@@ -167,6 +172,7 @@ function run_launcher --argument-names home repo mode existing expected_cwd extr
         "FZF_WORKSPACE_LOG=$workspace_log" \
         "FZF_MACHINE_LOG=$machine_log" \
         "HERDR_MACHINES_JSON=$HERDR_MACHINES_JSON" \
+        "HERDR_ACTIVE_PANE_CWD=$HERDR_ACTIVE_PANE_CWD" \
         "FZF_MACHINE_CHOICE=$FZF_MACHINE_CHOICE" \
         "FZF_AGENT_CHOICE=$FZF_AGENT_CHOICE" \
         "FZF_SPACE_CHOICE=$FZF_SPACE_CHOICE" \
@@ -206,6 +212,13 @@ test -f "$existing_home/.codex/config.toml"
 or fail "launcher did not create codex config"
 grep -qF "[projects.\"$existing_path\"]" "$existing_home/.codex/config.toml"
 or fail "launcher did not trust workspace in codex config"
+test -e "$existing_path/.git"
+or fail "workspace is not colocated with Git"
+jj --ignore-working-copy -R "$existing_path" git colocation status 2>/dev/null \
+    | string match -qr 'currently colocated'
+or fail "workspace does not report Git colocation"
+test (cat "$existing_home/.local/state/odsod/machine/last-agent" 2>/dev/null) = codex
+or fail "launcher did not record the last agent"
 
 run_launcher "$existing_home" "$existing_repo" existing 1 "$existing_path"
 set existing_log "$launcher_log"
@@ -347,6 +360,21 @@ or fail "ssh was not called with expected target and command when using --machin
 
 set -e HERDR_MACHINES_JSON
 set -e FZF_MACHINE_CHOICE
+
+# --- Caller repo prefill test ---
+
+setup_case caller_repo_prefill
+set -l caller_home "$case_home"
+set -l caller_repo "$case_repo"
+set -l caller_repo_rel "github.com/acme/repo"
+jj -R "$caller_repo" bookmark set feature -r @ >/dev/null
+set -g HERDR_ACTIVE_PANE_CWD "$caller_repo"
+set -l caller_path "$caller_home/Workspaces/$caller_repo_rel/feature"
+run_launcher "$caller_home" "$caller_repo" existing 0 "$caller_path"
+set -e HERDR_ACTIVE_PANE_CWD
+set -l caller_log (string collect < "$launcher_fzf_log")
+string match -q "*query:$caller_repo_rel*" "$caller_log"
+or fail "repo picker did not prefill the caller repo"
 
 # --- Age sorting test ---
 

@@ -19,12 +19,16 @@ function _trace --argument-names msg
     end
 end
 
-function _fzf_pick_compact --argument-names prompt
-    fzf --prompt="$prompt> " --height=40% --reverse --bind='j:down,k:up'
+function _fzf_pick_compact --argument-names prompt query
+    set -l query_args
+    test -n "$query"; and set query_args --query="$query"
+    fzf --prompt="$prompt> " --height=40% --reverse --bind='j:down,k:up' $query_args
 end
 
-function _fzf_pick_full --argument-names prompt
-    fzf --prompt="$prompt> " --height=100% --reverse
+function _fzf_pick_full --argument-names prompt query
+    set -l query_args
+    test -n "$query"; and set query_args --query="$query"
+    fzf --prompt="$prompt> " --height=100% --reverse $query_args
 end
 
 function _fzf_pick_or_query --argument-names prompt
@@ -42,6 +46,23 @@ function _handle_fzf_status --argument-names status_code prompt
             echo "$prompt picker failed (fzf exit $status_code)" >&2
             exit 1
     end
+end
+
+function _state_dir
+    printf '%s\n' "$HOME/.local/state/odsod/machine"
+end
+
+function _read_state --argument-names name
+    set -l path (_state_dir)/$name
+    test -r "$path"; or return 1
+    string trim -- (head -n1 "$path" 2>/dev/null)
+end
+
+function _write_state --argument-names name value
+    test -n "$value"; or return 0
+    set -l dir (_state_dir)
+    mkdir -p "$dir"; or return 0
+    printf '%s\n' "$value" >"$dir/$name"
 end
 
 
@@ -257,6 +278,32 @@ function _rank_repos
     ' | sort -t (printf '\t') -k1,1nr -k2,2nr -k3,3 | cut -f3
 end
 
+function _caller_repo_rel --argument-names repos
+    set -l cwds "$HERDR_ACTIVE_PANE_CWD"
+    if test -z "$cwds"
+        command -q herdr; or return 1
+        command -q jq; or return 1
+        set -l ws_id "$HERDR_ACTIVE_WORKSPACE_ID"
+        if test -z "$ws_id"
+            set ws_id (herdr workspace list 2>/dev/null \
+                | jq -r '.result.workspaces[] | select(.focused) | .workspace_id' 2>/dev/null \
+                | head -n1)
+        end
+        test -n "$ws_id"; or return 1
+        set cwds (herdr pane list --workspace "$ws_id" 2>/dev/null \
+            | jq -r '.result.panes[] | (.foreground_cwd // .cwd // empty)' 2>/dev/null)
+    end
+    for cwd in $cwds
+        for repo in $repos
+            if test "$HOME/Code/$repo" = "$cwd"; or string match -q -- "$HOME/Code/$repo/*" "$cwd"
+                printf '%s\n' "$repo"
+                return 0
+            end
+        end
+    end
+    return 1
+end
+
 function _pick_repo_rel --argument-names prompt
     set -l suggestions (discover_repos)
     if test (count $suggestions) -eq 0
@@ -264,7 +311,8 @@ function _pick_repo_rel --argument-names prompt
         return 1
     end
     set -l ranked (_rank_repos $suggestions)
-    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt")
+    set -l caller_repo (_caller_repo_rel $ranked)
+    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt" "$caller_repo")
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
     test -n "$picked"; or return 1
@@ -273,6 +321,12 @@ end
 
 function _jj_repo --argument-names repo_path
     jj --ignore-working-copy -R "$repo_path" $argv[2..-1]
+end
+
+function _prune_git_worktrees --argument-names repo_path
+    test -d "$repo_path/.git"; or return 0
+    command -q git; or return 0
+    git -C "$repo_path" worktree prune 2>/dev/null
 end
 
 function _jj_fetch_origin_for_picker --argument-names repo_path
@@ -303,8 +357,15 @@ end
 # --- Agent selection ---
 
 function select_agent
-    set agent_choice (printf '%s\n' claude codex cursor agy pi \
-        | _fzf_pick_compact Agent)
+    set -l agents claude codex cursor agy pi
+    set -l last_agent (_read_state last-agent)
+    set -l agent_query ""
+    if test -n "$last_agent"; and contains -- "$last_agent" $agents
+        set agent_query "$last_agent"
+        set agents $last_agent (string match -v -- "$last_agent" $agents)
+    end
+
+    set agent_choice (printf '%s\n' $agents | _fzf_pick_compact Agent "$agent_query")
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
 
@@ -334,6 +395,8 @@ function select_agent
         echo "Selected agent command not found: $agent_bin" >&2
         return 1
     end
+
+    _write_state last-agent "$agent_kind"
 end
 
 # --- Workspace trust ---
@@ -559,10 +622,18 @@ if test -z "$chosen_machine"
         test -n "$m"; and set -a available_machines "$m"
     end
 
-    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine)
+    set -l last_machine (_read_state last-machine)
+    set -l machine_query ""
+    if test -n "$last_machine"; and contains -- "$last_machine" $available_machines
+        set machine_query "$last_machine"
+        set available_machines $last_machine (string match -v -- "$last_machine" $available_machines)
+    end
+
+    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine "$machine_query")
     set -l status_code $status
     _handle_fzf_status "$status_code" Machine; or exit 0
     set chosen_machine (string trim -- "$chosen_machine")
+    _write_state last-machine "$chosen_machine"
 end
 
 test -n "$chosen_machine"; or exit 0
@@ -755,6 +826,7 @@ if test "$space_type" = Workspace
                 set workspace_path "$existing_workspace_path"
             else
                 _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
+                _prune_git_worktrees "$repo_path"
             end
         end
     end
@@ -830,6 +902,7 @@ if test "$space_type" = Workspace
         _trace "workspace: creating with base_rev=$base_rev path=$workspace_path"
 
         _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
+        _prune_git_worktrees "$repo_path"
 
         jj -R "$repo_path" workspace update-stale >/dev/null 2>&1
         or begin
@@ -839,7 +912,8 @@ if test "$space_type" = Workspace
             exit 1
         end
 
-        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" "$workspace_path" >/dev/null 2>&1
+        jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" \
+            --colocate --sparse-patterns full "$workspace_path" >/dev/null 2>&1
         or begin
             _status_clear
             echo "Failed to create workspace at $workspace_path" >&2
