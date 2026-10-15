@@ -1,24 +1,9 @@
 #!/usr/bin/env fish
 
-function _fail --argument-names msg
-    echo "$msg" >&2
+source (path dirname (realpath (status filename)))/lib.fish
+or begin
+    echo "Failed to load herdr/lib.fish" >&2
     exit 1
-end
-
-function _relative_time --argument-names epoch
-    set -l now (date +%s)
-    set -l diff (math "$now - $epoch")
-    if test $diff -lt 60
-        printf '%ds ago' $diff
-    else if test $diff -lt 3600
-        printf '%dm ago' (math "floor($diff / 60)")
-    else if test $diff -lt 86400
-        printf '%dh ago' (math "floor($diff / 3600)")
-    else if test $diff -lt 604800
-        printf '%dd ago' (math "floor($diff / 86400)")
-    else
-        printf '%dw ago' (math "floor($diff / 604800)")
-    end
 end
 
 function _load_open_dirs
@@ -110,10 +95,11 @@ for jj_dir in (fd --hidden --no-ignore --type d '^\.jj$' "$workspace_base" 2>/de
     test "$empty_flag" = 1; or set state changes
     _path_is_open "$workspace_path"; and set state open
 
-    set -l age (_relative_time (stat -c '%Y' "$workspace_path"))
+    set -l epoch (stat -c '%Y' "$workspace_path")
+    set -l age (_relative_time "$epoch")
     set -l repo_name (basename "$default_root")
-    set -a candidates (printf '%s\t%s\t%s\t%s\t%s\n' \
-        "$workspace_path" "$age" "$state" "$repo_name" "$workspace_name")
+    set -a candidates (printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "$epoch" "$workspace_path" "$age" "$state" "$repo_name" "$workspace_name")
 end
 
 if test (count $candidates) -eq 0
@@ -121,8 +107,11 @@ if test (count $candidates) -eq 0
     exit 0
 end
 
-set -l selection (printf '%s\n' $candidates \
-    | fzf --prompt='Remove> ' --height=100% --reverse \
+set -l sorted (printf '%s\n' $candidates \
+    | sort -t (printf '\t') -k1,1nr \
+    | cut -f2-)
+set -l selection (printf '%s\n' $sorted \
+    | _fzf_pick Remove 100% history \
         --delimiter='\t' --with-nth=2.. \
         --header='AGE  STATE  REPO  WORKSPACE')
 set -l fzf_status $status
@@ -185,10 +174,6 @@ end
 
 jj --ignore-working-copy -R "$default_root" workspace forget "$workspace_name"
 or _fail "Failed to forget jj workspace '$workspace_name'. Nothing was removed."
-
-if test -d "$default_root/.git"; and command -q git
-    git -C "$default_root" worktree prune 2>/dev/null
-end
 
 gio trash "$workspace_path"
 or begin

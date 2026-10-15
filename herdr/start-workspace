@@ -4,11 +4,11 @@ test -n "$HERDR_PANE_ID"; and herdr pane rename "$HERDR_PANE_ID" workspace 2>/de
 
 command -q fzf; or exit 0
 
-# --- Shared fzf helpers ---
+# --- Shared helpers ---
 
-function _fail --argument-names msg
-    echo "$msg" >&2
-    _trace "FAIL: $msg"
+source (path dirname (realpath (status filename)))/lib.fish
+or begin
+    echo "Failed to load herdr/lib.fish" >&2
     exit 1
 end
 
@@ -19,30 +19,9 @@ function _trace --argument-names msg
     end
 end
 
-function _fzf_pick_compact --argument-names prompt
-    fzf --prompt="$prompt> " --height=40% --reverse \
-        --scheme=history --bind='j:down,k:up'
-end
-
-function _fzf_pick_full --argument-names prompt
-    fzf --prompt="$prompt> " --height=100% --reverse --scheme=path
-end
-
 function _fzf_pick_or_query --argument-names prompt
     fzf --prompt="$prompt> " --height=100% --reverse \
         --bind='tab:replace-query,enter:accept-or-print-query'
-end
-
-function _handle_fzf_status --argument-names status_code prompt
-    switch "$status_code"
-        case 0
-            return 0
-        case 1 130
-            return 1
-        case '*'
-            echo "$prompt picker failed (fzf exit $status_code)" >&2
-            exit 1
-    end
 end
 
 function _state_dir
@@ -63,18 +42,6 @@ function _write_state --argument-names name value
 end
 
 
-function _last_non_empty_line
-    set -l value
-    for line in $argv
-        set line (string trim -- "$line")
-        if test -n "$line"
-            set value "$line"
-        end
-    end
-    test -n "$value"; or return 1
-    printf '%s\n' "$value"
-end
-
 function _status_show --argument-names msg
     printf '\r\033[2K%s' "$msg"
 end
@@ -88,22 +55,6 @@ function _workspace_label --argument-names base suffix
         printf '%s/%s\n' "$base" "$suffix"
     else
         printf '%s\n' "$base"
-    end
-end
-
-function _relative_time --argument-names epoch now
-    test -n "$now"; or set now (date +%s)
-    set -l diff (math "$now - $epoch")
-    if test $diff -lt 60
-        printf '%ds ago' $diff
-    else if test $diff -lt 3600
-        printf '%dm ago' (math "floor($diff / 60)")
-    else if test $diff -lt 86400
-        printf '%dh ago' (math "floor($diff / 3600)")
-    else if test $diff -lt 604800
-        printf '%dd ago' (math "floor($diff / 86400)")
-    else
-        printf '%dw ago' (math "floor($diff / 604800)")
     end
 end
 
@@ -188,7 +139,7 @@ function _select_existing_dir --argument-names base_dir prompt
         return 1
     end
 
-    set -l dir_name (printf '%s\n' $dirs | _fzf_pick_full "$prompt")
+    set -l dir_name (printf '%s\n' $dirs | _fzf_pick "$prompt" 100% path)
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
     test -n "$dir_name"; or return 1
@@ -312,7 +263,7 @@ function _pick_repo_rel --argument-names prompt
     if test -n "$caller_repo"
         set ranked $caller_repo (string match -v -- "$caller_repo" $ranked)
     end
-    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt")
+    set -l picked (printf '%s\n' $ranked | _fzf_pick "$prompt" 100% path)
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
     test -n "$picked"; or return 1
@@ -321,12 +272,6 @@ end
 
 function _jj_repo --argument-names repo_path
     jj --ignore-working-copy -R "$repo_path" $argv[2..-1]
-end
-
-function _prune_git_worktrees --argument-names repo_path
-    test -d "$repo_path/.git"; or return 0
-    command -q git; or return 0
-    git -C "$repo_path" worktree prune 2>/dev/null
 end
 
 function _jj_fetch_origin_for_picker --argument-names repo_path
@@ -349,9 +294,6 @@ function _ensure_jj_repo_ready --argument-names repo_path
         _jj_repo "$repo_path" git colocation enable >/dev/null 2>&1
         or _fail "Failed to enable jj/git colocation in $repo_path"
     end
-
-    _jj_repo "$repo_path" git import >/dev/null 2>&1
-    or _fail "Failed to import git refs into jj for $repo_path"
 end
 
 # --- Agent selection ---
@@ -363,7 +305,7 @@ function select_agent
         set agents $last_agent (string match -v -- "$last_agent" $agents)
     end
 
-    set agent_choice (printf '%s\n' $agents | _fzf_pick_compact Agent)
+    set agent_choice (printf '%s\n' $agents | _fzf_pick Agent 40% history)
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
 
@@ -625,7 +567,7 @@ if test -z "$chosen_machine"
         set available_machines $last_machine (string match -v -- "$last_machine" $available_machines)
     end
 
-    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine)
+    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick Machine 40% history)
     set -l status_code $status
     _handle_fzf_status "$status_code" Machine; or exit 0
     set chosen_machine (string trim -- "$chosen_machine")
@@ -649,6 +591,7 @@ if test "$chosen_machine" != "$local_host" -a "$chosen_machine" != Local
     set -l ssh_status $status
     if test $ssh_status -ne 0
         echo "Failed to start workspace on $remote_label (SSH exit $ssh_status)." >&2
+        echo "If authentication failed, run: herdr machine reconnect $remote_label" >&2
         sleep 2
         exit $ssh_status
     end
@@ -660,7 +603,7 @@ _trace "machine: selected local $local_host"
 # --- Type selection ---
 
 set space_type (printf '%s\n' Workspace Code Activity Project Vault \
-    | _fzf_pick_compact Space)
+    | _fzf_pick Space 40% history)
 set status_code $status
 _handle_fzf_status "$status_code" Space; or exit 0
 
@@ -822,7 +765,6 @@ if test "$space_type" = Workspace
                 set workspace_path "$existing_workspace_path"
             else
                 _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
-                _prune_git_worktrees "$repo_path"
             end
         end
     end
@@ -898,7 +840,6 @@ if test "$space_type" = Workspace
         _trace "workspace: creating with base_rev=$base_rev path=$workspace_path"
 
         _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1 || true
-        _prune_git_worktrees "$repo_path"
 
         jj -R "$repo_path" workspace update-stale >/dev/null 2>&1
         or begin
@@ -909,7 +850,7 @@ if test "$space_type" = Workspace
         end
 
         jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" \
-            --colocate --sparse-patterns full "$workspace_path" >/dev/null 2>&1
+            --sparse-patterns full "$workspace_path" >/dev/null 2>&1
         or begin
             _status_clear
             echo "Failed to create workspace at $workspace_path" >&2
