@@ -87,7 +87,7 @@ for the languages, `jj <cmd> --help` for a command.
    is behind trunk.
 2. Fix every broken commit before anything else:
    `jj log -r 'mutable() & descendants(main@origin+) & (conflicts() | divergent() | (~empty() & description(exact:"")))'`.
-   Conflicts → `jj resolve -r <rev>`. Divergent → `jj abandon <obsolete>`.
+   Conflicts → `jj resolve -r <rev>`. Divergent → `jj converge --no-interactive`.
    Empty description → `jj describe -r <rev> -m "<subject>"`.
 3. Read each diff. Split mixed commits: `jj split -r <rev> <paths> -m "<subject>"`.
 4. `jj bookmark set <name> -r <tip>`, `jj git push --bookmark <name>`, `gh pr create`.
