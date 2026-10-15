@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if ! command -v tailscale >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
-  echo "[herdr:sync-machines] tailscale or jq not found; skipping"
+if ! command -v tailscale >/dev/null 2>&1 || ! command -v herdr >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
+  echo "[herdr:sync-machines] tailscale, herdr, or jq not found; skipping"
   exit 0
 fi
 
@@ -18,15 +18,6 @@ if [ "$backend_state" != "Running" ]; then
   exit 0
 fi
 
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/herdr/client"
-ENDPOINTS_FILE="$STATE_DIR/endpoints.json"
-mkdir -p "$STATE_DIR"
-
-existing_catalog='{"version":1,"ssh":[]}'
-if [ -f "$ENDPOINTS_FILE" ]; then
-  existing_catalog="$(cat "$ENDPOINTS_FILE" 2>/dev/null || echo '{"version":1,"ssh":[]}')"
-fi
-
 peers="$(printf '%s\n' "$status_json" | jq -r '
   .Self as $self |
   (.Peer // {})[] |
@@ -40,37 +31,34 @@ peers="$(printf '%s\n' "$status_json" | jq -r '
   .HostName
 ' | sort -u)"
 
-new_ssh="[]"
-count=0
+# Read the supported profile list instead of the internal catalog file. Herdr
+# owns that file; its shape is not a stable interface.
+existing_targets="$(herdr machine list --json 2>/dev/null | jq -r '.[].target' || true)"
+
+added=0
+failed=0
 for peer in $peers; do
   [ -n "$peer" ] || continue
-  id="$(printf '%s' "$peer" | md5sum | cut -d' ' -f1)"
-
-  existing_profile="$(printf '%s\n' "$existing_catalog" | jq --arg target "$peer" '.ssh[] | select(.target == $target)' 2>/dev/null || true)"
-
-  if [ -n "$existing_profile" ]; then
-    new_ssh="$(printf '%s\n' "$new_ssh" | jq --argjson profile "$existing_profile" '. + [$profile]')"
-  else
-    new_ssh="$(printf '%s\n' "$new_ssh" | jq \
-      --arg id "$id" \
-      --arg target "$peer" \
-      --arg label "$peer" \
-      '. + [{id: $id, label: $label, target: $target, session: "default", enabled: true}]')"
+  if printf '%s\n' "$existing_targets" | grep -Fxq "$peer"; then
+    continue
   fi
-  count=$((count + 1))
+
+  add_cmd=(herdr machine add "$peer" --label "$peer" --remote-session default)
+  if command -v timeout >/dev/null 2>&1; then
+    add_cmd=(timeout 30s "${add_cmd[@]}")
+  fi
+
+  if "${add_cmd[@]}" </dev/null >/dev/null 2>&1; then
+    added=$((added + 1))
+  else
+    failed=$((failed + 1))
+    echo "[herdr:sync-machines] could not add $peer (unreachable or setup needed)" >&2
+  fi
 done
 
-final_catalog="$(jq -n --argjson ssh "$new_ssh" '{version: 1, ssh: $ssh}')"
-
-current_content=""
-if [ -f "$ENDPOINTS_FILE" ]; then
-  current_content="$(cat "$ENDPOINTS_FILE" 2>/dev/null || true)"
+if [ "$added" -gt 0 ]; then
+  echo "[herdr:sync-machines] Added $added Tailscale machine(s) to Herdr"
 fi
-
-if [ "$current_content" != "$final_catalog" ]; then
-  temp_file="$(mktemp "$STATE_DIR/endpoints.XXXXXX")"
-  chmod 600 "$temp_file"
-  printf '%s\n' "$final_catalog" > "$temp_file"
-  mv "$temp_file" "$ENDPOINTS_FILE"
-  echo "[herdr:sync-machines] Synced $count Tailscale machine(s) to Herdr catalog"
+if [ "$failed" -gt 0 ]; then
+  echo "[herdr:sync-machines] $failed machine(s) not added; retry with: herdr machine add <target>" >&2
 fi
