@@ -165,13 +165,13 @@ end
 
 fzf --fish | source
 
-abbr -a vim nvim
-abbr -a vi nvim
-abbr -a cat bat
-abbr -a find fd
-abbr -a ls eza
-abbr -a claude 'claude --dangerously-skip-permissions'
-abbr -a agy 'agy --dangerously-skip-permissions'
+abbr -a --description='edit with neovim' -- vim nvim
+abbr -a --description='edit with neovim' -- vi nvim
+abbr -a --description='show file contents' -- cat bat
+abbr -a --description='find files' -- find fd
+abbr -a --description='list files' -- ls eza
+abbr -a --description='claude without permission prompts' -- claude 'claude --dangerously-skip-permissions'
+abbr -a --description='antigravity without permission prompts' -- agy 'agy --dangerously-skip-permissions'
 
 set -g fish_key_bindings fish_vi_key_bindings
 
@@ -183,6 +183,7 @@ set -g fish_cursor_visual block blink
 
 # Keep theme state in repo config (avoid fish_frozen_theme.fish drift).
 set --global fish_color_autosuggestion brblack
+set --global fish_color_builtin brblue
 set --global fish_color_cancel --reverse
 set --global fish_color_command brcyan
 set --global fish_color_comment brblack --italics
@@ -191,6 +192,7 @@ set --global fish_color_cwd_root brred
 set --global fish_color_end brblue
 set --global fish_color_error brred
 set --global fish_color_escape bryellow
+set --global fish_color_function brgreen
 set --global fish_color_history_current brwhite --bold
 set --global fish_color_host brgreen
 set --global fish_color_host_remote
@@ -234,7 +236,7 @@ function _fzf_jump_dir --argument-names root prompt mode
     set -l opts --type d --base-directory $root --strip-cwd-prefix --exclude .git
     test "$mode" = all; and set -a opts --hidden --no-ignore
 
-    set -l target (fd $opts | fzf --prompt="$prompt> " --height=100% --reverse)
+    set -l target (fd $opts | fzf --prompt="$prompt> " --height=100% --reverse --scheme=path)
     if test -n "$target"
         cd "$root/$target"
         functions -q fish_vi_key_bindings; and set fish_bind_mode insert
