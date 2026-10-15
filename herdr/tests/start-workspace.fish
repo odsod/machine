@@ -361,9 +361,9 @@ or fail "ssh was not called with expected target and command when using --machin
 set -e HERDR_MACHINES_JSON
 set -e FZF_MACHINE_CHOICE
 
-# --- Caller repo prefill test ---
+# --- Caller repo ranking test ---
 
-setup_case caller_repo_prefill
+setup_case caller_repo_ranked
 set -l caller_home "$case_home"
 set -l caller_repo "$case_repo"
 set -l caller_repo_rel "github.com/acme/repo"
@@ -373,8 +373,11 @@ set -l caller_path "$caller_home/Workspaces/$caller_repo_rel/feature"
 run_launcher "$caller_home" "$caller_repo" existing 0 "$caller_path"
 set -e HERDR_ACTIVE_PANE_CWD
 set -l caller_log (string collect < "$launcher_fzf_log")
-string match -q "*query:$caller_repo_rel*" "$caller_log"
-or fail "repo picker did not prefill the caller repo"
+not string match -q "*query:$caller_repo_rel*" "$caller_log"
+or fail "repo picker should not prefill a query"
+set -l caller_lines (string split \n (string trim (string collect < "$launcher_workspace_log")))
+test "$caller_lines[1]" = "$caller_repo_rel"
+or fail "caller repo was not ranked first"
 
 # --- Age sorting test ---
 
