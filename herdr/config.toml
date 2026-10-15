@@ -101,14 +101,14 @@ width = 72
 height = 28
 description = "Session Picker"
 
-# Remove closed jj workspace
+# Close a workspace and remove its jj workspace
 [[keys.command]]
 key = "prefix+ctrl+p"
 command = "remove-jj-workspace"
 type = "popup"
 width = 90
 height = "80%"
-description = "Remove jj Workspace"
+description = "Close Workspace"
 
 # Clone repo popup
 [[keys.command]]

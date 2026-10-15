@@ -44,6 +44,14 @@ or fail "could not create test repo"
 
 printf '%s\n' \
     "#!$real_fish --no-config" \
+    'if test "$argv[1]" = workspace; and test "$argv[2]" = list' \
+    '    printf "%s\n" "$HERDR_WORKSPACES_JSON"' \
+    '    exit 0' \
+    'end' \
+    'if test "$argv[1]" = workspace; and test "$argv[2]" = close' \
+    '    test -n "$HERDR_CLOSE_LOG"; and printf "%s\n" "$argv[3]" >> "$HERDR_CLOSE_LOG"' \
+    '    exit 0' \
+    'end' \
     'if test "$argv[1]" = pane; and test "$argv[2]" = list' \
     '    printf "%s\n" "$HERDR_PANES_JSON"' \
     '    exit 0' \
@@ -76,12 +84,14 @@ printf '%s\n' \
 chmod +x "$stub_bin/herdr" "$stub_bin/fzf" "$stub_bin/gio" "$stub_bin/jj"
 
 set -l empty_panes '{"result":{"panes":[]}}'
+set -l empty_workspaces '{"result":{"workspaces":[]}}'
 set -l system_path (string join : $PATH)
 set -l common_env \
     "XDG_CONFIG_HOME=$test_home/config" \
     "PATH=$stub_bin:$system_path" \
     "REAL_JJ=$real_jj" \
     "REMOVE_JJ_WORKSPACE_ROOT=$search_root" \
+    "HERDR_WORKSPACES_JSON=$empty_workspaces" \
     "TEST_TRASH_ROOT=$trash_root"
 
 set -l feature_path (add_workspace feature)
@@ -99,15 +109,6 @@ assert_path "$feature_path"
 awk -F '\t' '$5 == "default" { found = 1 } END { exit found ? 0 : 1 }' "$picker_log"
 and fail "default workspace was offered for removal"
 
-set -l open_panes (jq -nc --arg path "$feature_path" \
-    '{result:{panes:[{cwd:$path,foreground_cwd:$path}]}}')
-set -l open_output (env $common_env "HERDR_PANES_JSON=$open_panes" \
-    "$real_fish" --no-config "$remove_script" 2>&1)
-test $status -ne 0; or fail "open workspace removal should fail: $open_output"
-string match -q '*Close the Herdr workspace*' -- "$open_output"
-or fail "open workspace failure did not explain how to proceed"
-assert_path "$feature_path"
-
 printf 'y\n' | env $common_env "HERDR_PANES_JSON=$empty_panes" \
     "$real_fish" --no-config "$remove_script" >/dev/null
 or fail "confirmed removal failed"
@@ -119,15 +120,30 @@ jj --ignore-working-copy -R "$default_root" log -r 'bookmarks(exact:feature)' \
     --no-graph --limit 1 | string match -qr '.'
 or fail "workspace bookmark was deleted"
 
+set -l open_path (add_workspace open-close)
+set -l open_panes (jq -nc --arg path "$open_path" \
+    '{result:{panes:[{cwd:$path,foreground_cwd:$path}]}}')
+set -l open_workspaces (jq -nc \
+    '{result:{workspaces:[{workspace_id:"wOpen",label:"repo/open-close"}]}}')
+set -l close_log "$test_root/close.log"
+printf 'y\n' | env $common_env "HERDR_PANES_JSON=$open_panes" \
+    "HERDR_WORKSPACES_JSON=$open_workspaces" "HERDR_CLOSE_LOG=$close_log" \
+    "$real_fish" --no-config "$remove_script" >/dev/null
+or fail "open workspace removal failed"
+grep -qF "wOpen" "$close_log"
+or fail "open workspace was not closed through Herdr"
+assert_no_path "$open_path"
+assert_path "$trash_root/open-close"
+
 set -l failure_path (add_workspace forget-failure)
 set -l failure_output (printf 'y\n' | env $common_env \
     "HERDR_PANES_JSON=$empty_panes" FAIL_JJ_FORGET=1 \
     "$real_fish" --no-config "$remove_script" 2>&1)
 test $status -ne 0; or fail "forget failure should return non-zero"
-string match -q '*can be restored with: gio trash --list*' -- "$failure_output"
-or fail "forget failure did not report recovery"
-assert_no_path "$failure_path"
-assert_path "$trash_root/forget-failure"
+string match -q '*Failed to forget jj workspace*' -- "$failure_output"
+or fail "forget failure did not explain"
+assert_path "$failure_path"
+assert_no_path "$trash_root/forget-failure"
 jj --ignore-working-copy -R "$default_root" workspace list -T 'self.name() ++ "\n"' \
     | string match -q forget-failure
 or fail "failed forget should leave the jj workspace registered"

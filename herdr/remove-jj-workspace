@@ -46,6 +46,21 @@ function _path_is_open --argument-names workspace_path
     return 1
 end
 
+function _herdr_workspace_ids_for_path --argument-names workspace_path
+    command -q herdr; or return 0
+    command -q jq; or return 0
+    set -l ws_ids (herdr workspace list 2>/dev/null \
+        | jq -r '.result.workspaces[]?.workspace_id' 2>/dev/null)
+    for ws_id in $ws_ids
+        set -l matches (herdr pane list --workspace "$ws_id" 2>/dev/null \
+            | jq -r --arg p "$workspace_path" '
+                (.result.panes // [])[]
+                | (.cwd // ""), (.foreground_cwd // "")
+                | select(. == $p or startswith($p + "/"))' 2>/dev/null)
+        test -n "$matches"; and printf '%s\n' "$ws_id"
+    end
+end
+
 for dependency in fd fzf gio herdr jj jq realpath
     command -q "$dependency"
         or _fail "$dependency is required but not found in PATH."
@@ -139,29 +154,48 @@ if test "$workspace_name" = default; or test "$workspace_path" = "$default_root"
     _fail "Refusing to remove the default jj workspace."
 end
 
-_load_open_dirs
-_path_is_open "$workspace_path"
-and _fail "Close the Herdr workspace for $workspace_name before removing it."
+set -l herdr_ids (_herdr_workspace_ids_for_path "$workspace_path")
+set -l caller_ws "$HERDR_ACTIVE_WORKSPACE_ID"
+test -n "$caller_ws"; or set caller_ws "$HERDR_WORKSPACE_ID"
+if test -n "$caller_ws"; and contains -- "$caller_ws" $herdr_ids
+    _fail "Refusing to remove the workspace you are currently in."
+end
 
 echo "Workspace: $workspace_name"
 echo "Path:      $workspace_path"
+if test (count $herdr_ids) -gt 0
+    echo "Herdr:     "(string join ', ' -- $herdr_ids)
+end
 echo
 jj -R "$workspace_path" status --no-pager
 or _fail "Could not snapshot $workspace_name. No workspace was removed."
 echo
 
-read -l -P "Move this workspace to trash? [y/N] " confirmation
+set -l action "Move this workspace to trash?"
+if test (count $herdr_ids) -gt 0
+    set action "Close its Herdr workspace and move it to trash?"
+end
+read -l -P "$action [y/N] " confirmation
 string match -rqi '^y(es)?$' -- "$confirmation"; or exit 0
 
-gio trash "$workspace_path"
-or _fail "Failed to move $workspace_path to trash."
+for ws_id in $herdr_ids
+    herdr workspace close "$ws_id" >/dev/null 2>&1
+    or echo "Warning: failed to close Herdr workspace $ws_id." >&2
+end
 
 jj --ignore-working-copy -R "$default_root" workspace forget "$workspace_name"
+or _fail "Failed to forget jj workspace '$workspace_name'. Nothing was removed."
+
+if test -d "$default_root/.git"; and command -q git
+    git -C "$default_root" worktree prune 2>/dev/null
+end
+
+gio trash "$workspace_path"
 or begin
-    echo "Moved $workspace_path to trash, but failed to forget jj workspace '$workspace_name'." >&2
-    echo "The directory can be restored with: gio trash --list" >&2
+    echo "Forgot jj workspace '$workspace_name', but failed to move $workspace_path to trash." >&2
+    echo "The directory is still on disk. Remove it manually when ready." >&2
     exit 1
 end
 
-echo "Removed jj workspace '$workspace_name'."
+echo "Closed and removed jj workspace '$workspace_name'."
 echo "The bookmark and commits were kept."
