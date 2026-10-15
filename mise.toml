@@ -698,6 +698,6 @@ fi
 """
 
 [tasks."herdr:sync-machines"]
-description = "Sync Tailscale peers to Herdr machine catalog"
+description = "Save missing Tailscale peers as Herdr machines"
 run = 'exec "$REPO_DIR/tasks/setup-herdr-machines.sh"'
 
