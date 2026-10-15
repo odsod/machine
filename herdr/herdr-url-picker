@@ -1,5 +1,11 @@
 #!/usr/bin/env fish
 
+source (path dirname (realpath (status filename)))/lib.fish
+or begin
+    echo "Failed to load herdr/lib.fish" >&2
+    exit 1
+end
+
 test -n "$HERDR_PANE_ID"; and herdr pane rename "$HERDR_PANE_ID" urls 2>/dev/null
 
 set pane_id $HERDR_PANE_ID
@@ -40,12 +46,7 @@ if test -z "$urls"
     exit 0
 end
 
-set selected_url (printf '%s\n' $urls | fzf \
-    --prompt="Open URL> " \
-    --height=100% \
-    --reverse \
-    --no-multi \
-    --bind='j:down,k:up')
+set selected_url (printf '%s\n' $urls | _fzf_pick 'Open URL' 100% history --no-multi)
 
 if test -n "$selected_url"
     open-url "$selected_url"

@@ -4,15 +4,16 @@ test -n "$HERDR_PANE_ID"; and herdr pane rename "$HERDR_PANE_ID" clone 2>/dev/nu
 
 command -q fzf; or exit 0
 
-# --- Shared fzf helpers ---
+# --- Shared helpers ---
 
-function _fail --argument-names msg
-    echo "$msg" >&2
+source (path dirname (realpath (status filename)))/lib.fish
+or begin
+    echo "Failed to load herdr/lib.fish" >&2
     exit 1
 end
 
 function _fzf_pick_or_query --argument-names prompt
-    fzf --prompt="$prompt> " --height=100% --reverse \
+    fzf --prompt="$prompt> " --height=100% --reverse --scheme=history \
         --print-query --bind='tab:replace-query,enter:replace-query+print-query+accept'
 end
 
@@ -30,17 +31,6 @@ function _handle_pick_or_query_status --argument-names status_code prompt raw_va
             echo "$prompt picker failed (fzf exit $status_code)" >&2
             exit 1
     end
-end
-
-function _last_non_empty_line
-    set -l last
-    for line in $argv
-        set line (string trim -- "$line")
-        if test -n "$line"
-            set last "$line"
-        end
-    end
-    printf '%s\n' "$last"
 end
 
 # --- Repo discovery ---
