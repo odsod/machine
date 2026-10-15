@@ -19,16 +19,13 @@ function _trace --argument-names msg
     end
 end
 
-function _fzf_pick_compact --argument-names prompt query
-    set -l query_args
-    test -n "$query"; and set query_args --query="$query"
-    fzf --prompt="$prompt> " --height=40% --reverse --bind='j:down,k:up' $query_args
+function _fzf_pick_compact --argument-names prompt
+    fzf --prompt="$prompt> " --height=40% --reverse \
+        --scheme=history --bind='j:down,k:up'
 end
 
-function _fzf_pick_full --argument-names prompt query
-    set -l query_args
-    test -n "$query"; and set query_args --query="$query"
-    fzf --prompt="$prompt> " --height=100% --reverse $query_args
+function _fzf_pick_full --argument-names prompt
+    fzf --prompt="$prompt> " --height=100% --reverse --scheme=path
 end
 
 function _fzf_pick_or_query --argument-names prompt
@@ -312,7 +309,10 @@ function _pick_repo_rel --argument-names prompt
     end
     set -l ranked (_rank_repos $suggestions)
     set -l caller_repo (_caller_repo_rel $ranked)
-    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt" "$caller_repo")
+    if test -n "$caller_repo"
+        set ranked $caller_repo (string match -v -- "$caller_repo" $ranked)
+    end
+    set -l picked (printf '%s\n' $ranked | _fzf_pick_full "$prompt")
     set -l status_code $status
     _handle_fzf_status "$status_code" "$prompt"; or return 1
     test -n "$picked"; or return 1
@@ -359,13 +359,11 @@ end
 function select_agent
     set -l agents claude codex cursor agy pi
     set -l last_agent (_read_state last-agent)
-    set -l agent_query ""
     if test -n "$last_agent"; and contains -- "$last_agent" $agents
-        set agent_query "$last_agent"
         set agents $last_agent (string match -v -- "$last_agent" $agents)
     end
 
-    set agent_choice (printf '%s\n' $agents | _fzf_pick_compact Agent "$agent_query")
+    set agent_choice (printf '%s\n' $agents | _fzf_pick_compact Agent)
     set status_code $status
     _handle_fzf_status "$status_code" Agent; or return 1
 
@@ -623,13 +621,11 @@ if test -z "$chosen_machine"
     end
 
     set -l last_machine (_read_state last-machine)
-    set -l machine_query ""
     if test -n "$last_machine"; and contains -- "$last_machine" $available_machines
-        set machine_query "$last_machine"
         set available_machines $last_machine (string match -v -- "$last_machine" $available_machines)
     end
 
-    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine "$machine_query")
+    set chosen_machine (printf '%s\n' $available_machines | _fzf_pick_compact Machine)
     set -l status_code $status
     _handle_fzf_status "$status_code" Machine; or exit 0
     set chosen_machine (string trim -- "$chosen_machine")
