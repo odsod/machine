@@ -3,3 +3,9 @@
 
 [bootstrap.packages]
 "dnf:uv" = "latest"
+
+[bootstrap.hooks.post-packages]
+run = """
+uv generate-shell-completion fish > ~/.config/fish/completions/uv.fish
+uvx --generate-shell-completion fish > ~/.config/fish/completions/uvx.fish
+"""

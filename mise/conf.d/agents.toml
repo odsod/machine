@@ -7,3 +7,10 @@
 "~/.codex/AGENTS.md" = "../../agents/AGENTS.md"
 "~/.gemini/AGENTS.md" = "../../agents/AGENTS.md"
 "~/.pi/agent/AGENTS.md" = "../../agents/AGENTS.md"
+
+[tasks.update-skills]
+description = "Update the vendored global agent skills to their latest upstream release"
+run = """
+cd "$REPO_DIR/agents"
+exec npx --yes skills update
+"""

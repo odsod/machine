@@ -1,0 +1,12 @@
+[vars]
+slack_version = "4.52.178"
+
+[tasks."slack:setup"]
+description = "Install Slack desktop client"
+run = """
+version="{{vars.slack_version}}"
+build="${version}-0.1.el8"
+if ! rpm -q "slack-${build}.x86_64" >/dev/null 2>&1; then
+  sudo dnf install -y "https://downloads.slack-edge.com/desktop-releases/linux/x64/${version}/slack-${build}.x86_64.rpm"
+fi
+"""

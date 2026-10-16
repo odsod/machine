@@ -1,0 +1,18 @@
+[bootstrap.packages]
+"dnf:libva-utils" = "latest"
+"dnf:mesa-dri-drivers" = "latest"
+"dnf:mesa-vulkan-drivers" = "latest"
+
+[tasks."graphics:setup"]
+description = "Install GPU-conditional graphics drivers"
+run = """
+if lspci -nn | grep -qi 'intel.*vga\\|vga.*intel'; then
+  echo "[graphics] Intel GPU detected - installing intel-media-driver..."
+  sudo dnf install -y -q intel-media-driver
+fi
+if lspci -nn | grep -qi 'amd.*vga\\|vga.*amd\\|advanced micro devices.*vga\\|vga.*advanced micro devices'; then
+  echo "[graphics] AMD GPU detected - installing udev perf rule..."
+  printf 'ACTION=="add", SUBSYSTEM=="drm", DRIVERS=="amdgpu", ATTR{device/power_dpm_force_performance_level}="high"\\n' \
+    | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
+fi
+"""

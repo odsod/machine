@@ -1,0 +1,88 @@
+# RPM Fusion publishes its keys at a stable URL, so its gpgkey lines point
+# there instead of the per-release keys the release RPM installs. The
+# testing, debuginfo, and source repos are left out; they ship disabled.
+[bootstrap.files."/etc/yum.repos.d/rpmfusion-free.repo"]
+content = """
+[rpmfusion-free]
+name=RPM Fusion for Fedora $releasever - Free
+metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+enabled=1
+metadata_expire=14d
+type=rpm-md
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://download1.rpmfusion.org/free/fedora/RPM-GPG-KEY-rpmfusion-free-fedora-2020
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[bootstrap.files."/etc/yum.repos.d/rpmfusion-free-updates.repo"]
+content = """
+[rpmfusion-free-updates]
+name=RPM Fusion for Fedora $releasever - Free - Updates
+metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
+enabled=1
+enabled_metadata=1
+type=rpm-md
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://download1.rpmfusion.org/free/fedora/RPM-GPG-KEY-rpmfusion-free-fedora-2020
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[bootstrap.files."/etc/yum.repos.d/rpmfusion-nonfree.repo"]
+content = """
+[rpmfusion-nonfree]
+name=RPM Fusion for Fedora $releasever - Nonfree
+metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+enabled=1
+enabled_metadata=1
+metadata_expire=14d
+type=rpm-md
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://download1.rpmfusion.org/nonfree/fedora/RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[bootstrap.files."/etc/yum.repos.d/rpmfusion-nonfree-updates.repo"]
+content = """
+[rpmfusion-nonfree-updates]
+name=RPM Fusion for Fedora $releasever - Nonfree - Updates
+metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
+enabled=1
+enabled_metadata=1
+type=rpm-md
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://download1.rpmfusion.org/nonfree/fedora/RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[bootstrap.packages]
+"dnf:lame" = "latest"
+"dnf:openh264" = "latest"
+"dnf:x264" = "latest"
+"dnf:x265" = "latest"
+
+[tasks."media:setup"]
+description = "Install media codecs (ffmpeg swap, group upgrade)"
+run = """
+sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
+sudo dnf group upgrade -y multimedia
+"""

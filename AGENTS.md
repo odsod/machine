@@ -24,13 +24,14 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
   `mise/conf.d/`. Paths in `[dotfiles]` and `[bootstrap.files]` resolve against
   `mise/conf.d/`, so repo files need a `../../` prefix.
   - **`00-machine.toml`**: Cross-cutting system base (`env.sh` links, `mise`
-    self-deploy links, core packages, vendor RPM repos, groups/users, sudoers,
-    `/tmp`, swap, and top-level orchestration tasks `discover`, `bump`, `apply`,
-    `clean`, `bootstrap`).
+    self-deploy links and repo, core CLI packages, user/sudoers, `/tmp`, swap,
+    and top-level orchestration tasks `discover`, `bump`, `apply`, `clean`,
+    `bootstrap`).
   - **`<topic>.toml`**: One file per topic (`fish.toml`, `herdr.toml`,
     `kde.toml`, `kwin.toml`, `keys.toml`, `llama.toml`, `whisper.toml`,
-    `endpoint-verification.toml`, ...). Owns that topic's `[vars]`,
-    `[dotfiles]`, `[bootstrap.*]`, and `[tasks."<topic>:*"]`.
+    `endpoint-verification.toml`, `docker.toml`, `tailscale.toml`, ...). Owns
+    that topic's `[vars]`, `[dotfiles]`, `[bootstrap.*]`, and
+    `[tasks."<topic>:*"]`.
 - **`env.sh`**: Permanent. Single source of truth for environment variables.
 - **`tasks/`**: Cross-cutting lifecycle and base-system scripts (`apply.sh`,
   `bump.sh`, `discover.sh`, `clean.sh`, `setup-swapfile.sh`, `setup-tmp.sh`).
@@ -88,10 +89,10 @@ means upstream changed its release scheme: fix the probe in `tasks/discover.sh`
 before trusting the row.
 
 - **Desktop apps** (Slack, Zoom, Cursor, Yaak, SoapUI, Obsidian): edit `[vars]`
-  in `mise/conf.d/00-machine.toml` (Slack, Zoom, Yaak, SoapUI),
-  `mise/conf.d/cursor.toml`, or `mise/conf.d/obsidian.toml`. Nothing else holds
-  an app version. Cursor needs `cursor_hash` bumped with `cursor_version`; both
-  values come from the same `discover` rows (see `cursor/AGENTS.md`). Fonts use
+  in `mise/conf.d/<app>.toml` (`slack.toml`, `zoom.toml`, `cursor.toml`,
+  `yaak.toml`, `soap-ui.toml`, `obsidian.toml`). Nothing else holds an app
+  version. Cursor needs `cursor_hash` bumped with `cursor_version`; both values
+  come from the same `discover` rows (see `cursor/AGENTS.md`). Fonts use
   `brew-cask:font-*` under `[bootstrap.packages]` in `mise/conf.d/kde.toml` and
   update via package bootstrap.
 - **mise tools**: `[tools]` uses `latest` (runtimes keep a major prefix:

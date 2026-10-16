@@ -1,15 +1,9 @@
 # Machine base: cross-cutting system state. Topic state lives in the sibling
-# fragment named after its directory (fish.toml, herdr.toml, ...).
+# fragment named after its topic (fish.toml, herdr.toml, ...).
 #
 # Fragments load in alphabetical order and before the root mise.toml. Paths in
 # [dotfiles] and [bootstrap.files] resolve against mise/conf.d/, so repo files
 # need a ../../ prefix.
-
-[vars]
-slack_version = "4.52.178"
-zoom_version = "7.2.1.5760"
-yaak_version = "2026.9.0"
-soap_ui_version = "5.10.0"
 
 [dotfiles]
 # env.sh (KDE session and login shell)
@@ -21,24 +15,13 @@ soap_ui_version = "5.10.0"
 "~/.config/mise/config.toml" = "../../mise.toml"
 "~/.config/mise/conf.d" = "../../mise/conf.d"
 
-
-[bootstrap.dnf.repos]
-# Fedora does not package scrcpy. Its COPR has no upstream repo, so it is
-# unofficial. It replaces Terra.
-scrcpy = { copr = "boobaa/scrcpy" }
-
 [bootstrap.packages]
 # Core system tools
-"dnf:android-tools" = "latest"
 "dnf:bat" = "latest"
 "dnf:binutils" = "latest"
 "dnf:ca-certificates" = "latest"
-"dnf:containerd" = "latest"
 "dnf:curl" = "latest"
 "dnf:dnf5-plugins" = "latest"
-"dnf:docker-buildx" = "latest"
-"dnf:docker-cli" = "latest"
-"dnf:docker-compose" = "latest"
 "dnf:dos2unix" = "latest"
 "dnf:fd-find" = "latest"
 "dnf:firefox" = "latest"
@@ -52,64 +35,28 @@ scrcpy = { copr = "boobaa/scrcpy" }
 "dnf:iftop" = "latest"
 "dnf:ImageMagick" = "latest"
 "dnf:java-25-openjdk-devel" = "latest"
-"dnf:lame" = "latest"
 "dnf:jq" = "latest"
 "dnf:keepassxc" = "latest"
 "dnf:maven" = "latest"
-"dnf:mesa-dri-drivers" = "latest"
-"dnf:mesa-vulkan-drivers" = "latest"
-"dnf:libva-utils" = "latest"
 "dnf:ncdu" = "latest"
-"dnf:openh264" = "latest"
 "dnf:net-snmp-utils" = "latest"
 "dnf:ngrep" = "latest"
 "dnf:pciutils" = "latest"
 "dnf:perl-Image-ExifTool" = "latest"
-"dnf:python3-devel" = "latest"
-"dnf:python3-pip" = "latest"
-"dnf:python3-virtualenv" = "latest"
-"dnf:python3.12" = "latest"
-
-# CPython source-build dependencies. mise compiles under python-build when no
-# precompiled standalone build exists yet (python-build-standalone lags point
-# releases). These headers keep every optional module (ssl, zlib, ctypes,
-# sqlite3, lzma, bz2, dbm, readline, uuid, zstd, tkinter) in a source build.
-# `patch` is absent from Fedora's default set and stops the build at once.
-"dnf:bzip2-devel" = "latest"
-"dnf:gdbm-devel" = "latest"
-"dnf:libffi-devel" = "latest"
-"dnf:libuuid-devel" = "latest"
-"dnf:libzstd-devel" = "latest"
-"dnf:openssl-devel" = "latest"
-"dnf:patch" = "latest"
-"dnf:readline-devel" = "latest"
-"dnf:sqlite-devel" = "latest"
-"dnf:tk-devel" = "latest"
-"dnf:xz-devel" = "latest"
-"dnf:zlib-ng-compat-devel" = "latest"
 "dnf:qbittorrent" = "latest"
 "dnf:ripgrep" = "latest"
-"dnf:scrcpy" = "latest"
+"dnf:rustup" = "latest"
 "dnf:simple-scan" = "latest"
-"dnf:syncthing" = "latest"
-"dnf:tailscale" = "latest"
 "dnf:tar" = "latest"
 "dnf:tree-sitter-cli" = "latest"
 "dnf:ttyd" = "latest"
 "dnf:unrar" = "latest"
 "dnf:unzip" = "latest"
 "dnf:util-linux" = "latest"
+"dnf:v4l-utils" = "latest"
 "dnf:wl-clipboard" = "latest"
 "dnf:wtype" = "latest"
-"dnf:v4l-utils" = "latest"
-"dnf:wireshark" = "latest"
-"dnf:x264" = "latest"
-"dnf:x265" = "latest"
 "dnf:yt-dlp" = "latest"
-"dnf:1password" = "latest"
-"dnf:mullvad-vpn" = "latest"
-"dnf:mullvad-browser" = "latest"
-"dnf:rustup" = "latest"
 
 # PDF decoding and OCR
 "dnf:poppler-utils" = "latest"
@@ -121,12 +68,6 @@ scrcpy = { copr = "boobaa/scrcpy" }
 # Flatpak
 "flatpak:com.spotify.Client" = "latest"
 "flatpak:hu.irl.cameractrls" = "latest"
-
-[bootstrap.groups.docker]
-system = true
-
-[bootstrap.groups.wireshark]
-system = true
 
 [bootstrap.users.odsod]
 group = "odsod"
@@ -153,136 +94,6 @@ group = "root"
 mode = "0644"
 replace = true
 
-# Vendor RPM repositories. All are static repo files, so mise owns them and
-# no pre-packages hook is needed. Ghostty and scrcpy are COPRs, declared in
-# [bootstrap.dnf.repos].
-#
-# RPM Fusion publishes its keys at a stable URL, so its gpgkey lines point
-# there instead of the per-release keys the release RPM installs. The
-# testing, debuginfo, and source repos are left out; they ship disabled.
-[bootstrap.files."/etc/yum.repos.d/rpmfusion-free.repo"]
-content = """
-[rpmfusion-free]
-name=RPM Fusion for Fedora $releasever - Free
-metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
-enabled=1
-metadata_expire=14d
-type=rpm-md
-gpgcheck=1
-repo_gpgcheck=0
-gpgkey=https://download1.rpmfusion.org/free/fedora/RPM-GPG-KEY-rpmfusion-free-fedora-2020
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/rpmfusion-free-updates.repo"]
-content = """
-[rpmfusion-free-updates]
-name=RPM Fusion for Fedora $releasever - Free - Updates
-metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
-enabled=1
-enabled_metadata=1
-type=rpm-md
-gpgcheck=1
-repo_gpgcheck=0
-gpgkey=https://download1.rpmfusion.org/free/fedora/RPM-GPG-KEY-rpmfusion-free-fedora-2020
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/rpmfusion-nonfree.repo"]
-content = """
-[rpmfusion-nonfree]
-name=RPM Fusion for Fedora $releasever - Nonfree
-metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
-enabled=1
-enabled_metadata=1
-metadata_expire=14d
-type=rpm-md
-gpgcheck=1
-repo_gpgcheck=0
-gpgkey=https://download1.rpmfusion.org/nonfree/fedora/RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/rpmfusion-nonfree-updates.repo"]
-content = """
-[rpmfusion-nonfree-updates]
-name=RPM Fusion for Fedora $releasever - Nonfree - Updates
-metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
-enabled=1
-enabled_metadata=1
-type=rpm-md
-gpgcheck=1
-repo_gpgcheck=0
-gpgkey=https://download1.rpmfusion.org/nonfree/fedora/RPM-GPG-KEY-rpmfusion-nonfree-fedora-2020
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/tailscale.repo"]
-content = """
-[tailscale-stable]
-name=Tailscale stable
-baseurl=https://pkgs.tailscale.com/stable/fedora/$basearch
-enabled=1
-type=rpm
-repo_gpgcheck=1
-gpgcheck=1
-gpgkey=https://pkgs.tailscale.com/stable/fedora/repo.gpg
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/mullvad.repo"]
-content = """
-[mullvad-stable]
-name=Mullvad VPN
-baseurl=https://repository.mullvad.net/rpm/stable/$basearch
-type=rpm
-enabled=1
-gpgcheck=1
-gpgkey=https://repository.mullvad.net/rpm/mullvad-keyring.asc
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
-[bootstrap.files."/etc/yum.repos.d/1password.repo"]
-content = """
-# This file is automatically added and configured by the 1Password package. Modifications may be overwritten.
-[1password]
-name=1Password Stable Channel
-baseurl=https://downloads.1password.com/linux/rpm/stable/$basearch
-enabled=1
-gpgcheck=1
-#repo_gpgcheck=1
-gpgkey=https://downloads.1password.com/linux/keys/1password.asc
-"""
-owner = "root"
-group = "root"
-mode = "0644"
-phase = "pre-packages"
-replace = true
-
 [bootstrap.files."/etc/yum.repos.d/mise.repo"]
 content = """
 [mise-repo]
@@ -298,14 +109,6 @@ mode = "0644"
 phase = "pre-packages"
 replace = true
 
-[bootstrap.services.docker]
-state = "running"
-enabled = true
-
-[bootstrap.services.tailscaled]
-state = "running"
-enabled = true
-
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
 env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
@@ -314,13 +117,6 @@ run = 'exec "$REPO_DIR/tasks/discover.sh"'
 [tasks.bump]
 description = "Upgrade mise tools and bump every self-managed pin"
 run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
-
-[tasks.update-skills]
-description = "Update the vendored global agent skills to their latest upstream release"
-run = """
-cd "$REPO_DIR/agents"
-exec npx --yes skills update
-"""
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
@@ -357,55 +153,6 @@ tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
 gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
 """
 
-[tasks."media:setup"]
-description = "Install media codecs (ffmpeg swap, group upgrade)"
-run = """
-sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing || true
-sudo dnf group upgrade -y multimedia
-"""
-
-[tasks."graphics:setup"]
-description = "Install GPU-conditional graphics drivers"
-run = """
-if lspci -nn | grep -qi 'intel.*vga\\|vga.*intel'; then
-  echo "[graphics] Intel GPU detected - installing intel-media-driver..."
-  sudo dnf install -y -q intel-media-driver
-fi
-if lspci -nn | grep -qi 'amd.*vga\\|vga.*amd\\|advanced micro devices.*vga\\|vga.*advanced micro devices'; then
-  echo "[graphics] AMD GPU detected - installing udev perf rule..."
-  printf 'ACTION=="add", SUBSYSTEM=="drm", DRIVERS=="amdgpu", ATTR{device/power_dpm_force_performance_level}="high"\\n' \
-    | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
-fi
-"""
-
-[tasks."slack:setup"]
-description = "Install Slack desktop client"
-run = """
-version="{{vars.slack_version}}"
-build="${version}-0.1.el8"
-if ! rpm -q "slack-${build}.x86_64" >/dev/null 2>&1; then
-  sudo dnf install -y "https://downloads.slack-edge.com/desktop-releases/linux/x64/${version}/slack-${build}.x86_64.rpm"
-fi
-"""
-
-[tasks."zoom:setup"]
-description = "Install Zoom desktop client"
-run = """
-version="{{vars.zoom_version}}"
-if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
-  sudo dnf install -y "https://zoom.us/client/${version}/zoom_x86_64.rpm"
-fi
-"""
-
-[tasks."yaak:setup"]
-description = "Install Yaak API client"
-run = """
-version="{{vars.yaak_version}}"
-if ! rpm -q "yaak-${version}" >/dev/null 2>&1; then
-  sudo dnf install -y "https://github.com/mountain-loop/yaak/releases/download/v${version}/yaak-${version}-1.x86_64.rpm"
-fi
-"""
-
 [tasks."swap:setup"]
 description = "Create and enable the disk swap tier"
 run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
@@ -413,10 +160,3 @@ run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
 [tasks."tmp:setup"]
 description = "Move /tmp off tmpfs onto the encrypted root"
 run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
-
-[bootstrap.hooks.post-packages]
-run = """
-systemctl --user enable syncthing.service
-uv generate-shell-completion fish > ~/.config/fish/completions/uv.fish
-uvx --generate-shell-completion fish > ~/.config/fish/completions/uvx.fish
-"""

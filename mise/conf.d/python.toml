@@ -1,0 +1,23 @@
+[bootstrap.packages]
+"dnf:python3-devel" = "latest"
+"dnf:python3-pip" = "latest"
+"dnf:python3-virtualenv" = "latest"
+"dnf:python3.12" = "latest"
+
+# CPython source-build dependencies. mise compiles under python-build when no
+# precompiled standalone build exists yet (python-build-standalone lags point
+# releases). These headers keep every optional module (ssl, zlib, ctypes,
+# sqlite3, lzma, bz2, dbm, readline, uuid, zstd, tkinter) in a source build.
+# `patch` is absent from Fedora's default set and stops the build at once.
+"dnf:bzip2-devel" = "latest"
+"dnf:gdbm-devel" = "latest"
+"dnf:libffi-devel" = "latest"
+"dnf:libuuid-devel" = "latest"
+"dnf:libzstd-devel" = "latest"
+"dnf:openssl-devel" = "latest"
+"dnf:patch" = "latest"
+"dnf:readline-devel" = "latest"
+"dnf:sqlite-devel" = "latest"
+"dnf:tk-devel" = "latest"
+"dnf:xz-devel" = "latest"
+"dnf:zlib-ng-compat-devel" = "latest"

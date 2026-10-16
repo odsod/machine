@@ -1,0 +1,11 @@
+[vars]
+zoom_version = "7.2.1.5760"
+
+[tasks."zoom:setup"]
+description = "Install Zoom desktop client"
+run = """
+version="{{vars.zoom_version}}"
+if ! rpm -q "zoom-${version}" >/dev/null 2>&1; then
+  sudo dnf install -y "https://zoom.us/client/${version}/zoom_x86_64.rpm"
+fi
+"""
