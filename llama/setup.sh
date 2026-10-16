@@ -11,10 +11,10 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="${LLAMA_VERSION:-$(sed -n 's/^llama_version = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
-MODEL="${LLAMA_MODEL:-$(sed -n 's/^llama_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
-MODEL_URL="${LLAMA_MODEL_URL:-$(sed -n 's/^llama_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
-PORT="${LLAMA_PORT:-$(sed -n 's/^llama_port = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
+VERSION="${LLAMA_VERSION:?run via mise run llama:setup}"
+MODEL="${LLAMA_MODEL:?run via mise run llama:setup}"
+MODEL_URL="${LLAMA_MODEL_URL:?run via mise run llama:setup}"
+PORT="${LLAMA_PORT:?run via mise run llama:setup}"
 SRC="$DATA_DIR/llama/llama.cpp-${VERSION}"
 BUILD="$SRC/build"
 

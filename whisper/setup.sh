@@ -11,12 +11,12 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="${WHISPER_VERSION:-$(sed -n 's/^whisper_version = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
-MODEL="${WHISPER_MODEL:-$(sed -n 's/^whisper_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
-MODEL_URL="${WHISPER_MODEL_URL:-$(sed -n 's/^whisper_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
-VAD_MODEL="${WHISPER_VAD_MODEL:-$(sed -n 's/^whisper_vad_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
-VAD_MODEL_URL="${WHISPER_VAD_MODEL_URL:-$(sed -n 's/^whisper_vad_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
-PORT="${WHISPER_PORT:-$(sed -n 's/^whisper_port = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+VERSION="${WHISPER_VERSION:?run via mise run whisper:setup}"
+MODEL="${WHISPER_MODEL:?run via mise run whisper:setup}"
+MODEL_URL="${WHISPER_MODEL_URL:?run via mise run whisper:setup}"
+VAD_MODEL="${WHISPER_VAD_MODEL:?run via mise run whisper:setup}"
+VAD_MODEL_URL="${WHISPER_VAD_MODEL_URL:?run via mise run whisper:setup}"
+PORT="${WHISPER_PORT:?run via mise run whisper:setup}"
 SRC="$DATA_DIR/whisper/whisper.cpp-${VERSION}"
 BUILD="$SRC/build"
 
