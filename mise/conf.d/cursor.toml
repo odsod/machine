@@ -1,0 +1,45 @@
+[vars]
+# Cursor RPMs live behind a per-release production hash. Both values come from
+# one `mise run discover` row and must be bumped together.
+cursor_version = "3.25.6"
+cursor_hash = "f0df777c412b670d09e3eaf214967d779e67c088"
+
+[dotfiles]
+"~/.config/Cursor/User/settings.json" = "../../cursor/settings.json"
+"~/.config/Cursor/User/keybindings.json" = "../../cursor/keybindings.json"
+"~/.cursor/hooks.json" = "../../cursor/hooks.json"
+"~/.cursor/hooks" = "../../cursor/hooks"
+
+[bootstrap.files."/etc/yum.repos.d/cursor.repo"]
+content = """
+[cursor]
+name=Cursor
+baseurl=https://downloads.cursor.com/yumrepo
+enabled=1
+gpgcheck=1
+gpgkey=https://downloads.cursor.com/keys/anysphere.asc
+repo_gpgcheck=1
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[tasks."cursor:setup"]
+description = "Install Cursor editor"
+run = """
+version="{{vars.cursor_version}}"
+if [ "$(rpm -q --qf '%{VERSION}' cursor 2>/dev/null || true)" != "$version" ]; then
+  sudo dnf install -y "https://downloads.cursor.com/production/{{vars.cursor_hash}}/linux/x64/rpm/x86_64/cursor-${version}.el8.x86_64.rpm"
+fi
+"""
+
+[tasks."cursor:setup-cli"]
+description = "Seed cursor CLI config from repo template"
+run = """
+if [ ! -f "$HOME/.cursor/cli-config.json" ]; then
+  mkdir -p "$HOME/.cursor"
+  cp "$REPO_DIR/cursor/cli-config.json" "$HOME/.cursor/cli-config.json"
+fi
+"""

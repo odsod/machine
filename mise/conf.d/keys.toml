@@ -1,37 +1,49 @@
-[tasks.install]
+[bootstrap.files."/etc/systemd/system/odsod-keys.service"]
+source = "../../keys/odsod-keys.service"
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+notify = ["odsod-keys"]
+
+[bootstrap.services.odsod-keys]
+state = "running"
+enabled = true
+on_change = "restart"
+
+[tasks."keys:install"]
 description = "Build and converge odsod-keys service"
-depends = ["build"]
+depends = ["keys:build"]
 run = "mise bootstrap files services"
 
-[tasks.build]
+[tasks."keys:build"]
 description = "Compile and install odsod-keys binary"
-sources = ["odsod-keys.c"]
-outputs = ["/usr/local/bin/odsod-keys"]
 run = """
+cd "$REPO_DIR/keys"
 sudo dnf install -y -q gcc kernel-headers
 gcc -O2 -Wall -Wextra -Werror -o odsod-keys odsod-keys.c
 sudo install -m 0755 odsod-keys /usr/local/bin/odsod-keys
 rm odsod-keys
 """
 
-[tasks.deploy]
+[tasks."keys:deploy"]
 description = "Build and restart service"
-depends = ["build"]
+depends = ["keys:build"]
 run = "sudo systemctl restart odsod-keys.service"
 
-[tasks.status]
+[tasks."keys:status"]
 description = "Show service status"
 run = "systemctl status odsod-keys.service"
 
-[tasks.log]
+[tasks."keys:log"]
 description = "Follow service logs"
 run = "journalctl -u odsod-keys.service -f"
 
-[tasks.stop]
+[tasks."keys:stop"]
 description = "Stop the service"
 run = "sudo systemctl stop odsod-keys.service"
 
-[tasks.uninstall]
+[tasks."keys:uninstall"]
 description = "Disable and remove everything"
 run = """
 sudo systemctl disable --now odsod-keys.service 2>/dev/null || true

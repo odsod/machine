@@ -1,0 +1,7 @@
+[dotfiles]
+"~/.gitconfig" = "../../git/gitconfig"
+
+[bootstrap.packages]
+"dnf:git" = "latest"
+"dnf:git-delta" = "latest"
+"dnf:difftastic" = "latest"

@@ -1,0 +1,20 @@
+[dotfiles]
+"~/.gemini/policies/machine.toml" = "../../antigravity/policies.toml"
+
+[tasks."antigravity:check"]
+description = "Check antigravity config drift (fails until resolved)"
+run = """
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
+  echo "[antigravity] Resolve with: mise run antigravity:resolve"
+  exit 1
+fi
+"""
+
+[tasks."antigravity:resolve"]
+description = "Resolve antigravity config drift by overwriting the live config"
+run = """
+if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
+  echo "[antigravity] Applying repo config over live config"
+fi
+install -m 600 "$REPO_DIR/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
+"""

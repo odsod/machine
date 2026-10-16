@@ -1,0 +1,31 @@
+[vars]
+whisper_version = "1.9.5"
+whisper_model = "ggml-large-v3.bin"
+whisper_model_url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin"
+whisper_vad_model = "ggml-silero-v6.2.0.bin"
+whisper_vad_model_url = "https://huggingface.co/ggml-org/whisper-vad/resolve/main/ggml-silero-v6.2.0.bin"
+whisper_port = "8178"
+
+[tasks."whisper:setup"]
+description = "Build and install whisper.cpp GPU speech-to-text service"
+env = { WHISPER_VERSION = "{{vars.whisper_version}}", WHISPER_MODEL = "{{vars.whisper_model}}", WHISPER_MODEL_URL = "{{vars.whisper_model_url}}", WHISPER_VAD_MODEL = "{{vars.whisper_vad_model}}", WHISPER_VAD_MODEL_URL = "{{vars.whisper_vad_model_url}}", WHISPER_PORT = "{{vars.whisper_port}}" }
+run = 'exec "$REPO_DIR/whisper/setup.sh"'
+
+[tasks."whisper:discover"]
+description = "Show latest stable whisper.cpp release version"
+run = """
+gh api 'repos/ggml-org/whisper.cpp/releases?per_page=30' \
+  --jq 'first(.[] | select(.prerelease == false) | .tag_name | select(test("^v[0-9]"))) | sub("^v"; "")' \
+  || echo UNKNOWN
+"""
+
+[tasks."whisper:clean"]
+description = "Remove whisper.cpp source trees other than the pinned version"
+run = """
+for dir in "$HOME/.local/share/odsod/machine/data/whisper"/whisper.cpp-*; do
+  if [ -d "$dir" ] && [ "$(basename "$dir")" != "whisper.cpp-{{vars.whisper_version}}" ]; then
+    echo "[clean] Removing $(basename "$dir")"
+    rm -rf "$dir"
+  fi
+done
+"""

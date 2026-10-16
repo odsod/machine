@@ -1,0 +1,5 @@
+[dotfiles]
+"~/.config/jj/config.toml" = "../../jj/config.toml"
+"~/.local/bin/jj-workflow" = "../../jj/workflow.fish"
+"~/.local/bin/jj-editor-guard" = "../../jj/editor-guard"
+

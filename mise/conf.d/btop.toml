@@ -1,0 +1,5 @@
+[dotfiles]
+"~/.config/btop/btop.conf" = "../../btop/btop.conf"
+
+[bootstrap.packages]
+"dnf:btop" = "latest"

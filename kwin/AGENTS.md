@@ -10,10 +10,11 @@ Custom KWin script and companion DBus service for window management.
 
 ## Development
 
-- `mise run -C kwin install-package && mise run -C kwin enable-plugin`: Reload after editing `main.js`
-- `mise run -C kwin tail`: Stream debug logs from the DBus service
+- `mise run kwin:install`: Install or upgrade the KWin script package, reload the plugin, and configure focus policy
+- `mise run kwin:install-package && mise run kwin:enable-plugin`: Reload after editing `main.js`
+- `mise run kwin:tail`: Stream debug logs from the DBus service
 - `Meta+W`: Recorder note popup (`recorder-note` via kdialog)
-- `Meta+;`: Debug shortcut — dumps all window `resourceName`/`resourceClass` to journal
+- `Meta+;`: Debug shortcut that dumps all window `resourceName`/`resourceClass` values to journal
 
 ## Chrome on Wayland: Window Class Rules
 
@@ -24,7 +25,7 @@ Custom KWin script and companion DBus service for window management.
 | Normal (no `--app`) | **Yes**              | Value of `--class`                               |
 | `--app=<url>`       | **No**               | `chrome-{url_host}__-{profile}` (auto-generated) |
 
-- `--class` maps to X11 `WM_CLASS` but Chromium also routes it to Wayland `xdg_toplevel_set_app_id` — **only in non-app mode**
+- `--class` maps to X11 `WM_CLASS` but Chromium also routes it to Wayland `xdg_toplevel_set_app_id` **only in non-app mode**
 - In `--app` mode, Chromium overrides the app_id with a URL-derived value regardless of `--class`
 - `--user-data-dir` does **not** affect the app_id
 
@@ -48,5 +49,5 @@ For `--app` windows, match using `resourceClassIncludes` with the URL host:
 resourceClassIncludes: "meet.google.com"; // matches chrome-meet.google.com__-Default
 ```
 
-- No tabs — single-page window
+- No tabs (single-page window)
 - Class is auto-generated, not controllable

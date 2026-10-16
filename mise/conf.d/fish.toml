@@ -1,0 +1,8 @@
+[dotfiles]
+"~/.config/fish/config.fish" = "../../fish/config.fish"
+"~/.config/fish/conf.d/00-env.fish" = "../../fish/env.fish"
+"~/.config/fish/conf.d/prompt.fish" = "../../fish/prompt.fish"
+"~/.config/fish/completions/aws.fish" = "../../fish/aws.fish"
+
+[bootstrap.user]
+login_shell = "/usr/local/bin/fish"

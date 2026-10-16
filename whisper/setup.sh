@@ -11,13 +11,13 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/whisper/mise.toml")"
-MODEL="ggml-large-v3.bin"
-MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/${MODEL}"
-VAD_MODEL="ggml-silero-v6.2.0.bin"
-VAD_MODEL_URL="https://huggingface.co/ggml-org/whisper-vad/resolve/main/${VAD_MODEL}"
-PORT="8178"
-SRC="$REPO_DIR/whisper/whisper.cpp-${VERSION}"
+VERSION="${WHISPER_VERSION:-$(sed -n 's/^whisper_version = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+MODEL="${WHISPER_MODEL:-$(sed -n 's/^whisper_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+MODEL_URL="${WHISPER_MODEL_URL:-$(sed -n 's/^whisper_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+VAD_MODEL="${WHISPER_VAD_MODEL:-$(sed -n 's/^whisper_vad_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+VAD_MODEL_URL="${WHISPER_VAD_MODEL_URL:-$(sed -n 's/^whisper_vad_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+PORT="${WHISPER_PORT:-$(sed -n 's/^whisper_port = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/whisper.toml")}"
+SRC="$DATA_DIR/whisper/whisper.cpp-${VERSION}"
 BUILD="$SRC/build"
 
 echo "[whisper] Installing ROCm build dependencies..."
@@ -31,8 +31,9 @@ sudo dnf install -y -q \
 
 if [ ! -f "$SRC/CMakeLists.txt" ]; then
   rm -rf "$SRC"
+  mkdir -p "$DATA_DIR/whisper"
   echo "[whisper] Downloading source..."
-  curl -fL "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/whisper"
+  curl -fL "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$DATA_DIR/whisper"
 fi
 
 echo "[whisper] Building whisper-server with ROCm/HIP..."
@@ -59,19 +60,21 @@ fi
 
 echo "[whisper] Installing systemd user service..."
 mkdir -p "$HOME/.config/systemd/user"
+UNIT_FILE="$HOME/.config/systemd/user/whisper-server.service"
+OLD_UNIT="$(cat "$UNIT_FILE" 2>/dev/null || true)"
 sed \
   -e "s|@SERVER_BIN@|${BUILD}/bin/whisper-server|" \
   -e "s|@MODEL_PATH@|${DATA_DIR}/whisper/${MODEL}|" \
   -e "s|@VAD_MODEL_PATH@|${DATA_DIR}/whisper/${VAD_MODEL}|" \
   -e "s|@PORT@|${PORT}|" \
-  "$REPO_DIR/whisper/whisper-server.service" > "$HOME/.config/systemd/user/whisper-server.service"
+  "$REPO_DIR/whisper/whisper-server.service" > "$UNIT_FILE"
 systemctl --user daemon-reload
 systemctl --user enable --now whisper-server.service
 
 # `enable --now` does not restart a running service, so a rebuilt binary would
-# sit unused. Restart only when the installed version actually moved.
+# sit unused. Restart when the installed version or unit file changed.
 STAMP="$DATA_DIR/whisper/.installed-version"
-if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ]; then
+if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ] || [ "$(cat "$UNIT_FILE")" != "$OLD_UNIT" ]; then
   systemctl --user restart whisper-server.service
   mkdir -p "$DATA_DIR/whisper"
   printf '%s\n' "$VERSION" > "$STAMP"

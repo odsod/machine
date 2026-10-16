@@ -1,0 +1,27 @@
+[dotfiles]
+"~/.config/mimeapps.list" = "../../kde/mimeapps.list"
+"~/.config/fontconfig/conf.d/10-rendering.conf" = "../../kde/fonts.conf"
+"~/.config/kwalletrc" = { content = "[Wallet]\nEnabled=true\nFirst Use=false\n" }
+
+[bootstrap.packages]
+"dnf:kdialog" = "latest"
+"dnf:pam-kwallet" = "latest"
+"brew-cask:font-inter" = "latest"
+"brew-cask:font-iosevka-ss08" = "latest"
+"brew-cask:font-iosevka-term-nerd-font" = "latest"
+
+[tasks."kde:setup-fonts"]
+description = "Configure KDE system fonts"
+run = """
+kwriteconfig6 --group "General" --key "font" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "fixed" "Iosevka SS08,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "smallestReadableFont" "Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "toolBarFont" "Inter,9,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "menuFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+kwriteconfig6 --group "General" --key "XftAntialias" "true"
+kwriteconfig6 --group "General" --key "XftHintStyle" "hintslight"
+kwriteconfig6 --group "General" --key "XftSubPixel" "none"
+kwriteconfig6 --group "WM" --key "activeFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
+fc-cache -f
+"""
+

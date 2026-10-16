@@ -1,0 +1,15 @@
+[dotfiles]
+"~/.config/herdr/config.toml" = "../../herdr/config.toml"
+"~/.local/bin/clone-repo" = "../../herdr/clone-repo"
+"~/.local/bin/start-workspace" = "../../herdr/start-workspace"
+"~/.local/bin/remove-jj-workspace" = "../../herdr/remove-jj-workspace"
+"~/.local/bin/recorder-toggle-herdr" = "../../herdr/recorder-toggle"
+"~/.local/bin/herdr-url-picker" = "../../herdr/herdr-url-picker"
+"~/.local/bin/desktop-run" = "../../herdr/desktop-run"
+"~/.local/bin/open-url" = "../../herdr/open-url"
+"~/.local/bin/xdg-open" = "../../herdr/xdg-open"
+"~/.local/bin/recorder-toggle" = "../../herdr/recorder-toggle"
+
+[tasks."herdr:sync-machines"]
+description = "Save missing Tailscale peers as Herdr machines"
+run = 'exec "$REPO_DIR/herdr/setup-machines.sh"'
