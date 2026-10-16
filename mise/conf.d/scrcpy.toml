@@ -1,0 +1,8 @@
+[bootstrap.dnf.repos]
+# Fedora does not package scrcpy. Its COPR has no upstream repo, so it is
+# unofficial. It replaces Terra.
+scrcpy = { copr = "boobaa/scrcpy" }
+
+[bootstrap.packages]
+"dnf:android-tools" = "latest"
+"dnf:scrcpy" = "latest"

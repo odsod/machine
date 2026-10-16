@@ -1,0 +1,5 @@
+[bootstrap.packages]
+"dnf:wireshark" = "latest"
+
+[bootstrap.groups.wireshark]
+system = true

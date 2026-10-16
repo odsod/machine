@@ -1,0 +1,12 @@
+[bootstrap.packages]
+"dnf:containerd" = "latest"
+"dnf:docker-buildx" = "latest"
+"dnf:docker-cli" = "latest"
+"dnf:docker-compose" = "latest"
+
+[bootstrap.groups.docker]
+system = true
+
+[bootstrap.services.docker]
+state = "running"
+enabled = true

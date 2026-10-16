@@ -1,0 +1,5 @@
+[bootstrap.packages]
+"dnf:syncthing" = "latest"
+
+[bootstrap.hooks.post-packages]
+run = "systemctl --user enable syncthing.service"

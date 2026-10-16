@@ -93,8 +93,7 @@ fi
 # that defines the named pin.
 pin_file() {
   case "$1" in
-  slack | zoom | yaak | soap-ui) echo "$REPO_DIR/mise/conf.d/00-machine.toml" ;;
-  obsidian | cursor | llama | whisper | endpoint-verification)
+  slack | zoom | yaak | soap-ui | obsidian | cursor | llama | whisper | endpoint-verification)
     echo "$REPO_DIR/mise/conf.d/$1.toml"
     ;;
   *)
