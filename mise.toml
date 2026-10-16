@@ -61,7 +61,7 @@ hyperfine = "latest"
 jj = "latest"
 neovim = { version = "latest", postinstall = """
 sudo dnf remove -y vim-enhanced vim-minimal 2>/dev/null || true
-nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
+nvim --headless '+lua local ok, err = pcall(require("odsod.pack").update); if not ok then vim.api.nvim_err_writeln(err); vim.cmd("cquit 1") end' +qa
 nvim_path="$(mise where neovim)/bin/nvim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vim"
 ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
