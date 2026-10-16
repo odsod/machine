@@ -28,6 +28,8 @@
   - bootstrap + top-level module loading
 - `lua/odsod/plugins.lua`
   - `vim.pack.add()` declarations + plugin configuration
+- `lua/odsod/pack.lua`
+  - plugin update + lockfile sync helper
 - `lua/odsod/lsp.lua`
   - LSP defaults + server enable list + LspAttach hooks
 - `lua/odsod/lsp/save_actions.lua`
@@ -79,8 +81,13 @@
 - Sync/update plugins:
 
 ```sh
-nvim --headless '+lua vim.pack.update(nil, { force = true })' +qa
+nvim --headless '+lua require("odsod.pack").update()' +qa
 ```
+
+- `odsod.pack.update()` updates every plugin to its latest revision and then
+  syncs `nvim-pack-lock.json` from the actual checkouts. Plain
+  `vim.pack.update()` skips the lockfile write when a checkout is already at
+  the remote revision, which leaves a stale lockfile.
 
 - Startup validation:
 

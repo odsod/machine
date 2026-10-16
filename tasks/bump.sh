@@ -44,7 +44,7 @@ while [ $# -gt 0 ]; do
     echo "  -n, --dry-run  Preview bumps without changing files"
     echo "  -h, --help     Show this help message"
     echo
-    echo "Targets: yaak, obsidian, slack, zoom, cursor, soap-ui, endpoint-verification, llama, whisper"
+    echo "Targets: neovim, yaak, obsidian, slack, zoom, cursor, soap-ui, endpoint-verification, llama, whisper"
     exit 0
     ;;
   -*)
@@ -58,13 +58,14 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# No targets means a full bump: every pin, including the GPU services, and the
-# mise-managed [tools]. An explicit target bumps only that pin.
+# No targets means a full bump: every pin, including the GPU services, the
+# Neovim plugin lock, and the mise-managed [tools]. An explicit target bumps
+# only that pin.
 tools=1
 if [ ${#targets[@]} -gt 0 ]; then
   tools=0
 else
-  targets=(yaak obsidian slack zoom cursor soap-ui endpoint-verification llama whisper)
+  targets=(neovim yaak obsidian slack zoom cursor soap-ui endpoint-verification llama whisper)
 fi
 
 # 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
@@ -102,10 +103,77 @@ check_url() {
   curl -sI -f -L --max-time 15 "$url" >/dev/null 2>&1
 }
 
+# Print the plugins whose lockfile revision is behind the remote default
+# branch, one "name old -> new" line each. The dry run must not touch the
+# lockfile, so it compares revisions instead of calling vim.pack.update. Lock
+# entries with no "version" track the remote default branch, so HEAD is the
+# target; entries with a "version" track a tag or branch and are left alone. A
+# probe that fails prints a warning and makes the function fail.
+neovim_pack_stale() {
+  python3 - "$REPO_DIR/neovim/nvim-pack-lock.json" <<'PY'
+import json, subprocess, sys
+
+stale = []
+failed = False
+for name, spec in sorted(json.load(open(sys.argv[1]))["plugins"].items()):
+    if "version" in spec:
+        continue
+    proc = subprocess.run(
+        ["git", "ls-remote", spec["src"], "HEAD"],
+        capture_output=True, text=True,
+    )
+    remote = proc.stdout.split()[0] if proc.stdout.strip() else ""
+    if not remote:
+        print(f"  {name}: cannot read remote HEAD", file=sys.stderr)
+        failed = True
+    elif remote != spec["rev"]:
+        stale.append(f"  {name}: {spec['rev'][:12]} -> {remote[:12]}")
+print("\n".join(stale))
+sys.exit(1 if failed else 0)
+PY
+}
+
+bump_neovim() {
+  local lock="$REPO_DIR/neovim/nvim-pack-lock.json"
+
+  if [ "$dry_run" -eq 1 ]; then
+    local stale
+    stale="$(neovim_pack_stale)" || true
+    if [ -z "$stale" ]; then
+      echo "[bump] neovim: plugins up to date"
+    else
+      echo "[bump] neovim: plugins would update:"
+      printf '%s\n' "$stale"
+      changed_count=$((changed_count + 1))
+    fi
+    return 0
+  fi
+
+  local before after
+  before="$(git -C "$REPO_DIR" hash-object "$lock")"
+  echo "[bump] Updating Neovim plugins..."
+  # require('odsod.pack').update() updates every plugin and then syncs the
+  # lockfile from the actual checkouts, including a checkout already ahead of
+  # a stale lockfile, which plain vim.pack.update() leaves behind. Wrap it in
+  # pcall because a headless Lua error exits 0.
+  nvim --headless '+lua local ok, err = pcall(require("odsod.pack").update); if not ok then vim.api.nvim_err_writeln(err); vim.cmd("cquit 1") end' +qa
+  after="$(git -C "$REPO_DIR" hash-object "$lock")"
+  if [ "$before" = "$after" ]; then
+    echo "[bump] neovim: plugins up to date"
+  else
+    echo "[bump] neovim: pack lock updated"
+    changed_count=$((changed_count + 1))
+  fi
+}
+
 changed_count=0
 
 bump_target() {
   local name="$1"
+  if [ "$name" = neovim ]; then
+    bump_neovim
+    return 0
+  fi
   local pinned=""
   local latest=""
   local check_target_url=""

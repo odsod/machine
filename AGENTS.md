@@ -30,11 +30,12 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 Run `mise run bump` to upgrade `[tools]` with `mise upgrade --bump`, then
 discover, pre-flight verify, and update every self-managed pin. That covers
-desktop apps, endpoint-verification, and the GPU services that compile from
-source. It writes only version files (`mise.toml`, the topic `mise.toml` files,
-and `mise.lock`) plus the tool installs that `mise upgrade` does. It does not
-apply config or run convergence. Run `mise run apply` for that. Pass
-`mise run bump <name>` to bump a single pin, or `--dry-run` to preview.
+desktop apps, endpoint-verification, the GPU services that compile from source,
+and the Neovim plugin lock. It writes only version files (`mise.toml`, the topic
+`mise.toml` files, `mise.lock`, and `neovim/nvim-pack-lock.json`) plus the tool
+installs that `mise upgrade` does. It does not apply config or run convergence.
+Run `mise run apply` for that. Pass `mise run bump <name>` to bump a single
+pin, or `--dry-run` to preview.
 
 To inspect versions manually, start with `mise run discover`. Before probing
 anything it refuses to run while any PR is open on the remote: the bump work may
@@ -69,6 +70,10 @@ before trusting the row.
   those, so `discover` filters on release shape instead. After a bump,
   `mise run apply` rebuilds the service. Its setup script restarts a running
   service only when the installed version moved.
+- **Neovim plugins**: a full bump updates every plugin and syncs
+  `neovim/nvim-pack-lock.json` from the actual checkouts. `mise run bump neovim`
+  updates only the plugins. `odsod.pack.update()` in `neovim/lua/odsod/pack.lua`
+  does the work, and the neovim `postinstall` hook calls it too.
 - **endpoint-verification**: `mise run -C endpoint-verification discover`
   prints `version`, `deb`, and `sha256` as a paste-ready `[vars]` block. All
   three move together: the filename carries a per-build hash, and install
