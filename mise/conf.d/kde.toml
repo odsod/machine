@@ -1,4 +1,5 @@
 [dotfiles]
+"~/.config/plasma-workspace/env/odsod-machine.sh" = "../../env.sh"
 "~/.config/mimeapps.list" = "../../kde/mimeapps.list"
 "~/.config/fontconfig/conf.d/10-rendering.conf" = "../../kde/fonts.conf"
 "~/.config/kwalletrc" = "../../kde/kwalletrc"
