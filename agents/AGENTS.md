@@ -46,9 +46,9 @@ Load `/agent-team` when asked to compose or run a multi-agent team.
 
 ## Skills
 
-`AGENTS.md` and `.agents/skills/` are the real files everywhere. Each per-agent
-name is a symlink onto them, never a second copy: `CLAUDE.md` → `AGENTS.md`,
-`.claude/skills` → `.agents/skills`. Read and edit the `.agents` path.
+`AGENTS.md` and `.agents/skills/` are the real files everywhere. `.claude/skills`
+is a symlink onto `.agents/skills`, never a second copy. Read and edit the
+`.agents` path.
 
 `~/.agents/skills/` holds only skills that apply in every repo: `herdr` and
 `agent-team`. A skill about one repo belongs in that repo's own `.agents/skills/`.
