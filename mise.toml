@@ -8,6 +8,11 @@ idiomatic_version_file_enable_tools = [
   "ruby",
   "terraform",
 ]
+# `mise upgrade` and `prune` parse every tracked config, including go.mod files
+# from build artifacts and other repos. A bare `go` directive is only a floor,
+# so ignore it now instead of warning until mise 2026.11.0 removes it. The
+# version comes from mise.toml or go.mod's `toolchain` line.
+idiomatic_version_file_ignore_minimum_versions = true
 lockfile = true
 minimum_release_age = "0s"
 pin = false
