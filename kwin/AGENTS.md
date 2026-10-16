@@ -1,53 +1,29 @@
-# kwin
+# KWin
 
 ## Architecture
 
-Custom KWin script and companion DBus service for window management.
-
-- **KWin script** (`contents/code/main.js`): Registers Meta+key shortcuts, toggles app windows by `resourceClass`/`resourceName`, remaps default window actions, and strips borders via `noBorder`.
-- **DBus service** (`odsod-kwin-dbus-service.py`): User-space Python service (`io.github.odsod.kwin`) auto-activated via D-Bus. Launches apps via `subprocess.Popen`, binds/unbinds global shortcuts via `KGlobalAccel`, and forwards script logs to syslog.
-- **Shortcut kinds**: `builtin` (KWin native), `app` (focus-or-launch), `command` (fire-and-forget), `callback` (inline JS).
+- **`contents/code/main.js`**: KWin script that binds `Meta+<key>` shortcuts,
+  toggles app windows by `resourceClass` or `resourceName`, remaps window
+  actions, and sets `noBorder`.
+- **`odsod-kwin-dbus-service.py`**: User D-Bus service (`io.github.odsod.kwin`)
+  that launches apps, registers global shortcuts in `KGlobalAccel`, and
+  forwards script logs to the journal.
+- **Shortcut kinds**: `builtin` (KWin action), `app` (focus or launch),
+  `command` (fire and forget), `callback` (inline JS).
 
 ## Development
 
-- `mise run kwin:install`: Install or upgrade the KWin script package, reload the plugin, and configure focus policy
-- `mise run kwin:install-package && mise run kwin:enable-plugin`: Reload after editing `main.js`
-- `mise run kwin:tail`: Stream debug logs from the DBus service
-- `Meta+W`: Recorder note popup (`recorder-note` via kdialog)
-- `Meta+;`: Debug shortcut that dumps all window `resourceName`/`resourceClass` values to journal
+- Full install and reload: `mise run kwin:install`
+- Reload after editing `main.js`: `mise run kwin:install-package && mise run kwin:enable-plugin`
+- Tail D-Bus logs: `mise run kwin:tail`
+- Dump all open window classes to the journal: `Meta+;`
 
-## Chrome on Wayland: Window Class Rules
+## Chrome Window Classes on Wayland
 
-**CRITICAL**: Chrome's `--class` flag behavior differs between modes on Wayland.
-
-| Launch mode         | `--class` respected? | Wayland `app_id` set to                          |
-| ------------------- | -------------------- | ------------------------------------------------ |
-| Normal (no `--app`) | **Yes**              | Value of `--class`                               |
-| `--app=<url>`       | **No**               | `chrome-{url_host}__-{profile}` (auto-generated) |
-
-- `--class` maps to X11 `WM_CLASS` but Chromium also routes it to Wayland `xdg_toplevel_set_app_id` **only in non-app mode**
-- In `--app` mode, Chromium overrides the app_id with a URL-derived value regardless of `--class`
-- `--user-data-dir` does **not** affect the app_id
-
-### Pattern: Chrome window with custom class
-
-Use `--user-data-dir` (separate profile) + `--class=<Name>` **without** `--app`:
-
-```sh
-google-chrome --user-data-dir="$HOME/.local/share/path/to/profile" --class=MyApp "$URL"
-```
-
-- Gives a normal Chrome window (supports tabs)
-- `resourceClass` in KWin matches the `--class` value
-- Each `--user-data-dir` isolates cookies/history
-
-### Pattern: Chrome --app mode (no class control)
-
-For `--app` windows, match using `resourceClassIncludes` with the URL host:
-
-```js
-resourceClassIncludes: "meet.google.com"; // matches chrome-meet.google.com__-Default
-```
-
-- No tabs (single-page window)
-- Class is auto-generated, not controllable
+- **Normal mode (no `--app`)**: Chromium passes `--class=<Name>` to Wayland
+  `xdg_toplevel_set_app_id`. Pair `--user-data-dir` with `--class` to get an
+  isolated profile with a controllable `resourceClass`:
+  `google-chrome --user-data-dir="$HOME/.local/share/..." --class=MyApp "$URL"`
+- **`--app=<url>` mode**: Chromium ignores `--class` and sets the Wayland
+  `app_id` to `chrome-<host>__-<profile>`. Match these windows in `main.js`
+  with `resourceClassIncludes: "<host>"`.

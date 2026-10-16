@@ -1,7 +1,5 @@
 # Keyboard Layout
 
-Custom Dvorak-based XKB layout with Swedish characters and programming symbols.
-
 ## Base Layer
 
 ```

@@ -1,114 +1,33 @@
-# keys Agent Guide
-
-## Scope
-
-- Path: `keys/`
-- Binary: `/usr/local/bin/odsod-keys`
-- Service: `odsod-keys.service` (systemd, root)
-- Source: single file `odsod-keys.c`
+# Keys Daemon
 
 ## Architecture
 
-```
-┌─────────────────┐     ┌──────────────┐     ┌─────────────────────┐
-│ Physical KBD(s) │────▶│  odsod-keys  │────▶│ uinput virtual kbd  │
-│ /dev/input/eventN│     │  (event loop)│     │ (remapped output)   │
-└─────────────────┘     └──────────────┘     └─────────────────────┘
-      EVIOCGRAB              poll()              write(uinput_fd)
-   (exclusive grab)
-```
+- `odsod-keys.c` compiles to `/usr/local/bin/odsod-keys` and runs as the root
+  `odsod-keys.service` systemd unit.
+- Grabs all physical keyboards via `EVIOCGRAB`, watches `/dev/input/` via
+  `inotify` for hotplug, and writes remapped events to `/dev/uinput` (vendor/product
+  `0x4f44:0x4b59`).
 
-- Grabs all physical keyboards exclusively via `EVIOCGRAB`
-- Creates a virtual keyboard via `/dev/uinput`
-- Processes events in a `poll()` loop
-- Hotplug: `inotify` on `/dev/input/` for new devices
-- Identifies own virtual device by vendor/product `0x4f44:0x4b59`
+## Overload State Machine
 
-## State Machine
+- **`capslock` and `leftctrl` -> `Ctrl` / `Esc`**:
+  - Press emits `Ctrl` down immediately.
+  - Release within 250ms with no intervening key emits an `Esc` tap.
+  - Release after an intervening key emits `Ctrl` up.
+- **`space` -> `Meta` chord / `Space`** (`IDLE -> PENDING -> HELD`):
+  - `PENDING` buffers events when space is pressed.
+  - Another key held past 150ms or tapped within 150ms transitions to `HELD`
+    and flushes the buffer as `Meta` chords.
+  - Space released within 350ms emits `Space` and flushes buffered keys
+    normally.
+  - Space released after 350ms with no other key drops the tap.
+- **Transient `Meta_L`**:
+  - `odsod-keys` never holds `Meta_L` across a layer (`Meta_L down -> key down -> SYN -> key up -> Meta_L up -> SYN` per keystroke).
+  - Sustaining `Meta_L` (as `keyd` does with `meta:M` and `inhibit_modifier_guard = 1`) causes KDE Plasma to see a bare `Meta_L` release and open the application launcher.
 
-Three independent overload handlers:
+## Development
 
-### capslock / leftctrl → ctrl/esc
-
-Simple overload:
-
-- Press → emit `Ctrl down` immediately
-- Release < 250ms with no intervening key → emit `Esc` tap
-- Release after intervening key → just `Ctrl up`
-
-### space → meta-layer/space
-
-Three-state machine: `IDLE → PENDING → HELD`
-
-```
-PENDING: space pressed, buffering events
-  ├── another key pressed (> 150ms) → HELD, flush queue as Meta chords
-  ├── another key tapped (press+release < 150ms) → HELD, flush as Meta
-  ├── space released (< 350ms) → emit space + flush queue as normal keys
-  └── space released (> 350ms) → drop everything (accidental hold)
-
-HELD: meta layer active
-  └── all subsequent keys emit as Meta+key until space released
-```
-
-### Critical design decision: Meta_L is never sustained
-
-Unlike keyd's `:M` layer modifier (which holds `Meta_L` for the duration
-of the layer activation), this daemon emits Meta only transiently per
-keystroke:
-
-```
-Meta_L down → key down → SYN → key up → Meta_L up → SYN
-```
-
-This makes it impossible for KDE to see a bare `Meta_L` tap, eliminating
-the application launcher trigger entirely.
-
-## Key constants
-
-| Constant            | Value | Purpose                           |
-| ------------------- | ----- | --------------------------------- |
-| `HOLD_THRESHOLD_NS` | 150ms | Rollover protection window        |
-| `TAP_TIMEOUT_NS`    | 350ms | Max duration for space tap        |
-| `MAX_QUEUE`         | 16    | Event buffer during PENDING state |
-| `MAX_DEVICES`       | 32    | Maximum simultaneous keyboards    |
-
-## Development workflow
-
-```bash
-mise run keys:build     # compile and install binary
-mise run keys:deploy    # build + install + restart service
-mise run keys:log       # tail journalctl output
-mise run keys:stop      # stop service (raw keyboard restored)
-```
-
-After editing `odsod-keys.c`, run `mise run keys:deploy` to test changes.
-If the keyboard becomes unresponsive, stop the service via SSH or from
-another machine.
-
-## Upstream references
-
-- [keyd](https://github.com/rvaiya/keyd) - original inspiration, modifier
-  guard analysis from `src/keyboard.c`
-- [Linux input subsystem](https://www.kernel.org/doc/html/latest/input/input.html)
-  - `EV_KEY`, `EV_SYN`, key repeat (`value=2`)
-- [uinput](https://www.kernel.org/doc/html/latest/input/uinput.html) -
-  virtual device creation
-- [evdev](https://www.freedesktop.org/software/libevdev/doc/latest/) -
-  event codes reference (`linux/input-event-codes.h`)
-
-## Background: keyd Meta + KDE interaction
-
-The reason this daemon exists (migrated from keyd v2.6.0):
-
-1. keyd's `meta` layer is internally `meta:M`. Activating it emits
-   `Meta_L down` immediately.
-2. On release without intervening keypress, keyd's `OP_LAYER` handler
-   sets `inhibit_modifier_guard = 1` (line 625 in `src/keyboard.c`)
-3. This disables the Ctrl interposition guard that normally prevents
-   DEs from seeing bare modifier taps
-4. KDE Plasma sees `Meta_L down → Meta_L up` → fires application launcher
-5. Neither `[ModifierOnlyShortcuts] Meta=` in kwinrc nor removing Meta
-   from plasmashell's kglobalaccel binding fully prevents this
-
-The fix is architectural: never emit a sustained `Meta_L` keypress.
+- Build and install: `mise run keys:build`
+- Build, install, and restart service: `mise run keys:deploy`
+- Follow logs: `mise run keys:log`
+- Stop service (restores raw keyboard): `mise run keys:stop`
