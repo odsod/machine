@@ -1,7 +1,7 @@
 [dotfiles]
 "~/.config/mimeapps.list" = "../../kde/mimeapps.list"
 "~/.config/fontconfig/conf.d/10-rendering.conf" = "../../kde/fonts.conf"
-"~/.config/kwalletrc" = { content = "[Wallet]\nEnabled=true\nFirst Use=false\n" }
+"~/.config/kwalletrc" = "../../kde/kwalletrc"
 
 [bootstrap.packages]
 "dnf:kdialog" = "latest"

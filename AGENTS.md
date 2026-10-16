@@ -203,7 +203,7 @@ mise is bootstrapped via the upstream dnf repo, then self-managed via `[tools]`.
 | `[tools]`               | `mise.toml`          | Versioned dev tool binaries (anchors `mise.lock`)      |
 | `[env]`                 | `mise.toml`          | Sources `env.sh` via `_.source`, sets `REPO_DIR`       |
 | `[vars]`                | `mise/conf.d/*.toml` | Pinned versions and model parameters                   |
-| `[dotfiles]`            | `mise/conf.d/*.toml` | Config symlinks (`../../` prefix) and inline dotfiles  |
+| `[dotfiles]`            | `mise/conf.d/*.toml` | Config symlinks (`../../` prefix into `<topic>/`)      |
 | `[bootstrap.dnf.repos]` | `mise/conf.d/*.toml` | COPR repositories (`ghostty`, `scrcpy`)                |
 | `[bootstrap.packages]`  | `mise/conf.d/*.toml` | dnf, brew-cask (fonts), flatpak packages               |
 | `[bootstrap.hooks.*]`   | `mise/conf.d/*.toml` | Pre/post hooks for packages and tools                  |
