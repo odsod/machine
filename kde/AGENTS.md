@@ -21,7 +21,7 @@ Two layers:
 - **`rgba=none` + `lcdfilter=lcdnone`**: Subpixel rendering is broken on Wayland (windows can rotate/scale arbitrarily). Grayscale antialiasing is correct.
 - **`hintslight`**: Best tradeoff. Snaps stems to pixel grid without distorting glyph shapes.
 - **`embeddedbitmap=false`**: Bitmaps look terrible on high-DPI. Forces outline rendering for all fonts.
-- **Font families**: Inter (UI), Iosevka SS08 (monospace). Installed via `brew-cask` packages in `mise.toml`.
+- **Font families**: Inter (UI), Iosevka SS08 (monospace). Installed via `brew-cask` packages in `mise/conf.d/kde.toml`.
 
 ### Verifying
 

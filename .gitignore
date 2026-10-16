@@ -6,5 +6,3 @@ __pycache__/
 skills-lock.json
 keys/odsod-keys
 .antigravitycli/
-llama/llama.cpp-*/
-whisper/whisper.cpp-*/

@@ -1,0 +1,17 @@
+[tasks."codex:check"]
+description = "Check codex config drift (fails until resolved)"
+run = """
+if ! diff -u "$HOME/.codex/config.toml" "$REPO_DIR/codex/config.toml"; then
+  echo "[codex] Resolve with: mise run codex:resolve"
+  exit 1
+fi
+"""
+
+[tasks."codex:resolve"]
+description = "Resolve codex config drift by overwriting the live config"
+run = """
+if ! diff -u "$HOME/.codex/config.toml" "$REPO_DIR/codex/config.toml"; then
+  echo "[codex] Applying repo config over live config"
+fi
+install -m 600 "$REPO_DIR/codex/config.toml" "$HOME/.codex/config.toml"
+"""

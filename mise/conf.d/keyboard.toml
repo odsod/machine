@@ -1,0 +1,13 @@
+[bootstrap.files."/usr/share/X11/xkb/symbols/odsod"]
+source = "../../keyboard/odsod"
+owner = "root"
+group = "root"
+mode = "0644"
+
+[tasks."keyboard:setup"]
+description = "Register custom XKB keyboard layout"
+run = """
+grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
+  sudo sed -i 's#</layoutList>#<layout><configItem><name>odsod</name><languageList><iso639Id>eng</iso639Id></languageList></configItem></layout></layoutList>#' \
+  /usr/share/X11/xkb/rules/evdev.xml
+"""

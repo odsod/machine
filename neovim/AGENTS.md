@@ -15,7 +15,7 @@
 
 ## Full Mount Symlink
 
-- Dotfile: `~/.config/nvim` → `neovim/` (`[dotfiles]` in root `mise.toml`)
+- Dotfile: `~/.config/nvim` → `neovim/` (`[dotfiles]` in `mise/conf.d/neovim.toml`)
 - Behavior: remove existing target and symlink `neovim/` as a whole
 - Rationale:
   - no per-file symlink maintenance

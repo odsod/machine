@@ -9,13 +9,15 @@
 
 ## Approach
 
-- Pin `version`, `deb`, and `sha256` in `[vars]`. Install downloads that exact
-  pool file, so the result is reproducible across machines.
+- Pin `endpoint_verification_version`, `endpoint_verification_deb`, and
+  `endpoint_verification_sha256` in `[vars]` in
+  `mise/conf.d/endpoint-verification.toml`. Install downloads that exact pool
+  file, so the result is reproducible across machines.
 - Discover the latest package from Google's apt index, printed as a paste-ready
   `[vars]` block:
 
   ```bash
-  mise run -C endpoint-verification discover
+  mise run endpoint-verification:discover
   ```
 
 - Verify the download against the pinned `SHA256`. The pool keeps delisted
@@ -62,10 +64,10 @@
 
 ## Verification
 
-- Run full install + verification:
+- Run full install:
 
   ```bash
-  mise run -C endpoint-verification
+  mise run endpoint-verification:install
   ```
 
 - Run focused checks after script edits:
@@ -73,7 +75,7 @@
   ```bash
   shellcheck endpoint-verification/device_state.sh
   sh -n endpoint-verification/device_state.sh
-  mise run -C endpoint-verification verify
+  mise run endpoint-verification:verify
   systemctl status endpoint-verification.service --no-pager
   ```
 
@@ -87,7 +89,7 @@
 
 ### LUKS Encryption Detection on Btrfs (Linux)
 
-**Status:** Chromium bug — unfixed as of Chrome 136 / June 2026.
+**Status:** Chromium bug (unfixed as of Chrome 136 / June 2026).
 
 #### Root Cause
 
@@ -106,7 +108,7 @@ SettingValue GetDiskEncrypted() {
 
 On **btrfs-on-LUKS**, `stat("/")` returns `st_dev` with **major=0** because
 btrfs subvolumes use anonymous block devices. Chrome constructs
-`/sys/dev/block/0:0/dm/uuid` — which doesn't exist — and falls through to
+`/sys/dev/block/0:0/dm/uuid`, which does not exist, and falls through to
 `return SettingValue::DISABLED`.
 
 On ext4-on-LUKS this works because `stat("/")` returns the dm-crypt device
@@ -159,13 +161,13 @@ device-mapper device is active.
   ```
 
 **Limitation:** This proves a dm-crypt device exists, not that root is on
-it. Also assumes `dm-0` (first device-mapper device) — fragile if the
-numbering changes.
+it. It also assumes `dm-0` (first device-mapper device), which is fragile if
+the numbering changes.
 
 **Option 2: Accept the gap + risk register**
 
 Document it as a known detection limitation. The native helper correctly
-reports encryption — the data is available for manual audit even if the
+reports encryption, so the data is available for manual audit even if the
 Admin console shows "Not Encrypted".
 
 **Option 3: File a Chromium bug**
@@ -180,7 +182,7 @@ File at https://issues.chromium.org/ against component
 
 ## Gotchas
 
-- `mise run -C endpoint-verification` restarts the oneshot service instead of only enabling it.
+- `mise run endpoint-verification:install` restarts the oneshot service instead of only enabling it.
 - Restart is required because `RemainAfterExit=yes` otherwise leaves stale `device_attrs`.
-- Run `verify` with installed files; the Chrome extension reads the `/opt` helper path.
+- Run `endpoint-verification:verify` with installed files; the Chrome extension reads the `/opt` helper path.
 - Do not install the Mozilla native messaging manifest unless Firefox support is intentionally added.

@@ -1,0 +1,15 @@
+[bootstrap.files."/etc/ssh/sshd_config.d/01-odsod-machine.conf"]
+source = "../../ssh/machine.conf"
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+notify = ["sshd"]
+
+[bootstrap.packages]
+"dnf:openssh-server" = "latest"
+
+[bootstrap.services.sshd]
+state = "running"
+enabled = true
+on_change = "reload_or_restart"

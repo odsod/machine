@@ -1,0 +1,9 @@
+[dotfiles]
+# Agents: one instruction file and one global skills dir, shared by every agent.
+# Cursor reads ~/.agents/skills itself; Claude Code needs ~/.claude/skills.
+"~/.agents" = "../../agents"
+"~/.claude/CLAUDE.md" = "../../agents/AGENTS.md"
+"~/.claude/skills" = "../../agents/skills"
+"~/.codex/AGENTS.md" = "../../agents/AGENTS.md"
+"~/.gemini/AGENTS.md" = "../../agents/AGENTS.md"
+"~/.pi/agent/AGENTS.md" = "../../agents/AGENTS.md"

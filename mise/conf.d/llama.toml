@@ -1,0 +1,34 @@
+[vars]
+llama_version = "0.7.0"
+llama_model = "Qwen3.5-9B-Q5_K_M.gguf"
+llama_model_url = "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q5_K_M.gguf"
+llama_port = "8179"
+
+[tasks."llama:setup"]
+description = "Build and install llama.cpp GPU inference service"
+env = { LLAMA_VERSION = "{{vars.llama_version}}", LLAMA_MODEL = "{{vars.llama_model}}", LLAMA_MODEL_URL = "{{vars.llama_model_url}}", LLAMA_PORT = "{{vars.llama_port}}" }
+run = 'exec "$REPO_DIR/llama/setup.sh"'
+
+[tasks."llama:discover"]
+description = "Show latest stable llama.cpp release version"
+run = """
+# Nightly bNNNN releases bury the semver tags past any fixed window,
+# so list tags and version-sort instead of scanning recent releases.
+git ls-remote --tags https://github.com/ggml-org/llama.cpp.git 'refs/tags/v*' \
+  | grep -v '\\^{}$' \
+  | sed 's#.*refs/tags/v##' \
+  | sort -V \
+  | tail -1 \
+  || echo UNKNOWN
+"""
+
+[tasks."llama:clean"]
+description = "Remove llama.cpp source trees other than the pinned version"
+run = """
+for dir in "$HOME/.local/share/odsod/machine/data/llama"/llama.cpp-*; do
+  if [ -d "$dir" ] && [ "$(basename "$dir")" != "llama.cpp-{{vars.llama_version}}" ]; then
+    echo "[clean] Removing $(basename "$dir")"
+    rm -rf "$dir"
+  fi
+done
+"""

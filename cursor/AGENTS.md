@@ -10,7 +10,7 @@
 
 - `mise run cursor:setup` - Install the Cursor RPM
 - `mise run cursor:setup-cli` - Seed `~/.cursor/cli-config.json` if missing
-- IDE settings, keybindings, and hooks are `[dotfiles]` symlinks
+- IDE settings, keybindings, and hooks are `[dotfiles]` symlinks in `mise/conf.d/cursor.toml`
 
 ## Version bumps
 
@@ -18,20 +18,20 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
 
 - `/latest` resolves to a redirect; the real asset lives at
   `downloads.cursor.com/production/<commit-hash>/.../cursor-<version>.el8.x86_64.rpm`
-- The commit hash in that path changes every release — a stale hash returns
-  `AccessDenied`
-- Do **not** install from `/latest` — it breaks idempotency (pinned `version`
-  can drift from what `/latest` serves)
+- The commit hash in that path changes every release. A stale hash returns
+  `AccessDenied`.
+- Do **not** install from `/latest`. It breaks idempotency because the pinned
+  `version` can drift from what `/latest` serves.
 
 **Bump workflow** (update version and URL hash together):
 
 1. `mise run discover` prints both values as the `cursor` and `cursor-hash`
    rows. Both read the `Location` header of
    `https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest`.
-2. Copy both into `[vars]` in `mise.toml`:
+2. Copy both into `[vars]` in `mise/conf.d/cursor.toml`:
    - `cursor_version = "…"`
    - `cursor_hash = "…"`
-3. Validate the assembled URL: `curl -I '<rpm_url>'` — expect `HTTP/2 200`
+3. Validate the assembled URL: `curl -I '<rpm_url>'` (expect `HTTP/2 200`)
 4. Install: `mise run cursor:setup`
 5. Verify: `rpm -q cursor` and `/usr/bin/cursor --version`
 
@@ -48,7 +48,7 @@ Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
 
 ## Constraints
 
-- Do not symlink `~/.cursor/cli-config.json` — merge preserves machine-local cache
+- Do not symlink `~/.cursor/cli-config.json`; keeping it a plain file preserves machine-local cache
 - Do not symlink `~/.cursor/skills`: Cursor reads `~/.agents/skills` and a repo's
   `.agents/skills` itself, so a Cursor-specific copy only duplicates them
 - Hook paths in `hooks.json` are relative to `~/.cursor/`

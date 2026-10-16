@@ -1,13 +1,20 @@
-[tasks.install]
+[dotfiles]
+"~/.local/bin/odsod-kwin-dbus-service.py" = "../../kwin/odsod-kwin-dbus-service.py"
+"~/.local/share/dbus-1/services/io.github.odsod.kwin.service" = "../../kwin/io.github.odsod.kwin.service"
+
+[tasks."kwin:install"]
 description = "Install KWin script package and configure"
-depends = ["install-package", "enable-plugin", "configure"]
+depends = ["kwin:install-package", "kwin:enable-plugin", "kwin:configure"]
 run = "echo '[kwin] Done'"
 
-[tasks.install-package]
+[tasks."kwin:install-package"]
 description = "Install Plasma KWin script package"
-run = "kpackagetool6 --type=KWin/Script --install . 2>/dev/null || kpackagetool6 --type=KWin/Script --upgrade ."
+run = """
+cd "$REPO_DIR/kwin"
+kpackagetool6 --type=KWin/Script --install . 2>/dev/null || kpackagetool6 --type=KWin/Script --upgrade .
+"""
 
-[tasks.enable-plugin]
+[tasks."kwin:enable-plugin"]
 description = "Enable KWin plugin"
 run = """
 kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled false
@@ -17,17 +24,17 @@ kwriteconfig6 --file kwinrc --group Plugins --key odsodEnabled true
 qdbus-qt6 org.kde.KWin /KWin reconfigure
 """
 
-[tasks.configure]
+[tasks."kwin:configure"]
 description = "Configure KWin window focus policy"
 run = """
 kwriteconfig6 --file kwinrc --group Windows --key FocusPolicy FocusFollowsMouse
 qdbus-qt6 org.kde.KWin /KWin reconfigure
 """
 
-[tasks.uninstall]
+[tasks."kwin:uninstall"]
 description = "Uninstall Plasma KWin script package"
 run = "kpackagetool6 --type=KWin/Script --remove odsod"
 
-[tasks.tail]
+[tasks."kwin:tail"]
 description = "Tail KWin dbus service log"
 run = "journalctl --user -f -t odsod-kwin-dbus-service"

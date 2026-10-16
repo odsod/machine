@@ -1,21 +1,24 @@
 [vars]
 # The apt pool keeps delisted builds, so pinning filename and checksum makes
 # this install reproducible. All three values come from `mise run discover`.
-version = "1765828494702-842239260"
-deb = "pool/endpoint-verification/endpoint-verification_1765828494702-842239260_amd64_3bcef7ad4e9e6bf8b16dae869190fca7.deb"
-sha256 = "2ea825143fd56a10d6ae3a3f2719cd47833479f7dd3faa6eed7f62ce2d0ac664"
+endpoint_verification_version = "1765828494702-842239260"
+endpoint_verification_deb = "pool/endpoint-verification/endpoint-verification_1765828494702-842239260_amd64_3bcef7ad4e9e6bf8b16dae869190fca7.deb"
+endpoint_verification_sha256 = "2ea825143fd56a10d6ae3a3f2719cd47833479f7dd3faa6eed7f62ce2d0ac664"
 
-[tasks.install]
+[tasks."endpoint-verification:install"]
 description = "Install Google Endpoint Verification"
-depends = ["install-files", "enable-service"]
+depends = [
+  "endpoint-verification:install-files",
+  "endpoint-verification:enable-service",
+]
 run = "echo '[endpoint-verification] Done'"
 
-[tasks.install-files]
+[tasks."endpoint-verification:install-files"]
 description = "Download, extract, and install helper files"
 run = """
-version="{{vars.version}}"
-sha256="{{vars.sha256}}"
-package_url="https://packages.cloud.google.com/apt/{{vars.deb}}"
+version="{{vars.endpoint_verification_version}}"
+sha256="{{vars.endpoint_verification_sha256}}"
+package_url="https://packages.cloud.google.com/apt/{{vars.endpoint_verification_deb}}"
 data_dir="$HOME/.local/share/odsod/machine/data/endpoint-verification"
 install_prefix="/opt/google/endpoint-verification"
 
@@ -53,7 +56,7 @@ fi
 sudo install -m 0755 \
   "${extract_dir}/opt/google/endpoint-verification/bin/apihelper" \
   ${install_prefix}/bin/apihelper
-sudo install -m 0755 "{{config_root}}/endpoint-verification/device_state.sh" \
+sudo install -m 0755 "$REPO_DIR/endpoint-verification/device_state.sh" \
   ${install_prefix}/bin/device_state.sh
 sudo install -m 0644 \
   "${extract_dir}/etc/opt/chrome/native-messaging-hosts/com.google.endpoint_verification.api_helper.json" \
@@ -63,7 +66,7 @@ sudo install -m 0644 \
   /lib/systemd/system/endpoint-verification.service
 """
 
-[tasks.enable-service]
+[tasks."endpoint-verification:enable-service"]
 description = "Enable endpoint-verification systemd service"
 run = """
 sudo systemctl daemon-reload
@@ -71,7 +74,7 @@ sudo systemctl enable endpoint-verification.service
 sudo systemctl restart endpoint-verification.service
 """
 
-[tasks.verify]
+[tasks."endpoint-verification:verify"]
 description = "Verify device state output"
 run = """
 echo '--- device_state.sh init ---'
@@ -80,7 +83,7 @@ echo '--- device_state.sh ---'
 /opt/google/endpoint-verification/bin/device_state.sh
 """
 
-[tasks.discover]
+[tasks."endpoint-verification:discover"]
 description = "Show latest available version as [vars] to paste"
 run = """
 curl -fsSL "https://packages.cloud.google.com/apt/dists/endpoint-verification/main/binary-amd64/Packages" \
@@ -96,5 +99,5 @@ curl -fsSL "https://packages.cloud.google.com/apt/dists/endpoint-verification/ma
       print version "\t" filename "\t" sha256
     }' \
   | sort -V | tail -1 \
-  | awk -F'\t' '{ printf "version = \\"%s\\"\\ndeb = \\"%s\\"\\nsha256 = \\"%s\\"\\n", $1, $2, $3 }'
+  | awk -F'\t' '{ printf "endpoint_verification_version = \\"%s\\"\\nendpoint_verification_deb = \\"%s\\"\\nendpoint_verification_sha256 = \\"%s\\"\\n", $1, $2, $3 }'
 """

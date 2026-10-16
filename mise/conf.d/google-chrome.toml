@@ -1,0 +1,21 @@
+[dotfiles]
+"~/.config/chrome-flags.conf" = "../../google-chrome/chrome-flags.conf"
+"~/.local/bin/google-chrome" = "../../google-chrome/google-chrome.sh"
+
+[bootstrap.files."/etc/yum.repos.d/google-chrome.repo"]
+content = """
+[google-chrome]
+name=google-chrome
+baseurl=https://dl.google.com/linux/chrome/rpm/stable/x86_64
+enabled=1
+gpgcheck=1
+gpgkey=https://dl.google.com/linux/linux_signing_key.pub
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[bootstrap.packages]
+"dnf:google-chrome-stable" = "latest"

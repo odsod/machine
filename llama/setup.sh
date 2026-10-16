@@ -11,11 +11,11 @@ if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
   exit 0
 fi
 
-VERSION="$(sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/llama/mise.toml")"
-MODEL="Qwen3.5-9B-Q5_K_M.gguf"
-MODEL_URL="https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/${MODEL}"
-PORT="8179"
-SRC="$REPO_DIR/llama/llama.cpp-${VERSION}"
+VERSION="${LLAMA_VERSION:-$(sed -n 's/^llama_version = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
+MODEL="${LLAMA_MODEL:-$(sed -n 's/^llama_model = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
+MODEL_URL="${LLAMA_MODEL_URL:-$(sed -n 's/^llama_model_url = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
+PORT="${LLAMA_PORT:-$(sed -n 's/^llama_port = "\(.*\)"$/\1/p' "$REPO_DIR/mise/conf.d/llama.toml")}"
+SRC="$DATA_DIR/llama/llama.cpp-${VERSION}"
 BUILD="$SRC/build"
 
 echo "[llama] Installing ROCm build dependencies..."
@@ -29,8 +29,9 @@ sudo dnf install -y -q \
 
 if [ ! -f "$SRC/CMakeLists.txt" ]; then
   rm -rf "$SRC"
+  mkdir -p "$DATA_DIR/llama"
   echo "[llama] Downloading source..."
-  curl -fL "https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$REPO_DIR/llama"
+  curl -fL "https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$DATA_DIR/llama"
 fi
 
 echo "[llama] Building llama-server with ROCm/HIP..."
@@ -50,11 +51,13 @@ fi
 
 echo "[llama] Installing systemd user services..."
 mkdir -p "$HOME/.config/systemd/user"
+UNIT_FILE="$HOME/.config/systemd/user/llama-server.service"
+OLD_UNIT="$(cat "$UNIT_FILE" 2>/dev/null || true)"
 sed \
   -e "s|@SERVER_BIN@|${BUILD}/bin/llama-server|" \
   -e "s|@MODEL_PATH@|${DATA_DIR}/llama/${MODEL}|" \
   -e "s|@PORT@|${PORT}|" \
-  "$REPO_DIR/llama/llama-server.service" > "$HOME/.config/systemd/user/llama-server.service"
+  "$REPO_DIR/llama/llama-server.service" > "$UNIT_FILE"
 if systemctl --user is-active --quiet llama-embed.service 2>/dev/null; then
   systemctl --user disable --now llama-embed.service 2>/dev/null || true
 fi
@@ -63,9 +66,9 @@ systemctl --user daemon-reload
 systemctl --user enable --now llama-server.service
 
 # `enable --now` does not restart a running service, so a rebuilt binary would
-# sit unused. Restart only when the installed version actually moved.
+# sit unused. Restart when the installed version or unit file changed.
 STAMP="$DATA_DIR/llama/.installed-version"
-if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ]; then
+if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ] || [ "$(cat "$UNIT_FILE")" != "$OLD_UNIT" ]; then
   systemctl --user restart llama-server.service
   mkdir -p "$DATA_DIR/llama"
   printf '%s\n' "$VERSION" > "$STAMP"

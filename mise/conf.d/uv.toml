@@ -1,0 +1,5 @@
+[dotfiles]
+"~/.config/uv/uv.toml" = "../../uv/uv.toml"
+
+[bootstrap.packages]
+"dnf:uv" = "latest"

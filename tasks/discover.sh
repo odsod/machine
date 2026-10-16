@@ -61,12 +61,8 @@ redirect_location() {
 
 cursor_location="$(redirect_location https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest)"
 
-nested_discover() {
-  mise run -C "$REPO_DIR/$1" --output interleave --quiet discover 2>/dev/null
-}
-
-pinned_var() {
-  sed -n 's/^version = "\(.*\)"$/\1/p' "$REPO_DIR/$1/mise.toml"
+topic_discover() {
+  mise run --output interleave --quiet "$1:discover" 2>/dev/null
 }
 
 row yaak "$PINNED_YAAK" "$(gh_tag mountain-loop/yaak)"
@@ -97,17 +93,16 @@ row soap-ui "$PINNED_SOAP_UI" "$(
     | grep -oP 'SoapUI-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1
 )"
 
-row llama "$(pinned_var llama)" "$(nested_discover llama | tail -1)"
-row whisper "$(pinned_var whisper)" "$(nested_discover whisper | tail -1)"
-row endpoint-verification "$(pinned_var endpoint-verification)" \
-  "$(nested_discover endpoint-verification | sed -n 's/^version = "\(.*\)"$/\1/p')"
+row llama "$PINNED_LLAMA" "$(topic_discover llama | tail -1)"
+row whisper "$PINNED_WHISPER" "$(topic_discover whisper | tail -1)"
+row endpoint-verification "$PINNED_EV" \
+  "$(topic_discover endpoint-verification | sed -n 's/^endpoint_verification_version = "\(.*\)"$/\1/p')"
 
 printf 'NAME\tPINNED\tLATEST\tSTATUS\n%b' "$rows" | column -t -s "$(printf '\t')"
 
 echo
-echo "Pins for desktop apps live in [vars] in mise.toml."
-echo "llama, whisper, and endpoint-verification pin in their own mise.toml."
-echo "Paste-ready endpoint-verification pins: mise run -C endpoint-verification discover"
+echo "Pins live in mise/conf.d (00-machine.toml, cursor.toml, obsidian.toml, llama.toml, whisper.toml, endpoint-verification.toml)."
+echo "Paste-ready endpoint-verification pins: mise run endpoint-verification:discover"
 echo
 echo "--- mise tools ---"
 # http:obsidian and http:soap-ui pin a concrete version from [vars] and have no

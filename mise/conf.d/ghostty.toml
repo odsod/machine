@@ -1,0 +1,12 @@
+[dotfiles]
+"~/.config/ghostty/config" = "../../ghostty/config"
+"~/.config/ghostty/themes" = "../../ghostty/themes"
+"~/.config/ghostty/ghostty-herdr.sh" = "../../ghostty/ghostty-herdr.sh"
+
+[bootstrap.dnf.repos]
+# Fedora does not package Ghostty. Upstream recommends this COPR. It replaces
+# Terra.
+ghostty = { copr = "scottames/ghostty" }
+
+[bootstrap.packages]
+"dnf:ghostty" = "latest"

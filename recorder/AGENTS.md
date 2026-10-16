@@ -1,4 +1,4 @@
-# Recorder — Machine Module
+# Recorder Machine Module
 
 Installation and configuration for the [recorder](https://github.com/odsod/recorder) daemon.
 
@@ -11,7 +11,7 @@ Installation and configuration for the [recorder](https://github.com/odsod/recor
 ## Install
 
 Binary: `"github:odsod/recorder"` in root `mise.toml`.
-Config and scripts: `[dotfiles]` entries.
+Config and scripts: `[dotfiles]` entries in `mise/conf.d/recorder.toml` and `mise/conf.d/herdr.toml`.
 
 ```bash
 mise install github:odsod/recorder
@@ -23,7 +23,7 @@ mise install github:odsod/recorder
 recorder/
 ├── AGENTS.md           # This file
 ├── config.json         # Shared config (symlinked to ~/.config/recorder/)
-└── recorder-note       # Bash script — kdialog note popup
+└── recorder-note       # Bash script for kdialog note popup
 ```
 
 ## Config
@@ -44,20 +44,20 @@ Symlinked to `~/.config/recorder/config.json`. Single config works on all hosts 
 }
 ```
 
-- **`promptVars`** — template variables for system prompts (languages, owner context, summary content guidance)
-- **`prompts`** — paths to prompt template files; seeded with defaults on first run if missing
+- **`promptVars`** - template variables for system prompts (languages, owner context, summary content guidance)
+- **`prompts`** - paths to prompt template files; seeded with defaults on first run if missing
 
 ## Scripts
 
-- **`herdr/recorder-toggle`** — creates/switches a Herdr workspace with recorder daemon + transcript tail
-- **`recorder-note`** — KDE popup (kdialog) that appends a note to the active transcript
+- **`herdr/recorder-toggle`** - creates/switches a Herdr workspace with recorder daemon + transcript tail
+- **`recorder-note`** - KDE popup (kdialog) that appends a note to the active transcript
 
 ## Dependencies
 
-- `pipewire-utils` (parec) — audio capture
-- `kdialog` — note popup UI
-- whisper-server (`http://odsod-desktop:8178`) — ASR
-- llama-server (`http://odsod-desktop:8179`) — LLM cleanup
+- `pipewire-utils` (parec) - audio capture
+- `kdialog` - note popup UI
+- whisper-server (`http://odsod-desktop:8178`) - ASR
+- llama-server (`http://odsod-desktop:8179`) - LLM cleanup
 
 ## Version Bumps
 

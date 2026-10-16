@@ -4,9 +4,9 @@ GPU-accelerated speech-to-text server (whisper.cpp + ROCm/HIP).
 
 ## VRAM Profiles
 
-Active model is set via `MODEL` in `tasks/setup-whisper.sh` and `model` in
-`whisper/mise.toml` `[vars]`. After changing, run `mise run whisper:setup` and
-`systemctl --user restart whisper-server`.
+Active model is set via `whisper_model` and `whisper_model_url` in
+`mise/conf.d/whisper.toml` `[vars]`. After changing, run `mise run whisper:setup`
+and `systemctl --user restart whisper-server`.
 
 | Model                     | VRAM   | Quality | Swedish                     | Speed      |
 | ------------------------- | ------ | ------- | --------------------------- | ---------- |
@@ -16,13 +16,13 @@ Active model is set via `MODEL` in `tasks/setup-whisper.sh` and `model` in
 
 **Default**: `ggml-large-v3.bin` (best Swedish quality).
 **Fallback**: If VRAM pressure causes desktop stutter, switch to
-`ggml-large-v3-turbo.bin` — saves 1.5 GB.
+`ggml-large-v3-turbo.bin` (saves 1.5 GB).
 
 ## Download additional models
 
 ```bash
 # Latest tag:
-mise run -C whisper discover
+mise run whisper:discover
 # Extra model into ~/.local/share/odsod/machine/data/whisper/:
 curl -fL -o ~/.local/share/odsod/machine/data/whisper/ggml-large-v3-turbo.bin \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
@@ -32,7 +32,7 @@ curl -fL -o ~/.local/share/odsod/machine/data/whisper/ggml-large-v3-turbo.bin \
 
 | Flag              | Value                    | Rationale                                                                                                                                                                        |
 | ----------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--vad`           | enabled                  | Server-side Silero VAD — primary hallucination defense. Skips non-speech before decoding. Industry-grade spectral analysis (0.97 accuracy) vs our coarse RMS gate                |
+| `--vad`           | enabled                  | Server-side Silero VAD (primary hallucination defense). Skips non-speech before decoding. Industry-grade spectral analysis (0.97 accuracy) vs our coarse RMS gate                |
 | `--vad-model`     | `ggml-silero-v6.2.0.bin` | GGML-format Silero VAD from `huggingface.co/ggml-org/whisper-vad`                                                                                                                |
 | `--language auto` | auto                     | Meetings mix English + Swedish; forcing one degrades the other                                                                                                                   |
 | `--suppress-nst`  | enabled                  | Suppresses non-speech tokens (`[Music]`, `[Applause]`, brackets) during decoding. Whisper was trained on subtitled video and emits these on ambient noise. See whisper.cpp #1724 |
@@ -40,13 +40,12 @@ curl -fL -o ~/.local/share/odsod/machine/data/whisper/ggml-large-v3-turbo.bin \
 
 ### Flags evaluated and not used
 
-- `--no-speech-thold` (default 0.6): Does not help when `--language auto` is set — whisper confidently
-  emits training artifacts (subtitle credits) even with high no-speech probability because the model
-  was trained on subtitled video data. See whisper.cpp PR #3763.
+- `--no-speech-thold` (default 0.6): Does not help when `--language auto` is set because whisper confidently
+  emits training artifacts (subtitle credits) even with high no-speech probability when trained on subtitled video data. See whisper.cpp PR #3763.
 
 ### VAD architecture note
 
-Client-side RMS gating is kept but permissive (threshold 0.002) — its role is to avoid
+Client-side RMS gating is kept but permissive (threshold 0.002). Its role is to avoid
 sending dead-silence WAVs over HTTP. The real speech/non-speech decision is made by
 server-side Silero VAD. Previous attempt at client-side Silero failed because it needed
 mic gain boost to trigger reliably; server-side is different since it processes audio that
@@ -54,7 +53,7 @@ already passed through parec capture.
 
 ## Ports
 
-- `8178` — OpenAI-compatible `/v1/audio/transcriptions`
+- `8178`: OpenAI-compatible `/v1/audio/transcriptions`
 
 ## OpenWhispr config
 

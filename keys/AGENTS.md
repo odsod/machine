@@ -76,33 +76,33 @@ the application launcher trigger entirely.
 ## Development workflow
 
 ```bash
-mise run -C keys build     # compile only (verify)
-mise run -C keys deploy    # build + install + restart service
-mise run -C keys log       # tail journalctl output
-mise run -C keys stop      # stop service (raw keyboard restored)
+mise run keys:build     # compile and install binary
+mise run keys:deploy    # build + install + restart service
+mise run keys:log       # tail journalctl output
+mise run keys:stop      # stop service (raw keyboard restored)
 ```
 
-After editing `odsod-keys.c`, run `mise run -C keys deploy` to test changes.
-If the keyboard becomes unresponsive, the service can be stopped via SSH
-or from another machine.
+After editing `odsod-keys.c`, run `mise run keys:deploy` to test changes.
+If the keyboard becomes unresponsive, stop the service via SSH or from
+another machine.
 
 ## Upstream references
 
-- [keyd](https://github.com/rvaiya/keyd) — original inspiration, modifier
+- [keyd](https://github.com/rvaiya/keyd) - original inspiration, modifier
   guard analysis from `src/keyboard.c`
 - [Linux input subsystem](https://www.kernel.org/doc/html/latest/input/input.html)
-  — `EV_KEY`, `EV_SYN`, key repeat (`value=2`)
-- [uinput](https://www.kernel.org/doc/html/latest/input/uinput.html) —
+  - `EV_KEY`, `EV_SYN`, key repeat (`value=2`)
+- [uinput](https://www.kernel.org/doc/html/latest/input/uinput.html) -
   virtual device creation
-- [evdev](https://www.freedesktop.org/software/libevdev/doc/latest/) —
+- [evdev](https://www.freedesktop.org/software/libevdev/doc/latest/) -
   event codes reference (`linux/input-event-codes.h`)
 
 ## Background: keyd Meta + KDE interaction
 
 The reason this daemon exists (migrated from keyd v2.6.0):
 
-1. keyd's `meta` layer is internally `meta:M` — activating it emits
-   `Meta_L down` immediately
+1. keyd's `meta` layer is internally `meta:M`. Activating it emits
+   `Meta_L down` immediately.
 2. On release without intervening keypress, keyd's `OP_LAYER` handler
    sets `inhibit_modifier_guard = 1` (line 625 in `src/keyboard.c`)
 3. This disables the Ctrl interposition guard that normally prevents

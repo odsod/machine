@@ -4,9 +4,9 @@ GPU-accelerated LLM inference server (llama.cpp + ROCm/HIP).
 
 ## VRAM Profiles
 
-Active model is set via `MODEL` in `tasks/setup-llama.sh` and `model` in
-`llama/mise.toml` `[vars]`. After changing, run `mise run llama:setup` and
-`systemctl --user restart llama-server`.
+Active model is set via `llama_model` and `llama_model_url` in
+`mise/conf.d/llama.toml` `[vars]`. After changing, run `mise run llama:setup`
+and `systemctl --user restart llama-server`.
 
 | Model                    | VRAM   | Quality | Swedish        | Speed |
 | ------------------------ | ------ | ------- | -------------- | ----- |
@@ -16,14 +16,14 @@ Active model is set via `MODEL` in `tasks/setup-llama.sh` and `model` in
 
 **Default**: `Qwen3.5-9B-Q5_K_M.gguf` (best quality-to-VRAM ratio).
 **Fallback**: If VRAM pressure causes desktop stutter, switch to
-`Qwen3.5-9B-Q4_K_M.gguf` — saves ~0.9 GB. Or drop to
-`Qwen3-8B-Q4_K_M.gguf` — saves ~1.3 GB total.
+`Qwen3.5-9B-Q4_K_M.gguf` (saves ~0.9 GB) or drop to
+`Qwen3-8B-Q4_K_M.gguf` (saves ~1.3 GB total).
 
 ## Download additional models
 
 ```bash
 # Latest tag:
-mise run -C llama discover
+mise run llama:discover
 # Extra GGUF into ~/.local/share/odsod/machine/data/llama/:
 curl -fL -o ~/.local/share/odsod/machine/data/llama/Qwen3.5-9B-Q4_K_M.gguf \
   https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q4_K_M.gguf
