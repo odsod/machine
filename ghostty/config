@@ -6,24 +6,19 @@ window-save-state = always
 confirm-close-surface = false
 window-padding-x = 4
 window-padding-y = 4
-window-padding-color = background
 resize-overlay = always
 
 # Font
 font-family = Iosevka SS08
 font-size = 11
-font-feature = -calt, -liga, -dlig
+font-feature = -calt, -liga
 window-title-font-family = Iosevka SS08
 
 # Mouse & Cursor
-cursor-style = block
 cursor-style-blink = true
-cursor-click-to-move = true
 mouse-hide-while-typing = true
-copy-on-select = true
-# Allow nvim OSC 52 clipboard writes without a permission prompt
-clipboard-write = allow
-selection-clear-on-typing = true
+# Write to both the primary and system clipboards (osc52 from nvim included)
+copy-on-select = clipboard
 focus-follows-mouse = true
 
 # Terminal & Integration
@@ -31,10 +26,8 @@ command = direct:/home/odsod/.config/ghostty/ghostty-herdr.sh
 # Handled by tmux
 scrollback-limit = 0
 shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo
-# Notify when a long-running command finishes (requires OSC 133 from shell integration)
-notify-on-command-finish = unfocused
-notify-on-command-finish-after = 10s
 
 # Keybindings
-keybind = ctrl+shift+p=toggle_command_palette
+# Release the mouse when a TUI or agent grabs mouse reporting
+keybind = ctrl+shift+m=toggle_mouse_reporting
 
