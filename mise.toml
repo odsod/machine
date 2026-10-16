@@ -344,7 +344,7 @@ scrcpy = { copr = "boobaa/scrcpy" }
 "dnf:sqlite-devel" = "latest"
 "dnf:tk-devel" = "latest"
 "dnf:xz-devel" = "latest"
-"dnf:zlib-devel" = "latest"
+"dnf:zlib-ng-compat-devel" = "latest"
 "dnf:qbittorrent" = "latest"
 "dnf:ripgrep" = "latest"
 "dnf:scrcpy" = "latest"
