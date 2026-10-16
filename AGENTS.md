@@ -20,8 +20,9 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
   highest-precedence config that defines tools, so moving them into fragments
   would relocate the lockfile.
 - **`mise/conf.d/`**: Global config fragments, loaded in alphabetical order
-  before `mise.toml`. Paths in `[dotfiles]` and `[bootstrap.files]` resolve
-  against `mise/conf.d/`, so repo files need a `../../` prefix.
+  before `mise.toml`. `~/.config/mise/conf.d` is a directory symlink to
+  `mise/conf.d/`. Paths in `[dotfiles]` and `[bootstrap.files]` resolve against
+  `mise/conf.d/`, so repo files need a `../../` prefix.
   - **`00-machine.toml`**: Cross-cutting system base (`env.sh` links, `mise`
     self-deploy links, core packages, vendor RPM repos, groups/users, sudoers,
     `/tmp`, swap, and top-level orchestration tasks `discover`, `bump`, `apply`,
@@ -37,6 +38,21 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
   Config files, service templates, topic setup scripts (`llama/setup.sh`,
   `whisper/setup.sh`, `herdr/setup-machines.sh`), and source code referenced by
   `mise/conf.d/<topic>.toml`.
+- **`~/.local/share/odsod/machine/data/`**: Runtime build trees, extracted
+  archives, and model weights (`llama/`, `whisper/`, `endpoint-verification/`).
+  Never store compiled trees or downloaded artifacts in the repo.
+
+### Dependency Direction
+
+Dependency flows strictly one way: **`mise/conf.d/<topic>.toml` -> `<topic>/`**.
+
+- `mise/conf.d/<topic>.toml` knows about `<topic>/`: it links files from
+  `../../<topic>/`, runs scripts in `<topic>/`, and passes `[vars]` into scripts
+  via task `env = { ... }`.
+- `<topic>/` never reads or parses `mise/conf.d/*.toml`. Topic scripts take
+  their inputs from environment variables supplied by the `mise` task.
+- Cross-cutting scripts in `tasks/` (`discover.sh`, `bump.sh`) are the only
+  scripts that read or write `mise/conf.d/*.toml`.
 
 ## Provisioning
 
@@ -199,6 +215,15 @@ mise is bootstrapped via the upstream dnf repo, then self-managed via `[tools]`.
 
 ## Key Design Decisions
 
+- **Why `mise/conf.d/<topic>.toml` is separate from `<topic>/`**: `mise`
+  resolves relative paths in `[dotfiles]` and `[bootstrap.files]` against
+  `path.parent()` of the loaded config path (`~/.config/mise/conf.d/<topic>.toml`)
+  without canonicalizing file symlinks first. A directory symlink
+  (`~/.config/mise/conf.d` -> `mise/conf.d/`) lets `../..` traverse back into
+  the repo root, whereas per-file symlinks from `~/.config/mise/conf.d/` into
+  `<topic>/` would resolve relative paths against `~/.config/mise/conf.d/` and
+  break. Keeping `mise.toml` out of `<topic>/` also prevents `mise` from
+  auto-discovering a second project config when you `cd` into `<topic>/`.
 - **`env.sh` is permanent**: KDE and systemd do not run mise. They source
   `env.sh` via `~/.profile` and `~/.config/plasma-workspace/env/`.
 - **`[bootstrap.services]`** is system-level only (not `--user`). User units are
