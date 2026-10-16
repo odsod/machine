@@ -1,61 +1,30 @@
-# whisper/
+# Whisper Server
 
-GPU-accelerated speech-to-text server (whisper.cpp + ROCm/HIP).
+## Service and Models
+
+- `whisper-server.service` serves OpenAI-compatible `/v1/audio/transcriptions`
+  on `127.0.0.1:8178` (ROCm/HIP).
+- `whisper_version`, `whisper_model`, `whisper_model_url`, `whisper_vad_model`,
+  and `whisper_vad_model_url` live in `mise/conf.d/whisper.toml`.
+- Source trees and model weights live in
+  `~/.local/share/odsod/machine/data/whisper/`.
+- After changing `[vars]`, run `mise run whisper:setup`.
 
 ## VRAM Profiles
 
-Active model is set via `whisper_model` and `whisper_model_url` in
-`mise/conf.d/whisper.toml` `[vars]`. After changing, run `mise run whisper:setup`
-and `systemctl --user restart whisper-server`.
-
-| Model                     | VRAM   | Quality | Swedish                     | Speed      |
-| ------------------------- | ------ | ------- | --------------------------- | ---------- |
-| `ggml-large-v3.bin`       | 3.1 GB | Best    | Good (32 decoder layers)    | ~3-4s/clip |
-| `ggml-large-v3-turbo.bin` | 1.6 GB | Good    | Adequate (4 decoder layers) | ~1s/clip   |
-| `ggml-large-v3-q5_0.bin`  | 1.1 GB | Good    | Good (quantized full)       | ~3-4s/clip |
-
-**Default**: `ggml-large-v3.bin` (best Swedish quality).
-**Fallback**: If VRAM pressure causes desktop stutter, switch to
-`ggml-large-v3-turbo.bin` (saves 1.5 GB).
-
-## Download additional models
-
-```bash
-# Latest tag:
-mise run whisper:discover
-# Extra model into ~/.local/share/odsod/machine/data/whisper/:
-curl -fL -o ~/.local/share/odsod/machine/data/whisper/ggml-large-v3-turbo.bin \
-  https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
-```
+- **Default (`ggml-large-v3.bin`, 3.1 GB)**: Best Swedish accuracy (32 decoder
+  layers).
+- **Fallbacks**:
+  - `ggml-large-v3-turbo.bin` (1.6 GB, 4 decoder layers, ~1s/clip)
+  - `ggml-large-v3-q5_0.bin` (1.1 GB, quantized full model)
 
 ## Server Flags
 
-| Flag              | Value                    | Rationale                                                                                                                                                                        |
-| ----------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--vad`           | enabled                  | Server-side Silero VAD (primary hallucination defense). Skips non-speech before decoding. Industry-grade spectral analysis (0.97 accuracy) vs our coarse RMS gate                |
-| `--vad-model`     | `ggml-silero-v6.2.0.bin` | GGML-format Silero VAD from `huggingface.co/ggml-org/whisper-vad`                                                                                                                |
-| `--language auto` | auto                     | Meetings mix English + Swedish; forcing one degrades the other                                                                                                                   |
-| `--suppress-nst`  | enabled                  | Suppresses non-speech tokens (`[Music]`, `[Applause]`, brackets) during decoding. Whisper was trained on subtitled video and emits these on ambient noise. See whisper.cpp #1724 |
-| `--convert`       | enabled                  | Accepts any audio format (WAV, etc.) without external conversion                                                                                                                 |
-
-### Flags evaluated and not used
-
-- `--no-speech-thold` (default 0.6): Does not help when `--language auto` is set because whisper confidently
-  emits training artifacts (subtitle credits) even with high no-speech probability when trained on subtitled video data. See whisper.cpp PR #3763.
-
-### VAD architecture note
-
-Client-side RMS gating is kept but permissive (threshold 0.002). Its role is to avoid
-sending dead-silence WAVs over HTTP. The real speech/non-speech decision is made by
-server-side Silero VAD. Previous attempt at client-side Silero failed because it needed
-mic gain boost to trigger reliably; server-side is different since it processes audio that
-already passed through parec capture.
-
-## Ports
-
-- `8178`: OpenAI-compatible `/v1/audio/transcriptions`
-
-## OpenWhispr config
-
-- Provider: Custom
-- Base URL: `http://localhost:8178` (local) or `http://odsod-desktop:8178` (remote via Tailscale)
+- `--vad` + `--vad-model ggml-silero-v6.2.0.bin`: Server-side Silero VAD filters
+  non-speech before decoding (primary hallucination defense).
+- `--language auto`: Supports mixed English and Swedish audio.
+- `--suppress-nst`: Suppresses non-speech tokens (`[Music]`, `[Applause]`)
+  emitted on ambient noise.
+- `--convert`: Accepts any audio container without client-side conversion.
+- Do not rely on `--no-speech-thold` with `--language auto`; Whisper still emits
+  subtitle-credit hallucinations at high no-speech probability.

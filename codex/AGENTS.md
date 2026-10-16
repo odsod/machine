@@ -1,33 +1,14 @@
 # Codex
 
-## Files
+## Config Drift
 
-- `config.toml` - Shared base config committed to the repo; the single source
-  of truth
-- `~/.codex/config.toml` - Live config written by Codex trust prompts and
-  runtime state
-
-## Tasks
-
-- Binary: `[tools] codex` in root `mise.toml`
-- `mise run codex:check` - Check drift between live and repo config; fails
-  `mise run apply`/`bootstrap` until resolved
-- `mise run codex:resolve` - Resolve drift by overwriting the live config with
-  the repo config; prints the diff it applies
-
-## Workflow
-
-- Let Codex trust prompts write directly to `~/.codex/config.toml`
-- Keep repo-managed defaults in `config.toml`
-- `mise run codex:check` shows the drift. Read the diff first. Integrate any
-  intentional settings back into `config.toml`. Do not keep workspace paths or
-  runtime state. Run `mise run codex:resolve` to sync the rest.
-- Trust is never granted standing in the base config; jj workspaces create
-  fresh directories, so each one should prompt for trust
-
-## Constraints
-
-- Resolve drops runtime state (per-project trust entries, `hooks.state`
-  hash, NUX counters); Codex re-prompts for the current directory and the
-  hook on next use
-- Do not reintroduce a symlink or a merge script
+- `config.toml` holds repo defaults. `~/.codex/config.toml` is a plain file
+  because Codex writes per-project trust entries, `hooks.state`, and NUX
+  counters into it at runtime.
+- `mise run codex:check` diffs the live file against `config.toml` and gates
+  `mise run apply`.
+- Copy intentional setting changes into `config.toml` (never workspace paths or
+  runtime state), then run `mise run codex:resolve` to overwrite
+  `~/.codex/config.toml`.
+- Never add standing project trust to `config.toml`; each `jj` workspace should
+  prompt for trust on first use.

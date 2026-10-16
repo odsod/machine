@@ -1,47 +1,21 @@
-# kde/
+# KDE
 
-KDE Plasma desktop configuration.
+## Fonts
 
-## Managed Config
-
-| File            | Target                                          | Purpose                                                         |
-| --------------- | ----------------------------------------------- | --------------------------------------------------------------- |
-| `mimeapps.list` | `~/.config/mimeapps.list`                       | Default app associations                                        |
-| `fonts.conf`    | `~/.config/fontconfig/conf.d/10-rendering.conf` | Font rendering (grayscale AA, no subpixel, no embedded bitmaps) |
-| `kwalletrc`     | `~/.config/kwalletrc`                           | Enable KWallet without first-use wizard                         |
-
-## Font Configuration
-
-Two layers:
-
-- **`fonts.conf`**: fontconfig rendering rules in `conf.d/10-rendering.conf` applied to all apps (GTK, Qt, Firefox, etc.)
-- **`mise run kde:setup-fonts`**: KDE-specific font selection via `kwriteconfig6` (writes to `~/.config/kdeglobals`)
-
-### Design Decisions
-
-- **`rgba=none` + `lcdfilter=lcdnone`**: Subpixel rendering is broken on Wayland (windows can rotate/scale arbitrarily). Grayscale antialiasing is correct.
-- **`hintslight`**: Best tradeoff. Snaps stems to pixel grid without distorting glyph shapes.
-- **`embeddedbitmap=false`**: Bitmaps look terrible on high-DPI. Forces outline rendering for all fonts.
-- **Font families**: Inter (UI), Iosevka SS08 (monospace). Installed via `brew-cask` packages in `mise/conf.d/kde.toml`.
-
-### Verifying
-
-```bash
-# Check effective rendering for a font
-fc-match -v 'Inter' | rg 'rgba|lcdfilter|embeddedbitmap|hintstyle'
-
-# Check KDE font selection
-kreadconfig6 --group "General" --key "font"
-```
+- `fonts.conf` (`~/.config/fontconfig/conf.d/10-rendering.conf`) sets
+  fontconfig rendering across all apps:
+  - `rgba=none` and `lcdfilter=lcdnone`: grayscale antialiasing (Wayland
+    windows scale and rotate, which breaks subpixel rendering).
+  - `hintslight`: snaps stems to the pixel grid without distorting glyphs.
+  - `embeddedbitmap=false`: forces outline rendering on high-DPI displays.
+- `mise run kde:setup-fonts` sets Inter (UI) and Iosevka SS08 (monospace) in
+  `~/.config/kdeglobals`.
+- Verify rendering: `fc-match -v 'Inter' | rg 'rgba|lcdfilter|embeddedbitmap|hintstyle'`
+- Verify KDE font: `kreadconfig6 --group "General" --key "font"`
 
 ## KWallet
 
-Enables KWallet + PAM auto-unlock (no password prompt on login).
-
-### Initialization (Plasma 6)
-
-If the wallet does not exist, initialize it via **KWalletManager** (`kwalletmanager6`):
-
-- **Wallet Name**: `kdewallet` (required for PAM)
-- **Encryption**: Blowfish (required for PAM)
-- **Password**: Login password (required for auto-unlock)
+- `kwalletrc` enables KWallet without the first-use wizard so `pam-kwallet`
+  auto-unlocks on login.
+- If the wallet is missing, create it in `kwalletmanager6` with name
+  `kdewallet`, Blowfish encryption, and the login password.

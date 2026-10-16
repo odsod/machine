@@ -1,54 +1,20 @@
 # Cursor
 
-## Files
+## RPM Pinning
 
-- `cli-config.json` - Shared agent CLI settings committed to the repo
-- `~/.cursor/cli-config.json` - Live config merged with repo settings on install
-- `hooks.json` / `hooks/` - User-level agent hooks (stop notification)
+- Pin both `cursor_version` and `cursor_hash` in `mise/conf.d/cursor.toml` from
+  the same `mise run discover` output (or `mise run bump cursor`).
+- Never install directly from `/latest`. The production asset lives under
+  `downloads.cursor.com/production/<cursor_hash>/...` and returns `AccessDenied`
+  when `cursor_hash` does not match `cursor_version`.
+- `mise run cursor:setup` skips installation when `rpm -q --qf '%{VERSION}' cursor`
+  matches `cursor_version`.
 
-## Tasks
+## CLI and Hooks
 
-- `mise run cursor:setup` - Install the Cursor RPM
-- `mise run cursor:setup-cli` - Seed `~/.cursor/cli-config.json` if missing
-- IDE settings, keybindings, and hooks are `[dotfiles]` symlinks in `mise/conf.d/cursor.toml`
-
-## Version bumps
-
-Cursor RPMs use a **pinned production URL**, not the `/latest` redirect.
-
-- `/latest` resolves to a redirect; the real asset lives at
-  `downloads.cursor.com/production/<commit-hash>/.../cursor-<version>.el8.x86_64.rpm`
-- The commit hash in that path changes every release. A stale hash returns
-  `AccessDenied`.
-- Do **not** install from `/latest`. It breaks idempotency because the pinned
-  `version` can drift from what `/latest` serves.
-
-**Bump workflow** (update version and URL hash together):
-
-1. `mise run discover` prints both values as the `cursor` and `cursor-hash`
-   rows. Both read the `Location` header of
-   `https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest`.
-2. Copy both into `[vars]` in `mise/conf.d/cursor.toml`:
-   - `cursor_version = "…"`
-   - `cursor_hash = "…"`
-3. Validate the assembled URL: `curl -I '<rpm_url>'` (expect `HTTP/2 200`)
-4. Install: `mise run cursor:setup`
-5. Verify: `rpm -q cursor` and `/usr/bin/cursor --version`
-
-**Idempotency**
-
-- Install is skipped when `rpm -q --qf '%{VERSION}' cursor` matches `version`
-- Never bump `cursor_version` without `cursor_hash` from the same discover run
-
-## Workflow
-
-- Keep repo-managed defaults in `cli-config.json`
-- `cursor:setup-cli` only seeds a missing live config; it does not merge
-- Model picker, auth, and cache fields live only in `~/.cursor/cli-config.json`
-
-## Constraints
-
-- Do not symlink `~/.cursor/cli-config.json`; keeping it a plain file preserves machine-local cache
-- Do not symlink `~/.cursor/skills`: Cursor reads `~/.agents/skills` and a repo's
-  `.agents/skills` itself, so a Cursor-specific copy only duplicates them
-- Hook paths in `hooks.json` are relative to `~/.cursor/`
+- `mise run cursor:setup-cli` copies `cli-config.json` to
+  `~/.cursor/cli-config.json` only when the live file is missing. Keep the live
+  file as a plain file so auth and model-picker state stay out of the repo.
+- Hook paths in `hooks.json` resolve relative to `~/.cursor/`.
+- Do not symlink `~/.cursor/skills`; Cursor reads `~/.agents/skills` and
+  `.agents/skills` directly.
