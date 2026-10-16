@@ -15,23 +15,20 @@ instructions live in `agents/AGENTS.md`. Do not duplicate them here.
 
 ## Structure
 
-- **`mise.toml`**: Root config for mise settings, `[tools]`, and `[env]`.
-  `[tools]` stays here on purpose: mise anchors `mise.lock` to the
-  highest-precedence config that defines tools, so moving them into fragments
-  would relocate the lockfile.
-- **`mise/conf.d/`**: Global config fragments, loaded in alphabetical order
-  before `mise.toml`. `~/.config/mise/conf.d` is a directory symlink to
-  `mise/conf.d/`. Paths in `[dotfiles]` and `[bootstrap.files]` resolve against
-  `mise/conf.d/`, so repo files need a `../../` prefix.
-  - **`00-machine.toml`**: Cross-cutting system base (`env.sh` links, `mise`
-    self-deploy links and repo, core CLI packages, user/sudoers, `/tmp`, swap,
-    and top-level orchestration tasks `discover`, `bump`, `apply`, `clean`,
-    `bootstrap`).
-  - **`<topic>.toml`**: One file per topic (`fish.toml`, `herdr.toml`,
-    `kde.toml`, `kwin.toml`, `keys.toml`, `llama.toml`, `whisper.toml`,
-    `endpoint-verification.toml`, `docker.toml`, `tailscale.toml`, ...). Owns
-    that topic's `[vars]`, `[dotfiles]`, `[bootstrap.*]`, and
-    `[tasks."<topic>:*"]`.
+- **`mise.toml`**: Root config for mise settings, `[tools]`, `[env]`,
+  cross-cutting base system state (core CLI packages, user/sudoers, `/tmp`,
+  swap, `mise.repo`), and top-level orchestration tasks (`discover`, `bump`,
+  `apply`, `clean`, `bootstrap`). `[tools]` stays here on purpose: mise anchors
+  `mise.lock` to the highest-precedence config that defines tools, so moving
+  them into fragments would relocate the lockfile.
+- **`mise/conf.d/<topic>.toml`**: One global config fragment per topic
+  (`fish.toml`, `herdr.toml`, `kde.toml`, `kwin.toml`, `keys.toml`,
+  `llama.toml`, `whisper.toml`, `endpoint-verification.toml`, `docker.toml`,
+  `tailscale.toml`, ...), loaded in alphabetical order before `mise.toml`.
+  `~/.config/mise/conf.d` is a directory symlink to `mise/conf.d/`. Paths in
+  `[dotfiles]` and `[bootstrap.files]` resolve against `mise/conf.d/`, so repo
+  files need a `../../` prefix. Each file owns that topic's `[vars]`,
+  `[dotfiles]`, `[bootstrap.*]`, and `[tasks."<topic>:*"]`.
 - **`env.sh`**: Permanent. Single source of truth for environment variables.
 - **`tasks/`**: Cross-cutting lifecycle and base-system scripts (`apply.sh`,
   `bump.sh`, `discover.sh`, `clean.sh`, `setup-swapfile.sh`, `setup-tmp.sh`).

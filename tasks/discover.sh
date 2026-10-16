@@ -101,7 +101,7 @@ row endpoint-verification "$PINNED_EV" \
 printf 'NAME\tPINNED\tLATEST\tSTATUS\n%b' "$rows" | column -t -s "$(printf '\t')"
 
 echo
-echo "Pins live in mise/conf.d (00-machine.toml, cursor.toml, obsidian.toml, llama.toml, whisper.toml, endpoint-verification.toml)."
+echo "Pins live in mise/conf.d/<name>.toml."
 echo "Paste-ready endpoint-verification pins: mise run endpoint-verification:discover"
 echo
 echo "--- mise tools ---"

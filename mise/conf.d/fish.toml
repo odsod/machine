@@ -1,4 +1,7 @@
 [dotfiles]
+"~/.profile" = "../../env.sh"
+"~/.config/mise/config.toml" = "../../mise.toml"
+"~/.config/mise/conf.d" = "../../mise/conf.d"
 "~/.config/fish/config.fish" = "../../fish/config.fish"
 "~/.config/fish/conf.d/00-env.fish" = "../../fish/env.fish"
 "~/.config/fish/conf.d/prompt.fish" = "../../fish/prompt.fish"

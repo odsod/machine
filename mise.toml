@@ -1,10 +1,11 @@
-# Machine root config: mise behavior, the toolchain, and the environment.
-# Every machine concern lives in a topic module under mise/conf.d/.
+# Machine root config: mise behavior, toolchain, environment, cross-cutting
+# base system state, and top-level lifecycle tasks. Topic-specific state lives
+# in mise/conf.d/<topic>.toml.
 #
 # [tools] stays here on purpose. mise anchors mise.lock to the highest-
 # precedence config that defines tools, so moving them into fragments would
-# relocate the lockfile to mise/mise.lock. Fragments load before this file, so a
-# setting here wins on conflict.
+# relocate the lockfile to mise/mise.lock. Fragments load before this file, so
+# variables from mise/conf.d/*.toml are in scope here.
 
 [settings]
 auto_update = true
@@ -134,4 +135,151 @@ ln -fsT "$(mise where http:obsidian)/Obsidian-{{vars.obsidian_version}}.AppImage
 [env]
 _.source = "{{ config_source | canonicalize | dirname }}/env.sh"
 REPO_DIR = "{{ config_source | canonicalize | dirname }}"
+
+[bootstrap.packages]
+# Core system tools
+"dnf:bat" = "latest"
+"dnf:binutils" = "latest"
+"dnf:ca-certificates" = "latest"
+"dnf:curl" = "latest"
+"dnf:dnf5-plugins" = "latest"
+"dnf:dos2unix" = "latest"
+"dnf:fd-find" = "latest"
+"dnf:firefox" = "latest"
+"dnf:flatpak" = "latest"
+"dnf:gcc-c++" = "latest"
+"dnf:gifsicle" = "latest"
+"dnf:gtk-layer-shell" = "latest"
+"dnf:gzip" = "latest"
+"dnf:hexyl" = "latest"
+"dnf:htop" = "latest"
+"dnf:iftop" = "latest"
+"dnf:ImageMagick" = "latest"
+"dnf:java-25-openjdk-devel" = "latest"
+"dnf:jq" = "latest"
+"dnf:keepassxc" = "latest"
+"dnf:maven" = "latest"
+"dnf:ncdu" = "latest"
+"dnf:net-snmp-utils" = "latest"
+"dnf:ngrep" = "latest"
+"dnf:pciutils" = "latest"
+"dnf:perl-Image-ExifTool" = "latest"
+"dnf:qbittorrent" = "latest"
+"dnf:ripgrep" = "latest"
+"dnf:rustup" = "latest"
+"dnf:simple-scan" = "latest"
+"dnf:tar" = "latest"
+"dnf:tree-sitter-cli" = "latest"
+"dnf:ttyd" = "latest"
+"dnf:unrar" = "latest"
+"dnf:unzip" = "latest"
+"dnf:util-linux" = "latest"
+"dnf:v4l-utils" = "latest"
+"dnf:wl-clipboard" = "latest"
+"dnf:wtype" = "latest"
+"dnf:yt-dlp" = "latest"
+
+# PDF decoding and OCR
+"dnf:poppler-utils" = "latest"
+"dnf:tesseract" = "latest"
+"dnf:tesseract-langpack-eng" = "latest"
+"dnf:tesseract-langpack-fin" = "latest"
+"dnf:tesseract-langpack-swe" = "latest"
+
+# Flatpak
+"flatpak:com.spotify.Client" = "latest"
+"flatpak:hu.irl.cameractrls" = "latest"
+
+[bootstrap.users.odsod]
+group = "odsod"
+groups = ["docker", "wireshark"]
+
+[bootstrap.files."/etc/sudoers.d/odsod"]
+content = "odsod ALL=(ALL) NOPASSWD: ALL\n"
+owner = "root"
+group = "root"
+mode = "0440"
+
+[bootstrap.files."/etc/tmpfiles.d/tmp.conf"]
+content = """
+# Clear tmp directories separately, to make them easier to override.
+#
+# /tmp sits on the encrypted root btrfs, not tmpfs: tasks/setup-tmp.sh masks
+# tmp.mount. Keep one week of files. systemd-tmpfiles-clean.timer enforces the
+# age 15 minutes after boot and once a day.
+q /tmp 1777 root root 7d
+q /var/tmp 1777 root root 30d
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+replace = true
+
+[bootstrap.files."/etc/yum.repos.d/mise.repo"]
+content = """
+[mise-repo]
+name=mise repo
+baseurl=https://mise.jdx.dev/rpm
+enabled=1
+gpgcheck=1
+gpgkey=https://mise.jdx.dev/gpg-key.pub
+"""
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+replace = true
+
+[tasks.discover]
+description = "Compare every pinned version with the latest upstream release"
+env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
+run = 'exec "$REPO_DIR/tasks/discover.sh"'
+
+[tasks.bump]
+description = "Upgrade mise tools and bump every self-managed pin"
+run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
+
+[tasks.clean]
+description = "Remove installed payloads and source trees other than the pinned versions"
+run = 'exec "$REPO_DIR/tasks/clean.sh"'
+
+[tasks.apply]
+description = "Apply every current version and config: full convergence"
+run = 'exec "$REPO_DIR/tasks/apply.sh" "$@"'
+
+[tasks.bootstrap]
+description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
+depends = [
+  "media:setup",
+  "graphics:setup",
+  "slack:setup",
+  "zoom:setup",
+  "cursor:setup",
+  "yaak:setup",
+  "llama:setup",
+  "whisper:setup",
+  "swap:setup",
+  "tmp:setup",
+  "kde:setup-fonts",
+  "keyboard:setup",
+  "herdr:sync-machines",
+  "codex:check",
+  "antigravity:check",
+  "cursor:setup-cli",
+]
+run = """
+echo "[bootstrap] Verifying auth services..."
+gh auth status 2>/dev/null || echo "  → Run: gh auth login"
+tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
+gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
+"""
+
+[tasks."swap:setup"]
+description = "Create and enable the disk swap tier"
+run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
+
+[tasks."tmp:setup"]
+description = "Move /tmp off tmpfs onto the encrypted root"
+run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
+
 
