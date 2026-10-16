@@ -1,0 +1,5 @@
+[dotfiles]
+"~/.psqlrc" = "../../postgresql/psqlrc"
+
+[bootstrap.packages]
+"dnf:postgresql" = "latest"

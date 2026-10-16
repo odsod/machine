@@ -12,35 +12,6 @@ yaak_version = "2026.9.0"
 soap_ui_version = "5.10.0"
 
 [dotfiles]
-# PipeWire
-"~/.config/pipewire/pipewire.conf.d/50-no-raop.conf" = { content = '''
-context.properties = {
-    module.raop = false
-}
-''' }
-
-# PostgreSQL
-"~/.psqlrc" = { content = '''
-\set COMP_KEYWORD_CASE upper
-\x auto
-\pset null '∅'
-\set HISTFILE ~/.psql_history
-\set HISTSIZE 2000
-\set HISTCONTROL ignoredups
-''' }
-
-# Node
-"~/.npmrc" = { content = "prefix=/home/odsod/.local/share/npm\n" }
-
-# Idasen
-"~/.config/idasen/idasen.yaml" = { content = '''
-mac_address: C8:42:EF:4A:28:C5
-positions:
-  sit: 0.85
-  stand: 0.98
-  chill: 0.62
-''' }
-
 # env.sh (KDE session and login shell)
 "~/.profile" = "../../env.sh"
 "~/.config/plasma-workspace/env/odsod-machine.sh" = "../../env.sh"
@@ -93,11 +64,7 @@ scrcpy = { copr = "boobaa/scrcpy" }
 "dnf:net-snmp-utils" = "latest"
 "dnf:ngrep" = "latest"
 "dnf:pciutils" = "latest"
-"dnf:pipewire-codec-aptx" = "latest"
-"dnf:pipewire-utils" = "latest"
 "dnf:perl-Image-ExifTool" = "latest"
-"dnf:postgresql" = "latest"
-"dnf:pulseaudio-utils" = "latest"
 "dnf:python3-devel" = "latest"
 "dnf:python3-pip" = "latest"
 "dnf:python3-virtualenv" = "latest"

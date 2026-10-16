@@ -8,6 +8,7 @@ KDE Plasma desktop configuration.
 | --------------- | ----------------------------------------------- | --------------------------------------------------------------- |
 | `mimeapps.list` | `~/.config/mimeapps.list`                       | Default app associations                                        |
 | `fonts.conf`    | `~/.config/fontconfig/conf.d/10-rendering.conf` | Font rendering (grayscale AA, no subpixel, no embedded bitmaps) |
+| `kwalletrc`     | `~/.config/kwalletrc`                           | Enable KWallet without first-use wizard                         |
 
 ## Font Configuration
 
