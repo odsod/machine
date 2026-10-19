@@ -21,27 +21,27 @@ Two dimensions. Headcount is what they require, not a chart to fill.
 
 **Context.** Will doing the unit here leave the orchestrator able to hold the plan? If it would fill the window with diffs, style corpora, dumps, or bulk files, give it to another pane even when this model could do the work. Keep own context fit for the horizon.
 
-Window size is part of that duty. Opus 5 is 1M; Grok 4.6 is 256k. For real long-horizon work, orchestrate on Opus 5 so less is lost to compact and continuity holds. Use Grok 4.6 to lead only when a different frame matters more than window.
+Window size is part of that duty. Opus 5.5 is 1M; Grok 4.7 is 256k. For real long-horizon work, orchestrate on Opus 5.5 so less is lost to compact and continuity holds.
 
 Add an agent when either dimension fails here. Add none when both pass. Drop or `/clear` a worker when its dimension is done.
 
 ## Roster
 
-| Kind     | Default model             | Give it                                                | Do not give it alone                    | Context reset                         |
-| -------- | ------------------------- | ------------------------------------------------------ | --------------------------------------- | ------------------------------------- |
-| `claude` | Opus 5                    | orchestrate, design, architecture, careful review      | bulk or multimodal grind                | `/compact`, then `/clear`             |
-| `agy`    | Gemini 3.8 Flash (Medium) | throughput, parallel subagents, multimodal, large text | unsupervised design or merge            | `/clear` only (no user compact)       |
-| `pi`     | DeepSeek V4.1 Flash       | fast coding; quality is OK with a reviewer             | design or review without a second agent | `/new`                                |
-| `cursor` | Grok 4.6                  | write; lead when Opus is wordy or stuck in one frame   | long-horizon orchestrate                | restart the agent if the pane is junk |
-| `cursor` | Composer 2.5              | fast coding, tighter than DeepSeek V4.1 Flash          | architecture                            | restart the agent if the pane is junk |
+| Kind     | Default model           | Give it                                                           | Do not give it alone                    | Context reset                         |
+| -------- | ----------------------- | ----------------------------------------------------------------- | --------------------------------------- | ------------------------------------- |
+| `claude` | Opus 5.5                | orchestrate, design, architecture                                 | bulk or multimodal grind                | `/compact`, then `/clear`             |
+| `agy`    | Gemini 4 Argon (Medium) | write, adversarial review, parallel subagents, multimodal, corpus | long-horizon orchestrate or merge       | `/clear` only (no user compact)       |
+| `pi`     | DeepSeek V4.1 Flash     | code implementation                                               | design or review without a second agent | `/new`                                |
+| `cursor` | Grok 4.7                | niche: alternate frame when Claude or Gemini is stuck             | long-horizon orchestrate                | restart the agent if the pane is junk |
+| `cursor` | Composer 2.5            | niche: alternate coder when `pi` is stuck                         | architecture                            | restart the agent if the pane is junk |
 
-`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude to Opus 5, agy to Gemini 3.8 Flash Medium, pi to DeepSeek V4.1 Flash.
+`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude to Opus 5.5, agy to Gemini 4 Argon (Medium), pi to DeepSeek V4.1 Flash.
 
-- Default: Opus 5 orchestrates; this pane keeps design and review; pi takes mechanical implement when it would burn that window.
-- Write (`AGENTS.md`, API docs): Grok 4.6.
-- Different frame: Grok 4.6 may lead a slice; do not move the whole horizon onto 256k unless the user wants that trade. Tighter coder: Composer 2.5 implements.
-- Bulk, multimodal, or corpus: agy fans out; orchestrator reads `report.md` only.
-- Repeated style-heavy review: isolated reviewer (Opus or Grok 4.6). See below.
+- Default: Opus 5.5 orchestrates and owns architecture; `pi` (DeepSeek V4.1 Flash) writes code; `agy` (Gemini 4 Argon) takes adversarial review and writing.
+- Write (`AGENTS.md`, API docs): Gemini 4 Argon via `agy`.
+- Adversarial review: Gemini 4 Argon via `agy` (or isolated reviewer; see below).
+- Bulk, multimodal, or corpus: `agy` fans out subagents; orchestrator reads `report.md` only.
+- Niche (`cursor`): Grok 4.7 or Composer 2.5 only when you need an extra frame or fallback coder.
 
 ## Responsibilities
 
@@ -57,7 +57,7 @@ Assign these. They are not agent types. One agent may hold several. An outcome m
 | verify         | Run the check; browser / user path / multimodal proof                                                     | Expanding scope                 |
 | bulk           | Large-surface read or transform, including parallel multimodal                                            | Architecture                    |
 
-**write:** short sentences, one idea each, plain verbs, no padding. Token-efficient. Match repo `AGENTS.md` style. Grok 4.6 unless this pane already is.
+**write:** short sentences, one idea each, plain verbs, no padding. Token-efficient. Match repo `AGENTS.md` style. Gemini 4 Argon (`agy`) unless this pane already is.
 
 ## Preconditions
 
@@ -103,14 +103,15 @@ Done when: <command or proof that it holds>
 
 ## Members
 
-- orchestrator <pane-id> claude/opus-5 orchestrate, design, review
+- orchestrator <pane-id> claude/opus-5.5 orchestrate, design
 - impl <pane-id> pi/deepseek-v4.1-flash implement # omit until you delegate
+- review <pane-id> agy/gemini-4-argon review # omit until you delegate
 
 ## Units
 
 - design: keep
 - implement: delegate
-- review: keep
+- review: delegate
 
 ## Handoff
 
@@ -175,9 +176,9 @@ Default is above: solo, then maybe an implement sibling.
 
 **Council.** Prime them. Create a dedicated tab: `herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label council --cwd "$PWD" --no-focus`. Split `.result.root_pane` into parallel panes for each member. Rename each pane by role or hypothesis: `herdr pane rename <pane-id> <role>`. Each member writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
 
-**Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan Flash subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
+**Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
 
-**Isolated reviewer.** When each cycle must reload fat style skills plus `AGENTS.md`, or the implementer is a fast model that needs a real gate. Reviewer is Opus or Grok 4.6, not pi or agy. Prime it with this skill. Spawn when the first implement unit lands. Load this skill and the stack style skill, read `AGENTS.md` on the touched path, write `review.md`, token `PHASE_COMPLETE` or `BLOCKED`, stop. Orchestrator reads `review.md`; it does not ingest the style corpus. Not for one or two reviews, and not when review is only "matches the brief."
+**Isolated reviewer.** When each cycle must reload fat style skills plus `AGENTS.md`, or the implementer needs an adversarial gate. Reviewer is Gemini 4 Argon (`agy`) or Opus 5.5 (`claude`), not `pi`. Prime it with this skill. Spawn when the first implement unit lands. Load this skill and the stack style skill, read `AGENTS.md` on the touched path, write `review.md`, token `PHASE_COMPLETE` or `BLOCKED`, stop. Orchestrator reads `review.md`; it does not ingest the style corpus. Not for one or two reviews, and not when review is only "matches the brief."
 
 ## Guardrails
 
@@ -185,4 +186,4 @@ Default is above: solo, then maybe an implement sibling.
 - Do not use Claude's experimental in-process agent teams. This protocol is Herdr panes so pi, agy, and cursor can sit on the same team.
 - Agy has no user compact: keep its units short and `/clear` between them.
 - After a restart: `herdr agent list`, read the brief, continue from Handoff.
-- Fast models (agy, pi, Composer): vacuum. One tight unit, an output path, a stop. Do not load this skill into those panes.
+- Execution workers (pi, Composer, or agy on bulk): vacuum. One tight unit, an output path, a stop. Do not load this skill into those panes.
