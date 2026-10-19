@@ -1,0 +1,21 @@
+{
+  "machine": {
+    "PostToolUse": [
+      {
+        "matcher": "write_to_file|replace_file_content",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.agents/hooks/format.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "$HOME/.agents/hooks/jj-snapshot.sh"
+      }
+    ]
+  }
+}
