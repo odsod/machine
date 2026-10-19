@@ -1,7 +1,6 @@
 {
   "allowNonWorkspaceAccess": true,
   "altScreenMode": "always",
-  "enableTelemetry": false,
   "gcp": {
     "project": "way-platform-ai",
     "location": "eu"
