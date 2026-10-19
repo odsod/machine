@@ -21,17 +21,18 @@ fi
 
 if ! open_prs="$(gh pr list --state open "--repo=$REPO" 2>&1)"; then
   echo "Aborting: cannot list open PRs on $REPO:" >&2
+  # shellcheck disable=SC2001
   echo "$open_prs" | sed 's/^/  /' >&2
   exit 1
 fi
 if [ -n "$open_prs" ]; then
   echo "Aborting: unmerged PRs on $REPO:" >&2
+  # shellcheck disable=SC2001
   echo "$open_prs" | sed 's/^/  /' >&2
   echo 'Merge or close them first. Rebase onto the fresh trunk, then rerun:' >&2
   echo '  jj git fetch --remote origin && jj rebase -o main@origin' >&2
   exit 1
 fi
-
 
 rows=""
 
@@ -51,8 +52,8 @@ row() {
 }
 
 gh_tag() {
-  gh api "repos/$1/releases/latest" --jq '.tag_name' 2>/dev/null \
-    | grep -oP '^v?\K[0-9][0-9.]*$'
+  gh api "repos/$1/releases/latest" --jq '.tag_name' 2>/dev/null |
+    grep -oP '^v?\K[0-9][0-9.]*$'
 }
 
 redirect_location() {
@@ -71,26 +72,26 @@ row yaak "$PINNED_YAAK" "$(gh_tag mountain-loop/yaak)"
 # that actually ships a desktop AppImage.
 row obsidian "$PINNED_OBSIDIAN" "$(
   gh api 'repos/obsidianmd/obsidian-releases/releases?per_page=20' \
-    --jq 'first(.[] | select([.assets[].name] | any(test("^Obsidian-[0-9.]+\\.AppImage$"))) | .tag_name)' 2>/dev/null \
-    | grep -oP '^v\K[0-9][0-9.]*$'
+    --jq 'first(.[] | select([.assets[].name] | any(test("^Obsidian-[0-9.]+\\.AppImage$"))) | .tag_name)' 2>/dev/null |
+    grep -oP '^v\K[0-9][0-9.]*$'
 )"
 
 row slack "$PINNED_SLACK" "$(
-  curl -s --max-time 20 https://slack.com/release-notes/linux/rss 2>/dev/null \
-    | grep -oP '<title>Slack \K[0-9][0-9.]*' | head -1
+  curl -s --max-time 20 https://slack.com/release-notes/linux/rss 2>/dev/null |
+    grep -oP '<title>Slack \K[0-9][0-9.]*' | head -1
 )"
 
 row zoom "$PINNED_ZOOM" "$(
-  redirect_location https://zoom.us/client/latest/zoom_x86_64.rpm \
-    | grep -oP '/prod/\K[0-9][0-9.]*'
+  redirect_location https://zoom.us/client/latest/zoom_x86_64.rpm |
+    grep -oP '/prod/\K[0-9][0-9.]*'
 )"
 
 row cursor "$PINNED_CURSOR" "$(echo "$cursor_location" | grep -oP '/cursor-\K[0-9][0-9.]*(?=\.el8)')"
 row cursor-hash "$PINNED_CURSOR_HASH" "$(echo "$cursor_location" | grep -oP '/production/\K[0-9a-f]{40}')"
 
 row soap-ui "$PINNED_SOAP_UI" "$(
-  curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null \
-    | grep -oP 'SoapUI-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1
+  curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null |
+    grep -oP 'SoapUI-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1
 )"
 
 row llama "$PINNED_LLAMA" "$(topic_discover llama | tail -1)"

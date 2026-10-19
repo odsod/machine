@@ -26,20 +26,20 @@ start_browser() {
 }
 
 case "${1:-}" in
-  connect)
-    start_browser
-    exec agent-browser connect "$PORT"
-    ;;
-  *)
-    # Launch only (for KWin focus-or-launch)
-    if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
-      exit 0
-    fi
-    exec google-chrome \
-      --user-data-dir="$PROFILE_DIR" \
-      --disable-extensions \
-      --remote-debugging-port="$PORT" \
-      --class=AgentBrowser \
-      about:blank
-    ;;
+connect)
+  start_browser
+  exec agent-browser connect "$PORT"
+  ;;
+*)
+  # Launch only (for KWin focus-or-launch)
+  if curl -s "http://localhost:$PORT/json/version" >/dev/null 2>&1; then
+    exit 0
+  fi
+  exec google-chrome \
+    --user-data-dir="$PROFILE_DIR" \
+    --disable-extensions \
+    --remote-debugging-port="$PORT" \
+    --class=AgentBrowser \
+    about:blank
+  ;;
 esac

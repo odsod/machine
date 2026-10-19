@@ -8,9 +8,12 @@
 set -euo pipefail
 
 case "$(uname -n)" in
-  odsod-desktop)   size=64G ;;
-  odsod-x1-carbon) size=48G ;;
-  *) echo "[swap] $(uname -n) is unlisted; keeping zram only"; exit 0 ;;
+odsod-desktop) size=64G ;;
+odsod-x1-carbon) size=48G ;;
+*)
+  echo "[swap] $(uname -n) is unlisted; keeping zram only"
+  exit 0
+  ;;
 esac
 
 path=/swap/swapfile

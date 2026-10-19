@@ -9,14 +9,7 @@
 
 [settings]
 auto_update = true
-idiomatic_version_file_enable_tools = [
-  "go",
-  "java",
-  "node",
-  "python",
-  "ruby",
-  "terraform",
-]
+idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
 # `mise upgrade` and `prune` parse every tracked config, including go.mod files
 # from build artifacts and other repos. A bare `go` directive is only a floor,
 # so ignore it now instead of warning until mise 2026.11.0 removes it. The
@@ -281,5 +274,32 @@ run = 'exec "$REPO_DIR/tasks/setup-swapfile.sh"'
 [tasks."tmp:setup"]
 description = "Move /tmp off tmpfs onto the encrypted root"
 run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
+
+[tasks.fmt]
+description = "Format all repo files"
+run = """
+cd "$REPO_DIR"
+shfmt -w -i 2 .
+stylua --indent-type Spaces --indent-width 2 .
+ruff check --fix --extend-exclude .agents,agents/skills .
+ruff format --extend-exclude .agents,agents/skills .
+oxfmt --write '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json'
+"""
+
+[tasks.check]
+description = "Run all linters and format checks"
+run = """
+cd "$REPO_DIR"
+mise install node shellcheck shfmt stylua ruff npm:oxfmt npm:oxlint github:fish-shell/fish-shell
+shfmt --find . | xargs shellcheck -x
+shfmt -d -i 2 .
+{ git ls-files '*.fish'; git grep -l '^#!/.*fish'; } | sort -u | xargs fish --no-execute
+stylua --indent-type Spaces --indent-width 2 --check .
+ruff check --extend-exclude .agents,agents/skills .
+ruff format --check --extend-exclude .agents,agents/skills .
+oxlint --ignore-pattern '.agents/**' --ignore-pattern 'agents/skills/**' .
+oxfmt --check '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json'
+mise config ls >/dev/null
+"""
 
 
