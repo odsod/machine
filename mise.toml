@@ -97,11 +97,11 @@ stylua = "latest"
 
 # Tools via GitHub releases
 "github:Feel-ix-343/markdown-oxide" = "latest"
-"github:fish-shell/fish-shell" = { version = "latest", exe = "fish", postinstall = { when = "always", run = """
+"github:fish-shell/fish-shell" = { version = "latest", postinstall = { when = "always", run = """
 sudo install -m 0755 "$(mise where github:fish-shell/fish-shell)/fish" /usr/local/bin/fish
 """ } }
-"github:googleworkspace/cli" = { version = "latest", exe = "gws" }
-"github:ludviglundgren/qbittorrent-cli" = { version = "latest", exe = "qbt" }
+"github:googleworkspace/cli" = "latest"
+"github:ludviglundgren/qbittorrent-cli" = "latest"
 "github:odsod/recorder" = "latest"
 "github:traefik/yaegi" = "latest"
 
