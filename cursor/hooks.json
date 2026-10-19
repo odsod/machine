@@ -3,12 +3,12 @@
   "hooks": {
     "afterFileEdit": [
       {
-        "command": "jq -r '.file_path' | { read -r f; case \"$f\" in *.md|*.yaml|*.yml|*.json|*.toml) oxfmt --write \"$f\" ;; esac; } 2>/dev/null || true"
+        "command": "$HOME/.agents/hooks/format.sh"
       }
     ],
     "stop": [
       {
-        "command": "./hooks/stop.sh"
+        "command": "$HOME/.agents/hooks/jj-snapshot.sh"
       }
     ]
   }

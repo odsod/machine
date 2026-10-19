@@ -4,7 +4,7 @@ personality = "pragmatic"
 web_search = "live"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
-notify = ["sh", "-lc", "test -d .jj && jj st > /dev/null 2>&1 || true"]
+notify = ["sh", "-lc", "$HOME/.agents/hooks/jj-snapshot.sh"]
 commit_attribution = ""
 
 [tui]
@@ -20,4 +20,4 @@ matcher = "Write|Edit|apply_patch"
 
 [[hooks.PostToolUse.hooks]]
 type = "command"
-command = "jq -r '.tool_input.file_path // .tool_input.path // empty' | { read -r f; case \"$f\" in *.md|*.yaml|*.yml|*.json|*.toml) oxfmt --write \"$f\" ;; esac; } 2>/dev/null || true"
+command = "$HOME/.agents/hooks/format.sh"

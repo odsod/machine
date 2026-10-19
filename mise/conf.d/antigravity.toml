@@ -1,5 +1,5 @@
 [dotfiles]
-"~/.gemini/policies/machine.toml" = "../../antigravity/policies.toml"
+"~/.gemini/config/hooks.json" = "../../antigravity/hooks.json"
 
 [tasks."antigravity:check"]
 description = "Check antigravity config drift (fails until resolved)"
