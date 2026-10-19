@@ -343,4 +343,3 @@ echo "[bump] Verifying discovery..."
 mise run discover
 
 echo "[bump] Versions bumped. Run: mise run apply"
-

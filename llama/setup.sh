@@ -57,7 +57,7 @@ sed \
   -e "s|@SERVER_BIN@|${BUILD}/bin/llama-server|" \
   -e "s|@MODEL_PATH@|${DATA_DIR}/llama/${MODEL}|" \
   -e "s|@PORT@|${PORT}|" \
-  "$REPO_DIR/llama/llama-server.service" > "$UNIT_FILE"
+  "$REPO_DIR/llama/llama-server.service" >"$UNIT_FILE"
 if systemctl --user is-active --quiet llama-embed.service 2>/dev/null; then
   systemctl --user disable --now llama-embed.service 2>/dev/null || true
 fi
@@ -71,7 +71,7 @@ STAMP="$DATA_DIR/llama/.installed-version"
 if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ] || [ "$(cat "$UNIT_FILE")" != "$OLD_UNIT" ]; then
   systemctl --user restart llama-server.service
   mkdir -p "$DATA_DIR/llama"
-  printf '%s\n' "$VERSION" > "$STAMP"
+  printf '%s\n' "$VERSION" >"$STAMP"
 fi
 
 echo "[llama] Done"

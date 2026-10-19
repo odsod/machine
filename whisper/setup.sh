@@ -67,7 +67,7 @@ sed \
   -e "s|@MODEL_PATH@|${DATA_DIR}/whisper/${MODEL}|" \
   -e "s|@VAD_MODEL_PATH@|${DATA_DIR}/whisper/${VAD_MODEL}|" \
   -e "s|@PORT@|${PORT}|" \
-  "$REPO_DIR/whisper/whisper-server.service" > "$UNIT_FILE"
+  "$REPO_DIR/whisper/whisper-server.service" >"$UNIT_FILE"
 systemctl --user daemon-reload
 systemctl --user enable --now whisper-server.service
 
@@ -77,7 +77,7 @@ STAMP="$DATA_DIR/whisper/.installed-version"
 if [ "$(cat "$STAMP" 2>/dev/null || true)" != "$VERSION" ] || [ "$(cat "$UNIT_FILE")" != "$OLD_UNIT" ]; then
   systemctl --user restart whisper-server.service
   mkdir -p "$DATA_DIR/whisper"
-  printf '%s\n' "$VERSION" > "$STAMP"
+  printf '%s\n' "$VERSION" >"$STAMP"
 fi
 
 echo "[whisper] Done"

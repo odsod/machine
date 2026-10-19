@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-import dbus
-import dbus.service
-import dbus.mainloop.glib
 import json
 import subprocess
 import syslog
+
+import dbus
+import dbus.mainloop.glib
+import dbus.service
 from gi.repository import GLib
 
 _QT_MODIFIERS = {
@@ -101,8 +102,7 @@ class Service(dbus.service.Object):
         for name in [
             str(name)
             for name in self._kwin_component.shortcutNames()
-            if (name.startswith("odsod") or name.startswith("[odsod]"))
-            and name not in active_names
+            if name.startswith(("odsod", "[odsod]")) and name not in active_names
         ]:
             syslog.syslog("unregistering " + name)
             self._kglobalaccel.unregister("kwin", name)

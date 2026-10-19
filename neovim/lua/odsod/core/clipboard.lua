@@ -27,10 +27,7 @@ function M.setup()
       local args = { "xclip", "-o", "-selection", want_primary and "primary" or "clipboard" }
       return vim.fn.systemlist(args, { "" }, 1)
     end
-    vim.notify(
-      "No clipboard access in this pane; paste with ctrl+shift+v (terminal paste)",
-      vim.log.levels.WARN
-    )
+    vim.notify("No clipboard access in this pane; paste with ctrl+shift+v (terminal paste)", vim.log.levels.WARN)
     return {}
   end
 

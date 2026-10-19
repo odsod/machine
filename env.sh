@@ -1,6 +1,9 @@
 #!/bin/sh
 
-[ -n "$ODSOD_MACHINE" ] && return || export ODSOD_MACHINE=1
+if [ -n "$ODSOD_MACHINE" ]; then
+  return
+fi
+export ODSOD_MACHINE=1
 
 # bat
 export BAT_THEME="Nord"
@@ -46,32 +49,34 @@ export PI_CLIPBOARD_OSC52=1
 export RUSTUP_HOME="$HOME/.rustup"
 export CARGO_HOME="$HOME/.cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
+# shellcheck source=/dev/null
 [ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
 
 # ssh — needed for non-fish shells (e.g. Claude Code's zsh) where
 # fish's refresh_ssh_auth_sock doesn't run; without this, jj sign-on-push hangs.
 if [ -z "$SSH_AUTH_SOCK" ]; then
-    if [ -S "$HOME/.ssh/auth_sock" ]; then
-        export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
-    elif [ -S "/run/user/$(id -u)/ssh-agent.socket" ]; then
-        export SSH_AUTH_SOCK="/run/user/$(id -u)/ssh-agent.socket"
-    fi
+  if [ -S "$HOME/.ssh/auth_sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
+  elif [ -S "/run/user/$(id -u)/ssh-agent.socket" ]; then
+    SSH_AUTH_SOCK="/run/user/$(id -u)/ssh-agent.socket"
+    export SSH_AUTH_SOCK
+  fi
 fi
 
 # va-api — auto-select driver based on available GPU
 if grep -q '0x1002' /sys/class/drm/card*/device/vendor 2>/dev/null; then
-    export LIBVA_DRIVER_NAME=radeonsi
+  export LIBVA_DRIVER_NAME=radeonsi
 elif grep -q '0x8086' /sys/class/drm/card*/device/vendor 2>/dev/null; then
-    # prefer iHD over i965 for Broadwell+ Intel integrated graphics
-    export LIBVA_DRIVER_NAME=iHD
+  # prefer iHD over i965 for Broadwell+ Intel integrated graphics
+  export LIBVA_DRIVER_NAME=iHD
 fi
 
 # local inference — llama/whisper run only on the desktop Radeon dGPU.
 # Laptops skip the ROCm servers and call odsod-desktop through Tailscale.
 export ODSOD_HAS_RADEON_DGPU=0
-if command -v lspci >/dev/null 2>&1 && \
-    lspci -nn -d 1002: | grep -Eqi '(VGA compatible controller|3D controller|Display controller).*(Radeon RX|Radeon PRO|Radeon VII|Radeon Instinct)'; then
-    export ODSOD_HAS_RADEON_DGPU=1
+if command -v lspci >/dev/null 2>&1 &&
+  lspci -nn -d 1002: | grep -Eqi '(VGA compatible controller|3D controller|Display controller).*(Radeon RX|Radeon PRO|Radeon VII|Radeon Instinct)'; then
+  export ODSOD_HAS_RADEON_DGPU=1
 fi
 
 # machine

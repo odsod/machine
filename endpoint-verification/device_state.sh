@@ -46,8 +46,8 @@ get_serial_number() {
 
 strip_subvolume_suffix() {
   case "$1" in
-    *'['*) "$PRINTF" '%s\n' "${1%%\[*}" ;;
-    *) "$PRINTF" '%s\n' "$1" ;;
+  *'['*) "$PRINTF" '%s\n' "${1%%\[*}" ;;
+  *) "$PRINTF" '%s\n' "$1" ;;
   esac
 }
 
@@ -64,21 +64,21 @@ is_crypt_or_has_crypt_parent() {
   DEVICE=$1
 
   case "$DEVICE" in
-    /dev/*) ;;
-    *) DEVICE=/dev/"$DEVICE" ;;
+  /dev/*) ;;
+  *) DEVICE=/dev/"$DEVICE" ;;
   esac
 
   while [ -n "$DEVICE" ]; do
     TYPE=$("$LSBLK" -dn -o TYPE "$DEVICE" 2>/dev/null | "$AWK" 'NR == 1 { print $1 }')
     case "$TYPE" in
-      crypt) return 0 ;;
+    crypt) return 0 ;;
     esac
 
     PARENT=$("$LSBLK" -dn -o PKNAME "$DEVICE" 2>/dev/null | "$AWK" 'NR == 1 { print $1 }')
     case "$PARENT" in
-      '') break ;;
-      /dev/*) DEVICE=$PARENT ;;
-      *) DEVICE=/dev/"$PARENT" ;;
+    '') break ;;
+    /dev/*) DEVICE=$PARENT ;;
+    *) DEVICE=/dev/"$PARENT" ;;
     esac
   done
 
@@ -90,17 +90,17 @@ get_disk_encrypted() {
   ROOT_SOURCE=$(strip_subvolume_suffix "$ROOT_SOURCE")
 
   case "$ROOT_SOURCE" in
-    '') DISK_ENCRYPTED=UNKNOWN ;;
-    /dev/*)
-      if is_crypt_or_has_crypt_parent "$ROOT_SOURCE"; then
-        DISK_ENCRYPTED=ENABLED
-      else
-        DISK_ENCRYPTED=DISABLED
-      fi
-      ;;
-    *)
-      DISK_ENCRYPTED=UNKNOWN
-      ;;
+  '') DISK_ENCRYPTED=UNKNOWN ;;
+  /dev/*)
+    if is_crypt_or_has_crypt_parent "$ROOT_SOURCE"; then
+      DISK_ENCRYPTED=ENABLED
+    else
+      DISK_ENCRYPTED=DISABLED
+    fi
+    ;;
+  *)
+    DISK_ENCRYPTED=UNKNOWN
+    ;;
   esac
 }
 
@@ -109,12 +109,12 @@ get_os_name_and_version() {
   if [ -r "$OS_INFO_FILE" ]; then
     OS_NAME=$("$GREP" -i '^NAME=' "$OS_INFO_FILE" | "$AWK" -F= '{ print $2 }' | "$TR" '[:upper:]' '[:lower:]')
     case "$OS_NAME" in
-      *ubuntu*|*debian*|*fedora*)
-        OS_VERSION=$("$GREP" -i '^VERSION_ID=' "$OS_INFO_FILE" | "$AWK" -F= '{ print $2 }' | "$TR" -d '"')
-        ;;
-      *)
-        OS_VERSION=
-        ;;
+    *ubuntu* | *debian* | *fedora*)
+      OS_VERSION=$("$GREP" -i '^VERSION_ID=' "$OS_INFO_FILE" | "$AWK" -F= '{ print $2 }' | "$TR" -d '"')
+      ;;
+    *)
+      OS_VERSION=
+      ;;
     esac
   else
     log_error "$OS_INFO_FILE is not available."
@@ -131,30 +131,30 @@ get_kde_screenlock_value() {
   fi
 
   case "$LOCK_ENABLED" in
-    true) SCREENLOCK_ENABLED=ENABLED ;;
-    false) SCREENLOCK_ENABLED=DISABLED ;;
-    *) SCREENLOCK_ENABLED=UNKNOWN ;;
+  true) SCREENLOCK_ENABLED=ENABLED ;;
+  false) SCREENLOCK_ENABLED=DISABLED ;;
+  *) SCREENLOCK_ENABLED=UNKNOWN ;;
   esac
 }
 
 get_screenlock_value() {
   SESSION_SPEC=$(echo "${XDG_CURRENT_DESKTOP:-unset}""${DESKTOP_SESSION:-unset}" | "$TR" '[:upper:]' '[:lower:]')
   case "$SESSION_SPEC" in
-    *cinnamon*) DESKTOP_ENV=cinnamon ;;
-    *gnome*) DESKTOP_ENV=gnome ;;
-    *unity*) DESKTOP_ENV=gnome ;;
-    *kde*|*plasma*)
+  *cinnamon*) DESKTOP_ENV=cinnamon ;;
+  *gnome*) DESKTOP_ENV=gnome ;;
+  *unity*) DESKTOP_ENV=gnome ;;
+  *kde* | *plasma*)
+    get_kde_screenlock_value
+    return
+    ;;
+  *)
+    if [ -x "$KREADCONFIG6" ] || [ -x "$KREADCONFIG5" ]; then
       get_kde_screenlock_value
       return
-      ;;
-    *)
-      if [ -x "$KREADCONFIG6" ] || [ -x "$KREADCONFIG5" ]; then
-        get_kde_screenlock_value
-        return
-      fi
-      SCREENLOCK_ENABLED=UNKNOWN
-      return
-      ;;
+    fi
+    SCREENLOCK_ENABLED=UNKNOWN
+    return
+    ;;
   esac
 
   LOCK_ENABLED=
@@ -168,9 +168,9 @@ get_screenlock_value() {
   fi
 
   case "$LOCK_ENABLED" in
-    true) SCREENLOCK_ENABLED=ENABLED ;;
-    false) SCREENLOCK_ENABLED=DISABLED ;;
-    *) SCREENLOCK_ENABLED=UNKNOWN ;;
+  true) SCREENLOCK_ENABLED=ENABLED ;;
+  false) SCREENLOCK_ENABLED=DISABLED ;;
+  *) SCREENLOCK_ENABLED=UNKNOWN ;;
   esac
 }
 
@@ -202,14 +202,14 @@ get_os_firewall() {
   if [ -x "$FIREWALL_CMD" ]; then
     FIREWALL_STATE=$("$FIREWALL_CMD" --state 2>/dev/null || true)
     case "$FIREWALL_STATE" in
-      running)
-        OS_FIREWALL=enabled
-        return
-        ;;
-      not\ running)
-        OS_FIREWALL=disabled
-        return
-        ;;
+    running)
+      OS_FIREWALL=enabled
+      return
+      ;;
+    not\ running)
+      OS_FIREWALL=disabled
+      return
+      ;;
     esac
   fi
 
@@ -233,14 +233,14 @@ get_os_firewall() {
 }
 
 case "$ACTION" in
-  init)
-    get_serial_number
-    get_disk_encrypted
+init)
+  get_serial_number
+  get_disk_encrypted
 
-    "$PRINTF" "serial_number: \"%s\"\n" "$SERIAL_NUMBER"
-    "$PRINTF" "disk_encrypted: %s\n" "$DISK_ENCRYPTED"
+  "$PRINTF" "serial_number: \"%s\"\n" "$SERIAL_NUMBER"
+  "$PRINTF" "disk_encrypted: %s\n" "$DISK_ENCRYPTED"
 
-    exit 0
+  exit 0
   ;;
 esac
 
@@ -261,7 +261,6 @@ get_os_firewall
 "$PRINTF" "model: \"%s\"\n" "$MODEL"
 "$PRINTF" "os_firewall: \"%s\"\n" "$OS_FIREWALL"
 
-echo "$MAC_ADDRESSES" | while IFS= read -r item
-do
+echo "$MAC_ADDRESSES" | while IFS= read -r item; do
   "$PRINTF" "mac_addresses: \"%s\"\n" "$item"
 done

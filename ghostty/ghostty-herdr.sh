@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 if ! command -v herdr >/dev/null 2>&1; then
-    exec "$SHELL"
+  exec "$SHELL"
 fi
 exec herdr
