@@ -4,8 +4,12 @@
 
 [tasks."kwin:install"]
 description = "Install KWin script package and configure"
-depends = ["kwin:install-package", "kwin:enable-plugin", "kwin:configure"]
+depends = ["kwin:install-package", "kwin:enable-plugin", "kwin:configure", "kwin:greeter-dropin"]
 run = "echo '[kwin] Done'"
+
+[tasks."kwin:greeter-dropin"]
+description = "Install greeter KWin RA24 workaround on Radeon dGPU machines only"
+run = 'exec "$REPO_DIR/kwin/setup-greeter-dropin.sh"'
 
 [tasks."kwin:install-package"]
 description = "Install Plasma KWin script package"
