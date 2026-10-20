@@ -1,5 +1,6 @@
 [dotfiles]
 "~/.pi/agent/settings.json" = "../../pi/settings.json"
+"~/.pi/agent/models.json" = "../../pi/models.json"
 "~/.pi/agent/themes/nord-dark.json" = "../../pi/themes/nord-dark.json"
 "~/.pi/agent/themes/nord-claude.json" = "../../pi/themes/nord-claude.json"
 

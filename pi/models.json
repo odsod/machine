@@ -1,0 +1,40 @@
+{
+  "$schema": "https://pi.dev/schemas/models.schema.json",
+  "providers": {
+    "opper": {
+      "name": "Opper",
+      "baseUrl": "https://api.opper.ai/v3/compat",
+      "api": "openai-completions",
+      "apiKey": "!secret-tool lookup service opper user odsod",
+      "models": [
+        {
+          "id": "deepseek-v4.1-flash-1017",
+          "name": "DeepSeek V4.1 Flash (1017)",
+          "api": "openai-completions",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "off": "none",
+            "minimal": "minimal",
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": "max"
+          },
+          "input": ["text", "image"],
+          "cost": {
+            "input": 0.2,
+            "output": 0.6,
+            "cacheRead": 0.006,
+            "cacheWrite": 0
+          },
+          "contextWindow": 1048576,
+          "maxTokens": 393216,
+          "compat": {
+            "supportsReasoningEffort": true
+          }
+        }
+      ]
+    }
+  }
+}
