@@ -6,6 +6,7 @@
 
 [bootstrap.packages]
 "dnf:kdialog" = "latest"
+"dnf:ksshaskpass" = "latest"
 "dnf:pam-kwallet" = "latest"
 "brew-cask:font-inter" = "latest"
 "brew-cask:font-iosevka-ss08" = "latest"
