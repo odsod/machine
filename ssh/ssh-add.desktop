@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=SSH Key Agent
+Comment=Automatically load SSH keys into ssh-agent at login using ksshaskpass
+Exec=ssh-add -q
+Type=Application
+X-KDE-autostart-after=panel
+X-KDE-StartupNotify=false

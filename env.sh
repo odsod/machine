@@ -63,6 +63,11 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
   fi
 fi
 
+if [ -x "/usr/bin/ksshaskpass" ]; then
+  export SSH_ASKPASS="/usr/bin/ksshaskpass"
+  export SSH_ASKPASS_REQUIRE="prefer"
+fi
+
 # va-api — auto-select driver based on available GPU
 if grep -q '0x1002' /sys/class/drm/card*/device/vendor 2>/dev/null; then
   export LIBVA_DRIVER_NAME=radeonsi
