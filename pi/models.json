@@ -11,8 +11,8 @@
       "apiKey": "!secret-tool lookup service opper user odsod",
       "models": [
         {
-          "id": "deepseek-v4.1-flash-1017",
-          "name": "DeepSeek V4.1 Flash (1017)",
+          "id": "deepinfra/deepseek-v4.1-flash-1017",
+          "name": "DeepSeek V4.1 Flash (DeepInfra)",
           "api": "openai-completions",
           "reasoning": true,
           "thinkingLevelMap": {

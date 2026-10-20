@@ -3,10 +3,12 @@
   "defaultModel": "deepseek-v4.1-flash",
   "modelThinkingLevels": {
     "opencode-go/deepseek-v4.1-flash": "high",
-    "opper/deepseek-v4.1-flash-1017": "high"
+    "opper/deepinfra/deepseek-v4.1-flash-1017": "high"
   },
   "theme": "nord-claude",
   "quietStartup": true,
-  "defaultTools": ["+codemode"],
-  "lastChangelogVersion": "1.3.0"
+  "defaultTools": [
+    "+codemode"
+  ],
+  "lastChangelogVersion": "1.4.0"
 }
