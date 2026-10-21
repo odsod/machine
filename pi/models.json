@@ -1,6 +1,9 @@
 {
   "$schema": "https://pi.dev/schemas/models.schema.json",
   "providers": {
+    "opencode-go": {
+      "apiKey": "!secret-tool lookup service opencode-go user odsod"
+    },
     "opper": {
       "name": "Opper",
       "baseUrl": "https://api.opper.ai/v3/compat",
