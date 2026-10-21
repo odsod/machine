@@ -1,7 +1,8 @@
 {
-  "defaultProvider": "opper",
-  "defaultModel": "deepseek-v4.1-flash-1017",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4.1-flash",
   "modelThinkingLevels": {
+    "opencode-go/deepseek-v4.1-flash": "high",
     "opper/deepseek-v4.1-flash-1017": "high"
   },
   "theme": "nord-claude",
