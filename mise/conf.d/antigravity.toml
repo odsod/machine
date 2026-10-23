@@ -2,19 +2,27 @@
 "~/.gemini/config/hooks.json" = "../../antigravity/hooks.json"
 
 [tasks."antigravity:check"]
-description = "Check antigravity config drift (fails until resolved)"
+description = "Check antigravity config drift on repo-managed keys (fails until resolved)"
 run = """
-if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
+repo_view=$(mktemp)
+live_view=$(mktemp)
+trap 'rm -f "$repo_view" "$live_view"' EXIT
+jq -S . "$REPO_DIR/antigravity/settings.json" >"$repo_view"
+jq -S --slurpfile ref "$REPO_DIR/antigravity/settings.json" \
+  'with_entries(select(.key as $k | $ref[0] | has($k)))' \
+  "$HOME/.gemini/antigravity-cli/settings.json" >"$live_view"
+if ! diff -u "$repo_view" "$live_view"; then
   echo "[antigravity] Resolve with: mise run antigravity:resolve"
   exit 1
 fi
 """
 
 [tasks."antigravity:resolve"]
-description = "Resolve antigravity config drift by overwriting the live config"
+description = "Resolve antigravity config drift by merging repo keys into the live config"
 run = """
-if ! diff -u "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json"; then
-  echo "[antigravity] Applying repo config over live config"
-fi
-install -m 600 "$REPO_DIR/antigravity/settings.json" "$HOME/.gemini/antigravity-cli/settings.json"
+merged=$(mktemp)
+trap 'rm -f "$merged"' EXIT
+jq -S -s '.[0] * .[1]' "$HOME/.gemini/antigravity-cli/settings.json" "$REPO_DIR/antigravity/settings.json" >"$merged"
+echo "[antigravity] Applying repo keys over live config"
+install -m 600 "$merged" "$HOME/.gemini/antigravity-cli/settings.json"
 """

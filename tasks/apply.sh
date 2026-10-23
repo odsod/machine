@@ -17,9 +17,10 @@ while [ $# -gt 0 ]; do
     echo "Apply every current version and config in the repo: full convergence."
     echo
     echo "Options:"
-    echo "  -f, --force  Overwrite the live codex and antigravity configs with"
-    echo "               the repo copies before convergence. This drops private"
-    echo "               runtime state; the apps re-prompt for it."
+    echo "  -f, --force  Merge the antigravity repo keys into the live config and"
+    echo "               overwrite the live codex config before convergence. The"
+    echo "               codex overwrite drops private runtime state; the app"
+    echo "               re-prompts for it."
     echo "  -h, --help   Show this help message"
     exit 0
     ;;

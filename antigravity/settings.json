@@ -1,6 +1,7 @@
 {
   "allowNonWorkspaceAccess": true,
   "altScreenMode": "always",
+  "artifactReviewPolicy": "always-proceed",
   "gcp": {
     "project": "way-platform-ai",
     "location": "eu"
@@ -8,5 +9,6 @@
   "model": "Gemini 4 Argon (Medium)",
   "notifications": true,
   "showFeedbackSurvey": false,
+  "toolPermission": "always-proceed",
   "verbosity": "high"
 }
