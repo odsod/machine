@@ -84,19 +84,5 @@ if command -v lspci >/dev/null 2>&1 &&
   export ODSOD_HAS_RADEON_DGPU=1
 fi
 
-# kwin — amdgpu advertises DRM_FORMAT_RGBA8888 in rgb_formats[] and
-# overlay_formats[], but fill_plane_buffer_attributes() has no case for it, so
-# the atomic commit fails with "Unsupported screen format RA24" and KWin
-# retries until the desktop wedges. Forcing overlays on keeps KWin on the
-# primary plane. KWin parses these as "value == 1", so 0 is not false, it is
-# unset; the greeter's own unit sets 0 for that reason. Direct scanout stays
-# enabled on purpose: it is what lets fullscreen video and games bypass the
-# compositor, and the overlay path above already covers this bug.
-# Gated on the Radeon dGPU so laptops and Intel-only machines are untouched.
-# Drop this when upstream adds the missing case.
-if [ "$XDG_CURRENT_DESKTOP" = "KDE" ] && [ "${ODSOD_HAS_RADEON_DGPU:-0}" = "1" ]; then
-  export KWIN_USE_OVERLAYS=1
-fi
-
 # machine
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
