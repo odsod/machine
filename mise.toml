@@ -286,11 +286,13 @@ run = 'exec "$REPO_DIR/tasks/setup-tmp.sh"'
 description = "Format all repo files"
 run = """
 cd "$REPO_DIR"
-shfmt -w -i 2 .
+# shfmt does not read .gitignore, so drop ignored trees such as src/.
+shfmt --find . | git check-ignore -nv --stdin | sed -n 's/^::\t//p' | xargs shfmt -w -i 2
 stylua --indent-type Spaces --indent-width 2 .
 ruff check --fix --extend-exclude .agents,agents/skills .
 ruff format --extend-exclude .agents,agents/skills .
-oxfmt --write '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json'
+mise fmt --all
+oxfmt --write '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json' '!mise.toml' '!mise/conf.d/**'
 """
 
 [tasks.check]
@@ -298,14 +300,16 @@ description = "Run all linters and format checks"
 run = """
 cd "$REPO_DIR"
 mise install node shellcheck shfmt stylua ruff npm:oxfmt npm:oxlint github:fish-shell/fish-shell
-shfmt --find . | xargs shellcheck -x
-shfmt -d -i 2 .
+sh_files="$(shfmt --find . | git check-ignore -nv --stdin | sed -n 's/^::\t//p')"
+echo "$sh_files" | xargs shellcheck -x
+echo "$sh_files" | xargs shfmt -d -i 2
 { git ls-files '*.fish'; git grep -l '^#!/.*fish'; } | sort -u | xargs fish --no-execute
 stylua --indent-type Spaces --indent-width 2 --check .
 ruff check --extend-exclude .agents,agents/skills .
 ruff format --check --extend-exclude .agents,agents/skills .
+mise fmt --all --check
 oxlint --ignore-pattern '.agents/**' --ignore-pattern 'agents/skills/**' .
-oxfmt --check '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json'
+oxfmt --check '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json' '!mise.toml' '!mise/conf.d/**'
 mise config ls >/dev/null
 """
 
