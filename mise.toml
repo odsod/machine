@@ -9,7 +9,14 @@
 
 [settings]
 auto_update = true
-idiomatic_version_file_enable_tools = ["go", "java", "node", "python", "ruby", "terraform"]
+idiomatic_version_file_enable_tools = [
+  "go",
+  "java",
+  "node",
+  "python",
+  "ruby",
+  "terraform",
+]
 # `mise upgrade` and `prune` parse every tracked config, including go.mod files
 # from build artifacts and other repos. A bare `go` directive is only a floor,
 # so ignore it now instead of warning until mise 2026.11.0 removes it. The

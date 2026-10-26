@@ -7,7 +7,10 @@ endpoint_verification_sha256 = "2ea825143fd56a10d6ae3a3f2719cd47833479f7dd3faa6e
 
 [tasks."endpoint-verification:install"]
 description = "Install Google Endpoint Verification"
-depends = ["endpoint-verification:install-files", "endpoint-verification:enable-service"]
+depends = [
+  "endpoint-verification:install-files",
+  "endpoint-verification:enable-service",
+]
 run = "echo '[endpoint-verification] Done'"
 
 [tasks."endpoint-verification:install-files"]
