@@ -1,5 +1,6 @@
 [dotfiles]
 "~/.config/pipewire/pipewire.conf.d/50-no-raop.conf" = "../../pipewire/50-no-raop.conf"
+"~/.config/wireplumber/wireplumber.conf.d/51-bluez-aptx-hd.conf" = "../../wireplumber/51-bluez-aptx-hd.conf"
 
 [bootstrap.packages]
 "dnf:pipewire-codec-aptx" = "latest"
