@@ -1,5 +1,5 @@
 [vars]
-llama_version = "0.7.0"
+llama_version = "0.8.0"
 llama_model = "Qwen3.5-9B-Q5_K_M.gguf"
 llama_model_url = "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/main/Qwen3.5-9B-Q5_K_M.gguf"
 llama_port = "8179"

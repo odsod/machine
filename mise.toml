@@ -26,6 +26,7 @@ lockfile = true
 minimum_release_age = "0s"
 pin = false
 trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
+experimental = true
 
 [settings.python]
 uv_venv_auto = "source"
@@ -44,7 +45,7 @@ run_auto_install = true
 # vfox-gcloud that requires "python" from hooks/, which only filesystem plugins
 # can resolve, so every gcloud command warns and installs fail. Unpin after the
 # fix lands.
-"aqua:jdx/mise" = "2026.10.21"
+"aqua:jdx/mise" = "2026.10.22"
 
 # Languages: major prefixes, not latest (avoids silent 24→26 / 3.12→3.14)
 go = "1.27"
