@@ -1,8 +1,8 @@
 [vars]
 # Cursor RPMs live behind a per-release production hash. Both values come from
 # one `mise run discover` row and must be bumped together.
-cursor_version = "3.27.14"
-cursor_hash = "69b724ebc67ec522c1b5d287a5025f7a7e81be97"
+cursor_version = "3.27.22"
+cursor_hash = "b1aa50cb6db84fd3e8c808259cb172ea73425c1f"
 
 [dotfiles]
 "~/.config/Cursor/User/settings.json" = "../../cursor/settings.json"
