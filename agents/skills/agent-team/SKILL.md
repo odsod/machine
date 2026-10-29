@@ -143,12 +143,12 @@ herdr agent prompt impl "Implement <unit>. Write /tmp/agent-team/<slug>/impl.md.
 **Confirm that every prompt landed.** A prompt sent right after `agent start` is often
 dropped: the agent reports `idle`, `interactive_ready: true`, and its input box is empty.
 `agent_prompted` does not mean the agent got the text. After each `herdr agent prompt`,
-check that the status turns `working`; if it does not, send the prompt once more:
+check that the status turns `working` (or `done`, when a short prompt already finished); if it does not, send the prompt once more:
 
 ```bash
 for i in 1 2 3; do
   sleep 15
-  [ "$(herdr agent get impl | jq -r .result.agent.agent_status)" = working ] && break
+  case "$(herdr agent get impl | jq -r .result.agent.agent_status)" in working|done) break ;; esac
   herdr agent read impl --source visible | tail -5   # empty input box = dropped
   herdr agent prompt impl "<same prompt>"
 done
