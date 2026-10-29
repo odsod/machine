@@ -187,6 +187,19 @@ Unclear → open question in the brief, do not invent. Same handoff fails twice 
 
 Implementer may make local `jj` commits. Nobody pushes unless asked.
 
+Close a worker as soon as its last unit is accepted. Do not keep idle panes for "maybe later".
+
+### 5. Clean up
+
+The outcome is not realized while the team still runs. Clean up before you report done. Do not hand cleanup to the user as a "leftovers" list.
+
+- Close every pane and tab the team created: `herdr pane close <pane-id>`, `herdr tab close <tab-id>`. Then check `herdr pane list --workspace "$HERDR_WORKSPACE_ID"` shows only panes the user had before.
+- Worker jj workspaces: check that each worker's commits are in the stack (`jj log -r '<ws>@- & ~::<tip>'` is empty), then `jj workspace forget <ws>` and remove the directory.
+- Stop local dev and other long processes the team started, unless the user needs them next. Say which ones you left running, and why.
+- Append `orchestrator: team closed` to Handoff.
+
+Something you cannot close safely (unique work, a process the user owns): name it in the final report, with the command to close it.
+
 ## Shapes
 
 Default is above: solo, then maybe an implement sibling.
@@ -203,4 +216,5 @@ Default is above: solo, then maybe an implement sibling.
 - Do not use Claude's experimental in-process agent teams. This protocol is Herdr panes so pi, agy, and cursor can sit on the same team.
 - Agy has no user compact: keep its units short and `/clear` between them.
 - After a restart: `herdr agent list`, read the brief, continue from Handoff.
+- An orchestrator that ends with idle workers has not finished. Close the team (step 5) before the last report.
 - Execution workers (pi, Composer, or agy on bulk): vacuum. One tight unit, an output path, a stop. Do not load this skill into those panes.
