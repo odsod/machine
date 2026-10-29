@@ -39,7 +39,7 @@ Add an agent when either dimension fails here. Add none when both pass. Drop or 
 
 - Default: Opus 5.5 orchestrates and owns architecture; `pi` (DeepSeek V4.1 Flash) writes code; `agy` (Gemini 4 Argon) takes adversarial review and writing.
 - Write (`AGENTS.md`, API docs): Gemini 4 Argon via `agy`.
-- Adversarial review: Gemini 4 Argon via `agy` (or isolated reviewer; see below).
+- Adversarial review: Gemini 4 Argon via `agy` (or isolated reviewer; see below). One review unit per stack touched; see Isolated reviewer.
 - Bulk, multimodal, or corpus: `agy` fans out subagents; orchestrator reads `report.md` only.
 - Niche (`cursor`): Grok 4.7 or Composer 2.5 only when you need an extra frame or fallback coder.
 
@@ -209,6 +209,8 @@ Default is above: solo, then maybe an implement sibling.
 **Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
 
 **Isolated reviewer.** When each cycle must reload fat style skills plus `AGENTS.md`, or the implementer needs an adversarial gate. Reviewer is Gemini 4 Argon (`agy`) or Opus 5.5 (`claude`), not `pi`. Prime it with this skill. Spawn when the first implement unit lands. Load this skill and the stack style skill, read `AGENTS.md` on the touched path, write `review.md`, token `PHASE_COMPLETE` or `BLOCKED`, stop. Orchestrator reads `review.md`; it does not ingest the style corpus. Not for one or two reviews, and not when review is only "matches the brief."
+
+Review each stack apart. A diff that touches backend and frontend gets one review unit per stack, never one review over the mixed diff. Each review unit loads the style skills of its stack and reads every `AGENTS.md` from the repo root down to each touched path. A data stack (dbt, Python, warehouse SQL) is a stack of its own.
 
 ## Guardrails
 
