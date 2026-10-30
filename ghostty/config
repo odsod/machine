@@ -17,15 +17,14 @@ window-title-font-family = Iosevka SS08
 # Mouse & Cursor
 cursor-style-blink = true
 mouse-hide-while-typing = true
-# Write to both the primary and system clipboards (osc52 from nvim included)
-copy-on-select = clipboard
+# Write to both the primary and system clipboards
+copy-on-select = both
 focus-follows-mouse = true
 
 # Terminal & Integration
 command = direct:/home/odsod/.config/ghostty/ghostty-herdr.sh
-# Handled by tmux
-scrollback-limit = 0
-shell-integration-features = cursor,title,path,ssh-env,ssh-terminfo,no-sudo
+# Handled by Herdr
+scrollback-limit-bytes = 0
 
 # Keybindings
 # Release the mouse when a TUI or agent grabs mouse reporting

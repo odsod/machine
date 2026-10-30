@@ -1,6 +1,5 @@
 [dotfiles]
 "~/.config/ghostty/config" = "../../ghostty/config"
-"~/.config/ghostty/themes" = "../../ghostty/themes"
 "~/.config/ghostty/ghostty-herdr.sh" = "../../ghostty/ghostty-herdr.sh"
 
 [bootstrap.dnf.repos]
