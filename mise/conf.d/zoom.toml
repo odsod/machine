@@ -1,5 +1,5 @@
 [vars]
-zoom_version = "7.2.1.5760"
+zoom_version = "7.2.5.6661"
 
 [tasks."zoom:setup"]
 description = "Install Zoom desktop client"
