@@ -1,6 +1,6 @@
 [bootstrap.dnf.repos]
 # Fedora does not package scrcpy. Its COPR has no upstream repo, so it is
-# unofficial. It replaces Terra.
+# unofficial.
 scrcpy = { copr = "boobaa/scrcpy" }
 
 [bootstrap.packages]
