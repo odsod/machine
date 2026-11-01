@@ -12,7 +12,7 @@ jq -S --slurpfile ref "$REPO_DIR/antigravity/settings.json" \
   'with_entries(select(.key as $k | $ref[0] | has($k)))' \
   "$HOME/.gemini/antigravity-cli/settings.json" >"$live_view"
 if ! diff -u "$repo_view" "$live_view"; then
-  echo "[antigravity] Resolve with: mise run antigravity:resolve"
+  echo "[antigravity] Resolve with: mise run resolve"
   exit 1
 fi
 """

@@ -2,7 +2,7 @@
 description = "Check codex config drift (fails until resolved)"
 run = """
 if ! diff -u "$HOME/.codex/config.toml" "$REPO_DIR/codex/config.toml"; then
-  echo "[codex] Resolve with: mise run codex:resolve"
+  echo "[codex] Resolve with: mise run resolve"
   exit 1
 fi
 """

@@ -37,8 +37,8 @@
 
 ## Provisioning and Convergence
 
-- **Full convergence**: `mise run apply` runs `mise bootstrap --yes`,
-  `mise reshim`, and `mise run clean`.
+- **Full convergence**: `mise run apply` runs `mise run config:check`,
+  `mise bootstrap --yes`, `mise reshim`, and `mise run clean`.
 - **Host packages**: `[bootstrap.packages]` installs missing packages only. A
   `"latest"` entry accepts any installed version, so `mise run apply` never
   upgrades one. Packages from enabled repos, such as the COPR builds of ghostty
@@ -49,16 +49,17 @@
   or `mise bootstrap --dry-run`.
 - **Fresh machine**: `./bootstrap.sh` trusts the config and runs
   `mise bootstrap --yes`.
-- **Runtime config drift**: `antigravity:check` and `codex:check` gate
-  `mise run apply`. Live `~/.gemini/antigravity-cli/settings.json` and
+- **Runtime config drift**: `mise run config:check` runs
+  `codex:check` and `antigravity:check` first in `mise run apply`, so drift
+  fails before any convergence work. `mise run resolve` runs every resolve
+  task. Live `~/.gemini/antigravity-cli/settings.json` and
   `~/.codex/config.toml` are plain files because the apps write private runtime
   state into them. `antigravity:check` compares only keys present in
   `antigravity/settings.json`, and `antigravity:resolve` merges those keys into
   the live file, so machine state such as `trustedWorkspaces` never needs to be
   committed. `codex:check` compares the whole file. On failure, copy
   intentional setting changes into the repo (never workspace paths or auth
-  state), then run `mise run antigravity:resolve` or `mise run codex:resolve`
-  (or `mise run apply --force`).
+  state), then run `mise run resolve` (or `mise run apply --force`).
 - **Overwritten dotfile symlinks**: If an app replaces a `[dotfiles]` symlink
   with a plain file, copy wanted changes into the repo before running
   `mise bootstrap --force-dotfiles`.

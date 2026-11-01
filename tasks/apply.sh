@@ -17,10 +17,10 @@ while [ $# -gt 0 ]; do
     echo "Apply every current version and config in the repo: full convergence."
     echo
     echo "Options:"
-    echo "  -f, --force  Merge the antigravity repo keys into the live config and"
-    echo "               overwrite the live codex config before convergence. The"
-    echo "               codex overwrite drops private runtime state; the app"
-    echo "               re-prompts for it."
+    echo "  -f, --force  Run every config resolve task before convergence. This"
+    echo "               merges the antigravity repo keys into the live config and"
+    echo "               overwrites the live codex config. The codex overwrite drops"
+    echo "               private runtime state; the app re-prompts for it."
     echo "  -h, --help   Show this help message"
     exit 0
     ;;
@@ -39,8 +39,14 @@ cd "$REPO_DIR"
 
 if [ "$force" -eq 1 ]; then
   echo "[apply] Resolving codex and antigravity config drift"
-  mise run codex:resolve
-  mise run antigravity:resolve
+  mise run resolve
+fi
+
+echo "[apply] Checking config drift..."
+if ! mise run config:check; then
+  echo "[apply] Config drift blocks convergence." >&2
+  echo "[apply] Copy wanted settings into the repo, then run: mise run resolve" >&2
+  exit 1
 fi
 
 mise bootstrap --yes
