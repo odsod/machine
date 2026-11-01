@@ -107,9 +107,12 @@ echo "Paste-ready endpoint-verification pins: mise run endpoint-verification:dis
 echo
 echo "--- mise tools ---"
 # http:obsidian and http:soap-ui pin a concrete version from [vars] and have no
-# version_list_url, so mise cannot list their releases and warns. The pins table
-# above already tracks both, so drop the benign lines.
+# version_list_url, so mise cannot list their releases. It warns once per tool,
+# and inside a task it also repeats a summary that names them. The pins table
+# above already tracks both, so drop those benign lines. Keep any summary that
+# names a non-http tool: that one is a real gap.
 tools_out="$(mise outdated 2>&1)"
 tools_rc=$?
-printf '%s\n' "$tools_out" | grep -v 'Error getting latest version for http:' || true
+printf '%s\n' "$tools_out" | grep -vE \
+  'Error getting latest version for http:|^mise WARN +Could not check [0-9]+ tools? for updates: (http:[^, ]+, )*http:[^, ]+$' || true
 exit "$tools_rc"
