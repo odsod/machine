@@ -23,6 +23,19 @@
   highlights. Breeze Plasma style SVGs, including the panel background, keep
   their own colors. GTK and browser themes are per app.
 
+## Wallpaper
+
+- `mise run kde:setup-wallpaper` downloads `ign-0011.png` from the Nordic
+  wallpapers repo, verifies its SHA-256, installs it to
+  `/usr/share/wallpapers/nordic-ign-0011.png`, sets it on every Plasma desktop,
+  sets it on the lock screen, and points the Plasma Login Manager at it.
+- The image URL is pinned to an upstream commit. Change the URL and checksum
+  together.
+- The lock screen reads `~/.config/kscreenlockerrc`. The Screen Locking KCM
+  writes the same keys.
+- The login screen reads `/etc/plasmalogin.conf`. The Login Screen KCM writes
+  the same keys.
+
 ## KWallet
 
 - `kwalletrc` enables KWallet without the first-use wizard so `pam-kwallet`
