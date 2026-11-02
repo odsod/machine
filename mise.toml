@@ -288,6 +288,7 @@ depends = [
   "swap:setup",
   "tmp:setup",
   "kde:setup-fonts",
+  "kde:setup-colors",
   "keyboard:setup",
   "herdr:sync-machines",
 ]
