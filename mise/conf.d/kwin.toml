@@ -4,7 +4,12 @@
 
 [tasks."kwin:install"]
 description = "Install KWin script package and configure"
-depends = ["kwin:install-package", "kwin:enable-plugin", "kwin:configure"]
+depends = [
+  "kwin:install-package",
+  "kwin:enable-plugin",
+  "kwin:configure",
+  "kwin:window-rules",
+]
 run = "echo '[kwin] Done'"
 
 [tasks."kwin:install-package"]
@@ -30,6 +35,10 @@ run = """
 kwriteconfig6 --file kwinrc --group Windows --key FocusPolicy FocusFollowsMouse
 qdbus-qt6 org.kde.KWin /KWin reconfigure
 """
+
+[tasks."kwin:window-rules"]
+description = "Configure KWin shadow-only window rules"
+run = 'exec "$REPO_DIR/kwin/window-rules.sh"'
 
 [tasks."kwin:uninstall"]
 description = "Uninstall Plasma KWin script package"
