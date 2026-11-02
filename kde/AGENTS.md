@@ -36,6 +36,24 @@
 - The login screen reads `/etc/plasmalogin.conf`. The Login Screen KCM writes
   the same keys.
 
+## Profile image
+
+- `mise run kde:setup-avatar` downloads the Gravatar avatar of
+  `oscardsoderlund`, verifies its SHA-256, and sets it through accountsservice.
+  It needs no sudo.
+- accountsservice `SetIconFile` writes `/var/lib/AccountsService/icons/odsod`
+  and sets `Icon=` in `/var/lib/AccountsService/users/odsod`.
+- The URL is pinned to the avatar hash from
+  `https://gravatar.com/oscardsoderlund.json` (`photos[0].value`). Change the
+  URL and checksum together after you change the Gravatar image.
+- The image shows in Kickoff, System Settings Users, and the lock screen.
+- accountsservice emits the icon change before it finishes the copy. A running
+  Plasma Shell or System Settings can therefore cache a failed decode and keep
+  showing no picture. Restart them
+  (`systemctl --user restart plasma-plasmashell`), or log out and in.
+- Verify:
+  `busctl get-property org.freedesktop.Accounts /org/freedesktop/Accounts/User1000 org.freedesktop.Accounts.User IconFile`
+
 ## KWallet
 
 - `kwalletrc` enables KWallet without the first-use wizard so `pam-kwallet`

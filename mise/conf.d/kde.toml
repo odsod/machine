@@ -40,3 +40,6 @@ plasma-apply-colorscheme --accent-color "#88C0D0" Nord
 description = "Set the Nord wallpaper on Plasma, the lock screen, and the login screen"
 run = 'exec "$REPO_DIR/kde/setup-wallpaper.sh"'
 
+[tasks."kde:setup-avatar"]
+description = "Set the account profile image from Gravatar"
+run = 'exec "$REPO_DIR/kde/setup-avatar.sh"'
