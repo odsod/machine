@@ -139,7 +139,7 @@ const shortcuts = [
     key: "Meta+.",
     kind: "app",
     command: ["flatpak", "run", "com.spotify.Client"],
-    resourceClass: "spotify",
+    resourceClass: "com.spotify.Client",
     noBorder: true,
   },
 
