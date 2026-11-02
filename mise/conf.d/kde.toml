@@ -3,6 +3,7 @@
 "~/.config/mimeapps.list" = "../../kde/mimeapps.list"
 "~/.config/fontconfig/conf.d/10-rendering.conf" = "../../kde/fonts.conf"
 "~/.config/kwalletrc" = "../../kde/kwalletrc"
+"~/.local/share/color-schemes/Nord.colors" = "../../kde/color-schemes/Nord.colors"
 
 [bootstrap.packages]
 "dnf:kdialog" = "latest"
@@ -25,5 +26,13 @@ kwriteconfig6 --group "General" --key "XftHintStyle" "hintslight"
 kwriteconfig6 --group "General" --key "XftSubPixel" "none"
 kwriteconfig6 --group "WM" --key "activeFont" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 fc-cache -f
+"""
+
+[tasks."kde:setup-colors"]
+description = "Apply the Nord color scheme and accent color"
+run = """
+# Applying a scheme resets the accent, so set the accent afterwards.
+plasma-apply-colorscheme Nord
+plasma-apply-colorscheme --accent-color "#88C0D0" Nord
 """
 

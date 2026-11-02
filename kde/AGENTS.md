@@ -13,6 +13,16 @@
 - Verify rendering: `fc-match -v 'Inter' | rg 'rgba|lcdfilter|embeddedbitmap|hintstyle'`
 - Verify KDE font: `kreadconfig6 --group "General" --key "font"`
 
+## Colors
+
+- `color-schemes/Nord.colors` is Breeze Dark with Nord palette values. The
+  dotfile puts it in `~/.local/share/color-schemes/`.
+- `mise run kde:setup-colors` applies the scheme and sets the accent color to
+  Frost `#88C0D0`.
+- The scheme covers Qt apps, Breeze decorations, and Plasma widget text and
+  highlights. Breeze Plasma style SVGs, including the panel background, keep
+  their own colors. GTK and browser themes are per app.
+
 ## KWallet
 
 - `kwalletrc` enables KWallet without the first-use wizard so `pam-kwallet`
