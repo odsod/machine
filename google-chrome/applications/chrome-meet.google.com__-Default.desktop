@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Google Meet
+Exec=google-chrome --app=https://meet.google.com --user-data-dir=/home/odsod/.local/share/odsod/machine/data/google-chrome/recorder --remote-debugging-port=9224
+Icon=odsod-chrome-google-meet
+Terminal=false
+StartupWMClass=chrome-meet.google.com__-Default

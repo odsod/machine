@@ -28,6 +28,26 @@
   `app_id` to `chrome-<host>__-<profile>`. Match these windows in `main.js`
   with `resourceClassIncludes: "<host>"`.
 
+## Chrome Window Icons
+
+KWin reports the `app_id` as the window's desktop file name, so Plasma resolves
+icon and app name from a desktop file with the same basename. Without one the
+window falls back to the generic Wayland icon.
+
+- `google-chrome/applications/` holds one entry per app window, linked into
+  `~/.local/share/applications/` by `[dotfiles]` in
+  `mise/conf.d/google-chrome.toml`.
+- Name each file `chrome-<host>__-Default.desktop` so it matches the app_id.
+  Keep its `Exec=` in sync with the launch command in `main.js`. Write paths
+  in full: desktop files do not expand `$HOME`.
+- `Icon=` is `odsod-chrome-<name>`, from the brand-colored marks in
+  `google-chrome/icons/`, linked into the user hicolor theme. Their `viewBox`
+  adds a 12% margin on every side, so they match the visual weight of the
+  package icons next to them. This is only for windows that would otherwise
+  have no icon; every other app keeps the icon from Breeze or its own package.
+- Plasma keeps app data for open windows, so windows that already exist before
+  the first run need a plasmashell restart or a reopen to show the icon.
+
 ## Window Rules
 
 `window-rules.sh` writes `~/.config/kwinrulesrc` rules that select the Plasma

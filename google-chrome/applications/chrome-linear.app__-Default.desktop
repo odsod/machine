@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Linear
+Exec=google-chrome --app=https://linear.app
+Icon=odsod-chrome-linear
+Terminal=false
+StartupWMClass=chrome-linear.app__-Default
