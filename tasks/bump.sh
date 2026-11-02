@@ -44,7 +44,7 @@ while [ $# -gt 0 ]; do
     echo "  -n, --dry-run  Preview bumps without changing files"
     echo "  -h, --help     Show this help message"
     echo
-    echo "Targets: neovim, yaak, obsidian, slack, zoom, cursor, soap-ui, endpoint-verification, llama, whisper"
+    echo "Targets: neovim, yaak, obsidian, slack, zoom, soap-ui, endpoint-verification, llama, whisper"
     exit 0
     ;;
   -*)
@@ -65,7 +65,7 @@ tools=1
 if [ ${#targets[@]} -gt 0 ]; then
   tools=0
 else
-  targets=(neovim yaak obsidian slack zoom cursor soap-ui endpoint-verification llama whisper)
+  targets=(neovim yaak obsidian slack zoom soap-ui endpoint-verification llama whisper)
 fi
 
 # 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
@@ -93,7 +93,7 @@ fi
 # that defines the named pin.
 pin_file() {
   case "$1" in
-  slack | zoom | yaak | soap-ui | obsidian | cursor | llama | whisper | endpoint-verification)
+  slack | zoom | yaak | soap-ui | obsidian | llama | whisper | endpoint-verification)
     echo "$REPO_DIR/mise/conf.d/$1.toml"
     ;;
   *)
@@ -217,17 +217,6 @@ bump_target() {
       grep -oP '/prod/\K[0-9][0-9.]*')"
     check_target_url="https://zoom.us/client/${latest}/zoom_x86_64.rpm"
     ;;
-  cursor)
-    pinned="$(sed -n 's/^cursor_version = "\(.*\)"$/\1/p' "$(pin_file cursor)")"
-    local cursor_loc
-    cursor_loc="$(redirect_location https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest)"
-    latest="$(echo "$cursor_loc" | grep -oP '/cursor-\K[0-9][0-9.]*(?=\.el8)')"
-    local cursor_hash
-    cursor_hash="$(echo "$cursor_loc" | grep -oP '/production/\K[0-9a-f]{40}')"
-    if [ -n "$latest" ] && [ -n "$cursor_hash" ]; then
-      check_target_url="https://downloads.cursor.com/production/${cursor_hash}/linux/x64/rpm/x86_64/cursor-${latest}.el8.x86_64.rpm"
-    fi
-    ;;
   soap-ui)
     pinned="$(sed -n 's/^soap_ui_version = "\(.*\)"$/\1/p' "$(pin_file soap-ui)")"
     latest="$(curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null |
@@ -298,10 +287,6 @@ bump_target() {
     ;;
   zoom)
     sed -i "s/^zoom_version = \".*\"/zoom_version = \"$latest\"/" "$(pin_file zoom)"
-    ;;
-  cursor)
-    sed -i "s/^cursor_version = \".*\"/cursor_version = \"$latest\"/" "$(pin_file cursor)"
-    sed -i "s/^cursor_hash = \".*\"/cursor_hash = \"$cursor_hash\"/" "$(pin_file cursor)"
     ;;
   soap-ui)
     sed -i "s/^soap_ui_version = \".*\"/soap_ui_version = \"$latest\"/" "$(pin_file soap-ui)"

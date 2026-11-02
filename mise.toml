@@ -237,7 +237,7 @@ replace = true
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_CURSOR = "{{vars.cursor_version}}", PINNED_CURSOR_HASH = "{{vars.cursor_hash}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
+env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
@@ -282,7 +282,6 @@ depends = [
   "graphics:setup",
   "slack:setup",
   "zoom:setup",
-  "cursor:setup",
   "yaak:setup",
   "llama:setup",
   "whisper:setup",
@@ -291,7 +290,6 @@ depends = [
   "kde:setup-fonts",
   "keyboard:setup",
   "herdr:sync-machines",
-  "cursor:setup-cli",
 ]
 run = """
 echo "[bootstrap] Verifying auth services..."

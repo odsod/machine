@@ -78,10 +78,9 @@
   `ok`, `mise bootstrap --dry-run` has no pending work, and GPU services answer
   (`/health` on `127.0.0.1:8178` and `127.0.0.1:8179`).
 - **Pin specifics**:
-  - **Desktop apps** (`slack`, `zoom`, `cursor`, `yaak`, `soap-ui`, `obsidian`):
-    Pinned in `[vars]` in `mise/conf.d/<app>.toml`. Cursor pairs
-    `cursor_version` with `cursor_hash` (see `cursor/AGENTS.md`). Obsidian
-    tracks the newest release with a desktop AppImage.
+  - **Desktop apps** (`slack`, `zoom`, `yaak`, `soap-ui`, `obsidian`):
+    Pinned in `[vars]` in `mise/conf.d/<app>.toml`. Obsidian tracks the newest
+    release with a desktop AppImage.
   - **GPU services** (`llama`, `whisper`): Pin the newest semver release tag
     (without `v`, never `bNNNN`) in `mise/conf.d/llama.toml` and
     `mise/conf.d/whisper.toml`. `mise run apply` rebuilds and restarts the

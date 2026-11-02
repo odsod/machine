@@ -176,15 +176,6 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] code", "KWin", ""],
-    key: "Meta+/",
-    kind: "app",
-    command: ["cursor"],
-    resourceName: "cursor",
-    noBorder: true,
-  },
-
-  {
     actionId: ["kwin", "[odsod] obsidian", "KWin", ""],
     key: "Meta+V",
     kind: "app",
