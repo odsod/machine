@@ -17,8 +17,15 @@
 
 - `color-schemes/Nord.colors` is Breeze Dark with Nord palette values. The
   dotfile puts it in `~/.local/share/color-schemes/`.
-- `mise run kde:setup-colors` applies the scheme and sets the accent color to
-  Frost `#88C0D0`.
+- `mise run kde:setup-colors` applies the scheme. It sets no accent color.
+- The Plasma accent tint replaces the selection colors with a lightened accent
+  and black text, because KDE picks black whenever white fails 4.5:1. Black on
+  that mid-blue reads badly. Frost `#88C0D0` stays in the scheme as the focus
+  and hover color, and selection keeps nord10 `#5E81AC` with the light text
+  `#ECEFF4`.
+- `plasma-apply-colorscheme` does nothing when the scheme is already current.
+  The task deletes `General/ColorScheme` first to force a full write, which
+  also clears an old accent block from `~/.config/kdeglobals`.
 - The scheme covers Qt apps, Breeze decorations, and Plasma widget text and
   highlights. Breeze Plasma style SVGs, including the panel background, keep
   their own colors. GTK and browser themes are per app.
