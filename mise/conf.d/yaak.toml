@@ -1,5 +1,5 @@
 [vars]
-yaak_version = "2026.9.0"
+yaak_version = "2026.9.1"
 
 [tasks."yaak:setup"]
 description = "Install Yaak API client"
