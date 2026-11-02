@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Gmail
+Exec=google-chrome --app=https://mail.google.com
+Icon=odsod-chrome-gmail
+Terminal=false
+StartupWMClass=chrome-mail.google.com__-Default

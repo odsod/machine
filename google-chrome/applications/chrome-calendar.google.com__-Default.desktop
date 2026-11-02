@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Google Calendar
+Exec=google-chrome --app=https://calendar.google.com
+Icon=odsod-chrome-google-calendar
+Terminal=false
+StartupWMClass=chrome-calendar.google.com__-Default

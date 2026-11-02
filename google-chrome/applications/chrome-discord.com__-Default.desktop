@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Discord
+Exec=google-chrome --app=https://discord.com
+Icon=odsod-chrome-discord
+Terminal=false
+StartupWMClass=chrome-discord.com__-Default

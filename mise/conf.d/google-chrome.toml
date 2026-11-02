@@ -1,6 +1,16 @@
 [dotfiles]
 "~/.config/chrome-flags.conf" = "../../google-chrome/chrome-flags.conf"
 "~/.local/bin/google-chrome" = "../../google-chrome/google-chrome.sh"
+"~/.local/share/applications/chrome-calendar.google.com__-Default.desktop" = "../../google-chrome/applications/chrome-calendar.google.com__-Default.desktop"
+"~/.local/share/applications/chrome-discord.com__-Default.desktop" = "../../google-chrome/applications/chrome-discord.com__-Default.desktop"
+"~/.local/share/applications/chrome-linear.app__-Default.desktop" = "../../google-chrome/applications/chrome-linear.app__-Default.desktop"
+"~/.local/share/applications/chrome-mail.google.com__-Default.desktop" = "../../google-chrome/applications/chrome-mail.google.com__-Default.desktop"
+"~/.local/share/applications/chrome-meet.google.com__-Default.desktop" = "../../google-chrome/applications/chrome-meet.google.com__-Default.desktop"
+"~/.local/share/icons/hicolor/scalable/apps/odsod-chrome-discord.svg" = "../../google-chrome/icons/discord.svg"
+"~/.local/share/icons/hicolor/scalable/apps/odsod-chrome-gmail.svg" = "../../google-chrome/icons/gmail.svg"
+"~/.local/share/icons/hicolor/scalable/apps/odsod-chrome-google-calendar.svg" = "../../google-chrome/icons/google-calendar.svg"
+"~/.local/share/icons/hicolor/scalable/apps/odsod-chrome-google-meet.svg" = "../../google-chrome/icons/google-meet.svg"
+"~/.local/share/icons/hicolor/scalable/apps/odsod-chrome-linear.svg" = "../../google-chrome/icons/linear.svg"
 
 [bootstrap.files."/etc/yum.repos.d/google-chrome.repo"]
 content = """
