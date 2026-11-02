@@ -29,11 +29,13 @@ fc-cache -f
 """
 
 [tasks."kde:setup-colors"]
-description = "Apply the Nord color scheme and accent color"
+description = "Apply the Nord color scheme"
 run = """
-# Applying a scheme resets the accent, so set the accent afterwards.
+# plasma-apply-colorscheme does nothing when the scheme is already set, so drop
+# the key to force a full write. It also skips the accent tint this way, which
+# turns selected text black on a mid-blue background.
+kwriteconfig6 --group General --key ColorScheme --delete
 plasma-apply-colorscheme Nord
-plasma-apply-colorscheme --accent-color "#88C0D0" Nord
 """
 
 [tasks."kde:setup-wallpaper"]
