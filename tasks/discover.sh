@@ -60,8 +60,6 @@ redirect_location() {
   curl -sI --max-time 20 "$1" 2>/dev/null | tr -d '\r' | grep -i '^location:' | tail -1
 }
 
-cursor_location="$(redirect_location https://api2.cursor.sh/updates/download/golden/linux-x64-rpm/cursor/latest)"
-
 topic_discover() {
   mise run --output interleave --quiet "$1:discover" 2>/dev/null
 }
@@ -85,9 +83,6 @@ row zoom "$PINNED_ZOOM" "$(
   redirect_location https://zoom.us/client/latest/zoom_x86_64.rpm |
     grep -oP '/prod/\K[0-9][0-9.]*'
 )"
-
-row cursor "$PINNED_CURSOR" "$(echo "$cursor_location" | grep -oP '/cursor-\K[0-9][0-9.]*(?=\.el8)')"
-row cursor-hash "$PINNED_CURSOR_HASH" "$(echo "$cursor_location" | grep -oP '/production/\K[0-9a-f]{40}')"
 
 row soap-ui "$PINNED_SOAP_UI" "$(
   curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null |
