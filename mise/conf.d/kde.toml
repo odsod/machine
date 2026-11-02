@@ -36,3 +36,7 @@ plasma-apply-colorscheme Nord
 plasma-apply-colorscheme --accent-color "#88C0D0" Nord
 """
 
+[tasks."kde:setup-wallpaper"]
+description = "Set the Nord wallpaper on Plasma, the lock screen, and the login screen"
+run = 'exec "$REPO_DIR/kde/setup-wallpaper.sh"'
+
