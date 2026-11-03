@@ -281,30 +281,7 @@ run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
 description = "Apply every current version and config: full convergence"
-run = 'exec "$REPO_DIR/tasks/apply.sh" "$@"'
-
-[tasks."config:check"]
-description = "Check every repo-managed app config for drift"
-run = """
-fail=0
-for task in codex:check antigravity:check; do
-  echo "[config:check] $task"
-  mise run "$task" || fail=1
-done
-if [ "$fail" -ne 0 ]; then
-  echo "[config:check] Drift found. Run: mise run resolve" >&2
-  exit 1
-fi
-"""
-
-[tasks.resolve]
-description = "Resolve drift in every repo-managed app config"
-run = """
-for task in codex:resolve antigravity:resolve; do
-  echo "[resolve] $task"
-  mise run "$task"
-done
-"""
+run = ["mise bootstrap --yes", "mise reshim", { task = "clean" }]
 
 [tasks.bootstrap]
 description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
