@@ -811,6 +811,48 @@ checksum = "sha256:d2c6c9c971c43a0bfdde8c692a9a1a7a45c3e4807cd01ae45662b4734fac1
 url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-windows-x86_64.zip"
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898234"
 
+[[tools."http:herdr-app"]]
+version = "0.1.12"
+backend = "http:herdr-app"
+specifiers = ["latest"]
+
+[tools."http:herdr-app"."platforms.linux-arm64"]
+checksum = "sha256:749f31d30e3f4d7e24e2748f74d9cb4a9bdda4c968027abaffb6fb239ffeb694"
+url = "https://releases.herdr.dev/app/0.1.12/herdr-app-linux-aarch64.tar.gz"
+
+[tools."http:herdr-app"."platforms.linux-arm64-musl"]
+checksum = "sha256:749f31d30e3f4d7e24e2748f74d9cb4a9bdda4c968027abaffb6fb239ffeb694"
+url = "https://releases.herdr.dev/app/0.1.12/herdr-app-linux-aarch64.tar.gz"
+
+[tools."http:herdr-app"."platforms.linux-x64"]
+checksum = "sha256:a265e6c925c487458406741ffa09d2fa0d3d4bd401a34ed8c01c336108e57c1f"
+url = "https://releases.herdr.dev/app/0.1.12/herdr-app-linux-x86_64.tar.gz"
+
+[tools."http:herdr-app"."platforms.linux-x64-musl"]
+checksum = "sha256:a265e6c925c487458406741ffa09d2fa0d3d4bd401a34ed8c01c336108e57c1f"
+url = "https://releases.herdr.dev/app/0.1.12/herdr-app-linux-x86_64.tar.gz"
+
+[[tools."http:herdr-core"]]
+version = "0.1.17"
+backend = "http:herdr-core"
+specifiers = ["latest"]
+
+[tools."http:herdr-core"."platforms.linux-arm64"]
+checksum = "sha256:3a37a454ec63494cf4306db26481fe9db96673d888723701d24f8a992ae8ab8c"
+url = "https://releases.herdr.dev/core/0.1.17/herdr-core-linux-aarch64.tar.gz"
+
+[tools."http:herdr-core"."platforms.linux-arm64-musl"]
+checksum = "sha256:3a37a454ec63494cf4306db26481fe9db96673d888723701d24f8a992ae8ab8c"
+url = "https://releases.herdr.dev/core/0.1.17/herdr-core-linux-aarch64.tar.gz"
+
+[tools."http:herdr-core"."platforms.linux-x64"]
+checksum = "sha256:82ec44043f6894bfdb716b979b87cda43fd7fa46b0104e7b7bd93e64d1a9b877"
+url = "https://releases.herdr.dev/core/0.1.17/herdr-core-linux-x86_64.tar.gz"
+
+[tools."http:herdr-core"."platforms.linux-x64-musl"]
+checksum = "sha256:82ec44043f6894bfdb716b979b87cda43fd7fa46b0104e7b7bd93e64d1a9b877"
+url = "https://releases.herdr.dev/core/0.1.17/herdr-core-linux-x86_64.tar.gz"
+
 [[tools."http:obsidian"]]
 version = "1.15.0"
 backend = "http:obsidian"

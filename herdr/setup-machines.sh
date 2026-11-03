@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
+# Save every Tailscale peer as a Herdr machine. The Herdr TUI (`herdr machine`)
+# and the Herdr app (`hc machine`) keep separate lists, so both are filled.
 set -euo pipefail
 
-if ! command -v tailscale >/dev/null 2>&1 || ! command -v herdr >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
-  echo "[herdr:sync-machines] tailscale, herdr, or jq not found; skipping"
+log() { echo "[herdr:sync-machines] $*"; }
+
+if ! command -v tailscale >/dev/null 2>&1; then
+  log "tailscale not found; skipping"
   exit 0
 fi
 
 status_json="$(tailscale status --json 2>/dev/null || true)"
-if [ -z "$status_json" ]; then
-  echo "[herdr:sync-machines] Tailscale status unavailable; skipping"
-  exit 0
-fi
-
-backend_state="$(printf '%s\n' "$status_json" | jq -r '.BackendState // empty')"
+backend_state="$(jq -r '.BackendState // empty' <<<"$status_json")"
 if [ "$backend_state" != "Running" ]; then
-  echo "[herdr:sync-machines] Tailscale state is '$backend_state'; skipping"
+  log "Tailscale state is '$backend_state'; skipping"
   exit 0
 fi
 
-peers="$(printf '%s\n' "$status_json" | jq -r '
+peers="$(jq -r '
   .Self as $self |
   (.Peer // {})[] |
   select(
@@ -29,36 +28,42 @@ peers="$(printf '%s\n' "$status_json" | jq -r '
     .HostName != $self.HostName
   ) |
   .HostName
-' | sort -u)"
+' <<<"$status_json" | sort -u)"
 
-# Read the supported profile list instead of the internal catalog file. Herdr
-# owns that file; its shape is not a stable interface.
-existing_targets="$(herdr machine list --json 2>/dev/null | jq -r '.[].target' || true)"
+# sync <name> <existing targets> <retry hint> <add command...>
+# Runs the add command for every peer not in the existing targets, with each
+# `{}` in it replaced by the peer.
+sync() {
+  local name="$1" existing="$2" hint="$3" peer added=0 failed=0
+  shift 3
+  for peer in $peers; do
+    grep -Fxq "$peer" <<<"$existing" && continue
+    if timeout 60s "${@//\{\}/$peer}" </dev/null >/dev/null 2>&1; then
+      added=$((added + 1))
+    else
+      failed=$((failed + 1))
+      log "could not add $peer to $name (unreachable or setup needed)" >&2
+    fi
+  done
+  [ "$added" -eq 0 ] || log "Added $added machine(s) to $name"
+  [ "$failed" -eq 0 ] || log "$failed machine(s) not added to $name; retry with: $hint" >&2
+}
 
-added=0
-failed=0
-for peer in $peers; do
-  [ -n "$peer" ] || continue
-  if printf '%s\n' "$existing_targets" | grep -Fxq "$peer"; then
-    continue
-  fi
-
-  add_cmd=(herdr machine add "$peer" --label "$peer" --remote-session default)
-  if command -v timeout >/dev/null 2>&1; then
-    add_cmd=(timeout 30s "${add_cmd[@]}")
-  fi
-
-  if "${add_cmd[@]}" </dev/null >/dev/null 2>&1; then
-    added=$((added + 1))
-  else
-    failed=$((failed + 1))
-    echo "[herdr:sync-machines] could not add $peer (unreachable or setup needed)" >&2
-  fi
-done
-
-if [ "$added" -gt 0 ]; then
-  echo "[herdr:sync-machines] Added $added Tailscale machine(s) to Herdr"
+# Read the supported list commands, not the internal catalog files: their
+# shape is not a stable interface.
+if command -v herdr >/dev/null 2>&1; then
+  sync "Herdr TUI" "$(herdr machine list --json | jq -r '.[].target')" \
+    "herdr machine add <target>" \
+    herdr machine add {} --label {} --remote-session default
+else
+  log "herdr not found; skipping Herdr TUI machines"
 fi
-if [ "$failed" -gt 0 ]; then
-  echo "[herdr:sync-machines] $failed machine(s) not added; retry with: herdr machine add <target>" >&2
+
+# No --install: that copies hc onto the other machine.
+if command -v hc >/dev/null 2>&1; then
+  sync "Herdr app" "$(hc machine ls --json | jq -r '.machines[].target')" \
+    "hc machine add <target> --install" \
+    hc machine add {}
+else
+  log "hc not found; skipping Herdr app machines"
 fi

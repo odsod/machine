@@ -137,6 +137,37 @@ ln -fsT "$(mise where http:soap-ui)/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
 ln -fsT "$(mise where http:obsidian)/Obsidian-{{vars.obsidian_version}}.AppImage" "$HOME/.local/bin/obsidian-app"
 """ }
 
+
+# Herdr app and herdr-core: releases.herdr.dev only. latest.json names the
+# newest version; manifest.json holds each target's sha256. The app still
+# updates itself in place: see AGENTS.md (Herdr app) for the upstream issues.
+[tools."http:herdr-core"]
+version = "latest"
+version_list_url = "https://releases.herdr.dev/core/latest.json"
+version_json_path = ".version"
+checksum_url = "https://releases.herdr.dev/core/{{ version }}/manifest.json"
+checksum_expr = '"sha256:" + filter(values(fromJSON(body).targets), { #.url == url })[0].sha256'
+postinstall = 'ln -fsT "$(mise where http:herdr-core)/herdr-core" "$HOME/.local/bin/hc"'
+
+[tools."http:herdr-core".platforms]
+linux-x64 = { url = "https://releases.herdr.dev/core/{{ version }}/herdr-core-linux-x86_64.tar.gz" }
+linux-arm64 = { url = "https://releases.herdr.dev/core/{{ version }}/herdr-core-linux-aarch64.tar.gz" }
+
+[tools."http:herdr-app"]
+version = "latest"
+version_list_url = "https://releases.herdr.dev/app/latest.json"
+version_json_path = ".version"
+checksum_url = "https://releases.herdr.dev/app/{{ version }}/manifest.json"
+checksum_expr = '"sha256:" + filter(values(fromJSON(body).targets), { #.url == url })[0].sha256'
+postinstall = """
+mkdir -p "$HOME/.local/share/icons/hicolor/scalable/apps"
+ln -fsT "$(mise where http:herdr-app)/herdr-app.svg" "$HOME/.local/share/icons/hicolor/scalable/apps/herdr-app.svg"
+"""
+
+[tools."http:herdr-app".platforms]
+linux-x64 = { url = "https://releases.herdr.dev/app/{{ version }}/herdr-app-linux-x86_64.tar.gz" }
+linux-arm64 = { url = "https://releases.herdr.dev/app/{{ version }}/herdr-app-linux-aarch64.tar.gz" }
+
 [env]
 _.source = "{{ config_source | canonicalize | dirname }}/env.sh"
 REPO_DIR = "{{ config_source | canonicalize | dirname }}"
