@@ -1,0 +1,13 @@
+{
+  "sounds": {
+    "enabled": false
+  },
+  "theme": "nord",
+  "appearance": "dark",
+  "font": "Iosevka SS08",
+  "font_size": 14,
+  "ui_font": "Inter",
+  "font_ligatures": false,
+  "clipboard_write": true,
+  "telemetry": false
+}

@@ -51,8 +51,8 @@
   `mise bootstrap --yes`.
 - **App-owned config**: Apps that write their own config get a
   `merge = "missing"` `[dotfiles]` entry instead of a symlink
-  (`codex/config.toml`, `antigravity/settings.json`). The repo file seeds
-  defaults: mise sets
+  (`codex/config.toml`, `antigravity/settings.json`,
+  `herdr/app/{settings,keys}.json`). The repo file seeds defaults: mise sets
   only keys the live file lacks, at any depth, and the app owns every key after
   that. A changed repo value does not reach a machine that already has the
   key; delete the key in the live file, then run `mise dot apply`. Copy
