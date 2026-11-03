@@ -1,0 +1,11 @@
+{
+  "global": {
+    "ctrl-u": "mod.open:prefix"
+  },
+  "terminal": {
+    "ctrl-u": "mod.open:prefix"
+  },
+  "mod:prefix": {
+    "ctrl-u": "prefix.send-prefix"
+  }
+}
