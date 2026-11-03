@@ -1,3 +1,15 @@
+[vars]
+# Google Workspace icons only. Bump after a redesign, then run:
+# mise run google-chrome:icons
+# Find the token in a URL on https://workspace.google.com
+# (productlogos/<name>_<generation>/web/).
+chrome_icon_generation = "2026/v2"
+
+[tasks."google-chrome:icons"]
+description = "Refresh the Chrome app window icons from the vendor brand kits"
+env = { CHROME_ICON_GENERATION = "{{vars.chrome_icon_generation}}" }
+run = 'exec "$REPO_DIR/google-chrome/fetch-icons.sh"'
+
 [dotfiles]
 "~/.config/chrome-flags.conf" = "../../google-chrome/chrome-flags.conf"
 "~/.local/bin/google-chrome" = "../../google-chrome/google-chrome.sh"
