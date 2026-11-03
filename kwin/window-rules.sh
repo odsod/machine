@@ -3,7 +3,7 @@
 # Plasma 6.8 and later: "shadow" selects a shadow-only KDecoration style.
 set -euo pipefail
 
-rules=(ghostty chrome-apps slack spotify keepassxc obsidian)
+rules=(ghostty chrome-apps slack spotify keepassxc obsidian herdr-app)
 
 write_rule() {
   local id=$1 description=$2 wmclass=$3 wmclassmatch=$4
@@ -21,13 +21,15 @@ write_rule() {
 # app_id is chrome-<host>__-<profile>. Slack is X11 and already runs without a
 # frame through the odsod KWin script. Spotify is a Flatpak that draws its own
 # UI but still gets a Breeze titlebar. KeePassXC (Qt) and Obsidian (Electron)
-# also get a Breeze titlebar that covers their own chrome.
+# also get a Breeze titlebar that covers their own chrome. The Herdr app draws
+# its own titlebar (layout `titlebar: none`).
 write_rule ghostty "Window settings for ghostty" com.mitchellh.ghostty 1
 write_rule chrome-apps "Window settings for Chrome app windows" '^chrome-.*__-' 3
 write_rule slack "Window settings for Slack" slack 1
 write_rule spotify "Window settings for Spotify" com.spotify.Client 1
 write_rule keepassxc "Window settings for KeePassXC" org.keepassxc.KeePassXC 1
 write_rule obsidian "Window settings for Obsidian" md.obsidian.Obsidian 1
+write_rule herdr-app "Window settings for Herdr" herdr-app 1
 
 # Keep existing rules and their order. KWin 6.8 reads General/Order, older
 # versions read General/rules, so write both.

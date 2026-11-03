@@ -66,6 +66,8 @@ and rounded corners, with no titlebar. Run `mise run kwin:window-rules`, or
   loses the Breeze titlebar; close it with `Meta+Backspace` or the menu.
 - `obsidian`: exact `wmclass` match on `md.obsidian.Obsidian`. Obsidian keeps
   its own custom frame and window buttons.
+- `herdr-app`: exact `wmclass` match on `herdr-app`, the Wayland `app_id` the
+  app sets for itself. The layout draws its own titlebar (`titlebar: none`).
 
 The radius, outline, and shadow size come from the Breeze decoration settings.
 A decoration plugin must list the `shadow` style in its metadata.
