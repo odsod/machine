@@ -13,7 +13,7 @@
   by `mise/conf.d/<topic>.toml`. Do not add `<topic>/mise.toml` files.
 - **`env.sh`**: Environment variables for `mise`, KDE (`~/.config/plasma-workspace/env/`),
   and login shells (`~/.profile`).
-- **`tasks/`**: Cross-cutting scripts (`discover.sh`, `bump.sh`, `apply.sh`,
+- **`tasks/`**: Cross-cutting scripts (`discover.sh`, `bump.sh`,
   `clean.sh`, `setup-swapfile.sh`, `setup-tmp.sh`).
 - **`~/.local/share/odsod/machine/data/`**: Runtime source trees, builds,
   archives, and model weights (`llama/`, `whisper/`, `endpoint-verification/`).
@@ -37,8 +37,8 @@
 
 ## Provisioning and Convergence
 
-- **Full convergence**: `mise run apply` runs `mise run config:check`,
-  `mise bootstrap --yes`, `mise reshim`, and `mise run clean`.
+- **Full convergence**: `mise run apply` runs `mise bootstrap --yes`,
+  `mise reshim`, and `mise run clean`.
 - **Host packages**: `[bootstrap.packages]` installs missing packages only. A
   `"latest"` entry accepts any installed version, so `mise run apply` never
   upgrades one. Packages from enabled repos, such as the COPR builds of ghostty
@@ -49,17 +49,15 @@
   or `mise bootstrap --dry-run`.
 - **Fresh machine**: `./bootstrap.sh` trusts the config and runs
   `mise bootstrap --yes`.
-- **Runtime config drift**: `mise run config:check` runs
-  `codex:check` and `antigravity:check` first in `mise run apply`, so drift
-  fails before any convergence work. `mise run resolve` runs every resolve
-  task. Live `~/.gemini/antigravity-cli/settings.json` and
-  `~/.codex/config.toml` are plain files because the apps write private runtime
-  state into them. `antigravity:check` compares only keys present in
-  `antigravity/settings.json`, and `antigravity:resolve` merges those keys into
-  the live file, so machine state such as `trustedWorkspaces` never needs to be
-  committed. `codex:check` compares the whole file. On failure, copy
-  intentional setting changes into the repo (never workspace paths or auth
-  state), then run `mise run resolve` (or `mise run apply --force`).
+- **App-owned config**: Apps that write their own config get a
+  `merge = "missing"` `[dotfiles]` entry instead of a symlink
+  (`codex/config.toml`, `antigravity/settings.json`). The repo file seeds
+  defaults: mise sets
+  only keys the live file lacks, at any depth, and the app owns every key after
+  that. A changed repo value does not reach a machine that already has the
+  key; delete the key in the live file, then run `mise dot apply`. Copy
+  settings changed in an app into the repo by hand (never workspace paths or
+  auth state).
 - **Overwritten dotfile symlinks**: If an app replaces a `[dotfiles]` symlink
   with a plain file, copy wanted changes into the repo before running
   `mise bootstrap --force-dotfiles`.
