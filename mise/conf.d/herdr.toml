@@ -1,4 +1,5 @@
 [dotfiles]
+"~/.local/share/applications/herdr-app.desktop" = "../../herdr/app/herdr-app.desktop"
 "~/.config/herdr/config.toml" = "../../herdr/config.toml"
 "~/.local/bin/clone-repo" = "../../herdr/clone-repo"
 "~/.local/bin/start-workspace" = "../../herdr/start-workspace"

@@ -81,6 +81,20 @@
   - **Desktop apps** (`slack`, `zoom`, `yaak`, `soap-ui`, `obsidian`):
     Pinned in `[vars]` in `mise/conf.d/<app>.toml`. Obsidian tracks the newest
     release with a desktop AppImage.
+  - **Herdr app** (`http:herdr-app`, `http:herdr-core`): mise tools in
+    `mise.toml`, pinned in `mise.lock` and bumped by `mise run bump`, with
+    checksums from the upstream release manifests. Separate from the Herdr TUI
+    (`herdr`): the two keep their own terminals, key bindings and machine
+    lists. herdr-core sees its mise install path and leaves updates to mise.
+    The app still updates itself in place, so it can run ahead of `mise.lock`.
+    Track these upstream issues and drop this caveat when one ships:
+    - [herdrdev/herdr-app#459](https://github.com/herdrdev/herdr-app/pull/459)
+      (fixes [#136](https://github.com/herdrdev/herdr-app/issues/136)): a
+      mise-installed app skips its own updates.
+    - [herdrdev/herdr-app#207](https://github.com/herdrdev/herdr-app/issues/207):
+      a setting to turn app updates off.
+    - [herdrdev/herdr-app#395](https://github.com/herdrdev/herdr-app/issues/395):
+      GitHub releases, which would allow a `github:` backend instead of `http:`.
   - **GPU services** (`llama`, `whisper`): Pin the newest semver release tag
     (without `v`, never `bNNNN`) in `mise/conf.d/llama.toml` and
     `mise/conf.d/whisper.toml`. `mise run apply` rebuilds and restarts the
