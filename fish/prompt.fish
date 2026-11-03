@@ -1,6 +1,14 @@
 # Prevent Python virtualenv activate scripts from altering the prompt
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 
+# Herdr app panes (herdr-core) pad their first prompt themselves; the TUI and
+# plain terminals do not. The core sets HC_TERMINAL_ID in every terminal it
+# runs, while the TUI sets HERDR_* only, so that variable tells the two apart.
+set -g __prompt_first 1
+function __prompt_after_command --on-event fish_preexec
+    set -g __prompt_first 0
+end
+
 function __prompt_badge -a color text
     set_color D8DEE9
     echo -n " ["
@@ -14,8 +22,11 @@ function fish_prompt
     set -l last_status $status
     set -l last_duration $CMD_DURATION
 
-    # Line 1: empty line before prompt
-    echo
+    # Line 1: empty line before prompt, except on the first prompt of a Herdr
+    # app pane, where the app's own padding already separates it.
+    if not set -q HC_TERMINAL_ID; or test "$__prompt_first" = 0
+        echo
+    end
 
     # Directory
     set_color EBCB8B
