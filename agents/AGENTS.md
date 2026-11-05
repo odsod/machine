@@ -90,15 +90,39 @@ for the languages, `jj <cmd> --help` for a command.
    Conflicts → `jj resolve -r <rev>`. Divergent → `jj converge --no-interactive`.
    Empty description → `jj describe -r <rev> -m "<subject>"`.
 3. Read each diff. Split mixed commits: `jj split -r <rev> <paths> -m "<subject>"`.
-4. `jj bookmark set <name> -r <tip>`, `jj git push --bookmark <name>`, `gh pr create`.
-5. `jj new @` after the push. Never `jj new main@origin`: that drops back to
+4. One bookmark per PR, bottom to top. Publish the chain as one GitHub stack:
+
+   ```
+   jj log --reversed -r 'trunk()..@ & bookmarks()' \
+     --no-graph -T 'bookmarks ++ "\n"'
+   jj bookmark set <name> -r <rev>
+   jj git push --bookmark <bottom> --bookmark <top>
+   gh pr create --base main --head <bottom> --title <t> --body-file <p>
+   gh pr create --base <bottom> --head <top> --title <t> --body-file <p>
+   gh stack link <bottom-pr> <top-pr>
+   ```
+
+   Pass `gh stack link` PR numbers, never branch names. Branch names make it
+   push with git, and jj owns pushes. It links the PRs into a native stack on
+   GitHub and corrects each base.
+
+5. Never run `gh stack init`, `add`, `submit`, `sync`, `rebase`, `view`, or
+   `modify`. They need an attached git HEAD, which a colocated jj repo never
+   has. `link`, `merge`, and `unstack` are safe.
+6. Grow the stack with `jj bookmark create <new> -r @`,
+   `jj git push --bookmark <new>`, `gh pr create`, then
+   `gh stack link <top-pr> <new-pr>`. Linking is additive.
+7. Merge with `gh stack merge <pr> --yes --squash`. It merges that PR and every
+   unmerged PR below it; `gh pr merge` cannot merge a stack. After the bottom
+   PR lands: `jj rebase -o main@origin`, push, `gh stack link` again.
+8. `jj new @` after the push. Never `jj new main@origin`: that drops back to
    trunk and hides the branch's files.
-6. Delete temporary helper scripts first. Never push with unchecked "Test plan"
+9. Delete temporary helper scripts first. Never push with unchecked "Test plan"
    boxes: finish them or remove the section.
-7. Watch CI: `gh pr checks <pr> -R <owner>/<repo>` every 60s until nothing is
-   pending. On red read only the failed check, with
-   `gh run view <run-id> -R <owner>/<repo> --log-failed` or
-   `gcloud builds log <build-id> | tail -80`. Fix, push, watch again.
+10. Watch CI: `gh pr checks <pr> -R <owner>/<repo>` every 60s until nothing is
+    pending. On red read only the failed check, with
+    `gh run view <run-id> -R <owner>/<repo> --log-failed` or
+    `gcloud builds log <build-id> | tail -80`. Fix, push, watch again.
 
 ## Layout
 

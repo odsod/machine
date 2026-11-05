@@ -76,6 +76,11 @@
   `ok`, `mise bootstrap --dry-run` has no pending work, and GPU services answer
   (`/health` on `127.0.0.1:8178` and `127.0.0.1:8179`).
 - **Pin specifics**:
+  - **gh extensions** (`github:github/gh-stack`): a mise tool pinned in
+    `mise.lock`. Its postinstall links the install dir to
+    `~/.local/share/gh/extensions/gh-stack` as a local extension.
+    Never run `gh extension install github/gh-stack`: gh keeps its copy and the
+    two writers fight.
   - **Desktop apps** (`slack`, `zoom`, `yaak`, `soap-ui`, `obsidian`):
     Pinned in `[vars]` in `mise/conf.d/<app>.toml`. Obsidian tracks the newest
     release with a desktop AppImage.
