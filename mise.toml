@@ -105,6 +105,12 @@ stylua = "latest"
 "github:fish-shell/fish-shell" = { version = "latest", postinstall = { when = "always", run = """
 sudo install -m 0755 "$(mise where github:fish-shell/fish-shell)/fish" /usr/local/bin/fish
 """ } }
+# gh runs `gh stack` only from its extension dir. A symlinked dir is a local
+# extension, which `gh extension upgrade` refuses to touch.
+"github:github/gh-stack" = { version = "latest", bin = "gh-stack", postinstall = { when = "always", run = """
+mkdir -p "${XDG_DATA_HOME:-$HOME/.local/share}/gh/extensions"
+ln -fsT "$MISE_TOOL_INSTALL_PATH" "${XDG_DATA_HOME:-$HOME/.local/share}/gh/extensions/gh-stack"
+""" } }
 "github:googleworkspace/cli" = "latest"
 "github:ludviglundgren/qbittorrent-cli" = "latest"
 "github:odsod/recorder" = "latest"

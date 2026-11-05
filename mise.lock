@@ -580,6 +580,53 @@ checksum = "sha256:20998a25f73217ddcc19f499055fd587e9912d1ad6e7109120fbcf2871f0b
 url = "https://github.com/fish-shell/fish-shell/releases/download/4.9.3/fish-4.9.3.tar.xz"
 url_api = "https://api.github.com/repos/fish-shell/fish-shell/releases/assets/551107871"
 
+[[tools."github:github/gh-stack"]]
+version = "0.3.0"
+backend = "github:github/gh-stack"
+specifiers = ["latest"]
+
+[tools."github:github/gh-stack"."platforms.linux-arm64"]
+checksum = "sha256:803ec91eeba9b2ac38827e299a79830fe75ca7284f0c28d60e6a2704bb34ed13"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/linux-arm64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826783"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.linux-arm64-musl"]
+checksum = "sha256:803ec91eeba9b2ac38827e299a79830fe75ca7284f0c28d60e6a2704bb34ed13"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/linux-arm64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826783"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.linux-x64"]
+checksum = "sha256:957e822cfa7e435cd84a297cd96c419b58e51e3ac58be249762c24bd9e45099b"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/linux-amd64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826777"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.linux-x64-musl"]
+checksum = "sha256:957e822cfa7e435cd84a297cd96c419b58e51e3ac58be249762c24bd9e45099b"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/linux-amd64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826777"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.macos-arm64"]
+checksum = "sha256:70c0cb11346ad5d4f97a02a5cf5242052254d1775d356dc0759f035457873850"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/darwin-arm64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826707"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.macos-x64"]
+checksum = "sha256:edea1d5f3ec80fe6596f44d438604b05846fcbcac3fff0707dbe7071794bd6a9"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/darwin-amd64"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826711"
+provenance = "github-attestations"
+
+[tools."github:github/gh-stack"."platforms.windows-x64"]
+checksum = "sha256:54b89068a1773d0e8d5a6a134aa152aedc3672f7f55888e50e448e6eeab9565f"
+url = "https://github.com/github/gh-stack/releases/download/v0.3.0/windows-amd64.exe"
+url_api = "https://api.github.com/repos/github/gh-stack/releases/assets/679826842"
+provenance = "github-attestations"
+
 [[tools."github:googleworkspace/cli"]]
 version = "0.22.5"
 backend = "github:googleworkspace/cli"
