@@ -37,6 +37,7 @@ upstream_work = "@ | ancestors(remote_bookmarks().., 2) | trunk()"
 # Default view: current work + your bookmarked branches + latest upstream main context.
 log = "present(@ | ancestors(@, 4) | (bookmarks() & mine()) | main@origin | descendants(main@origin, 4))"
 immutable-heads = "present(trunk()) | (working_copies() ~ @)"
+git-sign-on-push = "~signed() & mine()"
 
 [signing]
 backend = "ssh"
@@ -45,7 +46,6 @@ key = "~/.ssh/id_rsa.pub"
 
 [git]
 colocate = true
-sign-on-push = true
 
 [ui]
 # jj-editor-guard refuses to open an editor outside an interactive terminal,
