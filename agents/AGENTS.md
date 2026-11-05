@@ -43,7 +43,8 @@ Public URL for a local server (webhooks, external callers): `tailscale funnel --
 No cloud Artifacts (denied). Write deliverables as files in the repo if instructed.
 Put temporary or ephemeral artifacts in `/tmp`.
 
-`gh` always `-R <owner>/<repo>` (jj workspaces have no git remotes).
+`gh` always `-R <owner>/<repo>` (jj workspaces have no git remotes);
+`gh stack` takes `GH_REPO=<owner>/<repo>` instead.
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
 
@@ -152,8 +153,14 @@ Each PR costs a CI runner reservation. Default to one PR; split commits, not PRs
    `jj git push --bookmark <new>`, `gh pr create`, then
    `gh stack link <top-pr> <new-pr>`. Linking is additive.
 7. Merge with `gh stack merge <pr> --yes --squash`. It merges that PR and every
-   unmerged PR below it; `gh pr merge` cannot merge a stack. After the bottom
-   PR lands: `jj rebase -o main@origin`, push, `gh stack link` again.
+   unmerged PR below it; `gh pr merge` cannot merge a stack, and auto-merge is
+   refused for stacked PRs. With a merge queue it only queues once the required
+   checks of the head have run: wait for `gh pr checks`, then merge.
+   After the bottom PR lands, GitHub rebases the next PR onto trunk and
+   retargets it. `jj git fetch`, compare with
+   `jj diff --from <name>@origin --to <name>`, then take the remote copy:
+   `jj bookmark set <name> -r <name>@origin`, abandon the local one.
+   Rebase locally only when GitHub did not.
 8. `jj new @` after the push. Never `jj new main@origin`: that drops back to
    trunk and hides the branch's files.
 9. Delete temporary helper scripts first. Never push with unchecked "Test plan"
