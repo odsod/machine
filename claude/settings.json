@@ -1,21 +1,16 @@
 {
-  "awsAuthRefresh": "aws sso login --profile bedrock",
   "respectGitignore": false,
   "cleanupPeriodDays": 3650,
+  "forceLoginMethod": "claudeai",
   "env": {
-    "CLAUDE_CODE_USE_BEDROCK": "1",
-    "AWS_PROFILE": "bedrock",
-    "AWS_REGION": "eu-north-1",
-    "ANTHROPIC_SMALL_FAST_MODEL_AWS_REGION": "eu-north-1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
-    "CLAUDE_CODE_NO_FLICKER": "0",
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
   },
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "model": "eu.anthropic.claude-opus-5-5[1m]",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [],
     "PostToolUse": [
