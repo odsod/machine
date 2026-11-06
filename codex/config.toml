@@ -6,6 +6,7 @@ approval_policy = "never"
 sandbox_mode = "danger-full-access"
 notify = ["sh", "-lc", "$HOME/.agents/hooks/jj-snapshot.sh"]
 commit_attribution = ""
+check_for_update_on_startup = false
 
 [tui]
 status_line = ["model-with-reasoning", "context-remaining", "current-dir"]

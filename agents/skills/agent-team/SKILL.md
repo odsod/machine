@@ -47,7 +47,9 @@ Close a worker as soon as its last unit is accepted.
 
 Default team: Opus 5.5 orchestrates and designs, `pi` does the grind (implement, refactor, tests), Gemini 4 Argon reviews and writes, Gemini 3.8 Flash does web research.
 
-`--kind` from the Kind column. This machine pins each kind to its first model above. For Gemini 3.8 Flash, start agy with `-- --model gemini-3.8-flash-medium`. Pass other native args after `--` only when live `herdr agent start` help lists them.
+`--kind` from the Kind column. This machine pins each kind to its first model above. For Gemini 3.8 Flash, start agy with `-- --model gemini-3.8-flash-medium`. Start codex with `-- --dangerously-bypass-hook-trust`, or it can stop on a hook review screen.
+
+Workers never need approval: Herdr starts claude and agy with `--dangerously-skip-permissions`, codex config sets `approval_policy = "never"`, and pi has no approvals. A trust or approval dialog on a worker is a config bug: answer it once, then tell the user.
 
 For bulk and web research, agy writes `report.md` and the orchestrator reads only that file.
 
@@ -121,6 +123,7 @@ pane="$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | j
 # New tab (always pass --workspace, or Herdr uses the focused workspace):
 pane="$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label "<tab label>" --cwd "$PWD" --no-focus | jq -r .result.root_pane.pane_id)"
 
+trust-workspace "$PWD"   # trust this dir in every harness (idempotent)
 herdr pane rename "$pane" "Implement (pi)"
 herdr agent start "$(echo "$pane" | tr 'A-Z:' 'a-z-')" --kind pi --pane "$pane"
 herdr agent prompt "$pane" "Implement <unit>. Write /tmp/agent-team/<team>/impl.md. Stop when done." --wait --until working --until blocked --timeout 10000
