@@ -1,7 +1,6 @@
 {
   "respectGitignore": false,
   "cleanupPeriodDays": 3650,
-  "forceLoginMethod": "claudeai",
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
@@ -9,6 +8,9 @@
   "attribution": {
     "commit": "",
     "pr": ""
+  },
+  "permissions": {
+    "defaultMode": "bypassPermissions"
   },
   "model": "opus[1m]",
   "hooks": {
@@ -40,12 +42,16 @@
     "typescript-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "forceLoginMethod": "claudeai",
   "outputStyle": "Concise",
+  "effortLevel": "high",
   "autoMemoryEnabled": false,
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
+  "syncClaudeAiSkills": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark"
+  "theme": "dark",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "autoCompactWindow": 400000
+    }
+  }
 }

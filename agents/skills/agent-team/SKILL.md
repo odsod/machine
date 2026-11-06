@@ -1,117 +1,107 @@
 ---
 name: agent-team
-description: "Compose a Herdr team that works until an outcome is realized, or decide this pane can realize it alone. Use when the user invokes /agent-team, asks to set up an agent team, orchestrate a sibling pane, assign work across claude, agy, pi, or cursor, or when a smart agent on a long plan should offload mechanical work to preserve its own context. Do not use for a trivial one-file edit, and do not use merely to inspect panes (that is /herdr). Requires HERDR_ENV=1."
+description: "Compose the agent team of this Herdr workspace that works until an outcome is realized, or decide this pane can realize it alone. Use when the user invokes /agent-team, asks to set up an agent team, orchestrate a sibling pane, assign work across claude, codex, agy, or pi, or when a smart agent on a long plan should offload mechanical work to preserve its own context. Do not use for a trivial one-file edit, and do not use merely to inspect panes (that is /herdr). Requires HERDR_ENV=1."
 ---
 
 # Agent Team
 
-A team is live agents plus a brief, working until an outcome is realized. The outcome is an end state, not a work list; stop when the done-when check passes. Handoff and waiting are implied. Do not freeze standing roles. Pick harnesses and responsibilities for this outcome, agree them, then run.
+An agent team is live agents in Herdr panes plus a brief, working until an outcome is realized. The outcome is an end state, not a work list. Stop when the done-when check passes. Pick harnesses and responsibilities for this outcome, agree them, then run. Do not freeze standing assignments.
 
-The invoking agent is the **orchestrator** unless the user names someone else. It stays in this pane. A team is optional: execute alone and load this skill only when a unit is worth delegating.
+The invoking agent is the **orchestrator** unless the user names someone else. It stays in this pane. A team is optional: work alone, and delegate only a unit that is worth it. Load `/herdr` for CLI details.
 
-**Who loads this skill.** Prime agents that must judge or coordinate: orchestrator, design, review, write, council. Do not prime pure execution. Implement, bulk, and fast-model verify work in a vacuum: one unit, an output path, a stop. They never see `/agent-team`, the roster, or the brief's protocol. The orchestrator holds the protocol for them.
+**One team per workspace.** Each Herdr workspace has a name (its label) and holds at most one agent team. The team has the same name as the workspace. Never give the team a name of its own, and never start a second team in a workspace. Team agents stay in its workspace.
 
-Load `/herdr` for CLI details.
+**Pane IDs, labels, and roles.** Each member has three handles:
 
-## How many agents
+| Handle     | Example          | Use it for                                   |
+| ---------- | ---------------- | -------------------------------------------- |
+| Pane ID    | `wDR:p2`         | Every `herdr agent` and `herdr pane` command |
+| Pane label | `Implement (pi)` | Display only: what the pane does, then kind  |
+| Role       | `impl`           | Findings file name, brief, Handoff lines     |
 
-Two dimensions. Headcount is what they require, not a chart to fill.
+- Target agents by pane ID only. Pane IDs are unique on the server and never reused.
+- Agent names are unique across all workspaces, so a name like `impl` collides with other teams. `herdr agent start` needs a name: derive it from the pane ID (`wDR:p2` → `wdr-p2`).
+- Label every pane right after you create it, and write its pane ID into the brief.
+- Roles match `[a-z][a-z0-9_-]{0,31}` and are unique in the team.
 
-**Capability.** Does this unit need long-horizon design, careful review, fast coding, multimodal or parallel process, succinct docs, or a different frame? If this pane already can, do not add an agent for capability alone.
+**Primed vs vacuum.** Prime agents that judge or coordinate (orchestrate, design, review, write, council): their first prompt is load `/agent-team`, their role, and the brief path. Everything else works in a vacuum: one unit, an output path, a stop. Never show a vacuum agent this skill, the brief, or Handoff tokens. The orchestrator holds the protocol for it.
 
-**Context.** Will doing the unit here leave the orchestrator able to hold the plan? If it would fill the window with diffs, style corpora, dumps, or bulk files, give it to another pane even when this model could do the work. Keep own context fit for the horizon.
+## When to add an agent
 
-Window size is part of that duty. Opus 5.5 is 1M; Grok 4.7 is 256k. For real long-horizon work, orchestrate on Opus 5.5 so less is lost to compact and continuity holds.
+Add an agent only when this pane fails one of two tests:
 
-Add an agent when either dimension fails here. Add none when both pass. Drop or `/clear` a worker when its dimension is done.
+- **Capability.** The unit needs something this pane lacks: grind (implement, refactor, run tests), multimodal or parallel work, web research, or a different frame.
+- **Context.** Doing the unit here would fill this window with diffs, style corpora, dumps, or bulk files, and leave it unable to hold the plan.
+
+Close a worker as soon as its last unit is accepted.
 
 ## Roster
 
-| Kind     | Default model           | Give it                                                           | Do not give it alone                    | Context reset                         |
-| -------- | ----------------------- | ----------------------------------------------------------------- | --------------------------------------- | ------------------------------------- |
-| `claude` | Opus 5.5                | orchestrate, design, architecture                                 | bulk or multimodal grind                | `/compact`, then `/clear`             |
-| `agy`    | Gemini 4 Argon (Medium) | write, adversarial review, parallel subagents, multimodal, corpus | long-horizon orchestrate or merge       | `/clear` only (no user compact)       |
-| `pi`     | DeepSeek V4.1 Flash     | code implementation                                               | design or review without a second agent | `/new`                                |
-| `cursor` | Grok 4.7                | niche: alternate frame when Claude or Gemini is stuck             | long-horizon orchestrate                | restart the agent if the pane is junk |
-| `cursor` | Composer 2.5            | niche: alternate coder when `pi` is stuck                         | architecture                            | restart the agent if the pane is junk |
+| Kind     | Default model           | Give it                                                                | Do not give it alone                    | Context reset             |
+| -------- | ----------------------- | ---------------------------------------------------------------------- | --------------------------------------- | ------------------------- |
+| `claude` | Opus 5.5                | orchestrate, design, architecture                                      | bulk or multimodal grind                | `/compact`, then `/clear` |
+| `codex`  | Sol 6.1                 | fallback for Opus 5.5 (unavailable, rate-limited, or stuck)            | bulk or multimodal grind                | `/compact`, then `/new`   |
+| `agy`    | Gemini 4 Argon (Medium) | write, adversarial review, multimodal or large corpus (fans subagents) | long-horizon orchestrate or merge       | `/compact`, then `/clear` |
+| `agy`    | Gemini 3.8 Flash        | web research                                                           | design, review, or write                | `/compact`, then `/clear` |
+| `pi`     | DeepSeek V4.1 Flash     | grind: implement, refactor, run tests and smoke tests                  | design or review without a second agent | `/new`                    |
 
-`--kind` from the Kind column. Native model args only after `--` when live help documents them. This machine already pins Claude to Opus 5.5, agy to Gemini 4 Argon (Medium), pi to DeepSeek V4.1 Flash.
+Default team: Opus 5.5 orchestrates and designs, `pi` does the grind (implement, refactor, tests), Gemini 4 Argon reviews and writes, Gemini 3.8 Flash does web research.
 
-- Default: Opus 5.5 orchestrates and owns architecture; `pi` (DeepSeek V4.1 Flash) writes code; `agy` (Gemini 4 Argon) takes adversarial review and writing.
-- Write (`AGENTS.md`, API docs): Gemini 4 Argon via `agy`.
-- Adversarial review: Gemini 4 Argon via `agy` (or isolated reviewer; see below). One review unit per stack touched; see Isolated reviewer.
-- Bulk, multimodal, or corpus: `agy` fans out subagents; orchestrator reads `report.md` only.
-- Niche (`cursor`): Grok 4.7 or Composer 2.5 only when you need an extra frame or fallback coder.
+`--kind` from the Kind column. This machine pins each kind to its first model above. For Gemini 3.8 Flash, start agy with `-- --model gemini-3.8-flash-medium`. Pass other native args after `--` only when live `herdr agent start` help lists them.
 
-## Responsibilities
+For bulk and web research, agy writes `report.md` and the orchestrator reads only that file.
 
-Assign these. They are not agent types. One agent may hold several. An outcome may need only some.
-
-| Responsibility | Owns                                                                                                      | Does not own unless assigned    |
-| -------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| orchestrate    | Brief, keep vs delegate, own context fit for the horizon, signals, escalate, declare the outcome realized | Implementation it chose to keep |
-| design         | Shape, constraints, plan, what good looks like                                                            | Shipping the code               |
-| implement      | Code and tests in scope                                                                                   | Redefining the outcome          |
-| review         | Adversarial read against the brief and repo rules                                                         |                                 |
-| write          | High-impact docs for humans and agents (`AGENTS.md`, API docs)                                            | Implementation or architecture  |
-| verify         | Run the check; browser / user path / multimodal proof                                                     | Expanding scope                 |
-| bulk           | Large-surface read or transform, including parallel multimodal                                            | Architecture                    |
-
-**write:** short sentences, one idea each, plain verbs, no padding. Token-efficient. Match repo `AGENTS.md` style. Gemini 4 Argon (`agy`) unless this pane already is.
-
-## Preconditions
-
-```bash
-test "${HERDR_ENV:-}" = 1
-```
-
-If that fails, say you are not inside Herdr and stop. Discover pane, agent, and workspace IDs (`$HERDR_PANE_ID`, `$HERDR_WORKSPACE_ID`) per `/herdr`. Write them into the brief once. Do not re-resolve. Name this orchestrator pane:
-
-```bash
-herdr pane rename "$HERDR_PANE_ID" orchestrator
-```
+Responsibilities do not cross unless assigned: design does not ship code, implement does not redefine the outcome, write does not touch implementation or architecture, verify does not expand scope, bulk does not touch architecture. Write output is short sentences in the repo `AGENTS.md` style.
 
 ## Flow
 
-### 1. Compose, then agree
-
-Propose, then wait. Do not spawn first. Members may be this pane only.
-
-- Outcome in one paragraph (what will be true)
-- Capability and context budget per unit
-- Keep vs delegate
-- Workers only if a unit needs them (`impl`, `review`, `write`, `scan`; names `[a-z][a-z0-9_-]{0,31}`, unique)
-- Done-when: an exact command or proof that the outcome holds
-
-Do not name or start a worker until you have a unit for it. Do not spawn until Done when is a command or proof this pane can run without the worker. If the outcome is still a question, ask; do not staff.
-
-### 2. Write the brief
-
-Dir: `/tmp/agent-team/<slug>/`. Never the repo. Brief: `brief.md`. Findings: `<name>.md` in that dir.
+### 1. Set up
 
 ```bash
-mkdir -p /tmp/agent-team/<slug>
+test "${HERDR_ENV:-}" = 1 || echo "not in Herdr"
+team="$(herdr workspace get "$HERDR_WORKSPACE_ID" | jq -r .result.workspace.label)"
+test -f "/tmp/agent-team/$team/brief.md" && echo "team exists"
+herdr pane rename "$HERDR_PANE_ID" "Orchestrator (<kind>)"
 ```
 
-First prompt: primed agents load `/agent-team`, their name, path to the brief. Execution agents get the unit, the output path, and stop. No skill, no brief dump.
+- Not in Herdr: say so and stop.
+- No label: name the workspace for the outcome (short, lowercase, like `auth-refactor`) with `herdr workspace rename "$HERDR_WORKSPACE_ID" <name>`, and use that as `team`.
+- Brief exists and Handoff does not end with `orchestrator: team closed`: a live team exists. Continue it from Handoff. A closed team's brief: write a new one over it.
+
+### 2. Propose, then agree
+
+Propose, then wait for the user. Members may be this pane only.
+
+- Outcome in one paragraph (what will be true)
+- Units, with keep or delegate, and the capability or context reason
+- Workers for delegated units only, each with a role and a pane label
+- Done when: an exact command or proof that this pane can run without the worker
+
+If the outcome is still a question, ask. Do not staff a team to invent it.
+
+### 3. Write the brief
+
+Write `/tmp/agent-team/<team>/brief.md`, never in the repo. Findings go to `<role>.md` in the same dir.
 
 ```markdown
-# Team: <slug>
+# Team: <team>
+
+Workspace: <workspace-id>
 
 Outcome: …
 Done when: <command or proof that it holds>
 
 ## Members
 
-- orchestrator <pane-id> claude/opus-5.5 orchestrate, design
-- impl <pane-id> pi/deepseek-v4.1-flash implement # omit until you delegate
-- review <pane-id> agy/gemini-4-argon review # omit until you delegate
+<!-- role | pane ID | pane label | harness/model | responsibilities -->
+
+- orchestrator | wDR:p1 | Orchestrator (claude) | claude/opus-5.5 | orchestrate, design
+- impl | <pane-id> | Implement (pi) | pi/deepseek-v4.1-flash | implement # add when you delegate
 
 ## Units
 
 - design: keep
 - implement: delegate
-- review: delegate
 
 ## Handoff
 
@@ -119,104 +109,65 @@ Done when: <command or proof that it holds>
 - (append-only; orchestrator decisions in prose)
 ```
 
-A delegated unit gets at most two fix cycles. Count them from the orchestrator prose lines.
+### 4. Spawn when you delegate
 
-### 3. Spawn when you delegate
+Spawn a worker only when its unit is next. Reuse an idle sibling of the right kind. Do not create a workspace or worktree unless the user asks.
 
-Skip while this pane is doing the unit. Skip until Done when is runnable.
-
-Choose pane or tab layout:
-
-- **Same tab:** Default for 1 or 2 workers. Split a wide pane right, a tall pane down.
-- **New tab:** Use a new tab when splits make panes too narrow or short, or for multi-agent groups (such as council or test runners).
-- **Workspaces and worktrees:** Do not create a workspace or worktree unless the user explicitly asks.
-
-To split in the same tab:
+Layout: split this tab for 1 or 2 workers (right for a wide pane, down for a tall one). Use a new tab when splits get too narrow, or for a group such as a council.
 
 ```bash
-herdr pane split --current --direction right --cwd "$PWD" --no-focus
-herdr pane rename <pane-id> impl
-herdr agent start impl --kind pi --pane <pane-id>
-herdr agent prompt impl "Implement <unit>. Write /tmp/agent-team/<slug>/impl.md. Stop when done." --wait --timeout 120000
+# Same tab:
+pane="$(herdr pane split --current --direction right --cwd "$PWD" --no-focus | jq -r .result.pane.pane_id)"
+# New tab (always pass --workspace, or Herdr uses the focused workspace):
+pane="$(herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label "<tab label>" --cwd "$PWD" --no-focus | jq -r .result.root_pane.pane_id)"
+
+herdr pane rename "$pane" "Implement (pi)"
+herdr agent start "$(echo "$pane" | tr 'A-Z:' 'a-z-')" --kind pi --pane "$pane"
+herdr agent prompt "$pane" "Implement <unit>. Write /tmp/agent-team/<team>/impl.md. Stop when done." --wait --until working --until blocked --timeout 10000
+herdr agent wait "$pane" --timeout <ms that fit the unit>
 ```
 
-**Confirm that every prompt landed.** A prompt sent right after `agent start` is often
-dropped: the agent reports `idle`, `interactive_ready: true`, and its input box is empty.
-`agent_prompted` does not mean the agent got the text. After each `herdr agent prompt`,
-check that the status turns `working` (or `done`, when a short prompt already finished); if it does not, send the prompt once more:
+`--until working` only confirms the agent started; `agent wait` waits for the unit. A prompt sent right after `agent start` often stalls (`agent_prompt_stalled`). A stall does not prove the prompt was lost, so read the screen (`herdr agent read "$pane" --source visible`) before you act:
 
-```bash
-for i in 1 2 3; do
-  sleep 15
-  case "$(herdr agent get impl | jq -r .result.agent.agent_status)" in working|done) break ;; esac
-  herdr agent read impl --source visible | tail -5   # empty input box = dropped
-  herdr agent prompt impl "<same prompt>"
-done
-```
+- Input box empty and agent `idle`: resend once.
+- Prompt text still in the input box: `herdr agent send-keys "$pane" enter`.
+- `working`: continue to `agent wait`.
+- `blocked`: read the dialog and ask the user.
 
-Still `idle` after the retries → read the screen and tell the user. Never wait on a
-worker that never started.
+Still stalled after one resend: tell the user.
 
-To create a new tab:
+### 5. Run
 
-```bash
-herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label "<name-or-role>" --cwd "$PWD" --no-focus
-herdr pane rename <root-pane-id> <role>
-herdr agent start <name> --kind <kind> --pane <root-pane-id>
-```
+A unit is finished when its findings file exists, the agreed check passes, or a primed worker writes a token to Handoff. `agent wait` returning is not enough: it tracks state, not a turn, and an `idle` agy can still have subagents running.
 
-Always pass `--workspace "$HERDR_WORKSPACE_ID"`. Without it, Herdr attaches the tab to the focused workspace instead of this pane's workspace. Always name each pane by role with `herdr pane rename <pane-id> <role>` right after creation.
+- Review the diff and the check, not the worker's claims.
+- Append a prose Handoff line for each decision (`orchestrator → impl: fix cycle 1, see impl.md`). A restart uses these to tell reviewed from unreviewed work.
+- A delegated unit gets at most two fix cycles. Then ask the user.
+- Unclear: write an open question in the brief. Do not invent.
+- Workers may make local `jj` commits. Nobody pushes unless asked.
+- Only the orchestrator declares the outcome realized.
+- After a restart: read the brief, check its pane IDs with `herdr pane list --workspace "$HERDR_WORKSPACE_ID"`, continue from Handoff.
 
-For a primed sibling (review, write, council), first prompt is: load `/agent-team`, your name, path to `brief.md`. Wait.
+### 6. Clean up
 
-Reuse an idle sibling of the right kind. Native model args only after `--`, and only if live `herdr agent start` help lists them.
+The outcome is not realized while the team still runs. Clean up yourself before the final report:
 
-### 4. Run
-
-For each unit: do it here, or prompt a worker.
-
-A primed worker follows this skill: one unit, findings file, `PHASE_COMPLETE` or `BLOCKED` on Handoff, **stop**.
-
-An execution worker does not. Give it the unit, `/tmp/agent-team/<slug>/<name>.md`, and stop. Do not mention this skill or Handoff tokens. After `--wait`, the orchestrator checks the file (and the test), then appends the Handoff line itself.
-
-`--wait` is not a finished unit. It can return while the agent is still on an alternate screen, or sit on `working` after the artifact exists. A unit is finished when: findings file written, or the agreed check passed, or a token in Handoff. After `--wait`, read those; if needed `herdr agent get` / `herdr agent read --source visible`.
-
-Review the diff and the check, not the worker's claims. Then prompt the next unit, or send notes via the findings file. Append a prose Handoff line (`orchestrator → impl: fix cycle 1, see impl.md`) so a restart can tell reviewed from unreviewed and count fix cycles.
-
-Unclear → open question in the brief, do not invent. Same handoff fails twice → ask the user. Only the orchestrator declares the outcome realized.
-
-Implementer may make local `jj` commits. Nobody pushes unless asked.
-
-Close a worker as soon as its last unit is accepted. Do not keep idle panes for "maybe later".
-
-### 5. Clean up
-
-The outcome is not realized while the team still runs. Clean up before you report done. Do not hand cleanup to the user as a "leftovers" list.
-
-- Close every pane and tab the team created: `herdr pane close <pane-id>`, `herdr tab close <tab-id>`. Then check `herdr pane list --workspace "$HERDR_WORKSPACE_ID"` shows only panes the user had before.
+- Close every pane and tab the team created. Then check that `herdr pane list --workspace "$HERDR_WORKSPACE_ID"` shows only the panes the user had before.
 - Worker jj workspaces: check that each worker's commits are in the stack (`jj log -r '<ws>@- & ~::<tip>'` is empty), then `jj workspace forget <ws>` and remove the directory.
-- Stop local dev and other long processes the team started, unless the user needs them next. Say which ones you left running, and why.
+- Stop dev servers and other long processes the team started, unless the user needs them next. Say which ones you left running, and why.
 - Append `orchestrator: team closed` to Handoff.
 
 Something you cannot close safely (unique work, a process the user owns): name it in the final report, with the command to close it.
 
 ## Shapes
 
-Default is above: solo, then maybe an implement sibling.
+**Council.** For design, RFCs, or competing hypotheses. Not for a single-file edit. Make a `council` tab, split its root pane once per member, and label each pane by role or hypothesis. Prime each member. Each writes `<role>.md`. The orchestrator checks the claims and writes one answer. No majority vote.
 
-**Council.** Prime them. Create a dedicated tab: `herdr tab create --workspace "$HERDR_WORKSPACE_ID" --label council --cwd "$PWD" --no-focus`. Split `.result.root_pane` into parallel panes for each member. Rename each pane by role or hypothesis: `herdr pane rename <pane-id> <role>`. Each member writes `/tmp/agent-team/<slug>/<name>.md`. Orchestrator reads, checks claims, synthesizes one answer. No majority vote. For design, RFC, or competing hypotheses. Not a single-file edit.
+**Isolated reviewer.** For an adversarial gate, or when each review must load fat style skills plus `AGENTS.md`. Not for one or two reviews, or when review is only "matches the brief." Use Gemini 4 Argon, Opus 5.5, or Sol 6.1, never `pi`. Spawn it when the first implement unit lands. Prime it, and tell it to load the stack style skills, read `AGENTS.md` on the touched paths, write `review.md`, and stop. The orchestrator reads `review.md` and never loads the style corpus.
 
-**Agy vacuum.** Orchestrator keeps the question and the bar. Agy does not load this skill. Fan subagents over a large corpus. Orchestrator reads only `/tmp/agent-team/<slug>/report.md`. When the corpus would blow this window. Short units; `/clear` between them.
-
-**Isolated reviewer.** When each cycle must reload fat style skills plus `AGENTS.md`, or the implementer needs an adversarial gate. Reviewer is Gemini 4 Argon (`agy`) or Opus 5.5 (`claude`), not `pi`. Prime it with this skill. Spawn when the first implement unit lands. Load this skill and the stack style skill, read `AGENTS.md` on the touched path, write `review.md`, token `PHASE_COMPLETE` or `BLOCKED`, stop. Orchestrator reads `review.md`; it does not ingest the style corpus. Not for one or two reviews, and not when review is only "matches the brief."
-
-Review each stack apart. A diff that touches backend and frontend gets one review unit per stack, never one review over the mixed diff. Each review unit loads the style skills of its stack and reads every `AGENTS.md` from the repo root down to each touched path. A data stack (dbt, Python, warehouse SQL) is a stack of its own.
+**Review each stack apart.** A diff over backend and frontend gets one review unit per stack, never one review of the mixed diff. Each unit loads its stack's style skills and reads every `AGENTS.md` from the repo root down to each touched path. A data stack (dbt, Python, warehouse SQL) is a stack of its own.
 
 ## Guardrails
 
-- Do not spawn, and do not start a delegated unit, until Done when is a command or proof this pane can run without the worker. If the outcome is still an open question, ask. Do not staff a team to invent it.
-- Do not use Claude's experimental in-process agent teams. This protocol is Herdr panes so pi, agy, and cursor can sit on the same team.
-- Agy has no user compact: keep its units short and `/clear` between them.
-- After a restart: `herdr agent list`, read the brief, continue from Handoff.
-- An orchestrator that ends with idle workers has not finished. Close the team (step 5) before the last report.
-- Execution workers (pi, Composer, or agy on bulk): vacuum. One tight unit, an output path, a stop. Do not load this skill into those panes.
+- Do not use Claude's experimental in-process agent teams. Herdr panes let claude, codex, agy, and pi share one team.
+- An orchestrator that ends with idle workers has not finished. Clean up first.
