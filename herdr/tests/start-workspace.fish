@@ -116,7 +116,6 @@ function write_stubs --argument-names home
 
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/codex"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/claude"
-    printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/cursor"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/agy"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/pi"
     printf '%s\n' "#!$real_fish --no-config" 'exit 1' >"$stub_bin/timeout"
@@ -129,7 +128,7 @@ function write_stubs --argument-names home
     end
     chmod +x "$stub_bin/fzf" "$stub_bin/herdr" "$stub_bin/jj" \
         "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/claude" \
-        "$stub_bin/cursor" "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/timeout"
+        "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/timeout"
 end
 
 function setup_case --argument-names name
@@ -237,7 +236,7 @@ or fail "typed bookmark selection created the wrong workspace"
 
 # --- Auto-trust harness tests ---
 
-for agent in claude cursor agy pi
+for agent in claude codex agy pi
     setup_case "trust_$agent"
     set -l t_home "$case_home"
     set -l t_repo "$case_repo"
@@ -247,26 +246,22 @@ for agent in claude cursor agy pi
     run_launcher "$t_home" "$t_repo" existing 0 "$t_path"
     set -l t_log "$launcher_log"
 
+    # Every harness trusts the workspace, whichever agent starts it.
+    jq -e --arg p "$t_path" '.projects[$p].hasTrustDialogAccepted == true' "$t_home/.claude.json" >/dev/null
+    or fail "$agent: claude trust entry missing"
+    grep -qF "[projects.\"$t_path\"]" "$t_home/.codex/config.toml"
+    or fail "$agent: codex trust entry missing"
+    jq -e --arg p "$t_path" '(.trustedWorkspaces // []) | index($p) != null' "$t_home/.gemini/antigravity-cli/settings.json" >/dev/null
+    or fail "$agent: agy trustedWorkspaces missing path"
+    jq -e --arg p "$t_path" '.[$p] == true' "$t_home/.pi/agent/trust.json" >/dev/null
+    or fail "$agent: pi trust entry missing"
+
     switch "$agent"
-        case claude
-            test -f "$t_home/.claude.json"
-            or fail "claude trust file not created"
-            jq -e --arg p "$t_path" '.projects[$p].hasTrustDialogAccepted == true' "$t_home/.claude.json" >/dev/null
-            or fail "claude trust entry missing"
-        case cursor
-            set -l slug (echo "$t_path" | string replace -r '^/' '' | string replace -ra '[^a-zA-Z0-9]+' '-')
-            test -f "$t_home/.cursor/projects/$slug/.workspace-trusted"
-            or fail "cursor workspace-trusted file not created"
-            jq -e --arg p "$t_path" '.workspacePath == $p' "$t_home/.cursor/projects/$slug/.workspace-trusted" >/dev/null
-            or fail "cursor workspacePath mismatch"
-            string match -q '*agent start cursor-wcase --kind cursor --pane wCase:p1 -- --trust*' \
+        case codex
+            string match -q -- '*agent start codex-wcase --kind codex --pane wCase:p1 -- --dangerously-bypass-hook-trust*' \
                 (string collect < "$t_log")
-            or fail "cursor agent not started with --trust flag"
+            or fail "codex agent not started with --dangerously-bypass-hook-trust"
         case agy
-            test -f "$t_home/.gemini/antigravity-cli/settings.json"
-            or fail "agy settings file not created"
-            jq -e --arg p "$t_path" '(.trustedWorkspaces // []) | index($p) != null' "$t_home/.gemini/antigravity-cli/settings.json" >/dev/null
-            or fail "agy trustedWorkspaces missing path"
             string match -q '*agent start agy-wcase --kind agy --pane wCase:p1*' \
                 (string collect < "$t_log")
             or fail "agy agent not started with expected arguments"
@@ -277,11 +272,6 @@ for agent in claude cursor agy pi
                     (string collect < "$launcher_setsid_log")
                 or fail "setsid not called with -f nohup and expected arguments"
             end
-        case pi
-            test -f "$t_home/.pi/agent/trust.json"
-            or fail "pi trust.json not created"
-            jq -e --arg p "$t_path" '.[$p] == true' "$t_home/.pi/agent/trust.json" >/dev/null
-            or fail "pi trust entry missing"
     end
 end
 set -e FZF_AGENT_CHOICE

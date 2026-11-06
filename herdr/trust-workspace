@@ -1,0 +1,38 @@
+#!/usr/bin/env fish
+# Trust a directory in every agent harness, so an agent started there skips
+# the folder trust dialog. Usage: trust-workspace [<dir>] (default: $PWD).
+# Claude, Codex, and agy match exact paths only; pi also honors parents.
+
+command -q jq; or begin
+    echo "trust-workspace: jq not found" >&2
+    exit 1
+end
+
+set -g dir $argv[1]
+test -n "$dir"; or set dir $PWD
+set dir (realpath -s -- "$dir"); or exit 1
+
+# Apply a jq filter to a JSON file in place, seeding it with $seed if missing.
+function _jq_update --argument-names file seed filter
+    mkdir -p (path dirname -- "$file")
+    test -s "$file"; or printf '%s\n' "$seed" >"$file"
+    set -l tmp (mktemp)
+    if jq --arg dir "$dir" "$filter" "$file" >"$tmp"
+        cat "$tmp" >"$file"
+    end
+    rm -f "$tmp"
+end
+
+_jq_update "$HOME/.claude.json" '{}' \
+    '.projects[$dir] = ((.projects[$dir] // {}) + {hasTrustDialogAccepted: true})'
+
+_jq_update "$HOME/.gemini/antigravity-cli/settings.json" '{}' \
+    '.trustedWorkspaces = (((.trustedWorkspaces // []) + [$dir]) | unique)'
+
+_jq_update "$HOME/.pi/agent/trust.json" '{}' '.[$dir] = true'
+
+set -l codex_file "$HOME/.codex/config.toml"
+mkdir -p (path dirname -- "$codex_file")
+if not grep -qF "[projects.\"$dir\"]" "$codex_file" 2>/dev/null
+    printf '\n[projects."%s"]\ntrust_level = "trusted"\n' "$dir" >>"$codex_file"
+end
