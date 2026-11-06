@@ -1,7 +1,6 @@
 [dotfiles]
 "~/.config/plasma-workspace/env/odsod-machine.sh" = "../../env.sh"
 "~/.config/mimeapps.list" = "../../kde/mimeapps.list"
-"~/.config/fontconfig/conf.d/10-rendering.conf" = "../../kde/fonts.conf"
 "~/.config/kwalletrc" = "../../kde/kwalletrc"
 "~/.local/share/color-schemes/Nord.colors" = "../../kde/color-schemes/Nord.colors"
 
@@ -15,7 +14,11 @@
 
 [tasks."kde:setup-fonts"]
 description = "Configure KDE system fonts"
+# KDE writes ~/.config/fontconfig/conf.d/10-rendering.conf itself when font
+# rendering changes, so a dotfile symlink there gets replaced by a plain file.
+# This task owns the path instead and rewrites it on every apply.
 run = """
+install -m 0644 "$REPO_DIR/kde/fonts.conf" "$HOME/.config/fontconfig/conf.d/10-rendering.conf"
 kwriteconfig6 --group "General" --key "font" "Inter,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 kwriteconfig6 --group "General" --key "fixed" "Iosevka SS08,10,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"
 kwriteconfig6 --group "General" --key "smallestReadableFont" "Inter,8,-1,5,400,0,0,0,0,0,0,0,0,0,0,1"

@@ -1,6 +1,2 @@
-[vars]
-obsidian_version = "1.15.0"
-
 [dotfiles]
 "~/.local/bin/obsidian" = "../../obsidian/obsidian-wrapper.sh"
-

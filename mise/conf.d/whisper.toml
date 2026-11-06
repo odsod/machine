@@ -8,6 +8,7 @@ whisper_port = "8178"
 
 [tasks."whisper:setup"]
 description = "Build and install whisper.cpp GPU speech-to-text service"
+lock = true
 env = { WHISPER_VERSION = "{{vars.whisper_version}}", WHISPER_MODEL = "{{vars.whisper_model}}", WHISPER_MODEL_URL = "{{vars.whisper_model_url}}", WHISPER_VAD_MODEL = "{{vars.whisper_vad_model}}", WHISPER_VAD_MODEL_URL = "{{vars.whisper_vad_model_url}}", WHISPER_PORT = "{{vars.whisper_port}}" }
 run = 'exec "$REPO_DIR/whisper/setup.sh"'
 

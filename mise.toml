@@ -8,7 +8,7 @@
 # variables from mise/conf.d/*.toml are in scope here.
 
 [settings]
-auto_update = true
+self_update.auto = true
 idiomatic_version_file_enable_tools = [
   "go",
   "java",
@@ -17,35 +17,23 @@ idiomatic_version_file_enable_tools = [
   "ruby",
   "terraform",
 ]
-# `mise upgrade` and `prune` parse every tracked config, including go.mod files
-# from build artifacts and other repos. A bare `go` directive is only a floor,
-# so ignore it now instead of warning until mise 2026.11.0 removes it. The
-# version comes from mise.toml or go.mod's `toolchain` line.
-idiomatic_version_file_ignore_minimum_versions = true
 lockfile = true
+# The bump flow takes releases the day they ship, so keep the cooldown off.
 minimum_release_age = "0s"
-pin = false
 trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
-experimental = true
 
 [settings.python]
 uv_venv_auto = "source"
 
 [settings.status]
-missing_tools = "if_other_versions_installed"
 show_env = false
 show_tools = false
 
 [settings.task]
 output = "prefix"
-run_auto_install = true
 
 [tools]
-# Hold mise at 2026.10.19 until jdx/mise#15034 is fixed. 2026.10.20 vendors a
-# vfox-gcloud that requires "python" from hooks/, which only filesystem plugins
-# can resolve, so every gcloud command warns and installs fail. Unpin after the
-# fix lands.
-"aqua:jdx/mise" = "2026.11.1"
+"aqua:jdx/mise" = "2026.11.2"
 
 # Languages: major prefixes, not latest (avoids silent 24→26 / 3.12→3.14)
 go = "1.27"
@@ -135,13 +123,28 @@ spacectl = "latest"
 # dependency-graph install rejects, so take the GitHub release instead.
 "aqua:astral-sh/ty" = "latest"
 
-# HTTP archive tools
-"http:soap-ui" = { version = "{{vars.soap_ui_version}}", url = "https://dl.eviware.com/soapuios/{{vars.soap_ui_version}}/SoapUI-{{vars.soap_ui_version}}-linux-bin.tar.gz", strip_components = 1, bin_path = "bin", postinstall = """
-ln -fsT "$(mise where http:soap-ui)/bin/soapui.sh" "$HOME/.local/bin/soap-ui"
-""" }
-"http:obsidian" = { version = "{{vars.obsidian_version}}", url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v{{vars.obsidian_version}}/Obsidian-{{vars.obsidian_version}}.AppImage", postinstall = """
-ln -fsT "$(mise where http:obsidian)/Obsidian-{{vars.obsidian_version}}.AppImage" "$HOME/.local/bin/obsidian-app"
-""" }
+# Desktop downloads that mise can both fetch and version-track through the http
+# backend. version_list_url lets `mise outdated` and `mise upgrade --bump` see
+# them. Obsidian needs the expression because its newest releases are sometimes
+# Android only.
+[tools."http:soap-ui"]
+version = "latest"
+url = "https://dl.eviware.com/soapuios/{{ version }}/SoapUI-{{ version }}-linux-bin.tar.gz"
+version_list_url = "https://www.soapui.org/downloads/latest-release/"
+version_regex = 'SoapUI-(\d+\.\d+\.\d+)-linux-bin\.tar\.gz'
+strip_components = 1
+bin_path = "bin"
+postinstall = 'ln -fsT "$(mise where http:soap-ui)/bin/soapui.sh" "$HOME/.local/bin/soap-ui"'
+
+[tools."http:obsidian"]
+version = "latest"
+version_order = "semver"
+url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v{{ version }}/Obsidian-{{ version }}.AppImage"
+version_list_url = "https://api.github.com/repos/obsidianmd/obsidian-releases/releases?per_page=20"
+version_expr = 'fromJSON(body) | filter({ any(#.assets, { #.name startsWith "Obsidian-" && #.name endsWith ".AppImage" }) }) | map({ trimPrefix(#.tag_name, "v") })'
+postinstall = """
+ln -fsT "$(mise where http:obsidian)"/Obsidian-*.AppImage "$HOME/.local/bin/obsidian-app"
+"""
 
 
 # Herdr app and herdr-core: releases.herdr.dev only. latest.json names the
@@ -274,19 +277,22 @@ replace = true
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_OBSIDIAN = "{{vars.obsidian_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_SOAP_UI = "{{vars.soap_ui_version}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
+env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
 description = "Upgrade mise tools and bump every self-managed pin"
+lock = "machine-apply"
 run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
 
 [tasks.clean]
 description = "Remove installed payloads and source trees other than the pinned versions"
+lock = "machine-apply"
 run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
 [tasks.apply]
 description = "Apply every current version and config: full convergence"
+lock = "machine-apply"
 run = ["mise bootstrap --yes", "mise reshim", { task = "clean" }]
 
 [tasks.bootstrap]
@@ -337,6 +343,7 @@ oxfmt --write '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nv
 
 [tasks.check]
 description = "Run all linters and format checks"
+output = "summary"
 run = """
 cd "$REPO_DIR"
 mise install node shellcheck shfmt stylua ruff npm:oxfmt npm:oxlint github:fish-shell/fish-shell

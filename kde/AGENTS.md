@@ -8,8 +8,12 @@
     windows scale and rotate, which breaks subpixel rendering).
   - `hintslight`: snaps stems to the pixel grid without distorting glyphs.
   - `embeddedbitmap=false`: forces outline rendering on high-DPI displays.
-- `mise run kde:setup-fonts` sets Inter (UI) and Iosevka SS08 (monospace) in
-  `~/.config/kdeglobals`.
+- `mise run kde:setup-fonts` installs `fonts.conf` at
+  `~/.config/fontconfig/conf.d/10-rendering.conf`, then sets Inter (UI) and
+  Iosevka SS08 (monospace) in `~/.config/kdeglobals`.
+- KDE writes that rendering file itself when font settings change, so the file
+  is task-managed, not a dotfile symlink. A symlink there gets replaced by a
+  plain file and `mise bootstrap` then refuses to overwrite it.
 - Verify rendering: `fc-match -v 'Inter' | rg 'rgba|lcdfilter|embeddedbitmap|hintstyle'`
 - Verify KDE font: `kreadconfig6 --group "General" --key "font"`
 
