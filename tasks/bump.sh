@@ -44,7 +44,7 @@ while [ $# -gt 0 ]; do
     echo "  -n, --dry-run  Preview bumps without changing files"
     echo "  -h, --help     Show this help message"
     echo
-    echo "Targets: neovim, yaak, obsidian, slack, zoom, soap-ui, endpoint-verification, llama, whisper"
+    echo "Targets: neovim, yaak, slack, zoom, endpoint-verification, llama, whisper"
     exit 0
     ;;
   -*)
@@ -65,7 +65,7 @@ tools=1
 if [ ${#targets[@]} -gt 0 ]; then
   tools=0
 else
-  targets=(neovim yaak obsidian slack zoom soap-ui endpoint-verification llama whisper)
+  targets=(neovim yaak slack zoom endpoint-verification llama whisper)
 fi
 
 # 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
@@ -76,14 +76,11 @@ if [ "$tools" -eq 1 ]; then
   export GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token 2>/dev/null || true)}"
   if [ "$dry_run" -eq 1 ]; then
     echo "[bump] Tools that would be upgraded:"
-    mise upgrade --bump --dry-run -x http:obsidian -x http:soap-ui
+    mise upgrade --bump --dry-run
   else
     before="$(git -C "$REPO_DIR" hash-object mise.lock mise.toml)"
     echo "[bump] Upgrading mise tools..."
-    # http:obsidian and http:soap-ui pin a concrete version from [vars] and have
-    # no version_list_url, so mise cannot list their releases. Skip their upgrade
-    # check: the pins loop below owns both.
-    (cd "$REPO_DIR" && mise upgrade --bump -x http:obsidian -x http:soap-ui)
+    (cd "$REPO_DIR" && mise upgrade --bump)
     after="$(git -C "$REPO_DIR" hash-object mise.lock mise.toml)"
     [ "$before" = "$after" ] || tools_changed=1
   fi
@@ -93,7 +90,7 @@ fi
 # that defines the named pin.
 pin_file() {
   case "$1" in
-  slack | zoom | yaak | soap-ui | obsidian | llama | whisper | endpoint-verification)
+  slack | zoom | yaak | llama | whisper | endpoint-verification)
     echo "$REPO_DIR/mise/conf.d/$1.toml"
     ;;
   *)
@@ -198,13 +195,6 @@ bump_target() {
     latest="$(gh_tag mountain-loop/yaak)"
     check_target_url="https://github.com/mountain-loop/yaak/releases/download/v${latest}/yaak-${latest}-1.x86_64.rpm"
     ;;
-  obsidian)
-    pinned="$(sed -n 's/^obsidian_version = "\(.*\)"$/\1/p' "$(pin_file obsidian)")"
-    latest="$(gh api 'repos/obsidianmd/obsidian-releases/releases?per_page=20' \
-      --jq 'first(.[] | select([.assets[].name] | any(test("^Obsidian-[0-9.]+\\.AppImage$"))) | .tag_name)' 2>/dev/null |
-      grep -oP '^v\K[0-9][0-9.]*$')"
-    check_target_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${latest}/Obsidian-${latest}.AppImage"
-    ;;
   slack)
     pinned="$(sed -n 's/^slack_version = "\(.*\)"$/\1/p' "$(pin_file slack)")"
     latest="$(curl -s --max-time 20 https://slack.com/release-notes/linux/rss 2>/dev/null |
@@ -216,12 +206,6 @@ bump_target() {
     latest="$(redirect_location https://zoom.us/client/latest/zoom_x86_64.rpm |
       grep -oP '/prod/\K[0-9][0-9.]*')"
     check_target_url="https://zoom.us/client/${latest}/zoom_x86_64.rpm"
-    ;;
-  soap-ui)
-    pinned="$(sed -n 's/^soap_ui_version = "\(.*\)"$/\1/p' "$(pin_file soap-ui)")"
-    latest="$(curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null |
-      grep -oP 'SoapUI-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1)"
-    check_target_url="https://dl.eviware.com/soapuios/${latest}/SoapUI-${latest}-linux-bin.tar.gz"
     ;;
   endpoint-verification)
     pinned="$(sed -n 's/^endpoint_verification_version = "\(.*\)"$/\1/p' "$(pin_file endpoint-verification)")"
@@ -279,17 +263,11 @@ bump_target() {
   yaak)
     sed -i "s/^yaak_version = \".*\"/yaak_version = \"$latest\"/" "$(pin_file yaak)"
     ;;
-  obsidian)
-    sed -i "s/^obsidian_version = \".*\"/obsidian_version = \"$latest\"/" "$(pin_file obsidian)"
-    ;;
   slack)
     sed -i "s/^slack_version = \".*\"/slack_version = \"$latest\"/" "$(pin_file slack)"
     ;;
   zoom)
     sed -i "s/^zoom_version = \".*\"/zoom_version = \"$latest\"/" "$(pin_file zoom)"
-    ;;
-  soap-ui)
-    sed -i "s/^soap_ui_version = \".*\"/soap_ui_version = \"$latest\"/" "$(pin_file soap-ui)"
     ;;
   endpoint-verification)
     sed -i "s|^endpoint_verification_version = \".*\"|endpoint_verification_version = \"$latest\"|" "$(pin_file endpoint-verification)"

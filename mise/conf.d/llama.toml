@@ -6,6 +6,7 @@ llama_port = "8179"
 
 [tasks."llama:setup"]
 description = "Build and install llama.cpp GPU inference service"
+lock = true
 env = { LLAMA_VERSION = "{{vars.llama_version}}", LLAMA_MODEL = "{{vars.llama_model}}", LLAMA_MODEL_URL = "{{vars.llama_model_url}}", LLAMA_PORT = "{{vars.llama_port}}" }
 run = 'exec "$REPO_DIR/llama/setup.sh"'
 

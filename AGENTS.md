@@ -75,15 +75,21 @@
 - **After bumping**: Run `mise run apply`. Verify `mise run discover` shows all
   `ok`, `mise bootstrap --dry-run` has no pending work, and GPU services answer
   (`/health` on `127.0.0.1:8178` and `127.0.0.1:8179`).
+- **Lockfile format**: `mise.lock` is format 4, which records the npm repository
+  each `npm:` package's provenance names. mise keeps an existing lockfile at its
+  format, so run `mise lock --global --upgrade` after a mise upgrade, then
+  `mise install` to write new pins. `--global` is required: the repo config is
+  the global config.
 - **Pin specifics**:
   - **gh extensions** (`github:github/gh-stack`): a mise tool pinned in
     `mise.lock`. Its postinstall links the install dir to
     `~/.local/share/gh/extensions/gh-stack` as a local extension.
     Never run `gh extension install github/gh-stack`: gh keeps its copy and the
     two writers fight.
-  - **Desktop apps** (`slack`, `zoom`, `yaak`, `soap-ui`, `obsidian`):
-    Pinned in `[vars]` in `mise/conf.d/<app>.toml`. Obsidian tracks the newest
-    release with a desktop AppImage.
+  - **Desktop apps** (`slack`, `zoom`, `yaak`): Pinned in `[vars]` in
+    `mise/conf.d/<app>.toml`, because mise cannot install an RPM. `obsidian` and
+    `soap-ui` are `http:` tools in `mise.toml` that read their releases through
+    `version_list_url`, so `mise outdated` and `mise upgrade --bump` cover them.
   - **Herdr app** (`http:herdr-app`, `http:herdr-core`): mise tools in
     `mise.toml`, pinned in `mise.lock` and bumped by `mise run bump`, with
     checksums from the upstream release manifests. Separate from the Herdr TUI

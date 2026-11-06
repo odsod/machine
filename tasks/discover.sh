@@ -66,14 +66,6 @@ topic_discover() {
 
 row yaak "$PINNED_YAAK" "$(gh_tag mountain-loop/yaak)"
 
-# The newest Obsidian tag is sometimes Android only, so take the newest release
-# that actually ships a desktop AppImage.
-row obsidian "$PINNED_OBSIDIAN" "$(
-  gh api 'repos/obsidianmd/obsidian-releases/releases?per_page=20' \
-    --jq 'first(.[] | select([.assets[].name] | any(test("^Obsidian-[0-9.]+\\.AppImage$"))) | .tag_name)' 2>/dev/null |
-    grep -oP '^v\K[0-9][0-9.]*$'
-)"
-
 row slack "$PINNED_SLACK" "$(
   curl -s --max-time 20 https://slack.com/release-notes/linux/rss 2>/dev/null |
     grep -oP '<title>Slack \K[0-9][0-9.]*' | head -1
@@ -82,11 +74,6 @@ row slack "$PINNED_SLACK" "$(
 row zoom "$PINNED_ZOOM" "$(
   redirect_location https://zoom.us/client/latest/zoom_x86_64.rpm |
     grep -oP '/prod/\K[0-9][0-9.]*'
-)"
-
-row soap-ui "$PINNED_SOAP_UI" "$(
-  curl -sL --max-time 25 https://www.soapui.org/downloads/latest-release/ 2>/dev/null |
-    grep -oP 'SoapUI-\K[0-9]+\.[0-9]+\.[0-9]+' | head -1
 )"
 
 row llama "$PINNED_LLAMA" "$(topic_discover llama | tail -1)"
@@ -101,13 +88,4 @@ echo "Pins live in mise/conf.d/<name>.toml."
 echo "Paste-ready endpoint-verification pins: mise run endpoint-verification:discover"
 echo
 echo "--- mise tools ---"
-# http:obsidian and http:soap-ui pin a concrete version from [vars] and have no
-# version_list_url, so mise cannot list their releases. It warns once per tool,
-# and inside a task it also repeats a summary that names them. The pins table
-# above already tracks both, so drop those benign lines. Keep any summary that
-# names a non-http tool: that one is a real gap.
-tools_out="$(mise outdated 2>&1)"
-tools_rc=$?
-printf '%s\n' "$tools_out" | grep -vE \
-  'Error getting latest version for http:|^mise WARN +Could not check [0-9]+ tools? for updates: (http:[^, ]+, )*http:[^, ]+$' || true
-exit "$tools_rc"
+mise outdated
