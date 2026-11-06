@@ -13,7 +13,7 @@
       "src": "https://github.com/shaunsingh/nord.nvim"
     },
     "nvim-tree.lua": {
-      "rev": "69eb0c34ed3d836d5a0d92d913b77dd73b054f2f",
+      "rev": "4cb123287efe9a7191cce287a005d4a9c8bed4a0",
       "src": "https://github.com/nvim-tree/nvim-tree.lua"
     },
     "nvim-treesitter": {
