@@ -2,6 +2,7 @@
   "allowNonWorkspaceAccess": true,
   "altScreenMode": "always",
   "artifactReviewPolicy": "always-proceed",
+  "colorScheme": "terminal",
   "gcp": {
     "project": "way-platform-ai",
     "location": "eu"
