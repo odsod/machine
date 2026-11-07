@@ -1,3 +1,3 @@
 [dotfiles]
 "~/.claude/settings.json" = "../../claude/settings.json"
-
+"~/.claude/themes/nord.json" = "../../claude/themes/nord.json"
