@@ -48,7 +48,7 @@
   "autoMemoryEnabled": false,
   "syncClaudeAiSkills": false,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark",
+  "theme": "custom:nord",
   "idleCompaction": true,
   "modelSettings": {
     "claude-opus-5-5": {
