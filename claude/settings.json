@@ -49,6 +49,7 @@
   "syncClaudeAiSkills": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
+  "idleCompaction": true,
   "modelSettings": {
     "claude-opus-5-5": {
       "autoCompactWindow": 400000
