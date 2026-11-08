@@ -96,50 +96,50 @@ url_api = "https://api.github.com/repos/astral-sh/ty/releases/assets/716731865"
 provenance = "github-attestations"
 
 [[tools."aqua:jdx/mise"]]
-version = "2026.11.3"
+version = "2026.11.4"
 backend = "aqua:jdx/mise"
-specifiers = ["2026.11.3"]
+specifiers = ["2026.11.4"]
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64"]
-checksum = "sha256:975fcaac68ddf1a667ceceab30168989d3645f6894b39b40a7b0e6de94096101"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716894389"
+checksum = "sha256:d2b1f015317baff1e3a1486ff323a1a3c571e6b7233778318dd39d5349d42062"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721205998"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-arm64-musl"]
-checksum = "sha256:975fcaac68ddf1a667ceceab30168989d3645f6894b39b40a7b0e6de94096101"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716894389"
+checksum = "sha256:d2b1f015317baff1e3a1486ff323a1a3c571e6b7233778318dd39d5349d42062"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721205998"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64"]
-checksum = "sha512:baaf66fd45572c63114354ccb740293ba55f95c16e323fe728b73936e0162bef77b8f6c5c988daed3d5d84f0efc5d42a05e76b429ef307bbc95be83141f57c99"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716895103"
+checksum = "sha512:1966719b64f0294b9c002a08c1dc9f13d8ce351d2c757f406c0c0bcb1af4026715815f93ad432541c6388653247f1ae99928876ccacea2b61aed27fcb366aec6"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721206753"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.linux-x64-musl"]
-checksum = "sha256:af4122789a7ede3e2c308c9aaa03e55d0d88956ba6bece2cd46b002630e38f9c"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716895103"
+checksum = "sha256:ff81b3a813edbb1e884a0a68b0c1f1aa726f15f6c4e47606f83359fb12beb009"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721206753"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-arm64"]
-checksum = "sha256:de9a54330fee4edede51a3cf6196bbf522f01c5e3fd981e0bebea33f561a0431"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716895418"
+checksum = "sha256:d37c01389b0918a19bbf763ee8ed339e533eebdb281be4911e9ad71d00b51477"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721207112"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.macos-x64"]
-checksum = "sha256:88389a4a624a7279ec8d2d06e5c0fbd874ce4f5de791767883b32f62f4e1d62c"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-macos-x64.tar.gz"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716895508"
+checksum = "sha256:b8a74f677aba6a8e418c82870c2321a563391e828b0a2474f61497e2801177de"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-macos-x64.tar.gz"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721207279"
 provenance = "minisign"
 
 [tools."aqua:jdx/mise"."platforms.windows-x64"]
-checksum = "sha256:ee9001a7f396d3c5e53f6f64fa9edc328d53bc3001cccfcd4faf69d09ffe62b2"
-url = "https://github.com/jdx/mise/releases/download/v2026.11.3/mise-v2026.11.3-windows-x64.zip"
-url_api = "https://api.github.com/repos/jdx/mise/releases/assets/716895789"
+checksum = "sha256:aa601a967bb48f1a603345887dd5af0518a552bafbe724139456e75f10e0e102"
+url = "https://github.com/jdx/mise/releases/download/v2026.11.4/mise-v2026.11.4-windows-x64.zip"
+url_api = "https://api.github.com/repos/jdx/mise/releases/assets/721207452"
 provenance = "minisign"
 
 [[tools.awscli]]
@@ -381,44 +381,50 @@ url = "https://github.com/antonmedv/fx/releases/download/40.0.1/fx_windows_amd64
 url_api = "https://api.github.com/repos/antonmedv/fx/releases/assets/666017512"
 
 [[tools.fzf]]
-version = "0.74.5"
+version = "0.75.0"
 backend = "aqua:junegunn/fzf"
 specifiers = ["latest"]
 
 [tools.fzf."platforms.linux-arm64"]
-checksum = "sha256:cf058001da21724a469b714a29cf4aab9cbe860d218a0d6c1b5b661efad7784c"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581759"
+checksum = "sha256:bd0717badb6a5620387e014bb94209aac4d9eab6ab77b5348eabb0833aeb4d59"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590838"
 
 [tools.fzf."platforms.linux-arm64-musl"]
-checksum = "sha256:cf058001da21724a469b714a29cf4aab9cbe860d218a0d6c1b5b661efad7784c"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581759"
+checksum = "sha256:bd0717badb6a5620387e014bb94209aac4d9eab6ab77b5348eabb0833aeb4d59"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590838"
 
 [tools.fzf."platforms.linux-x64"]
-checksum = "sha256:d47d7f882972c7d674dbbba998ffa4116e68379616ffac7695d0671e9a722c5f"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581740"
+checksum = "sha256:0d6640f83582d991cf429754baad64b07e3a4e439a6019670f4b91da1314141c"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590794"
 
 [tools.fzf."platforms.linux-x64-musl"]
-checksum = "sha256:d47d7f882972c7d674dbbba998ffa4116e68379616ffac7695d0671e9a722c5f"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581740"
+checksum = "sha256:0d6640f83582d991cf429754baad64b07e3a4e439a6019670f4b91da1314141c"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590794"
 
 [tools.fzf."platforms.macos-arm64"]
-checksum = "sha256:ada808c7401b9949ce8842274ac16a6b6193fd32dcada396884a6a9a89e5985a"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581702"
+checksum = "sha256:1e76698eb481436e42119bea6aa6e2bd9552ff090789d769c286e3c3a4e0ded6"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590797"
 
 [tools.fzf."platforms.macos-x64"]
-checksum = "sha256:aca6cab692e6c069e724a43070a448e18586c7c0fdd1139f6d487ec1680599ed"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-darwin_amd64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581774"
+checksum = "sha256:8fa67fa874468b8e73ecad2df82cc110026f45d10605128aaac6b191262d2844"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590841"
 
 [tools.fzf."platforms.windows-x64"]
-checksum = "sha256:01f854ec8b9b47c99a7d78023638f7d2056cfb0af56b72dabd112032eed3993e"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-windows_amd64.zip"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581724"
+checksum = "sha256:e3fb809d48094bea7f9f4df03b2fea33ae6e28a6cd32fdad9970cd79e1103901"
+checksum_source = "mise-versions"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-windows_amd64.zip"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590885"
 
 [[tools.gcloud]]
 version = "592.0.0"
