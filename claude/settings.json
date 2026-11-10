@@ -1,6 +1,7 @@
 {
   "respectGitignore": false,
   "cleanupPeriodDays": 3650,
+  "syncClaudeAiSkills": false,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0",
     "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
@@ -12,7 +13,7 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "PreToolUse": [],
     "PostToolUse": [
@@ -45,14 +46,13 @@
   "forceLoginMethod": "claudeai",
   "outputStyle": "Concise",
   "effortLevel": "high",
-  "autoMemoryEnabled": false,
-  "syncClaudeAiSkills": false,
-  "skipDangerousModePermissionPrompt": true,
-  "theme": "custom:nord",
-  "idleCompaction": true,
   "modelSettings": {
     "claude-opus-5-5": {
       "autoCompactWindow": 400000
     }
-  }
+  },
+  "autoMemoryEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "custom:nord",
+  "idleCompaction": true
 }
