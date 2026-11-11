@@ -9,6 +9,5 @@
   "quietStartup": true,
   "defaultTools": [
     "+codemode"
-  ],
-  "lastChangelogVersion": "1.5.2"
+  ]
 }
