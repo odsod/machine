@@ -736,6 +736,52 @@ checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9
 url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
 
+[[tools."github:shaharia-lab/slackcli"]]
+version = "0.19.1"
+backend = "github:shaharia-lab/slackcli"
+specifiers = ["latest"]
+
+[tools."github:shaharia-lab/slackcli"."platforms.linux-arm64"]
+checksum = "sha256:b4ed37b0e71223d7142b4d8d5cade92a7d79cdca11f57a3e2da41f65a815cc66"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-linux-arm64"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653179"
+
+[tools."github:shaharia-lab/slackcli"."platforms.linux-arm64-musl"]
+checksum = "sha256:b4ed37b0e71223d7142b4d8d5cade92a7d79cdca11f57a3e2da41f65a815cc66"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-linux-arm64"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653179"
+
+[tools."github:shaharia-lab/slackcli"."platforms.linux-x64"]
+checksum = "sha256:c9d97d4b57682f664a94a6a7c81df09ff9f674dd7c900c38024ec95db4940692"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-linux"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653180"
+
+[tools."github:shaharia-lab/slackcli"."platforms.linux-x64-musl"]
+checksum = "sha256:c9d97d4b57682f664a94a6a7c81df09ff9f674dd7c900c38024ec95db4940692"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-linux"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653180"
+
+[tools."github:shaharia-lab/slackcli"."platforms.macos-arm64"]
+checksum = "sha256:02c63544f43acd799957abe42f6db008e337179108b8d0d1bb5d23a10af44897"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-macos-arm64"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653173"
+
+[tools."github:shaharia-lab/slackcli"."platforms.macos-x64"]
+checksum = "sha256:6f2fe1eed9284ca5974778bce083aa071dc1514f192c9e993eb407591d05935e"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-macos"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653175"
+
+[tools."github:shaharia-lab/slackcli"."platforms.windows-x64"]
+checksum = "sha256:57d3625af9989945afd71cfd70933b02764484d16e881c099c1b4e6a14f2acca"
+checksum_source = "mise-versions"
+url = "https://github.com/shaharia-lab/slackcli/releases/download/v0.19.1/slackcli-windows.exe"
+url_api = "https://api.github.com/repos/shaharia-lab/slackcli/releases/assets/721653178"
+
 [[tools."github:traefik/yaegi"]]
 version = "0.16.3"
 backend = "github:traefik/yaegi"
