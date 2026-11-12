@@ -83,6 +83,15 @@ for the languages, `jj <cmd> --help` for a command.
 - `diff_lines()`, not `diff_contains()`. No `all:` modifier; use `visible_heads()`.
 - Repos are colocated by default: `.jj/` and `.git/` both exist.
 
+### PR boundaries
+
+Each PR costs a CI runner reservation. Default to one PR; split commits, not PRs.
+
+- New PR only at a ship gate: work that must merge and take effect first
+  (secrets to set, a migration to run, a release to pin). Name the gate in
+  that PR's body.
+- Unrelated changes: use judgment, but bias to fewer PRs.
+
 ### PR lifecycle
 
 1. `jj git fetch --remote origin`, then `jj rebase -o main@origin` if the stack
@@ -92,7 +101,7 @@ for the languages, `jj <cmd> --help` for a command.
    Conflicts → `jj resolve -r <rev>`. Divergent → `jj converge --no-interactive`.
    Empty description → `jj describe -r <rev> -m "<subject>"`.
 3. Read each diff. Split mixed commits: `jj split -r <rev> <paths> -m "<subject>"`.
-4. One bookmark per PR, bottom to top. Publish the chain as one GitHub stack:
+4. One bookmark per ship gate, bottom to top. Publish several as one GitHub stack:
 
    ```
    jj log --reversed -r 'trunk()..@ & bookmarks()' \
@@ -111,7 +120,8 @@ for the languages, `jj <cmd> --help` for a command.
 5. Never run `gh stack init`, `add`, `submit`, `sync`, `rebase`, `view`, or
    `modify`. They need an attached git HEAD, which a colocated jj repo never
    has. `link`, `merge`, and `unstack` are safe.
-6. Grow the stack with `jj bookmark create <new> -r @`,
+6. No new gate: `jj bookmark set <top> -r @` and push. New gate: grow the
+   stack with `jj bookmark create <new> -r @`,
    `jj git push --bookmark <new>`, `gh pr create`, then
    `gh stack link <top-pr> <new-pr>`. Linking is additive.
 7. Merge with `gh stack merge <pr> --yes --squash`. It merges that PR and every
