@@ -52,6 +52,9 @@ export PATH="$CARGO_HOME/bin:$PATH"
 # shellcheck source=/dev/null
 [ -f "$CARGO_HOME/env" ] && . "$CARGO_HOME/env"
 
+# slackcli: mise owns updates; the notice suggests `slackcli update`
+export SLACKCLI_NO_UPDATE_NOTIFIER=1
+
 # ssh — needed for non-fish shells (e.g. Claude Code's zsh) where
 # fish's refresh_ssh_auth_sock doesn't run; without this, jj sign-on-push hangs.
 if [ -z "$SSH_AUTH_SOCK" ]; then
