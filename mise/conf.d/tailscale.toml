@@ -21,3 +21,11 @@ replace = true
 [bootstrap.services.tailscaled]
 state = "running"
 enabled = true
+
+# Let the login user run `tailscale serve` and `tailscale funnel` without sudo.
+[bootstrap.hooks.post-packages]
+run = """
+if [ "$(tailscale debug prefs 2>/dev/null | jq -r '.OperatorUser // ""')" != "$USER" ]; then
+  sudo tailscale set --operator="$USER"
+fi
+"""

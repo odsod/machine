@@ -36,6 +36,8 @@ PDFs: `pdftotext` for text, `pdftoppm` + `tesseract` for OCR.
 
 Web: `defuddle parse <url> --md --frontmatter -l en` first.
 Interactive/auth: `agent-browser-odsod connect`, then `agent-browser open|read|click`.
+Public URL for a local server (webhooks, external callers): `tailscale funnel --bg --https=8443 <port>`;
+`tailscale funnel --https=8443 off` when done. Not cloudflared or ngrok.
 
 `gh` always `-R <owner>/<repo>` (jj workspaces have no git remotes).
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
