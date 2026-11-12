@@ -736,6 +736,53 @@ checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9
 url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
 
+[[tools."github:schpet/linear-cli"]]
+version = "3.1.0"
+backend = "github:schpet/linear-cli"
+specifiers = ["latest"]
+
+[tools."github:schpet/linear-cli"."platforms.linux-arm64"]
+checksum = "sha256:4b0b15b69464e8b6a665290d702817654be2124cf1d58fad7d7ed5754f9431d7"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891356"
+
+[tools."github:schpet/linear-cli"."platforms.linux-arm64-musl"]
+checksum = "sha256:4b0b15b69464e8b6a665290d702817654be2124cf1d58fad7d7ed5754f9431d7"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-aarch64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891356"
+
+[tools."github:schpet/linear-cli"."platforms.linux-x64"]
+checksum = "sha256:bf7712097ce6a01e8a379de8357eca66d5748050201d336ba787b6ad3687f3e7"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891463"
+
+[tools."github:schpet/linear-cli"."platforms.linux-x64-musl"]
+checksum = "sha256:bf7712097ce6a01e8a379de8357eca66d5748050201d336ba787b6ad3687f3e7"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-x86_64-unknown-linux-gnu.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891463"
+
+[tools."github:schpet/linear-cli"."platforms.macos-arm64"]
+checksum = "sha256:bba81cf3ce19f3486f1ada52cf9841a8d749fca716338ea684e6b3b08a706954"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891310"
+
+[tools."github:schpet/linear-cli"."platforms.macos-x64"]
+checksum = "sha256:d9e3cea4f5703bfc2a3c98627e4bb69d7532af39a9d523165025a9015392e0b7"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-x86_64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891417"
+
+[tools."github:schpet/linear-cli"."platforms.windows-x64"]
+checksum = "sha256:988bbbe64a8cd257f38693fbe53a1856de546da01bec4e45ddc2ded263aa9b32"
+checksum_source = "mise-versions"
+url = "https://github.com/schpet/linear-cli/releases/download/v3.1.0/linear-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/schpet/linear-cli/releases/assets/666891436"
+
 [[tools."github:shaharia-lab/slackcli"]]
 version = "0.19.1"
 backend = "github:shaharia-lab/slackcli"

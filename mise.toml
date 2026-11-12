@@ -102,6 +102,7 @@ ln -fsT "$MISE_TOOL_INSTALL_PATH" "${XDG_DATA_HOME:-$HOME/.local/share}/gh/exten
 "github:googleworkspace/cli" = "latest"
 "github:ludviglundgren/qbittorrent-cli" = "latest"
 "github:odsod/recorder" = "latest"
+"github:schpet/linear-cli" = "latest"
 "github:shaharia-lab/slackcli" = "latest"
 "github:traefik/yaegi" = "latest"
 
