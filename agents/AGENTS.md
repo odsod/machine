@@ -52,9 +52,9 @@ Load `/agent-team` when asked to compose or run a multi-agent team.
 is a symlink onto `.agents/skills`, never a second copy. Read and edit the
 `.agents` path.
 
-`~/.agents/skills/` holds only skills that apply in every repo: `herdr` and
-`agent-team`. A skill about one repo belongs in that repo's own `.agents/skills/`.
-Install a skill where it is needed rather than everywhere.
+`~/.agents/skills/` holds only skills that apply in every repo: `herdr`,
+`agent-team`, and `slackcli`. A skill about one repo belongs in that repo's own
+`.agents/skills/`. Install a skill where it is needed rather than everywhere.
 
 ## Version control
 

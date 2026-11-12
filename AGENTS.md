@@ -86,6 +86,8 @@
     `~/.local/share/gh/extensions/gh-stack` as a local extension.
     Never run `gh extension install github/gh-stack`: gh keeps its copy and the
     two writers fight.
+  - **slackcli**: never run `slackcli update`, even when the vendored skill
+    suggests it. It replaces the mise binary and leaves `mise.lock` stale.
   - **Desktop apps** (`slack`, `zoom`, `yaak`): Pinned in `[vars]` in
     `mise/conf.d/<app>.toml`, because mise cannot install an RPM. `obsidian` and
     `soap-ui` are `http:` tools in `mise.toml` that read their releases through

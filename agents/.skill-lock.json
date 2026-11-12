@@ -9,6 +9,15 @@
       "skillFolderHash": "2be0d86d481d1bb29c62e11ef37b78d27d01b478",
       "installedAt": "2026-08-07T06:39:33.103Z",
       "updatedAt": "2026-11-06T10:12:01.442Z"
+    },
+    "slackcli": {
+      "source": "shaharia-lab/slackcli",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/shaharia-lab/slackcli.git",
+      "skillPath": "plugins/slackcli/skills/slackcli/SKILL.md",
+      "skillFolderHash": "0534fabf56e3cd50098a15000cbd49c912d2f995",
+      "installedAt": "2026-11-12T05:59:19.559Z",
+      "updatedAt": "2026-11-12T05:59:19.559Z"
     }
   },
   "dismissed": {
