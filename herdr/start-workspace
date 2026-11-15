@@ -336,6 +336,54 @@ function select_agent
     _write_state last-agent "$agent_kind"
 end
 
+# --- Linear context ---
+
+# Ask which Linear issues or project the workspace tracks and write them to
+# .linear-context.md, which agents/hooks/linear-context.sh reads at session
+# start. Skip when the file exists, linear is missing, or nothing is picked.
+function _pick_linear_context --argument-names dir
+    set -l file "$dir/.linear-context.md"
+    test -e "$file"; and return 0
+    command -q linear; or return 0
+
+    _status_show "Loading Linear issues..."
+    set -l lines (timeout 10 linear issue list -s started -s unstarted --json --no-input 2>/dev/null \
+        | jq -r '.[] | "\(.identifier)\t\(.title)"' 2>/dev/null)
+    _status_clear
+
+    set -l picked (printf '%s\n' $lines | fzf --prompt="Linear> " --height=100% --reverse \
+        --multi --print-query --delimiter=\t --bind='enter:accept-or-print-query' \
+        --header='tab: select · type issue IDs or a project slug · esc: skip')
+    test $status -le 1; or return 0
+
+    # Selected list lines win; otherwise read issue IDs and one project from the query.
+    set -l issues
+    set -l project
+    set -l selected (string match -- '*'\t'*' $picked[2..-1])
+    if test (count $selected) -gt 0
+        for line in $selected
+            set -a issues (string split -f1 \t -- "$line")
+        end
+    else
+        for token in (string split -n ' ' -- "$picked[1]")
+            if string match -rq '^[A-Za-z]+-[0-9]+$' -- "$token"
+                set -a issues (string upper -- "$token")
+            else if test -z "$project"
+                set project "$token"
+            end
+        end
+    end
+    test (count $issues) -gt 0 -o -n "$project"; or return 0
+
+    begin
+        echo ---
+        echo linear:
+        test -n "$project"; and echo "  project: $project"
+        test (count $issues) -gt 0; and echo "  issues: ["(string join ', ' -- $issues)"]"
+        echo ---
+    end >"$file"
+end
+
 # --- Workspace trust ---
 
 # Trust the workspace in every harness, so agent-team siblings of any kind
@@ -785,6 +833,7 @@ if test "$space_type" = Workspace
     _status_clear
     _trace "workspace: selecting agent"
     select_agent; or exit 0
+    _pick_linear_context "$workspace_path"
     _trace "workspace: launching"
 
     set ws_label (_workspace_label "$repo_name" "$bookmark")

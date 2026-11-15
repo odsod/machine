@@ -1,5 +1,6 @@
 [dotfiles]
 "~/.gitconfig" = "../../git/gitconfig"
+"~/.config/git/ignore" = "../../git/ignore"
 
 [bootstrap.packages]
 "dnf:git" = "latest"
