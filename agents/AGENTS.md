@@ -39,6 +39,9 @@ Interactive/auth: `agent-browser-odsod connect`, then `agent-browser open|read|c
 Public URL for a local server (webhooks, external callers): `tailscale funnel --bg --https=8443 <port>`;
 `tailscale funnel --https=8443 off` when done. Not cloudflared or ngrok.
 
+No cloud Artifacts (denied). Write deliverables as files in the repo if instructed.
+Put temporary or ephemeral artifacts in `/tmp`.
+
 `gh` always `-R <owner>/<repo>` (jj workspaces have no git remotes).
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
