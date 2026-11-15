@@ -11,7 +11,9 @@
     "pr": ""
   },
   "permissions": {
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "bypassPermissions",
+    "//": "Deny cloud Artifacts. Agents write deliverables as repo files if instructed, and temporary or ephemeral artifacts in /tmp.",
+    "deny": ["Artifact"]
   },
   "model": "opus",
   "hooks": {
