@@ -68,6 +68,8 @@ function write_stubs --argument-names home
         '        else' \
         '            echo "$bm_lines[1]"' \
         '        end' \
+        '    case "Linear> "' \
+        '        exit 130' \
         '    case "Agent> "' \
         '        if test -n "$FZF_AGENT_CHOICE"' \
         '            echo "$FZF_AGENT_CHOICE"' \
@@ -118,6 +120,7 @@ function write_stubs --argument-names home
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/claude"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/agy"
     printf '%s\n' "#!$real_fish --no-config" 'exit 0' >"$stub_bin/pi"
+    printf '%s\n' "#!$real_fish --no-config" 'exit 1' >"$stub_bin/linear"
     printf '%s\n' "#!$real_fish --no-config" 'exit 1' >"$stub_bin/timeout"
     if test -n "$real_setsid"
         printf '%s\n' \
@@ -128,7 +131,7 @@ function write_stubs --argument-names home
     end
     chmod +x "$stub_bin/fzf" "$stub_bin/herdr" "$stub_bin/jj" \
         "$stub_bin/ssh" "$stub_bin/codex" "$stub_bin/claude" \
-        "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/timeout"
+        "$stub_bin/agy" "$stub_bin/pi" "$stub_bin/linear" "$stub_bin/timeout"
 end
 
 function setup_case --argument-names name

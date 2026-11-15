@@ -1,5 +1,11 @@
 {
   "machine": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "$HOME/.agents/hooks/linear-context.sh --agy"
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "write_to_file|replace_file_content",

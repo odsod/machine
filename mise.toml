@@ -64,6 +64,7 @@ ln -fsT "$nvim_path" "$HOME/.local/bin/vi"
 pi = "latest"
 ruff = "latest"
 usage = "latest"
+yq = "latest"
 
 # Python dependency graphs need uv >= 0.12.10; Fedora 44 ships 0.12.9, so dnf
 # cannot satisfy it. dnf:uv stays for the post-packages hook that runs before

@@ -22,3 +22,9 @@ matcher = "Write|Edit|apply_patch"
 [[hooks.PostToolUse.hooks]]
 type = "command"
 command = "$HOME/.agents/hooks/format.sh"
+
+[[hooks.SessionStart]]
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "$HOME/.agents/hooks/linear-context.sh"
