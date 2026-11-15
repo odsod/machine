@@ -22,6 +22,7 @@ peers="$(jq -r '
   (.Peer // {})[] |
   select(
     .UserID == $self.UserID and
+    .Online == true and
     (.OS == "linux" or .OS == "darwin") and
     .HostName != null and
     .HostName != "" and
