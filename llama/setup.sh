@@ -18,6 +18,20 @@ PORT="${LLAMA_PORT:?run via mise run llama:setup}"
 SRC="$DATA_DIR/llama/llama.cpp-${VERSION}"
 BUILD="$SRC/build"
 
+# Tarball builds have no git history, so llama.cpp derives BUILD_NUMBER 0 and
+# asks the HF bucket for UI assets tagged "b0". That bucket does not exist, so
+# it falls back to "latest", whose asset set does not match this release and
+# fails validation. Pass the tag's build number when it carries one.
+CMAKE_ARGS=(
+  -DGGML_HIP=ON
+  -DCMAKE_HIP_ARCHITECTURES=gfx1200
+  -DGGML_NATIVE=ON
+  -DCMAKE_BUILD_TYPE=Release
+)
+if [[ $VERSION =~ -b([0-9]+) ]]; then
+  CMAKE_ARGS+=("-DLLAMA_BUILD_NUMBER=${BASH_REMATCH[1]}")
+fi
+
 echo "[llama] Installing ROCm build dependencies..."
 sudo dnf install -y -q \
   cmake \
@@ -36,11 +50,7 @@ fi
 
 echo "[llama] Building llama-server with ROCm/HIP..."
 cd "$SRC"
-cmake -B build \
-  -DGGML_HIP=ON \
-  -DCMAKE_HIP_ARCHITECTURES=gfx1200 \
-  -DGGML_NATIVE=ON \
-  -DCMAKE_BUILD_TYPE=Release
+cmake -B build "${CMAKE_ARGS[@]}"
 cmake --build build --target llama-server -j"$(nproc)"
 
 if [ ! -f "${DATA_DIR}/llama/${MODEL}" ]; then
