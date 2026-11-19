@@ -1,5 +1,5 @@
 [vars]
-slack_version = "4.53.283"
+slack_version = "4.53.287"
 
 [tasks."slack:setup"]
 description = "Install Slack desktop client"
