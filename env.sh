@@ -24,7 +24,7 @@ export FZF_ALT_C_COMMAND="fd --type d --strip-cwd-prefix --hidden --follow --exc
 # google-cloud / vertexai
 export GOOGLE_GENAI_USE_VERTEXAI=true
 export GOOGLE_CLOUD_PROJECT="way-platform-ai"
-export GOOGLE_CLOUD_LOCATION="eu"
+export GOOGLE_CLOUD_LOCATION="global"
 
 # go — GOPATH/bin for `go install`-ed binaries (mise manages GOROOT)
 export PATH="$HOME/go/bin:$PATH"
