@@ -346,23 +346,36 @@ function _pick_linear_context --argument-names dir
     test -e "$file"; and return 0
     command -q linear; or return 0
 
-    _status_show "Loading Linear issues..."
+    # Lines are kind<TAB>id<TAB>label; fzf shows only the label.
+    _status_show "Loading Linear issues and projects..."
     set -l lines (timeout 10 linear issue list -s started -s unstarted --json --no-input 2>/dev/null \
-        | jq -r '.[] | "\(.identifier)\t\(.title)"' 2>/dev/null)
+        | jq -r '.[] | "issue\t\(.identifier)\t\(.identifier)  \(.title)"' 2>/dev/null)
+    set -a lines (timeout 10 linear project list --json --no-input 2>/dev/null \
+        | jq -r '.[] | select(.status.type | IN("backlog", "planned", "started", "paused"))
+            | "project\t\(.slugId)\tproject: \(.name) (\(.status.name))"' 2>/dev/null)
     _status_clear
 
+    # Enter accepts only tab-marked lines; with none marked it returns just the
+    # query, so a bare enter picks nothing.
     set -l picked (printf '%s\n' $lines | fzf --prompt="Linear> " --height=100% --reverse \
-        --multi --print-query --delimiter=\t --bind='enter:accept-or-print-query' \
-        --header='tab: select · type issue IDs or a project slug · esc: skip')
+        --multi --print-query --delimiter=\t --with-nth=3 --with-shell='sh -c' \
+        --bind='enter:transform:[ "$FZF_SELECT_COUNT" -gt 0 ] && echo accept || echo print-query' \
+        --header='tab: select issues and one project · type issue IDs or a project slug · esc: skip')
     test $status -le 1; or return 0
 
-    # Selected list lines win; otherwise read issue IDs and one project from the query.
+    # Marked list lines win; otherwise read issue IDs and one project from the query.
     set -l issues
     set -l project
     set -l selected (string match -- '*'\t'*' $picked[2..-1])
     if test (count $selected) -gt 0
         for line in $selected
-            set -a issues (string split -f1 \t -- "$line")
+            set -l fields (string split \t -- "$line")
+            switch $fields[1]
+                case issue
+                    set -a issues $fields[2]
+                case project
+                    test -z "$project"; and set project $fields[2]
+            end
         end
     else
         for token in (string split -n ' ' -- "$picked[1]")
