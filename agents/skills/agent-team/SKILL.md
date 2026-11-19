@@ -53,6 +53,14 @@ Workers never need approval: Herdr starts claude and agy with `--dangerously-ski
 
 For bulk and web research, agy writes `report.md` and the orchestrator reads only that file.
 
+Web research is vacuum work, so put these rules in its unit prompt:
+
+- Give the URL of each key reference next to the claim it supports.
+- Fetch every cited URL in this session (`defuddle parse <url> --md`). Never cite a URL from memory.
+- Drop or replace a URL that fails, redirects to an unrelated page, or does not support the claim.
+- Record the publish date, update date, or version of each source. Flag a source that a newer release or doc replaces.
+- End `report.md` with a References list: URL, date or version, and one line on what it supports.
+
 Responsibilities do not cross unless assigned: design does not ship code, implement does not redefine the outcome, write does not touch implementation or architecture, verify does not expand scope, bulk does not touch architecture. Write output is short sentences in the repo `AGENTS.md` style.
 
 ## Flow
