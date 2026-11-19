@@ -107,10 +107,11 @@
     - [herdrdev/herdr-app#395](https://github.com/herdrdev/herdr-app/issues/395):
       GitHub releases, which would allow a `github:` backend instead of `http:`.
   - **GPU services** (`llama`, `whisper`): Pin the newest semver release tag
-    (without `v`, never `bNNNN`) in `mise/conf.d/llama.toml` and
-    `mise/conf.d/whisper.toml`. `mise run apply` rebuilds and restarts the
-    service when the version or unit changes, then `clean` removes old source
-    trees. Never run `clean` before `apply`.
+    without `v`, never a bare `bNNNN` tag (`1.0.0-b12359-b1b770d`, not
+    `b12359`), in `mise/conf.d/llama.toml` and `mise/conf.d/whisper.toml`.
+    `mise run apply` rebuilds and restarts the service when the version or
+    unit changes, then `clean` removes old source trees. Never run `clean`
+    before `apply`.
   - **endpoint-verification**: `mise run endpoint-verification:discover` prints
     `endpoint_verification_version`, `endpoint_verification_deb`, and
     `endpoint_verification_sha256` for `mise/conf.d/endpoint-verification.toml`.
