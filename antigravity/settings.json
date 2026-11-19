@@ -5,9 +5,9 @@
   "colorScheme": "terminal",
   "gcp": {
     "project": "way-platform-ai",
-    "location": "eu"
+    "location": "global"
   },
-  "model": "Gemini 4 Argon (Medium)",
+  "model": "Gemini 4 Hydrogen (Medium)",
   "notifications": true,
   "showFeedbackSurvey": false,
   "toolPermission": "always-proceed",
