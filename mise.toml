@@ -290,7 +290,7 @@ lock = "machine-apply"
 run = 'exec "$REPO_DIR/tasks/bump.sh" "$@"'
 
 [tasks.clean]
-description = "Remove installed payloads and source trees other than the pinned versions"
+description = "Remove unpinned payloads and source trees, and forget dead config links"
 lock = "machine-apply"
 run = 'exec "$REPO_DIR/tasks/clean.sh"'
 
