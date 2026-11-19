@@ -37,17 +37,17 @@ Close a worker as soon as its last unit is accepted.
 
 ## Roster
 
-| Kind     | Default model           | Give it                                                                | Do not give it alone                    | Context reset             |
-| -------- | ----------------------- | ---------------------------------------------------------------------- | --------------------------------------- | ------------------------- |
-| `claude` | Opus 5.5                | orchestrate, design, architecture                                      | bulk or multimodal grind                | `/compact`, then `/clear` |
-| `codex`  | Sol 6.1                 | fallback for Opus 5.5 (unavailable, rate-limited, or stuck)            | bulk or multimodal grind                | `/compact`, then `/new`   |
-| `agy`    | Gemini 4 Argon (Medium) | write, adversarial review, multimodal or large corpus (fans subagents) | long-horizon orchestrate or merge       | `/compact`, then `/clear` |
-| `agy`    | Gemini 3.8 Flash        | web research                                                           | design, review, or write                | `/compact`, then `/clear` |
-| `pi`     | DeepSeek V4.1 Flash     | grind: implement, refactor, run tests and smoke tests                  | design or review without a second agent | `/new`                    |
+| Kind     | Default model              | Give it                                                                | Do not give it alone                    | Context reset             |
+| -------- | -------------------------- | ---------------------------------------------------------------------- | --------------------------------------- | ------------------------- |
+| `claude` | Opus 5.5                   | orchestrate, design, architecture                                      | bulk or multimodal grind                | `/compact`, then `/clear` |
+| `codex`  | Sol 6.1                    | fallback for Opus 5.5 (unavailable, rate-limited, or stuck)            | bulk or multimodal grind                | `/compact`, then `/new`   |
+| `agy`    | Gemini 4 Neon (Medium)     | write, adversarial review, multimodal or large corpus (fans subagents) | long-horizon orchestrate or merge       | `/compact`, then `/clear` |
+| `agy`    | Gemini 4 Hydrogen (Medium) | web research                                                           | design, review, or write                | `/compact`, then `/clear` |
+| `pi`     | DeepSeek V4.1 Flash        | grind: implement, refactor, run tests and smoke tests                  | design or review without a second agent | `/new`                    |
 
-Default team: Opus 5.5 orchestrates and designs, `pi` does the grind (implement, refactor, tests), Gemini 4 Argon reviews and writes, Gemini 3.8 Flash does web research.
+Default team: Opus 5.5 orchestrates and designs, `pi` does the grind (implement, refactor, tests), Gemini 4 Neon reviews and writes, Gemini 4 Hydrogen does web research.
 
-`--kind` from the Kind column. This machine pins each kind to its first model above. For Gemini 3.8 Flash, start agy with `-- --model gemini-3.8-flash-medium`. Start codex with `-- --dangerously-bypass-hook-trust`, or it can stop on a hook review screen.
+`--kind` from the Kind column. This machine pins claude, codex, and pi to the model above. Always start agy with its model: `-- --model gemini-4-neon-medium` or `-- --model gemini-4-hydrogen-medium`. Start codex with `-- --dangerously-bypass-hook-trust`, or it can stop on a hook review screen.
 
 Workers never need approval: Herdr starts claude and agy with `--dangerously-skip-permissions`, codex config sets `approval_policy = "never"`, and pi has no approvals. A trust or approval dialog on a worker is a config bug: answer it once, then tell the user.
 
@@ -166,7 +166,7 @@ Something you cannot close safely (unique work, a process the user owns): name i
 
 **Council.** For design, RFCs, or competing hypotheses. Not for a single-file edit. Make a `council` tab, split its root pane once per member, and label each pane by role or hypothesis. Prime each member. Each writes `<role>.md`. The orchestrator checks the claims and writes one answer. No majority vote.
 
-**Isolated reviewer.** For an adversarial gate, or when each review must load fat style skills plus `AGENTS.md`. Not for one or two reviews, or when review is only "matches the brief." Use Gemini 4 Argon, Opus 5.5, or Sol 6.1, never `pi`. Spawn it when the first implement unit lands. Prime it, and tell it to load the stack style skills, read `AGENTS.md` on the touched paths, write `review.md`, and stop. The orchestrator reads `review.md` and never loads the style corpus.
+**Isolated reviewer.** For an adversarial gate, or when each review must load fat style skills plus `AGENTS.md`. Not for one or two reviews, or when review is only "matches the brief." Use Gemini 4 Neon, Opus 5.5, or Sol 6.1, never `pi`. Spawn it when the first implement unit lands. Prime it, and tell it to load the stack style skills, read `AGENTS.md` on the touched paths, write `review.md`, and stop. The orchestrator reads `review.md` and never loads the style corpus.
 
 **Review each stack apart.** A diff over backend and frontend gets one review unit per stack, never one review of the mixed diff. Each unit loads its stack's style skills and reads every `AGENTS.md` from the repo root down to each touched path. A data stack (dbt, Python, warehouse SQL) is a stack of its own.
 
