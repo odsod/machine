@@ -1,5 +1,14 @@
 --- a/main.js
 +++ b/main.js
+@@ -74,7 +74,7 @@
+ 
+ // The agent's icon from the app's program table: a one-color glyph or a picture.
+ function icon(p, size, color) {
+-  if (!p?.icon) return null;
++  return null; // odsod: no program icons
+   return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
+ }
+ 
 @@ -362,7 +362,7 @@
            })).child(pic)))
          .child(h_flex().flex_1().min_w(0).gap(5).items_center()

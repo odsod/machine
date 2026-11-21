@@ -16,7 +16,6 @@
 "~/.local/bin/xdg-open" = "../../herdr/xdg-open"
 "~/.local/bin/herdr-patch-mods" = "../../herdr/patch-mods"
 "~/.config/herdr-app-patches" = "../../herdr/app/patches"
-"~/.config/herdr-app/programs.json" = "../../herdr/app/programs.json"
 "~/.config/systemd/user/herdr-patch-mods.path" = "../../herdr/herdr-patch-mods.path"
 "~/.config/systemd/user/herdr-patch-mods.service" = "../../herdr/herdr-patch-mods.service"
 
