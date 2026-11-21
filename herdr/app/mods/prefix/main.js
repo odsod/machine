@@ -12,7 +12,7 @@
 // keeps the terminals running.
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { closeOverlay, focused, hc, nextCommand, props, run, theme } from "herdr";
+import { closeOverlay, focused, hc, nextCommand, openOverlay, props, run, theme } from "herdr";
 
 const PREFIX = "ctrl+u";
 const BINDINGS = [
@@ -33,7 +33,8 @@ const BINDINGS = [
   ["ctrl+w", "New tab", "tab.new"],
   ["ctrl+m", "Rename tab", "tab.rename"],
   ["ctrl+f", "Goto picker", "mod.open", { name: "picker" }],
-  ["ctrl+y", "Close space", "space.close"],
+  ["ctrl+t", "Start a space", "mod.open", { name: "space" }],
+  ["ctrl+e", "Close this space", "space", { confirm: true }],
   ["ctrl+q", "Detach (close window)", "window.close"],
   ...Array.from({ length: 10 }, (_, i) => [
     String(i),
@@ -44,7 +45,7 @@ const BINDINGS = [
 ];
 // The one-line hint. Keep it in step with BINDINGS.
 const HINT =
-  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · q detach";
+  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · t start · e close · q detach";
 
 export default class Prefix extends View {
   init(_props, cx) {
@@ -96,7 +97,10 @@ export default class Prefix extends View {
     if (!binding) return this.dismiss();
     const [, , command, args = {}] = binding;
     this.dismiss();
-    run(command, args);
+    // "space" opens the space dialog's confirm for the current space.
+    if (command === "space")
+      openOverlay({ mod: "space", kind: "dialog", width: 520, height: 260, props: args });
+    else run(command, args);
   }
 
   render() {
