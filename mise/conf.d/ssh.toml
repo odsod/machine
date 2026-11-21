@@ -10,6 +10,17 @@ mode = "0644"
 replace = true
 notify = ["sshd"]
 
+[bootstrap.directories."/etc/ssh/authorized_keys.d"]
+owner = "root"
+group = "root"
+mode = "0755"
+
+[bootstrap.files."/etc/ssh/authorized_keys.d/odsod"]
+source = "../../ssh/authorized_keys"
+owner = "root"
+group = "root"
+mode = "0644"
+
 [bootstrap.packages]
 "dnf:openssh-server" = "latest"
 
