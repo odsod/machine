@@ -57,12 +57,14 @@ export SLACKCLI_NO_UPDATE_NOTIFIER=1
 
 # ssh — needed for non-fish shells (e.g. Claude Code's zsh) where
 # fish's refresh_ssh_auth_sock doesn't run; without this, jj sign-on-push hangs.
+# A local login uses the local agent, even before its socket listens: the
+# stable link can point at an agent another machine forwards.
 if [ -z "$SSH_AUTH_SOCK" ]; then
-  if [ -S "$HOME/.ssh/auth_sock" ]; then
-    export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
-  elif [ -S "/run/user/$(id -u)/ssh-agent.socket" ]; then
+  if [ -z "$SSH_CONNECTION" ]; then
     SSH_AUTH_SOCK="/run/user/$(id -u)/ssh-agent.socket"
     export SSH_AUTH_SOCK
+  elif [ -S "$HOME/.ssh/auth_sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
   fi
 fi
 
