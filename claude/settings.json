@@ -11,9 +11,9 @@
     "pr": ""
   },
   "permissions": {
+    "deny": ["Artifact"],
     "defaultMode": "bypassPermissions",
-    "//": "Deny cloud Artifacts. Agents write deliverables as repo files if instructed, and temporary or ephemeral artifacts in /tmp.",
-    "deny": ["Artifact"]
+    "//": "Deny cloud Artifacts. Agents write deliverables as repo files if instructed, and temporary or ephemeral artifacts in /tmp."
   },
   "model": "opus",
   "hooks": {
@@ -66,5 +66,6 @@
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:nord",
-  "idleCompaction": true
+  "idleCompaction": true,
+  "feedbackDrafts": "off"
 }

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       defuddle:
-        specifier: 0.19.7
-        version: 0.19.7
+        specifier: 0.19.13
+        version: 0.19.13
 
 packages:
 
@@ -41,8 +41,8 @@ packages:
     resolution: {integrity: sha512-nlsLjRxRN2RPomw3r+e+oD3KQBbEbKK0+oBUATbodf5N38FlOMg/5nqV0CdClNvpVsjFLikD63H6dgKTgeuuUg==}
     engines: {node: '>=20.0.0'}
 
-  defuddle@0.19.7:
-    resolution: {integrity: sha512-eMCseeaNoFhTq5MMI3Ny3v5g2kc59IHB8Eznr0Jt1kybiA1mMFZrKjZIXO7IIVcBi6MXI5SCE4u+YVMe+6O0kA==}
+  defuddle@0.19.13:
+    resolution: {integrity: sha512-BMrCxWUmHge6o8ZBKRDTFxXNSfGDiWiV2rzJLh9vVMJnDExzCvLzaSrSH1mwa/sZZtCBa3Z+jccCXNblj3qnCg==}
     hasBin: true
 
   dom-serializer@2.0.0:
@@ -146,7 +146,7 @@ snapshots:
   cssomnom@0.1.12:
     optional: true
 
-  defuddle@0.19.7:
+  defuddle@0.19.13:
     dependencies:
       commander: 12.1.0
       mathml-to-latex: 1.8.0
