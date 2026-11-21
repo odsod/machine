@@ -123,8 +123,6 @@
     rewrites `installed.json`, so upstream changes arrive on their own. A
     patch that no longer applies keeps the last good build and sends a
     desktop notification: fix the patch against the new shipped file.
-    Agent icons are hidden through `herdr/app/programs.json` (`"icon": ""`),
-    not a patch.
   - **GPU services** (`llama`, `whisper`): Pin the newest semver release tag
     without `v`, never a bare `bNNNN` tag (`1.0.0-b12359-b1b770d`, not
     `b12359`), in `mise/conf.d/llama.toml` and `mise/conf.d/whisper.toml`.

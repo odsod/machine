@@ -1,5 +1,14 @@
 --- a/main.js
 +++ b/main.js
+@@ -25,7 +25,7 @@
+ }
+ 
+ function icon(p, size, color) {
+-  if (!p?.icon) return null;
++  return null; // odsod: no program icons
+   return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
+ }
+ 
 @@ -35,6 +35,16 @@
    return cwd === h ? "~" : cwd.startsWith(h + "/") ? "~" + cwd.slice(h.length) : cwd;
  }
