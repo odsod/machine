@@ -48,8 +48,10 @@ Put temporary or ephemeral artifacts in `/tmp`.
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
 
-Terminals run in the Herdr app on herdr-core (`HC_TERMINAL_ID`). Load `/herdr` only when
-asked to inspect terminals.
+Terminals run in the Herdr app on herdr-core (`HC_TERMINAL_ID`). When asked about Herdr,
+read `hc --skill` (terminals, agents) and `herdr-app --skill` (window) first.
+Never stop or restart a core unless asked, and never start one from an agent shell:
+its terminals inherit that shell's environment.
 Load `/agent-team` when asked to compose or run a multi-agent team.
 
 ## Skills
@@ -58,7 +60,7 @@ Load `/agent-team` when asked to compose or run a multi-agent team.
 is a symlink onto `.agents/skills`, never a second copy. Read and edit the
 `.agents` path.
 
-`~/.agents/skills/` holds only skills that apply in every repo: `herdr`,
+`~/.agents/skills/` holds only skills that apply in every repo:
 `agent-team`, `slackcli`, and `linear-cli`. A skill about one repo belongs in
 that repo's own `.agents/skills/`. Install a skill where it is needed rather than everywhere.
 

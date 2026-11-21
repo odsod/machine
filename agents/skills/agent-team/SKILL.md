@@ -1,13 +1,13 @@
 ---
 name: agent-team
-description: "Compose the agent team of this Herdr space that works until an outcome is realized, or decide this terminal can realize it alone. Use when the user invokes /agent-team, asks to set up an agent team, orchestrate another agent terminal, assign work across claude, codex, agy, or pi, or when a smart agent on a long plan should offload mechanical work to preserve its own context. Do not use for a trivial one-file edit, and do not use merely to inspect terminals (that is /herdr). Requires HC_TERMINAL_ID."
+description: "Compose the agent team of this Herdr space that works until an outcome is realized, or decide this terminal can realize it alone. Use when the user invokes /agent-team, asks to set up an agent team, orchestrate another agent terminal, assign work across claude, codex, agy, or pi, or when a smart agent on a long plan should offload mechanical work to preserve its own context. Do not use for a trivial one-file edit, and do not use merely to inspect terminals. Requires HC_TERMINAL_ID."
 ---
 
 # Agent Team
 
 An agent team is live agents in herdr-core terminals plus a brief, working until an outcome is realized. The outcome is an end state, not a work list. Stop when the done-when check passes. Pick harnesses and responsibilities for this outcome, agree them, then run. Do not freeze standing assignments.
 
-The invoking agent is the **orchestrator** unless the user names someone else. It stays in this terminal. A team is optional: work alone, and delegate only a unit that is worth it. Load `/herdr` and read `hc --skill` for CLI details.
+The invoking agent is the **orchestrator** unless the user names someone else. It stays in this terminal. A team is optional: work alone, and delegate only a unit that is worth it. Read `hc --skill` for CLI details.
 
 **One team per space.** Each Herdr space has a name and holds at most one agent team. The team has the same name as the space. Never give the team a name of its own, and never start a second team in a space. Team agents stay in its space.
 
