@@ -34,7 +34,7 @@ if [ -z "$is_agent" ]; then
       is_agent=1
       break
       ;;
-    herdr | systemd)
+    herdr-core | hc | systemd)
       break
       ;;
     esac

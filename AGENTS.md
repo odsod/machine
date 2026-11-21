@@ -95,9 +95,8 @@
     `version_list_url`, so `mise outdated` and `mise upgrade --bump` cover them.
   - **Herdr app** (`http:herdr-app`, `http:herdr-core`): mise tools in
     `mise.toml`, pinned in `mise.lock` and bumped by `mise run bump`, with
-    checksums from the upstream release manifests. Separate from the Herdr TUI
-    (`herdr`): the two keep their own terminals, key bindings and machine
-    lists. herdr-core sees its mise install path and leaves updates to mise.
+    checksums from the upstream release manifests. herdr-core sees its mise
+    install path and leaves updates to mise.
     `herdr:setup-core` links `hc` and `herdr-core` in `~/.local/bin` to the
     pinned core (the app looks there before the mise shims) and warns when a
     running core is stale. Run `hc server restart` by hand at a safe point;

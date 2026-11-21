@@ -112,7 +112,6 @@ antigravity-cli = "latest"
 awscli = "latest"
 fx = "latest"
 gcloud = "latest"
-herdr = "latest"
 jwt = "latest"
 spacectl = "latest"
 

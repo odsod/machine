@@ -1,9 +1,8 @@
 # Prevent Python virtualenv activate scripts from altering the prompt
 set -gx VIRTUAL_ENV_DISABLE_PROMPT 1
 
-# Herdr app panes (herdr-core) pad their first prompt themselves; the TUI and
-# plain terminals do not. The core sets HC_TERMINAL_ID in every terminal it
-# runs, while the TUI sets HERDR_* only, so that variable tells the two apart.
+# Herdr app panes (herdr-core) pad their first prompt themselves; plain
+# terminals do not. The core sets HC_TERMINAL_ID in every terminal it runs.
 set -g __prompt_first 1
 function __prompt_after_command --on-event fish_preexec
     set -g __prompt_first 0

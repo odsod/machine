@@ -41,8 +41,8 @@ export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
 # neovim
 export EDITOR="nvim"
 
-# pi: also emit OSC 52 on copy. Herdr captures the sequence and writes the
-# clipboard on the viewing client, where a remote wl-copy would miss.
+# pi: also emit OSC 52 on copy. The Herdr app writes it to the local
+# clipboard, where a remote wl-copy would miss.
 export PI_CLIPBOARD_OSC52=1
 
 # rust

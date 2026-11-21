@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Save every Tailscale peer as a Herdr machine. The Herdr TUI (`herdr machine`)
-# and the Herdr app (`hc machine`) keep separate lists, so both are filled.
+# Save every Tailscale peer as a herdr-core machine (`hc machine`).
 set -euo pipefail
 
 log() { echo "[herdr:sync-machines] $*"; }
@@ -52,14 +51,6 @@ sync() {
 
 # Read the supported list commands, not the internal catalog files: their
 # shape is not a stable interface.
-if command -v herdr >/dev/null 2>&1; then
-  sync "Herdr TUI" "$(herdr machine list --json | jq -r '.[].target')" \
-    "herdr machine add <target>" \
-    herdr machine add {} --label {} --remote-session default
-else
-  log "herdr not found; skipping Herdr TUI machines"
-fi
-
 # No --install: that copies hc onto the other machine.
 if command -v hc >/dev/null 2>&1; then
   sync "Herdr app" "$(hc machine ls --json | jq -r '.machines[].target')" \

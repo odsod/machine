@@ -1,5 +1,4 @@
-// Start or close a space, as `herdr/start-workspace` and
-// `herdr/remove-jj-workspace` do for the Herdr TUI. Opened as a dialog with
+// Start or close a space. Opened as a dialog with
 // props { tab: "start" | "close" } or { confirm: true }; the prefix mod binds start and confirm.
 //
 // Start: pick a repo (then a bookmark), or a folder, and Enter. The type,
