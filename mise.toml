@@ -149,6 +149,18 @@ postinstall = """
 ln -fsT "$(mise where http:obsidian)"/Obsidian-*.AppImage "$HOME/.local/bin/obsidian-app"
 """
 
+# Vibe Typer publishes one unversioned AppImage. The changelog names the
+# version, so a pin older than the newest release fails its checksum: bump it.
+[tools."http:vibetyper"]
+version = "latest"
+version_order = "semver"
+url = "https://cdn.vibetyper.com/releases/linux/VibeTyper.AppImage"
+version_list_url = "https://vibetyper.com/changelog"
+version_regex = 'Version <!-- -->(\d+\.\d+\.\d+)'
+postinstall = """
+ln -fsT "$(mise where http:vibetyper)/VibeTyper.AppImage" "$HOME/.local/bin/vibetyper"
+"""
+
 
 # Herdr app and herdr-core: releases.herdr.dev only. latest.json names the
 # newest version; manifest.json holds each target's sha256. The app still
@@ -321,7 +333,7 @@ depends = [
 run = """
 echo "[bootstrap] Verifying auth services..."
 gh auth status 2>/dev/null || echo "  → Run: gh auth login"
-tailscale status 2>/dev/null | head -1 || echo "  → Run: sudo tailscale up"
+tailscale status >/dev/null 2>&1 || echo "  → Run: tailscale up --operator=$USER"
 gcloud auth list --filter="status:ACTIVE" --format="value(account)" 2>/dev/null | grep -q . || echo "  → Run: gcloud auth login"
 """
 
