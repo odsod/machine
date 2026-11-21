@@ -4,26 +4,29 @@
 "dnf:mesa-vulkan-drivers" = "latest"
 
 [tasks."graphics:setup"]
-description = "Install GPU-conditional graphics drivers"
+description = "Install per-host graphics drivers and tweaks"
 run = """
-if lspci -nn | grep -qi 'intel.*vga\\|vga.*intel'; then
-  echo "[graphics] Intel GPU detected - installing intel-media-driver..."
+case "$(uname -n)" in
+odsod-x1-carbon)
+  echo "[graphics] Intel Meteor Lake - installing intel-media-driver..."
   sudo dnf install -y -q intel-media-driver
-fi
-# i915 loads from the initramfs and waits ~20s for the MEI GSC proxy. The MEI
-# drivers load only after the LUKS prompt, so the proxy fails to init. Load
-# them in the initramfs too. 0f73db04-... is the GSC proxy MEI client.
-if ls /sys/bus/mei/devices/ 2>/dev/null | grep -qi 0f73db04-97ab-4125-b893-e904ad0d5464; then
+  # i915 loads from the initramfs and waits ~20s for the MEI GSC proxy. The
+  # MEI drivers load only after the LUKS prompt, so the proxy fails to init.
+  # Load them in the initramfs too.
   conf='force_drivers+=" mei_me mei_gsc_proxy "'
   if [ "$(cat /etc/dracut.conf.d/odsod-gsc-proxy.conf 2>/dev/null)" != "$conf" ]; then
-    echo "[graphics] Intel GSC proxy detected - adding MEI drivers to initramfs..."
+    echo "[graphics] Adding MEI drivers to initramfs..."
     printf '%s\\n' "$conf" | sudo tee /etc/dracut.conf.d/odsod-gsc-proxy.conf > /dev/null
     sudo dracut -f
   fi
-fi
-if lspci -nn | grep -qi 'amd.*vga\\|vga.*amd\\|advanced micro devices.*vga\\|vga.*advanced micro devices'; then
-  echo "[graphics] AMD GPU detected - installing udev perf rule..."
-  printf 'ACTION=="add", SUBSYSTEM=="drm", DRIVERS=="amdgpu", ATTR{device/power_dpm_force_performance_level}="high"\\n' \
+  ;;
+odsod-desktop)
+  echo "[graphics] Radeon dGPU - installing udev perf rule..."
+  printf 'ACTION=="add", SUBSYSTEM=="drm", DRIVERS=="amdgpu", ATTR{device/power_dpm_force_performance_level}="high"\\n' \\
     | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
-fi
+  ;;
+*)
+  echo "[graphics] $(uname -n) is unlisted; nothing to do"
+  ;;
+esac
 """

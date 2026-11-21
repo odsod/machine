@@ -6,8 +6,10 @@ DATA_DIR="$HOME/.local/share/odsod/machine/data"
 
 . "$REPO_DIR/env.sh"
 
-if [ "${ODSOD_HAS_RADEON_DGPU:-0}" != "1" ]; then
-  echo "[llama] Skipping: no dedicated Radeon GPU detected"
+# Only the desktop has the Radeon RX 9060 XT (gfx1200) that the build targets.
+# Other hosts call odsod-desktop through Tailscale.
+if [ "$(uname -n)" != "odsod-desktop" ]; then
+  echo "[llama] Skipping: $(uname -n) is not odsod-desktop"
   exit 0
 fi
 
