@@ -2,14 +2,13 @@
 // herdr.dev/mods/herdrdev/tmux-prefix (herdrdev/herdr-layout-examples).
 //
 // Changes from that example:
-// - The prefix is ctrl+u, to match herdr/config.toml [keys] for the Herdr TUI.
+// - The prefix is ctrl+u, as it was in the Herdr TUI.
 // - The second key works with or without ctrl: `prefix ctrl+h` and `prefix h`.
 // - Every key closes the hint, as in the TUI: no repeat window.
 // - The hint is a one-line bar; `?` shows the whole list.
 //
-// BINDINGS mirror the TUI [keys]. `herdr-app commands` lists what exists: copy
-// mode has no app equivalent, and detach is `window.close`, since the core
-// keeps the terminals running.
+// `herdr-app commands` lists what BINDINGS can run. Detach is `window.close`,
+// since the core keeps the terminals running.
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { closeOverlay, focused, hc, nextCommand, openOverlay, props, run, theme } from "herdr";
@@ -35,6 +34,8 @@ const BINDINGS = [
   ["ctrl+f", "Goto picker", "mod.open", { name: "picker" }],
   ["ctrl+t", "Start a space", "mod.open", { name: "space" }],
   ["ctrl+e", "Close this space", "space", { confirm: true }],
+  ["ctrl+o", "Clone a repo", "terminal.open", { argv: ["clone-repo"], name: "clone" }],
+  ["ctrl+c", "Pick a link", "mod.open", { name: "links" }],
   ["ctrl+q", "Detach (close window)", "window.close"],
   ...Array.from({ length: 10 }, (_, i) => [
     String(i),
@@ -45,7 +46,7 @@ const BINDINGS = [
 ];
 // The one-line hint. Keep it in step with BINDINGS.
 const HINT =
-  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · t start · e close · q detach";
+  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · t start · e close · o clone · c link · q detach";
 
 export default class Prefix extends View {
   init(_props, cx) {
