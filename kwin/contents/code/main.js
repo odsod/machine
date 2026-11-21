@@ -60,8 +60,8 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] terminal", "KWin", ""],
     key: "Meta+U",
     kind: "app",
-    command: ["ghostty"],
-    resourceClass: "com.mitchellh.ghostty",
+    command: ["herdr-app"],
+    resourceClass: "herdr-app",
   },
 
   {

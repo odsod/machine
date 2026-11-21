@@ -42,8 +42,8 @@
   every tool version no tracked config selects.
 - **Host packages**: `[bootstrap.packages]` installs missing packages only. A
   `"latest"` entry accepts any installed version, so `mise run apply` never
-  upgrades one. Packages from enabled repos, such as the COPR builds of ghostty
-  and scrcpy, follow system updates (KDE Discover via PackageKit, or
+  upgrades one. Packages from enabled repos, such as the COPR build of
+  scrcpy, follow system updates (KDE Discover via PackageKit, or
   `sudo dnf upgrade`). Use `mise bootstrap packages upgrade` to upgrade them
   from mise instead.
 - **Inspect state**: `mise bootstrap status --missing`, `mise bootstrap plan`,
