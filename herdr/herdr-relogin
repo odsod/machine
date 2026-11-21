@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Log in again to every Herdr machine that says it needs a login. The login
+# autostart runs this after ssh-add: a core that tried a machine before the
+# key was loaded marks it needs_login and retries only every few minutes.
+# `hc machine login` insists on a terminal, so give it a pseudo-terminal; with
+# the key loaded it never prompts.
+set -euo pipefail
+
+log() { echo "[herdr-relogin] $*"; }
+
+command -v hc >/dev/null 2>&1 || exit 0
+# hc starts a core when none runs; leave that to the app.
+pgrep -u "$(id -u)" -f '(herdr-core|/hc) serve$' >/dev/null || exit 0
+
+for machine in $(hc machine ls --json | jq -r '.machines[] | select(.state == "needs_login") | .name'); do
+  if timeout 60s python3 -c 'import pty, sys; sys.exit(pty.spawn(sys.argv[1:]) >> 8)' \
+    hc machine login "$machine" </dev/null >/dev/null 2>&1; then
+    log "Logged in to $machine"
+  else
+    log "Could not log in to $machine; run: hc machine login $machine" >&2
+  fi
+done

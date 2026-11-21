@@ -1,0 +1,6 @@
+# imsettings-boot.sh does not support Plasma and fails on every login.
+# Plasma starts input methods itself (System Settings > Virtual Keyboard).
+[Desktop Entry]
+Type=Application
+Name=Input Method starter
+Hidden=true
