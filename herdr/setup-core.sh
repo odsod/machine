@@ -27,3 +27,13 @@ have="$(hc server status --json | jq -r '.version')"
 if [ "$have" != "$want" ]; then
   log "Core $have is running, $want is pinned. At a safe point: hc server restart"
 fi
+
+# A core started from an agent's shell keeps that agent's variables, and every
+# terminal it starts inherits them: Claude then stops saving transcripts.
+# `hc server restart` keeps them too; only a stop and a start from a clean
+# shell clear them.
+for pid in $(pgrep -u "$(id -u)" -f '(herdr-core|/hc) serve$'); do
+  if tr '\0' '\n' <"/proc/$pid/environ" 2>/dev/null | grep -qE '^(CLAUDECODE|CLAUDE_CODE_CHILD_SESSION)='; then
+    log "Core $pid runs with Claude Code variables. At a safe point, from a shell outside Herdr: hc server stop && hc server start"
+  fi
+done
