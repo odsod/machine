@@ -59,6 +59,10 @@
   key; delete the key in the live file, then run `mise dot apply`. Copy
   settings changed in an app into the repo by hand (never workspace paths or
   auth state).
+- **Links into tool installs**: `tools:link` (`tasks/link-tools.sh`) points
+  `vi`, `vim`, `obsidian-app` and similar links at the versions this config
+  selects, on every apply. Never link from a postinstall: it follows the last
+  install, which can be an older pin from another workspace.
 - **Overwritten dotfile symlinks**: If an app replaces a `[dotfiles]` symlink
   with a plain file, copy wanted changes into the repo before running
   `mise bootstrap --force-dotfiles`.
@@ -83,7 +87,7 @@
   the global config.
 - **Pin specifics**:
   - **gh extensions** (`github:github/gh-stack`): a mise tool pinned in
-    `mise.lock`. Its postinstall links the install dir to
+    `mise.lock`. `tools:link` links the install dir to
     `~/.local/share/gh/extensions/gh-stack` as a local extension.
     Never run `gh extension install github/gh-stack`: gh keeps its copy and the
     two writers fight.
