@@ -48,10 +48,13 @@ if [ ! -f "$SRC/CMakeLists.txt" ]; then
   curl -fL "https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$DATA_DIR/llama"
 fi
 
-echo "[llama] Building llama-server with ROCm/HIP..."
-cd "$SRC"
-cmake -B build "${CMAKE_ARGS[@]}"
-cmake --build build --target llama-server -j"$(nproc)"
+# Each version has its own tree, so a built binary is current.
+if [ ! -x "$BUILD/bin/llama-server" ]; then
+  echo "[llama] Building llama-server with ROCm/HIP..."
+  cd "$SRC"
+  cmake -B build "${CMAKE_ARGS[@]}"
+  cmake --build build --target llama-server -j"$(nproc)"
+fi
 
 if [ ! -f "${DATA_DIR}/llama/${MODEL}" ]; then
   echo "[llama] Downloading model..."
