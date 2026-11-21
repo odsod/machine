@@ -55,7 +55,6 @@ window falls back to the generic Wayland icon.
 and rounded corners, with no titlebar. Run `mise run kwin:window-rules`, or
 `mise run kwin:install` to run it with the rest of the KWin setup.
 
-- `ghostty`: exact `wmclass` match on `com.mitchellh.ghostty`.
 - `chrome-apps`: regex `wmclass` match on `^chrome-.*__-`. This covers every
   Chrome app window and not the normal browser window (`google-chrome`).
 - `slack`: exact `wmclass` match on `slack`. Slack is an X11 window; the rule
