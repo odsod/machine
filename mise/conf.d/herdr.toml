@@ -6,6 +6,8 @@
 "~/.config/herdr-app/mods/prefix/mod.json" = "../../herdr/app/mods/prefix/mod.json"
 "~/.config/herdr-app/mods/space/main.js" = "../../herdr/app/mods/space/main.js"
 "~/.config/herdr-app/mods/space/mod.json" = "../../herdr/app/mods/space/mod.json"
+"~/.config/herdr-app/mods/links/main.js" = "../../herdr/app/mods/links/main.js"
+"~/.config/herdr-app/mods/links/mod.json" = "../../herdr/app/mods/links/mod.json"
 "~/.local/share/applications/herdr-app.desktop" = "../../herdr/app/herdr-app.desktop"
 "~/.config/herdr/config.toml" = "../../herdr/config.toml"
 "~/.local/bin/clone-repo" = "../../herdr/clone-repo"
