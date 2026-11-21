@@ -8,3 +8,12 @@
            .child(div().flex_initial().min_w(SIDE_MIN).truncate().text_color(t.foreground).child(w.name))
            .child(g ? this.gitTail(g, tree, w.name, t) : div().flex_1()),
        );
+@@ -537,7 +536,7 @@
+       this.revealedAt = this.activeAt;
+       if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
+     }
+-    return v_flex().size_full().min_h(0).bg(t.chrome).text_size(13)
++    return v_flex().size_full().min_h(0).bg(t.chrome).text_size(12.5) // odsod: was 13
+       .child(h_flex().h(31).pl(16).pr(10).items_center().justify_between().text_size(11.5).text_color(t.dim)
+         .when(collapsed, el => el.pl(0).pr(0).justify_center())
+         .when(!collapsed, el => el.child("Spaces"))
