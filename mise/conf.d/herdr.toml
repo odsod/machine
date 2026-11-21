@@ -19,4 +19,9 @@
 
 [tasks."herdr:sync-machines"]
 description = "Save missing Tailscale peers as Herdr machines"
+depends = ["herdr:setup-core"]
 run = 'exec "$REPO_DIR/herdr/setup-machines.sh"'
+
+[tasks."herdr:setup-core"]
+description = "Link hc and herdr-core to the pinned herdr-core and flag a stale core"
+run = 'exec "$REPO_DIR/herdr/setup-core.sh"'
