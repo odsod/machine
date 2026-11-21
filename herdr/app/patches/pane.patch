@@ -1,0 +1,27 @@
+--- a/main.js
++++ b/main.js
+@@ -35,6 +35,16 @@
+   return cwd === h ? "~" : cwd.startsWith(h + "/") ? "~" + cwd.slice(h.length) : cwd;
+ }
+ 
++// odsod: an agent's live title (the tabs mod's test), shown after its name.
++const clean = (s) => (s ?? "").replace(/^[^\p{L}\p{N}\p{Ps}\p{Pi}]+/u, "").replace(/^\[ [!.] \] /, "").trim();
++function liveTitle(p) {
++  if (!p.program?.agent) return null;
++  const live = clean(p.title);
++  const path = /^[~/]|^[A-Za-z]:\\/.test((p.title ?? "").replace(/^[^\p{L}\p{N}~/]+/u, ""));
++  const telling = live && live !== p.terminal && live !== p.program.name && !path && !live.includes("@") && live.toLowerCase() !== p.program.key;
++  return telling ? live : null;
++}
++
+ export default class Pane extends View {
+   init() { this.hovered = false; }
+ 
+@@ -80,6 +90,7 @@
+       .on_click(() => run("pane.focus", { pane }))
+       .when(Boolean(pic), (el) => el.child(pic))
+       .child(div().flex_none().truncate().max_w(260).font_medium().text_color(t.foreground).child(name))
++      .when(Boolean(liveTitle(p)), el => el.child(div().flex_initial().min_w(0).truncate().text_color(t.muted).child(`\u00b7 ${liveTitle(p)}`)))
+       .child(div().flex_1().truncate().text_color(t.dim).child(folder(p.cwd)))
+       .when(st === "working", el => el.child(svg("mods/workspace-chrome/spinner.svg").size(12).flex_none().text_color(t.working).spin(900)))
+       .when(st === "blocked", el => el.child(div().flex_none().px(6).h(18).flex().items_center().rounded(5).bg(t.blocked + "26").text_size(10.5).font_semibold().text_color(t.blocked).child("Needs you")))

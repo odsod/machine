@@ -1,0 +1,12 @@
+--- a/main.js
++++ b/main.js
+@@ -19,7 +19,8 @@
+ function label(tab, lead) {
+   const prog = lead?.program?.name;
+   const base = tab.named ? tab.name : prog ?? "Terminal";
+-  if (!lead?.program?.agent) return base;
++  // odsod: the pane header shows the agent's live title, so tabs keep their name.
++  return base;
+   const live = clean(lead.title);
+   // clean() would strip a path's leading ~ or /: test the title with only its status glyph gone.
+   const path = /^[~/]|^[A-Za-z]:\\/.test((lead.title ?? "").replace(/^[^\p{L}\p{N}~/]+/u, ""));
