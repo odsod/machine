@@ -241,6 +241,7 @@ REPO_DIR = "{{ config_source | canonicalize | dirname }}"
 "dnf:yt-dlp" = "latest"
 
 # PDF decoding and OCR
+"dnf:chafa" = "latest"
 "dnf:poppler-utils" = "latest"
 "dnf:tesseract" = "latest"
 "dnf:tesseract-langpack-eng" = "latest"
