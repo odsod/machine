@@ -91,7 +91,10 @@ function refresh_ssh_auth_sock
         set -e SSH_AUTH_SOCK
     end
 end
-refresh_ssh_auth_sock
+# Only interactive shells move the link. A command run over SSH, such as
+# another machine's herdr-core reaching this one, would point it at that
+# machine's forwarded agent, and local programs would follow.
+status is-interactive; and refresh_ssh_auth_sock
 
 # Recover if this shell loaded before the ssh-agent socket existed. herdr-core
 # terminals can start seconds ahead of socket activation and never re-check otherwise.
