@@ -21,7 +21,7 @@
 
 - Check script syntax and lint: `shellcheck endpoint-verification/device_state.sh && sh -n endpoint-verification/device_state.sh`
 - Install and verify signals: `mise run endpoint-verification:install && mise run endpoint-verification:verify`
-- Expected output: `disk_encrypted: ENABLED`, `os_version: "44"`,
+- Expected output: `disk_encrypted: ENABLED`, `os_version: "45"`,
   `screen_lock_secured: ENABLED`, `os_firewall: "enabled"`.
 
 ## Known Limitation: Btrfs on LUKS in Chrome

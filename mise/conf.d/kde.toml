@@ -2,6 +2,7 @@
 "~/.config/plasma-workspace/env/odsod-machine.sh" = "../../env.sh"
 "~/.config/mimeapps.list" = "../../kde/mimeapps.list"
 "~/.config/kwalletrc" = "../../kde/kwalletrc"
+"~/.config/autostart/imsettings-start.desktop" = "../../kde/autostart/imsettings-start.desktop"
 "~/.local/share/color-schemes/Nord.colors" = "../../kde/color-schemes/Nord.colors"
 
 [bootstrap.packages]
