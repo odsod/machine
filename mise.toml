@@ -311,6 +311,7 @@ depends = [
   "keyboard:setup",
   "herdr:setup-core",
   "herdr:sync-machines",
+  "herdr:patch-mods",
   "tools:link",
 ]
 run = """

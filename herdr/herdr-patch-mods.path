@@ -1,0 +1,9 @@
+[Unit]
+Description=Rebuild patched Herdr app mods when the app rewrites its shipped files
+
+[Path]
+# The app writes installed.json last, after its shipped mods and layouts.
+PathChanged=%h/.config/herdr-app/installed.json
+
+[Install]
+WantedBy=default.target

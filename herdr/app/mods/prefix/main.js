@@ -31,7 +31,7 @@ const BINDINGS = [
   ["ctrl+b", "Previous tab", "tab.prev"],
   ["ctrl+w", "New tab", "tab.new"],
   ["ctrl+m", "Rename tab", "tab.rename"],
-  ["ctrl+f", "Goto picker", "mod.open", { name: "picker" }],
+  ["ctrl+f", "Goto picker", "mod.open", { name: "odsod-picker" }],
   ["ctrl+t", "Start a space", "mod.open", { name: "space" }],
   ["ctrl+e", "Close this space", "space", { confirm: true }],
   ["ctrl+o", "Clone a repo", "terminal.open", { argv: ["clone-repo"], name: "clone" }],

@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Rebuild odsod-<mod> from each shipped Herdr app mod plus
+# $HERDR_MOD_PATCHES/<mod>.patch, and the odsod-main layout from the shipped
+# main layout with those mods swapped in. The app rewrites its shipped files on
+# every start, so each run picks up upstream changes. A patch that no longer
+# applies fails the run and keeps the last good build.
+set -euo pipefail
+
+home="${HERDR_APP_HOME:-$HOME/.config/herdr-app}"
+patches="${HERDR_MOD_PATCHES:?HERDR_MOD_PATCHES is not set}"
+
+log() { echo "[herdr:patch-mods] $*"; }
+
+if [ ! -f "$home/layouts/main.json" ]; then
+  log "No shipped layout in $home yet (start the app once); skipping"
+  exit 0
+fi
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+failed=0
+built=()
+
+for patch in "$patches"/*.patch; do
+  name="$(basename "$patch" .patch)"
+  out="$home/mods/odsod-$name"
+  if [ ! -d "$home/mods/$name" ]; then
+    log "ERROR: herdr-app no longer ships mod '$name'" >&2
+    failed=1
+  else
+    # Build outside mods/: the app loads every folder there.
+    cp -a "$home/mods/$name" "$work/$name"
+    if ! patch -s -d "$work/$name" -p1 --fuzz=0 --no-backup-if-mismatch -r - <"$patch"; then
+      log "ERROR: $patch no longer applies to the shipped '$name'; fix the patch" >&2
+      failed=1
+    elif ! diff -rq "$work/$name" "$out" >/dev/null 2>&1; then
+      mkdir -p "$out"
+      rsync -a --delete "$work/$name/" "$out/"
+      log "Built odsod-$name"
+    fi
+  fi
+  # A failed rebuild keeps using the last good build, if there is one.
+  [ -d "$out" ] && built+=("$name")
+done
+
+layout="$home/layouts/odsod-main.json"
+jq --args 'walk(
+    if type == "object" and (.mod | type) == "string" and (.mod as $m | $ARGS.positional | index($m))
+    then .mod = "odsod-" + .mod else . end
+  )' "${built[@]}" <"$home/layouts/main.json" >"$work/layout.json"
+if ! cmp -s "$work/layout.json" "$layout"; then
+  # Write beside the layouts, not in them, then move into place in one step.
+  cp "$work/layout.json" "$home/.odsod-main.json.tmp"
+  mv "$home/.odsod-main.json.tmp" "$layout"
+  log "Built layouts/odsod-main.json"
+fi
+
+# Under the path unit nobody reads the output: say it on the desktop too.
+if [ "$failed" -ne 0 ] && command -v notify-send >/dev/null 2>&1; then
+  notify-send -a "Herdr" "Herdr mod patches failed" "Run: mise run herdr:patch-mods" || true
+fi
+exit "$failed"
