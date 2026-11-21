@@ -4,7 +4,9 @@ set -euo pipefail
 mise run llama:clean
 mise run whisper:clean
 
-# Forget tracked config links to deleted files (old workspaces).
-mise prune --configs
+# Delete tool versions no tracked config selects, and forget tracked configs
+# whose files are gone (old workspaces). mise keeps versions a running process
+# started from.
+mise prune --yes
 
 echo "[clean] Done"
