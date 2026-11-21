@@ -38,7 +38,8 @@
 ## Provisioning and Convergence
 
 - **Full convergence**: `mise run apply` runs `mise bootstrap --yes`,
-  `mise reshim`, and `mise run clean`.
+  `mise reshim`, and `mise run clean`. `clean` runs `mise prune`, which deletes
+  every tool version no tracked config selects.
 - **Host packages**: `[bootstrap.packages]` installs missing packages only. A
   `"latest"` entry accepts any installed version, so `mise run apply` never
   upgrades one. Packages from enabled repos, such as the COPR builds of ghostty
