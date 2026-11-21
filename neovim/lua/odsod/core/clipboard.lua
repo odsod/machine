@@ -1,12 +1,11 @@
 local M = {}
 
 -- System clipboard access goes through the + and * registers only; plain
--- yanks stay in nvim. Copy: nvim emits OSC 52, and both ghostty and herdr
--- deliver it to the clipboard of the attached client, locally and over
--- remote attach. Paste reads the system clipboard when this session has
--- one. Herdr does not relay OSC 52 read queries, so in a remote pane
--- paste-by-register cannot work; use the terminal paste (ctrl+shift+v)
--- there.
+-- yanks stay in nvim. Copy: nvim emits OSC 52, and the Herdr app writes it
+-- to the local clipboard, also from a terminal on another machine. Paste
+-- reads the system clipboard when this session has one. The app never
+-- answers OSC 52 read queries, so in a remote terminal paste-by-register
+-- cannot work; use the terminal paste (ctrl+shift+v) there.
 function M.setup()
   local osc52 = require("vim.ui.clipboard.osc52")
 

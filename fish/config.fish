@@ -10,12 +10,12 @@ end
 
 functions -q source_env_sh; and not set -q ODSOD_MACHINE; and source_env_sh
 
-# Work around https://github.com/herdrdev/herdr/issues/2448.
-# Remove this refresh and the xdg-open shim after
-# https://github.com/herdrdev/herdr/pull/2854 ships in stable Herdr.
+# herdr-core terminals outlive the desktop session that started them, so they
+# can hold a stale display and D-Bus address. Refresh them from the user
+# manager, as the xdg-open shim does for programs.
 function desktop-env-refresh --on-event fish_prompt --on-event fish_preexec
-    # Herdr TUI panes set HERDR_ENV; the app's panes (herdr-core) set HC_*.
-    test "$HERDR_ENV" = 1 -o -n "$HC_TERMINAL_ID"; or return 0
+    # herdr-core sets HC_TERMINAL_ID in every terminal it runs.
+    set -q HC_TERMINAL_ID; or return 0
 
     set -l runtime_dir (test -n "$XDG_RUNTIME_DIR"; and echo "$XDG_RUNTIME_DIR"; or echo "/run/user/"(id -u))
 
@@ -93,8 +93,8 @@ function refresh_ssh_auth_sock
 end
 refresh_ssh_auth_sock
 
-# Recover if this shell loaded before the ssh-agent socket existed. herdr panes
-# can start seconds ahead of socket activation and never re-check otherwise.
+# Recover if this shell loaded before the ssh-agent socket existed. herdr-core
+# terminals can start seconds ahead of socket activation and never re-check otherwise.
 function _ssh_auth_sock_recheck --on-event fish_prompt
     set -q SSH_AUTH_SOCK[1]; and return
     refresh_ssh_auth_sock

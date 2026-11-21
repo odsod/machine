@@ -929,46 +929,6 @@ version = "0.12.0"
 backend = "go:mvdan.cc/gofumpt"
 specifiers = ["latest"]
 
-[[tools.herdr]]
-version = "0.9.5"
-backend = "aqua:herdrdev/herdr"
-specifiers = ["latest"]
-
-[tools.herdr."platforms.linux-arm64"]
-checksum = "sha256:17d7536f2da50859523680ef279dffcac8e4a235f4e46fe8da6c2ec44141897c"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-linux-aarch64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898231"
-
-[tools.herdr."platforms.linux-arm64-musl"]
-checksum = "sha256:17d7536f2da50859523680ef279dffcac8e4a235f4e46fe8da6c2ec44141897c"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-linux-aarch64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898231"
-
-[tools.herdr."platforms.linux-x64"]
-checksum = "sha256:14d9e8bc8b4a9e0118d77c32266f76d461f09b40342eb23752960bd89f59929d"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-linux-x86_64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898235"
-
-[tools.herdr."platforms.linux-x64-musl"]
-checksum = "sha256:14d9e8bc8b4a9e0118d77c32266f76d461f09b40342eb23752960bd89f59929d"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-linux-x86_64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898235"
-
-[tools.herdr."platforms.macos-arm64"]
-checksum = "sha256:fb77c2232a05a8035421382c894392f4174e4e38a18e48af3dd0290157c3a7e2"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-macos-aarch64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898230"
-
-[tools.herdr."platforms.macos-x64"]
-checksum = "sha256:5fb0a908ec7f6745e3e245738b06bfad56c46391c391ab3c0955fbead01f1369"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-macos-x86_64"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898229"
-
-[tools.herdr."platforms.windows-x64"]
-checksum = "sha256:d2c6c9c971c43a0bfdde8c692a9a1a7a45c3e4807cd01ae45662b4734fac1cbf"
-url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-windows-x86_64.zip"
-url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898234"
-
 [[tools."http:herdr-app"]]
 version = "0.1.16"
 backend = "http:herdr-app"
