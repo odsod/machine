@@ -1,0 +1,7 @@
+[Unit]
+Description=Rebuild patched Herdr app mods
+
+[Service]
+Type=oneshot
+Environment=HERDR_MOD_PATCHES=%h/.config/herdr-app-patches
+ExecStart=%h/.local/bin/herdr-patch-mods

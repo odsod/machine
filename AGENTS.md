@@ -114,6 +114,17 @@
       a setting to turn app updates off.
     - [herdrdev/herdr-app#395](https://github.com/herdrdev/herdr-app/issues/395):
       GitHub releases, which would allow a `github:` backend instead of `http:`.
+  - **Herdr app mods**: shipped mods and layouts are read-only and rewritten
+    on every app start. To change one, add `herdr/app/patches/<mod>.patch`
+    (a unified diff of its `main.js`, `a/` and `b/` prefixes).
+    `herdr:patch-mods` rebuilds `odsod-<mod>` from the shipped mod plus the
+    patch, and `layouts/odsod-main.json` from the shipped `main` with those
+    mods swapped in. `herdr-patch-mods.path` reruns it whenever the app
+    rewrites `installed.json`, so upstream changes arrive on their own. A
+    patch that no longer applies keeps the last good build and sends a
+    desktop notification: fix the patch against the new shipped file.
+    Agent icons are hidden through `herdr/app/programs.json` (`"icon": ""`),
+    not a patch.
   - **GPU services** (`llama`, `whisper`): Pin the newest semver release tag
     without `v`, never a bare `bNNNN` tag (`1.0.0-b12359-b1b770d`, not
     `b12359`), in `mise/conf.d/llama.toml` and `mise/conf.d/whisper.toml`.
