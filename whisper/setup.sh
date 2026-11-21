@@ -36,15 +36,18 @@ if [ ! -f "$SRC/CMakeLists.txt" ]; then
   curl -fL "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${VERSION}.tar.gz" | tar xz -C "$DATA_DIR/whisper"
 fi
 
-echo "[whisper] Building whisper-server with ROCm/HIP..."
-cd "$SRC"
-cmake -B build \
-  -DWHISPER_BUILD_SERVER=ON \
-  -DGGML_HIP=ON \
-  -DCMAKE_HIP_ARCHITECTURES=gfx1200 \
-  -DGGML_NATIVE=ON \
-  -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target whisper-server -j"$(nproc)"
+# Each version has its own tree, so a built binary is current.
+if [ ! -x "$BUILD/bin/whisper-server" ]; then
+  echo "[whisper] Building whisper-server with ROCm/HIP..."
+  cd "$SRC"
+  cmake -B build \
+    -DWHISPER_BUILD_SERVER=ON \
+    -DGGML_HIP=ON \
+    -DCMAKE_HIP_ARCHITECTURES=gfx1200 \
+    -DGGML_NATIVE=ON \
+    -DCMAKE_BUILD_TYPE=Release
+  cmake --build build --target whisper-server -j"$(nproc)"
+fi
 
 if [ ! -f "${DATA_DIR}/whisper/${MODEL}" ]; then
   echo "[whisper] Downloading model..."
