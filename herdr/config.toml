@@ -84,7 +84,7 @@ rename_tab = "prefix+ctrl+m"
 
 # Workspace navigation
 goto = "prefix+ctrl+f"
-close_workspace = "prefix+ctrl+y"
+close_workspace = "prefix+ctrl+e"
 
 # Copy mode
 copy_mode = "prefix+ctrl+r"
