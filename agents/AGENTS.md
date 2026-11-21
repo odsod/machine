@@ -48,7 +48,8 @@ Put temporary or ephemeral artifacts in `/tmp`.
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
 
-Terminal mux is Herdr (`HERDR_ENV=1`). Load `/herdr` only when asked to inspect panes.
+Terminals run in the Herdr app on herdr-core (`HC_TERMINAL_ID`). Load `/herdr` only when
+asked to inspect terminals.
 Load `/agent-team` when asked to compose or run a multi-agent team.
 
 ## Skills
