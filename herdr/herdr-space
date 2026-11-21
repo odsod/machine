@@ -1,0 +1,386 @@
+#!/usr/bin/env fish
+# Non-interactive helper for the Herdr app `space` mod. The mod runs it with
+# `exec` on the chosen machine and draws every list itself. Output is JSON.
+#
+#   herdr-space repos                     [{repo}] ranked by recent use
+#   herdr-space bookmarks <repo>          [{name, remote, epoch}] newest first
+#   herdr-space fetch <repo>              jj git fetch from origin (10s limit)
+#   herdr-space dirs <kind>               [{name, epoch}] newest first
+#   herdr-space prepare <kind> <name> [<bookmark>]
+#                                         makes the folder, trusts it: {path, label}
+#   herdr-space linear                    [{kind, id, label}] open issues and projects
+#   herdr-space linear-context <dir> <project|-> [<issue>...]
+#   herdr-space workspaces                [{path, repo, name, epoch, changes, bookmarks}]
+#                                         newest first; repo is relative to ~/Code
+#   herdr-space remove <path>             forgets the jj workspace, trashes its folder
+#
+# <kind> is workspace, code, activity, project or vault. <repo> and <name> for
+# workspace and code are relative to ~/Code: <host>/<org>/<repo>.
+
+source (path dirname (realpath (status filename)))/lib.fish
+or begin
+    echo "Failed to load herdr/lib.fish" >&2
+    exit 1
+end
+
+# mise shims cost ~0.4s a call and this script makes dozens: use the active
+# tools' real folders instead, and the system's for everything else.
+if command -q mise
+    set -gx PATH (mise bin-paths 2>/dev/null) (string match -v -- '*/mise/shims' $PATH)
+end
+
+set -g workspace_base "$HOME/Workspaces"
+set -q HERDR_SPACE_WORKSPACES; and set workspace_base "$HERDR_SPACE_WORKSPACES"
+
+function _jj_repo --argument-names repo_path
+    jj --ignore-working-copy -R "$repo_path" $argv[2..-1]
+end
+
+function _has_rev --argument-names repo_path rev
+    _jj_repo "$repo_path" log -r "$rev" --no-graph --limit 1 >/dev/null 2>&1
+end
+
+# Tab-separated lines on stdin to a JSON array of objects with these keys.
+# Keys ending in "?" are booleans ("1" or "0"); keys ending in "#" are numbers.
+function _tsv_json
+    jq -R -s -c --args '
+        ($ARGS.positional) as $keys
+        | [split("\n")[] | select(length > 0) | split("\t") as $f
+          | [range($keys | length) as $i
+             | $keys[$i] as $k
+             | if ($k | endswith("?")) then {key: $k[:-1], value: ($f[$i] == "1")}
+               elif ($k | endswith("#")) then {key: $k[:-1], value: (($f[$i] // "0") | tonumber)}
+               else {key: $k, value: ($f[$i] // "")} end]
+          | from_entries]' $argv
+end
+
+function _history_file
+    printf '%s\n' "$HOME/.local/state/odsod/machine/workspace-history.tsv"
+end
+
+function _record_repo_use --argument-names repo_rel
+    set -l history_file (_history_file)
+    mkdir -p (path dirname "$history_file"); or return 0
+    printf '%s\t%s\n' (date +%s) "$repo_rel" >>"$history_file"
+end
+
+function _ensure_jj_repo_ready --argument-names repo_path
+    if not test -d "$repo_path/.jj"
+        jj git init --colocate "$repo_path" >/dev/null 2>&1
+        or _fail "Failed to initialize jj in $repo_path"
+    end
+    set -l colocation (_jj_repo "$repo_path" git colocation status 2>&1)
+    or _fail "$colocation"
+    if not string match -rq "currently colocated" -- "$colocation"
+        _jj_repo "$repo_path" git colocation enable >/dev/null 2>&1
+        or _fail "Failed to enable jj/git colocation in $repo_path"
+    end
+end
+
+function _trust --argument-names dir
+    set -l fish (status fish-path)
+    $fish (path dirname (realpath (status filename)))/trust-workspace "$dir" >/dev/null
+end
+
+function _emit_space --argument-names path label
+    jq -n -c --arg path "$path" --arg label "$label" '{path: $path, label: $label}'
+end
+
+# --- Lists ---
+
+# Repos in ~/Code as <host>/<org>/<repo>, one per line.
+function _repo_rels
+    for git_path in (fd --hidden --no-follow -d 4 --min-depth 4 -g '.git' "$HOME/Code" 2>/dev/null)
+        set -l rel (string replace "$HOME/Code/" "" -- (path dirname "$git_path"))
+        string match -rq '^[^/]+/[^/]+/[^/]+$' -- "$rel"; and echo "$rel"
+    end | sort -u
+end
+
+function cmd_repos
+    set -l repos (_repo_rels)
+    set -l history_file (_history_file)
+    test -r "$history_file"; or set history_file /dev/null
+    # Rank by uses in the last 90 days, then by last use, then by name.
+    printf '%s\n' $repos | awk -F '\t' -v now=(date +%s) -v hist="$history_file" '
+        { known[$0] = 1; order[++n] = $0 }
+        END {
+            while ((getline line < hist) > 0) {
+                split(line, f, "\t")
+                if (!(f[2] in known)) continue
+                if (f[1] + 0 > last[f[2]]) last[f[2]] = f[1] + 0
+                if (now - f[1] <= 90 * 86400) score[f[2]]++
+            }
+            for (i = 1; i <= n; i++) printf "%d\t%d\t%s\n", score[order[i]] + 0, last[order[i]] + 0, order[i]
+        }' | sort -t \t -k1,1nr -k2,2nr -k3,3 | cut -f3 | _tsv_json repo
+end
+
+function cmd_bookmarks --argument-names repo_rel
+    set -l repo_path "$HOME/Code/$repo_rel"
+    test -d "$repo_path/.jj"; or begin
+        echo '[]'
+        return 0
+    end
+    # Local bookmarks, then origin bookmarks with no local one. A bookmark's
+    # epoch is its commit time or its workspace folder's mtime, the newer one.
+    begin
+        _jj_repo "$repo_path" log --no-graph -r 'bookmarks()' \
+            -T 'local_bookmarks.map(|b| b.name() ++ "\t0\t" ++ committer.timestamp().format("%s") ++ "\n").join("")'
+        _jj_repo "$repo_path" log --no-graph -r 'remote_bookmarks(remote=exact:origin)' \
+            -T 'remote_bookmarks.filter(|rb| rb.remote() == "origin" && !local_bookmarks.any(|lb| lb.name() == rb.name())).map(|b| b.name() ++ "\t1\t" ++ committer.timestamp().format("%s") ++ "\n").join("")'
+    end 2>/dev/null | while read -l -d \t name remote epoch
+        test -n "$name"; or continue
+        set -l dir "$workspace_base/$repo_rel/$name"
+        if test -d "$dir"
+            set -l mtime (stat -c '%Y' "$dir")
+            test "$mtime" -gt "$epoch"; and set epoch $mtime
+        end
+        printf '%s\t%s\t%s\n' "$epoch" "$name" "$remote"
+    end | sort -t \t -k1,1nr -k2,2 -u | awk -F '\t' '{ print $2 "\t" $3 "\t" $1 }' \
+        | _tsv_json name 'remote?' 'epoch#'
+end
+
+function cmd_fetch --argument-names repo_rel
+    timeout --kill-after=2s 10s jj --ignore-working-copy -R "$HOME/Code/$repo_rel" git fetch --remote origin >/dev/null 2>&1
+    echo '{}'
+end
+
+function _kind_root --argument-names kind
+    switch $kind
+        case activity
+            echo "$HOME/Activities"
+        case project
+            echo "$HOME/Projects"
+        case vault
+            echo "$HOME/Vaults"
+        case '*'
+            _fail "Unknown folder kind: $kind"
+    end
+end
+
+function cmd_dirs --argument-names kind
+    set -l root (_kind_root $kind)
+    for d in $root/*/
+        test -d "$d"; or continue
+        printf '%s\t%s\n' (stat -c '%Y' "$d") (path basename "$d")
+    end | sort -t \t -k1,1nr | awk -F '\t' '{ print $2 "\t" $1 }' | _tsv_json name 'epoch#'
+end
+
+function cmd_linear
+    command -q linear; or begin
+        echo '[]'
+        return 0
+    end
+    begin
+        timeout 10 linear issue list -s started -s unstarted --json --no-input 2>/dev/null \
+            | jq -c '.[] | {kind: "issue", id: .identifier, label: "\(.identifier)  \(.title)"}' 2>/dev/null
+        timeout 10 linear project list --json --no-input 2>/dev/null \
+            | jq -c '.[] | select(.status.type | IN("backlog", "planned", "started", "paused"))
+                | {kind: "project", id: .slugId, label: "project: \(.name) (\(.status.name))"}' 2>/dev/null
+    end | jq -s -c .
+end
+
+# Writes .linear-context.md, which agents/hooks/linear-context.sh reads.
+function cmd_linear_context --argument-names dir project
+    set -l issues $argv[3..-1]
+    test "$project" = -; and set project ""
+    test (count $issues) -gt 0 -o -n "$project"; or return 0
+    test -e "$dir/.linear-context.md"; and return 0
+    begin
+        echo ---
+        echo linear:
+        test -n "$project"; and echo "  project: $project"
+        test (count $issues) -gt 0; and echo "  issues: ["(string join ', ' -- $issues)"]"
+        echo ---
+    end >"$dir/.linear-context.md"
+    echo '{}'
+end
+
+# --- Prepare ---
+
+function _prepare_workspace --argument-names repo_rel selected
+    set -l repo_path "$HOME/Code/$repo_rel"
+    test -d "$repo_path"; or _fail "No repo at $repo_path"
+    _ensure_jj_repo_ready "$repo_path"
+
+    set -l bookmark "$selected"
+    set -l remote_ref ""
+    if string match -q -- '*@origin' "$selected"
+        set bookmark (string replace -r '@origin$' '' -- "$selected")
+        set remote_ref "$selected"
+    end
+    string match -rq '^[A-Za-z0-9._/-]+$' -- "$bookmark"
+    or _fail "Invalid bookmark name: $bookmark"
+
+    set -l path "$workspace_base/$repo_rel/$bookmark"
+    set -l known (_jj_repo "$repo_path" workspace root --name "$bookmark" 2>/dev/null)
+    if test -n "$known"
+        if test -d "$known"
+            set path "$known"
+        else
+            _jj_repo "$repo_path" workspace forget "$bookmark" >/dev/null 2>&1
+        end
+    end
+
+    if test -d "$path"
+        jj --ignore-working-copy -R "$path" root >/dev/null 2>&1
+        or _fail "Path exists but is not a jj workspace: $path"
+        jj -R "$path" workspace update-stale >/dev/null 2>&1
+        or _fail "Failed to refresh stale workspace at $path"
+    else
+        set -l local_exists 0
+        _jj_repo "$repo_path" bookmark list "exact:$bookmark" -T 'name ++ "\n"' 2>/dev/null | string match -q -- "$bookmark"
+        and set local_exists 1
+        test -z "$remote_ref"; and test $local_exists -eq 0; and _has_rev "$repo_path" "$bookmark@origin"
+        and set remote_ref "$bookmark@origin"
+        if test -n "$remote_ref"; and not _has_rev "$repo_path" "$remote_ref"
+            cmd_fetch "$repo_rel" >/dev/null
+        end
+
+        set -l base_rev
+        if test -n "$remote_ref"
+            _has_rev "$repo_path" "$remote_ref"; or _fail "Missing remote bookmark $remote_ref"
+            set base_rev "$remote_ref"
+        else if test $local_exists -eq 1
+            set base_rev "$bookmark"
+        else
+            for rev in main@origin main @
+                _has_rev "$repo_path" $rev; and set base_rev $rev; and break
+            end
+        end
+
+        mkdir -p (path dirname "$path"); or _fail "Failed to create $(path dirname "$path")"
+        jj -R "$repo_path" workspace update-stale >/dev/null 2>&1
+        or _fail "Failed to refresh stale workspace in $repo_path"
+        set -l out (jj -R "$repo_path" workspace add --name "$bookmark" -r "$base_rev" \
+            --sparse-patterns full "$path" 2>&1)
+        or _fail "Failed to create workspace at $path: $out"
+        if test -n "$remote_ref"
+            jj --ignore-working-copy -R "$path" bookmark track "$bookmark" --remote=origin >/dev/null 2>&1
+        else if test $local_exists -eq 0
+            jj --ignore-working-copy -R "$path" bookmark set "$bookmark" -r @ >/dev/null 2>&1
+            or _fail "Failed to create bookmark $bookmark"
+        end
+    end
+
+    _record_repo_use "$repo_rel"
+    _trust "$path"
+    _emit_space "$path" (path basename "$repo_rel")"/$bookmark"
+end
+
+function cmd_prepare --argument-names kind name bookmark
+    test -n "$name"; or _fail "Missing name"
+    switch $kind
+        case workspace
+            test -n "$bookmark"; or _fail "Missing bookmark"
+            _prepare_workspace "$name" "$bookmark"
+        case code
+            set -l path "$HOME/Code/$name"
+            test -d "$path"; or _fail "No repo at $path"
+            _ensure_jj_repo_ready "$path"
+            _record_repo_use "$name"
+            _trust "$path"
+            _emit_space "$path" (string join / -- (string split / -- "$name")[-2..-1])
+        case activity project vault
+            string match -rq '^[^/]+$' -- "$name"; and test "$name" != . -a "$name" != ..
+            or _fail "Invalid folder name: $name"
+            set -l root (_kind_root $kind)
+            set -l path "$root/$name"
+            if not test -d "$path"
+                test $kind = vault; and _fail "No vault named $name"
+                if test $kind = project; and not string match -rq '^[0-9]{4}-[0-9]{2}-[0-9]{2}-' -- "$name"
+                    set name (date '+%Y-%m-%d')-$name
+                    set path "$root/$name"
+                end
+                mkdir -p "$path"; or _fail "Failed to create $path"
+            end
+            _trust "$path"
+            set -l label "$name"
+            test $kind = vault; and set label "Vaults/$name"
+            _emit_space "$path" "$label"
+        case '*'
+            _fail "Unknown kind: $kind"
+    end
+end
+
+# --- Close ---
+
+function _default_root --argument-names path
+    set -l root (_jj_repo "$path" workspace root --name default 2>/dev/null)
+    test -n "$root"; and realpath -m -- "$root"
+end
+
+# The workspace's own name, empty when it is not a jj workspace.
+function _workspace_name --argument-names path
+    _jj_repo "$path" workspace list \
+        -T 'if(self.target().current_working_copy(), self.name(), "") ++ "\n"' 2>/dev/null \
+        | string match -rv '^$' | head -n1
+end
+
+function cmd_workspaces
+    set -l base (realpath -m -- "$workspace_base")
+    # Each repo's jj workspaces, from its own list: walking ~/Workspaces is slow.
+    for repo_rel in (_repo_rels)
+        set -l repo_path "$HOME/Code/$repo_rel"
+        test -d "$repo_path/.jj"; or continue
+        _jj_repo "$repo_path" workspace list -T 'name ++ "\t" ++ root ++ "\n"' 2>/dev/null \
+            | while read -l -d \t name root
+            test "$name" != default; or continue
+            string match -q -- "$base/*" "$root"; and test -d "$root"; or continue
+            set -l changes (_jj_repo "$root" diff -r @ --summary 2>/dev/null | head -n 8)
+            # Bookmarks on @ or its parent, with whether origin has them.
+            set -l bookmarks (_jj_repo "$root" log --no-graph -r '@ | @-' \
+                -T 'local_bookmarks.map(|b| b.name() ++ "\t" ++ if(b.synced(), "1", "0") ++ "\n").join("")' 2>/dev/null)
+            jq -n -c --arg path "$root" --arg repo "$repo_rel" --arg name "$name" \
+                --argjson epoch (stat -c '%Y' "$root") \
+                --argjson changes (printf '%s\n' $changes | jq -R -s -c 'split("\n") | map(select(length > 0))') \
+                --argjson bookmarks (printf '%s\n' $bookmarks | _tsv_json name 'synced?') \
+                '{path: $path, repo: $repo, name: $name, epoch: $epoch, changes: $changes, bookmarks: $bookmarks}'
+        end
+    end | jq -s -c 'sort_by(-.epoch)'
+end
+
+function cmd_remove --argument-names target
+    test -n "$target"; or _fail "Missing path"
+    set -l base (realpath -m -- "$workspace_base")
+    set -l path (realpath -m -- "$target")
+    string match -q -- "$base/*" "$path"; or _fail "Refusing to remove a path outside $base."
+    set -l name (_workspace_name "$path")
+    test -n "$name"; or _fail "Not a jj workspace: $path"
+    set -l root (_default_root "$path")
+    test -n "$root"; or _fail "Could not find the default checkout for $name."
+    test "$name" != default -a "$root" != "$path"; or _fail "Refusing to remove the default jj workspace."
+
+    # Snapshot first: changes on disk land in the working-copy commit, which
+    # stays in the repo after forget.
+    set -l out (jj -R "$path" status --no-pager 2>&1)
+    or _fail "Could not snapshot $name: $out. Nothing was removed."
+    set -l commit (_jj_repo "$path" log -r @ --no-graph -T 'if(empty, "", change_id.short())' 2>/dev/null)
+    set out (_jj_repo "$root" workspace forget "$name" 2>&1)
+    or _fail "Failed to forget jj workspace $name: $out. Nothing was removed."
+    gio trash "$path"
+    or _fail "Forgot jj workspace $name, but could not trash $path. Remove it by hand."
+    jq -n -c --arg name "$name" --arg commit "$commit" '{name: $name, kept: $commit}'
+end
+
+switch "$argv[1]"
+    case repos
+        cmd_repos
+    case bookmarks
+        cmd_bookmarks $argv[2]
+    case fetch
+        cmd_fetch $argv[2]
+    case dirs
+        cmd_dirs $argv[2]
+    case prepare
+        cmd_prepare $argv[2..-1]
+    case linear
+        cmd_linear
+    case linear-context
+        cmd_linear_context $argv[2..-1]
+    case workspaces
+        cmd_workspaces
+    case remove
+        cmd_remove $argv[2]
+    case '*'
+        _fail "Usage: herdr-space repos|bookmarks|fetch|dirs|prepare|linear|linear-context|workspaces|remove"
+end
