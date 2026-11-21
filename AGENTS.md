@@ -97,6 +97,10 @@
     checksums from the upstream release manifests. Separate from the Herdr TUI
     (`herdr`): the two keep their own terminals, key bindings and machine
     lists. herdr-core sees its mise install path and leaves updates to mise.
+    `herdr:setup-core` links `hc` and `herdr-core` in `~/.local/bin` to the
+    pinned core (the app looks there before the mise shims) and warns when a
+    running core is stale. Run `hc server restart` by hand at a safe point;
+    terminals survive it, attached streams reattach.
     The app still updates itself in place, so it can run ahead of `mise.lock`.
     Track these upstream issues and drop this caveat when one ships:
     - [herdrdev/herdr-app#459](https://github.com/herdrdev/herdr-app/pull/459)
