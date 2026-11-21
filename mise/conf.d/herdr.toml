@@ -1,3 +1,7 @@
+[vars]
+# Tailscale peers that run no herdr-core (space-separated host names).
+herdr_skip_machines = "odsod-hx99g"
+
 [dotfiles]
 "~/.config/herdr-app/settings.json/repo" = { source = "../../herdr/app/settings.json", merge = "missing" }
 "~/.config/herdr-app/keys.json/repo" = { source = "../../herdr/app/keys.json", merge = "missing" }
@@ -22,6 +26,7 @@
 [tasks."herdr:sync-machines"]
 description = "Save missing Tailscale peers as Herdr machines"
 depends = ["herdr:setup-core"]
+env = { HERDR_SKIP_MACHINES = "{{vars.herdr_skip_machines}}" }
 run = 'exec "$REPO_DIR/herdr/setup-machines.sh"'
 
 [tasks."herdr:setup-core"]

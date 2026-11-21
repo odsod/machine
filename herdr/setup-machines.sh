@@ -16,7 +16,10 @@ if [ "$backend_state" != "Running" ]; then
   exit 0
 fi
 
-peers="$(jq -r '
+# Peers in HERDR_SKIP_MACHINES (space-separated) run no herdr-core: a media
+# server, say. Skip them, or every apply warns that they could not be added.
+peers="$(jq -r --arg skip "${HERDR_SKIP_MACHINES:-}" '
+  ($skip | split(" ") | map(select(. != ""))) as $skipped |
   .Self as $self |
   (.Peer // {})[] |
   select(
@@ -25,7 +28,8 @@ peers="$(jq -r '
     (.OS == "linux" or .OS == "darwin") and
     .HostName != null and
     .HostName != "" and
-    .HostName != $self.HostName
+    .HostName != $self.HostName and
+    (.HostName as $h | $skipped | index($h) | not)
   ) |
   .HostName
 ' <<<"$status_json" | sort -u)"
