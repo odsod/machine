@@ -6,6 +6,7 @@
   "appearance": "dark",
   "font": "Iosevka SS08",
   "font_size": 14,
+  "font_weight": 400,
   "ui_font": "Inter",
   "font_ligatures": false,
   "clipboard_write": true,
