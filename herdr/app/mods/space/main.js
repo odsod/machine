@@ -11,7 +11,8 @@
 // confirm: the same for the current space, as a small yes/no dialog.
 //
 // `herdr-space` (in `herdr/`) does the work on the chosen machine; this mod
-// only draws lists and runs space.new / space.select / space.close.
+// only draws lists and runs space.close. Start runs `herdr-space start` here,
+// the same command agents use.
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, Input, InputState, ScrollHandle } from "gpui-base";
 import {
@@ -29,12 +30,7 @@ import {
 } from "herdr";
 
 const TYPES = ["Workspace", "Code", "Activity", "Project", "Vault"];
-const AGENTS = [
-  ["claude", ["claude"]],
-  ["codex", ["codex", "--dangerously-bypass-hook-trust"]],
-  ["agy", ["agy"]],
-  ["pi", ["pi"]],
-];
+const AGENTS = ["claude", "codex", "agy", "pi"];
 const MAX_ROWS = 200;
 const PLACEHOLDERS = {
   first: "Type to filter",
@@ -80,10 +76,7 @@ export default class Space extends View {
     this.confirm = Boolean(props()?.confirm);
     this.tab = this.confirm || props()?.tab === "close" ? "close" : "start";
     this.type = Math.max(0, TYPES.indexOf(localStorage.getItem("type")));
-    this.agent = Math.max(
-      0,
-      AGENTS.findIndex(([n]) => n === localStorage.getItem("agent")),
-    );
+    this.agent = Math.max(0, AGENTS.indexOf(localStorage.getItem("agent")));
     this.localName = "this computer";
     this.machine =
       this.tab === "close"
@@ -300,7 +293,7 @@ export default class Space extends View {
       this.at = 0;
     } else if (what === "agent" && this.tab === "start") {
       this.agent = (this.agent + by + AGENTS.length) % AGENTS.length;
-      localStorage.setItem("agent", AGENTS[this.agent][0]);
+      localStorage.setItem("agent", AGENTS[this.agent]);
     } else return;
     this.error = "";
     this.load(cx);
@@ -386,25 +379,18 @@ export default class Space extends View {
     const type = TYPES[this.type];
     const args =
       type === "Workspace"
-        ? ["prepare", "workspace", this.repo, this.bookmark]
-        : ["prepare", type.toLowerCase(), this.target];
-    const picked = linearRows.filter((r) => this.marks.has(r.key)).map((r) => r.item);
-    const project = picked.find((l) => l.kind === "project")?.id ?? "-";
-    const issues = picked.filter((l) => l.kind === "issue").map((l) => l.id);
-    const on = this.machine;
-    const argv = AGENTS[this.agent][1];
+        ? ["start", "workspace", this.repo, this.bookmark]
+        : ["start", type.toLowerCase(), this.target];
+    args.push("--agent", AGENTS[this.agent], "--focus");
+    if (this.machine) args.push("--on", this.machine);
+    for (const r of linearRows.filter((r) => this.marks.has(r.key)))
+      args.push(r.item.kind === "project" ? "--linear-project" : "--linear-issue", r.item.id);
     this.busy = true;
     this.error = "";
     cx.notify();
     cx.spawn(async (cx) => {
       try {
-        const { path, label } = await helper(args, on, 120_000);
-        if (picked.length) await helper(["linear-context", path, project, ...issues], on);
-        const existing = spaces().find(
-          (s) => (s.machine ?? null) === (on ?? null) && s.folder === path,
-        );
-        if (existing) run("space.select", { id: existing.id });
-        else run("space.new", { name: label, folder: path, machine: on ?? "", argv });
+        await helper(args, null, 150_000);
         this.close();
       } catch (error) {
         this.error = String(error.message ?? error);
@@ -634,7 +620,7 @@ export default class Space extends View {
       .child(word("·  on"))
       .child(value("machine", this.machineLabel(this.machine)))
       .child(word("·  with"))
-      .child(value("agent", AGENTS[this.agent][0]));
+      .child(value("agent", AGENTS[this.agent]));
   }
 
   list(t) {

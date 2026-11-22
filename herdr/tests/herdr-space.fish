@@ -81,4 +81,34 @@ test -d "$HOME/Projects/$project"; or fail "project folder missing"
 run_helper prepare vault nope >/dev/null 2>&1; and fail "prepare made a vault"
 run_helper dirs project | jq -e --arg n "$project" '.[0].name == $n' >/dev/null; or fail "dirs does not list $project"
 
+# start: prepare, then a new unfocused space with the agent and its task
+printf '%s\n' "#!$real_fish --no-config" \
+    'test "$argv[1]" = ls; and begin; cat '"$test_root/spaces.json"'; exit 0; end' \
+    'printf "%s\n" $argv >'"$test_root/app-args" >"$stub_bin/herdr-app"
+chmod +x "$stub_bin/herdr-app"
+echo '{"spaces":[]}' >"$test_root/spaces.json"
+set out (run_helper start workspace "$repo_rel" feat-y --agent codex --prompt "Fix it"); or fail "start failed"
+set -l ws_y "$HOME/Workspaces/$repo_rel/feat-y"
+printf '%s' "$out" | jq -e --arg p "$ws_y" '.path == $p' >/dev/null; or fail "start printed $out"
+set -l app_args (cat "$test_root/app-args")
+test "$app_args" = "do space.new --name repo/feat-y --folder $ws_y --machine  --argv [\"codex\",\"--dangerously-bypass-hook-trust\"] --focus false --task Fix it"
+or fail "start ran herdr-app $app_args"
+
+# start refuses a folder that already has a space, and an unknown agent
+jq -n -c --arg f "$ws_y" '{spaces: [{id: "sp1", folder: $f}]}' >"$test_root/spaces.json"
+run_helper start workspace "$repo_rel" feat-y >/dev/null 2>&1; and fail "start made a second space"
+run_helper start workspace "$repo_rel" feat-z --agent nope >/dev/null 2>&1; and fail "start accepted an unknown agent"
+
+# start --focus shows the existing space instead
+run_helper start workspace "$repo_rel" feat-y --focus >/dev/null; or fail "start --focus failed on an existing space"
+test "$(string join -- " " (cat "$test_root/app-args"))" = "do space.select --id sp1"; or fail "start --focus did not show sp1"
+
+# start writes the Linear context and focuses a new space
+echo '{"spaces":[]}' >"$test_root/spaces.json"
+run_helper start code "$repo_rel" --focus --linear-project proj --linear-issue ENG-1 --linear-issue ENG-2 >/dev/null
+or fail "start code failed"
+string match -q -- "*--focus true*" (string join -- " " (cat "$test_root/app-args")); or fail "start --focus made an unfocused space"
+grep -q 'issues: \[ENG-1, ENG-2\]' "$repo/.linear-context.md"; or fail "start wrote no Linear issues"
+grep -q 'project: proj' "$repo/.linear-context.md"; or fail "start wrote no Linear project"
+
 echo "ok"

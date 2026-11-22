@@ -13,6 +13,13 @@
 #   herdr-space workspaces                [{path, repo, name, epoch, changes, bookmarks}]
 #                                         newest first; repo is relative to ~/Code
 #   herdr-space remove <path>             forgets the jj workspace, trashes its folder
+#   herdr-space start <kind> <name> [<bookmark>] [--agent <a>] [--prompt <text>] [--on <machine>]
+#                     [--focus] [--linear-project <id>] [--linear-issue <id>]...
+#                                         prepare, then a new space running the agent
+#                                         (claude, codex, agy or pi) with the prompt as
+#                                         its first task; prints {path, label}. With
+#                                         --focus it shows the space, and shows an
+#                                         existing one for the folder instead of failing
 #
 # <kind> is workspace, code, activity, project or vault. <repo> and <name> for
 # workspace and code are relative to ~/Code: <host>/<org>/<repo>.
@@ -302,6 +309,66 @@ function cmd_prepare --argument-names kind name bookmark
     end
 end
 
+# --- Start ---
+
+# What Ctrl+U Ctrl+T does, in one call: the space mod runs it, and so can any
+# agent. Runs where the Herdr app is; with --on, the folder is made on that
+# machine.
+function cmd_start
+    argparse -n herdr-space 'agent=' 'prompt=' 'on=' focus 'linear-project=' 'linear-issue=+' -- $argv
+    or exit 1
+    set -l agent claude
+    set -q _flag_agent; and set agent $_flag_agent
+    set -l argv_json
+    switch $agent
+        case claude agy pi
+            set argv_json (jq -n -c --arg a $agent '[$a]')
+        case codex
+            set argv_json '["codex","--dangerously-bypass-hook-trust"]'
+        case '*'
+            _fail "Unknown agent: $agent (claude, codex, agy or pi)"
+    end
+    set -l on ""
+    set -q _flag_on; and set on $_flag_on
+
+    # Run a herdr-space subcommand where the folder is.
+    function _there -V on
+        if test -n "$on"
+            hc exec --on "$on" --timeout 120 herdr-space $argv
+        else
+            set -l cmd cmd_(string replace -a - _ $argv[1])
+            $cmd $argv[2..-1]
+        end
+    end
+
+    set -l out (_there prepare $argv); or exit 1
+    set -l path (printf '%s' "$out" | jq -r .path)
+    set -l label (printf '%s' "$out" | jq -r .label)
+
+    if set -q _flag_linear_project; or set -q _flag_linear_issue
+        set -l project -
+        set -q _flag_linear_project; and set project $_flag_linear_project
+        _there linear-context "$path" "$project" $_flag_linear_issue >/dev/null; or exit 1
+    end
+
+    set -l existing (herdr-app ls | jq -r --arg f "$path" --arg m "$on" \
+        '.spaces[] | select(.folder == $f and (.machine // "") == $m) | .id' | head -n1)
+    if test -n "$existing"
+        set -q _flag_focus
+        or _fail "Space $existing already runs in $path. Use hc send to reach its agent."
+        herdr-app do space.select --id "$existing" >/dev/null; or _fail "herdr-app could not show $existing"
+        printf '%s\n' "$out"
+        return 0
+    end
+
+    set -l focus false
+    set -q _flag_focus; and set focus true
+    set -l args space.new --name "$label" --folder "$path" --machine "$on" --argv "$argv_json" --focus $focus
+    set -q _flag_prompt; and set -a args --task "$_flag_prompt"
+    herdr-app do $args >/dev/null; or _fail "herdr-app could not start the space"
+    printf '%s\n' "$out"
+end
+
 # --- Close ---
 
 function _default_root --argument-names path
@@ -381,6 +448,8 @@ switch "$argv[1]"
         cmd_workspaces
     case remove
         cmd_remove $argv[2]
+    case start
+        cmd_start $argv[2..-1]
     case '*'
-        _fail "Usage: herdr-space repos|bookmarks|fetch|dirs|prepare|linear|linear-context|workspaces|remove"
+        _fail "Usage: herdr-space repos|bookmarks|fetch|dirs|prepare|start|linear|linear-context|workspaces|remove"
 end

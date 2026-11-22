@@ -58,6 +58,11 @@ Your address is `$HC_TERMINAL_ID`. `herdr-app` changes what the user sees;
 - New tab: `herdr-app do tab.new --space <your space> --name <name> --argv '[...]'`.
   Always pass `--space`: the default is the selected space, often not yours.
   Open tabs and splits only when asked. Close them with `tab.close --id <id> --confirmed true`.
+- Fork work into its own space and agent:
+  `herdr-space start workspace <host>/<org>/<repo> <bookmark> --prompt "<task>"`
+  (also `--agent codex|agy|pi`, `--on <machine>`). It makes the jj workspace
+  and starts the agent there without moving the user. Other kinds take a
+  name only: `code <host>/<org>/<repo>`, `activity|project|vault <name>`.
 - See the window yourself: `herdr-app shot /tmp/shot.png`, then read the PNG.
 - Never stop or restart a core or the app unless asked. Never start a core from an agent shell:
   its terminals would inherit your shell's environment.
