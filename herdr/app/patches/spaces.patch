@@ -1,14 +1,119 @@
 --- a/main.js
 +++ b/main.js
-@@ -492,7 +492,6 @@
+@@ -33,6 +33,16 @@
+ const railCell = (el) => h_flex().flex_none().justify_center().child(el);
+ const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
+ const base = (path) => path.replace(/\/+$/, "").split("/").pop();
++// odsod: ~/Code/<host>/<org>/<repo> is a repo's original checkout and
++// ~/Workspaces/<host>/<org>/<repo>/<name> its workspaces. Both group under the
++// repo, keyed by the folder the space was made in, so no git look is needed.
++const ROOT = /^(.*)\/(Code|Workspaces)\/([^/]+\/[^/]+\/[^/]+)(?:\/(.+))?$/;
++function root(s) {
++  const m = ROOT.exec((s.folder ?? "").replace(/\/+$/, ""));
++  if (!m || (m[2] === "Code") === Boolean(m[4])) return null;
++  const machine = s.machine ?? null;
++  return { key: JSON.stringify([machine, m[3]]), machine, code: `${m[1]}/Code/${m[3]}`, label: m[3].split("/").slice(1).join("/"), rest: m[4] ?? null };
++}
+ // Changes made outside Herdr (an editor's save, a commit in another app): looked
+ // for this often, in repos the list shows, while the window is in front.
+ const FALLBACK = 60000;
+@@ -300,19 +310,22 @@
+     const sp = spaces(), ps = panes();
+     const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
+     for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
+-    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null }));
+-    const mains = new Set(list.filter((r) => r.g && !r.g.linked).map((r) => r.g.repo));
+-    const nested = (r) => r.g?.linked && mains.has(r.g.repo);
+-    const out = [];
+-    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
++    // odsod: group by root() instead of git: the original checkout's space, or a
++    // header standing in for it, then its workspaces.
++    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w) }));
++    const all = [];
++    const placed = new Set();
+     for (const r of list) {
+-      if (nested(r)) continue;
+-      out.push({ ...r, tree: null });
+-      if (!r.g || r.g.linked || placed.has(r.g.repo)) continue;
+-      placed.add(r.g.repo);
+-      const kids = list.filter((k) => nested(k) && k.g.repo === r.g.repo);
+-      kids.forEach((k, n) => out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
++      if (!r.root) { all.push({ ...r, tree: null }); continue; }
++      if (placed.has(r.root.key)) continue;
++      placed.add(r.root.key);
++      const group = list.filter((k) => k.root?.key === r.root.key);
++      const main = group.find((k) => !k.root.rest);
++      const kids = group.filter((k) => k !== main);
++      all.push(main ? { ...main, tree: null } : { head: r.root, w: { id: `root:${r.root.key}`, machine: r.root.machine } });
++      kids.forEach((k, n) => all.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
+     }
++    const out = all.filter((r) => !r.head);
+     // Simulate the batch so later indexes include earlier moves. An attempted
+     // write can lose a sync conflict: allow the echo to settle before retrying.
+     const order = sp.map(w => w.id);
+@@ -332,13 +345,15 @@
+       }
+       this.ordering.machines = [...moved];
+     }
+-    return out.filter(r => this.shown.has(r.w.id));
++    // odsod: headers stay in the list only above a workspace that is shown.
++    const shown = all.filter(r => r.head || this.shown.has(r.w.id));
++    return shown.filter((r, n) => !r.head || shown[n + 1]?.tree);
+   }
+ 
+   // The rows, under a header per machine once one isn't this computer.
+   grouped(t, collapsed) {
+     const rows = this.ordered();
+-    const draw = (r) => (collapsed ? this.compact(r, t) : this.row(r, t));
++    const draw = (r) => (r.head ? this.head(r, t, collapsed) : collapsed ? this.compact(r, t) : this.row(r, t)); // odsod: head
+     // Where the active space's row lands among the children this returns: the list scrolls by its direct
+     // children, and machine headers, login notes and loading rows count too.
+     this.activeAt = -1;
+@@ -425,7 +440,7 @@
+   gitTail(g, tree, name, t) {
+     const raw = g.branch ?? "detached";
+     const same = (a) => a.toLowerCase() === name.toLowerCase();
+-    const branch = same(raw) || raw === "master" || raw === "main" ? "" : raw;
++    const branch = same(raw) || raw === "master" || raw === "main" || raw === "(detached)" ? "" : raw; // odsod: jj workspaces are always detached
+     const repo = tree || same(g.name) ? "" : g.name;
+     const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
+     return h_flex()
+@@ -441,7 +456,8 @@
+       .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
+   }
+ 
+-  row({ w, i, g, tree }, t) {
++  row({ w, i, g, tree, root }, t) {
++    const label = root?.rest ?? w.name; // odsod: a workspace goes by its folder under the repo
+     const on = w.active;
+     const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
+     const colors = shared("space.colors") ?? {};
+@@ -492,12 +508,21 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
 -          .when(!tree, el => el.child(h_flex().size(18).flex_none().rounded(5).bg(fill).items_center().justify_center().text_size(10.5).font_bold().text_color("#ffffff").child([...w.name][0]?.toUpperCase() ?? "?")))
-           .child(div().flex_initial().min_w(SIDE_MIN).truncate().text_color(t.foreground).child(w.name))
-           .child(g ? this.gitTail(g, tree, w.name, t) : div().flex_1()),
+-          .child(div().flex_initial().min_w(SIDE_MIN).truncate().text_color(t.foreground).child(w.name))
+-          .child(g ? this.gitTail(g, tree, w.name, t) : div().flex_1()),
++          .child(div().flex_initial().min_w(SIDE_MIN).truncate().text_color(t.foreground).child(label))
++          .child(g ? this.gitTail(g, tree || root, label, t) : div().flex_1()),
        );
-@@ -537,7 +536,7 @@
+   }
+ 
++  // odsod: stands in for a repo's original checkout while no space shows it. A
++  // click opens it, named as the space mod names it.
++  head({ head }, t, collapsed) {
++    if (collapsed) return div().id(`root-${head.key}`).h(6).flex_none();
++    return h_flex().id(`root-${head.key}`).px(8).h(30).flex_none().items_center().rounded(8)
++      .cursor_pointer().hover((s) => s.bg(t.hover)).tooltip(`Open ${head.code}`)
++      .on_click(() => run("space.new", { name: head.label, folder: head.code, machine: head.machine ?? "" }))
++      .child(div().min_w(0).truncate().text_color(t.muted).child(head.label));
++  }
++
+   compact({ w, i }, t) {
+     return railCell(h_flex()
+       .id(`space-${w.id}`)
+@@ -537,7 +562,7 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
