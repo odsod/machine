@@ -73,11 +73,5 @@ if [ -x "/usr/bin/ksshaskpass" ]; then
   export SSH_ASKPASS_REQUIRE="prefer"
 fi
 
-# va-api: pick the driver per host. Unlisted hosts let libva choose.
-case "$(uname -n)" in
-odsod-desktop) export LIBVA_DRIVER_NAME=radeonsi ;;
-odsod-x1-carbon) export LIBVA_DRIVER_NAME=iHD ;;
-esac
-
 # machine
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
