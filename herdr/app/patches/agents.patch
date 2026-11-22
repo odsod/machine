@@ -1,5 +1,14 @@
 --- a/main.js
 +++ b/main.js
+@@ -2,7 +2,7 @@
+ 
+ import { View, div, image, svg } from "gpui-kit";
+ import { v_flex, h_flex } from "gpui-base";
+-import { agents, terminals, panes, focused, spaces, run, theme, shared, setShared, setAgentOrder, openOverlay, closeOverlay, props, window, layout } from "herdr";
++import { agents, exec, terminals, panes, focused, spaces, run, theme, shared, setShared, setAgentOrder, openOverlay, closeOverlay, props, window, layout } from "herdr";
+ 
+ function find(node, id) {
+   if (node?.id === id) return node;
 @@ -60,9 +60,30 @@
    { id: "priority", label: "Priority", icon: "clock" },
    { id: "grouped", label: "Grouped by space", icon: "layers" },
@@ -41,7 +50,16 @@
    return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
  }
  
-@@ -237,7 +258,20 @@
+@@ -82,6 +103,8 @@
+   init(_props, cx) {
+     if (props()?.sortMenu) return;
+     this.folded = new Set();
++    this.hostname = null; // odsod: this computer's agents name it too (as in odsod-spaces)
++    cx.spawn(async (cx) => { try { const r = await exec("uname", ["-n"]); if (r.code === 0) { this.hostname = r.stdout.trim(); cx.notify(); } } catch {} });
+     // Each agent's last state and when it changed (ms), kept across restarts.
+     try { this.changed = JSON.parse(localStorage.getItem("changed") ?? "{}"); } catch { this.changed = {}; }
+     if (!this.changed || typeof this.changed !== "object" || Array.isArray(this.changed)) this.changed = {};
+@@ -237,7 +260,20 @@
      const byPriority = sort.id === "priority";
      const urgency = new Map(list.map((a) => [a.address, Math.max(this.rank(a), ...this.tree(all, a.address).map((s) => RANK[kidStatus(s.t, this.listed)] ?? 0))]));
      const rankOf = (a) => urgency.get(a.address);
@@ -62,7 +80,7 @@
      const pinned = list.filter((a) => a.pinned);
      const rest = list.filter((a) => !a.pinned);
      list = [...pinned, ...rest];
-@@ -280,7 +314,7 @@
+@@ -280,7 +316,7 @@
      // agent's own title, never an automatic tab number unless two rows would
      // otherwise read the same.
      // Read the pane snapshot once: every host read copies the whole list into JS.
@@ -71,7 +89,16 @@
      const tabs = new Map(spaces().flatMap(s => s.tabs).map(tab => [tab.id, tab]));
      const labels = new Map(list.map(a => {
        const tab = tabs.get(a.tab);
-@@ -335,12 +369,14 @@
+@@ -299,7 +335,7 @@
+       const pic = icon(a.program, 16, t.foreground);
+       const more = detail.get(a.address);
+       // An agent on another machine (`vps/t7`) says which.
+-      const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
++      const machine = a.address.includes("/") ? a.address.split("/")[0] : this.hostname; // odsod: this computer too
+       if (collapsed) {
+         return h_flex()
+           .id(`ag-${a.address}`)
+@@ -335,12 +371,14 @@
          .child(svg(`mods/workspace-chrome/${isPinned ? "pin-off" : "pin"}.svg`).size(13));
        // Under a space header the space goes without saying; an automatic tab number says nothing.
        // Without a space header above (priority, pinned) the row names its space.
@@ -89,7 +116,7 @@
          .flex_none()
          .rounded(8)
          .items_center()
-@@ -361,9 +397,9 @@
+@@ -361,9 +399,9 @@
              cx.notify();
            })).child(pic)))
          .child(h_flex().flex_1().min_w(0).gap(5).items_center()
@@ -102,7 +129,7 @@
          .when(subs.length > 0, el => el.child(fold(a, subs)))
          .when(this.hovered === a.address, el => el.child(pin))
          .when(this.hovered !== a.address && Boolean(when), el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(duration(now - when))))
-@@ -375,9 +411,9 @@
+@@ -375,9 +413,9 @@
      const groups = pinned.length ? [{ id: "pinned", label: "Pinned", status: null, members: pinned }] : [];
      for (const a of rest) {
        const r = rankOf(a) || RANK.idle;
@@ -114,7 +141,7 @@
      }
  
      // A group's header; it folds the group. Folded, it says how many and the most urgent state.
-@@ -407,9 +443,22 @@
+@@ -407,9 +445,22 @@
            .when(!byPriority && top && top !== "idle", (el) => el.child(this.status(t, { status: top }, true)))
            .child(svg("mods/workspace-chrome/chevron-right.svg").size(11).flex_none().text_color(t.dim)));
      };
@@ -122,7 +149,7 @@
 +    const places = (g) => g.members.reduce((out, a) => {
 +      const k = placeOf(a);
 +      if (out.at(-1)?.k === k) out.at(-1).members.push(a);
-+      else out.push({ k, label: roots.get(a.space)?.label ?? (a.space_name || ""), machine: a.address.includes("/") ? a.address.split("/")[0] : null, members: [a] });
++      else out.push({ k, label: roots.get(a.space)?.label ?? (a.space_name || ""), machine: a.address.includes("/") ? a.address.split("/")[0] : this.hostname, members: [a] }); // odsod: this computer too
 +      return out;
 +    }, []);
 +    const placeHeader = (g, p, n) => h_flex().id(`${g.id}:${p.k}`).px(8).h(ROW.place).when(n > 0, (el) => el.mt(ROW.placeGap)).flex_none().items_center()
@@ -138,7 +165,7 @@
  
      return v_flex()
        .size_full()
-@@ -417,34 +466,12 @@
+@@ -417,34 +468,12 @@
        .bg(t.chrome)
        .border_t(1)
        .border_color(t.border)
