@@ -35,6 +35,7 @@ Prefer: `rg` not grep, `fd` not find, `uv` not pip, `oxfmt` for JS/TS/JSON/YAML/
 PDFs: `pdftotext` for text, `pdftoppm` + `tesseract` for OCR.
 Show the user an image: `chafa -f kitty <png>` in a new Herdr tab
 (`herdr-app do tab.new`). Bash output never renders images.
+Phone camera photos: `/nfs/media/Photos/Oscar's Pixel 9 Pro/` (Syncthing to NAS, NFS automount).
 
 Web: `defuddle parse <url> --md --frontmatter -l en` first.
 Interactive/auth: `agent-browser-odsod connect`, then `agent-browser open|read|click`.
