@@ -1,23 +1,28 @@
 --- a/main.js
 +++ b/main.js
-@@ -33,6 +33,16 @@
+@@ -33,6 +33,21 @@
  const railCell = (el) => h_flex().flex_none().justify_center().child(el);
  const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
  const base = (path) => path.replace(/\/+$/, "").split("/").pop();
 +// odsod: ~/Code/<host>/<org>/<repo> is a repo's original checkout and
 +// ~/Workspaces/<host>/<org>/<repo>/<name> its workspaces. Both group under the
 +// repo, keyed by the folder the space was made in, so no git look is needed.
++// A space made elsewhere (at ~) goes by where its first terminal is now
++// (`cwd`), anywhere in a checkout.
 +const ROOT = /^(.*)\/(Code|Workspaces)\/([^/]+\/[^/]+\/[^/]+)(?:\/(.+))?$/;
-+function root(s) {
-+  const m = ROOT.exec((s.folder ?? "").replace(/\/+$/, ""));
-+  if (!m || (m[2] === "Code") === Boolean(m[4])) return null;
++function root(s, cwd) {
 +  const machine = s.machine ?? null;
-+  return { key: JSON.stringify([machine, m[3]]), machine, code: `${m[1]}/Code/${m[3]}`, label: m[3].split("/").slice(1).join("/"), rest: m[4] ?? null };
++  const at = (path, loose) => {
++    const m = ROOT.exec((path ?? "").replace(/\/+$/, ""));
++    if (!m || (m[2] === "Workspaces" && !m[4]) || (m[2] === "Code" && m[4] && !loose)) return null;
++    return { key: JSON.stringify([machine, m[3]]), machine, code: `${m[1]}/Code/${m[3]}`, label: m[3].split("/").slice(1).join("/"), rest: m[2] === "Code" ? null : m[4] };
++  };
++  return at(s.folder, false) ?? at(cwd, true);
 +}
  // Changes made outside Herdr (an editor's save, a commit in another app): looked
  // for this often, in repos the list shows, while the window is in front.
  const FALLBACK = 60000;
-@@ -300,19 +310,22 @@
+@@ -300,19 +315,22 @@
      const sp = spaces(), ps = panes();
      const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
      for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
@@ -28,7 +33,7 @@
 -    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
 +    // odsod: group by root() instead of git: the original checkout's space, or a
 +    // header standing in for it, then its workspaces.
-+    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w) }));
++    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w, place(w, ps)) }));
 +    const all = [];
 +    const placed = new Set();
      for (const r of list) {
@@ -51,7 +56,7 @@
      // Simulate the batch so later indexes include earlier moves. An attempted
      // write can lose a sync conflict: allow the echo to settle before retrying.
      const order = sp.map(w => w.id);
-@@ -332,13 +345,15 @@
+@@ -332,13 +350,15 @@
        }
        this.ordering.machines = [...moved];
      }
@@ -69,7 +74,7 @@
      // Where the active space's row lands among the children this returns: the list scrolls by its direct
      // children, and machine headers, login notes and loading rows count too.
      this.activeAt = -1;
-@@ -425,7 +440,7 @@
+@@ -425,7 +445,7 @@
    gitTail(g, tree, name, t) {
      const raw = g.branch ?? "detached";
      const same = (a) => a.toLowerCase() === name.toLowerCase();
@@ -78,17 +83,17 @@
      const repo = tree || same(g.name) ? "" : g.name;
      const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
      return h_flex()
-@@ -441,7 +456,8 @@
+@@ -441,7 +461,8 @@
        .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
    }
  
 -  row({ w, i, g, tree }, t) {
 +  row({ w, i, g, tree, root }, t) {
-+    const label = root?.rest ?? w.name; // odsod: a workspace goes by its folder under the repo
++    const label = root ? (root.rest ?? root.label) : w.name; // odsod: by its folder: <org>/<repo> or the workspace
      const on = w.active;
      const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
      const colors = shared("space.colors") ?? {};
-@@ -492,12 +508,21 @@
+@@ -492,12 +513,21 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
@@ -113,7 +118,7 @@
    compact({ w, i }, t) {
      return railCell(h_flex()
        .id(`space-${w.id}`)
-@@ -537,7 +562,7 @@
+@@ -537,7 +567,7 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
