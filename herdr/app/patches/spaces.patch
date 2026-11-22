@@ -74,7 +74,15 @@
      // Where the active space's row lands among the children this returns: the list scrolls by its direct
      // children, and machine headers, login notes and loading rows count too.
      this.activeAt = -1;
-@@ -425,7 +445,7 @@
+@@ -367,6 +387,7 @@
+       const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
+       const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
+       const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
++        .when(!collapsed, el => el.mt(24)) // odsod: as above each section in odsod-agents
+         .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
+         .cursor_pointer().hover(s => s.bg(t.hover))
+         .on_click((_e, cx) => {
+@@ -425,7 +446,7 @@
    gitTail(g, tree, name, t) {
      const raw = g.branch ?? "detached";
      const same = (a) => a.toLowerCase() === name.toLowerCase();
@@ -83,7 +91,7 @@
      const repo = tree || same(g.name) ? "" : g.name;
      const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
      return h_flex()
-@@ -441,7 +461,8 @@
+@@ -441,7 +462,8 @@
        .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
    }
  
@@ -93,7 +101,7 @@
      const on = w.active;
      const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
      const colors = shared("space.colors") ?? {};
-@@ -492,12 +513,21 @@
+@@ -492,12 +514,21 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
@@ -118,7 +126,7 @@
    compact({ w, i }, t) {
      return railCell(h_flex()
        .id(`space-${w.id}`)
-@@ -537,12 +567,13 @@
+@@ -537,13 +568,14 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
@@ -131,7 +139,9 @@
          .when(!collapsed, el => el.child("Spaces"))
          .child(div().id("space-new").size(26).flex_none().flex().items_center().justify_center().rounded(6).hover(s => s.bg(t.hover).text_color(t.foreground))
 -          .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14))))
+-      .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
 +          .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14)))))
-       .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
++      .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pt(collapsed ? 0 : 8) /* odsod: no row above */.pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
          // A block above (another mod's) growing, or the window resizing, shrinks this list and can push the active space out.
          .on_size_change((_size, cx) => { if (this.activeAt >= 0) { this.scroll.scroll_to_item(this.activeAt); cx.notify(); } })
+         .on_mouse_up("left", (_e, cx) => { this.pressed = null; cx.notify(); })

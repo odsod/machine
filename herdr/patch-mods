@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Rebuild odsod-<mod> from each shipped Herdr app mod plus
 # $HERDR_MOD_PATCHES/<mod>.patch, and the odsod-main layout from the shipped
-# main layout with those mods swapped in. The app rewrites its shipped files on
+# main layout with those mods swapped in, then filtered by
+# $HERDR_MOD_PATCHES/layout.jq if it exists. The app rewrites its shipped files on
 # every start, so each run picks up upstream changes. A patch that no longer
 # applies fails the run and keeps the last good build.
 set -euo pipefail
@@ -48,6 +49,15 @@ jq --args 'walk(
     if type == "object" and (.mod | type) == "string" and (.mod as $m | $ARGS.positional | index($m))
     then .mod = "odsod-" + .mod else . end
   )' "${built[@]}" <"$home/layouts/main.json" >"$work/layout.json"
+if [ -f "$patches/layout.jq" ]; then
+  if jq -f "$patches/layout.jq" <"$work/layout.json" >"$work/layout.filtered.json"; then
+    mv "$work/layout.filtered.json" "$work/layout.json"
+  else
+    log "ERROR: $patches/layout.jq failed on the shipped layout; fix the filter" >&2
+    failed=1
+    cp "$layout" "$work/layout.json" 2>/dev/null || true
+  fi
+fi
 if ! cmp -s "$work/layout.json" "$layout"; then
   # Write beside the layouts, not in them, then move into place in one step.
   cp "$work/layout.json" "$home/.odsod-main.json.tmp"

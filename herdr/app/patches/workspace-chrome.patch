@@ -1,15 +1,45 @@
 --- a/main.js
 +++ b/main.js
-@@ -47,8 +47,10 @@
+@@ -24,26 +24,29 @@
+ }
+ 
+ export default class WorkspaceChrome extends View {
+-  button(id, label, action) {
++  button(id, label, action, tip) {
+     const t = theme();
+-    return div().id(id).size(26).flex_none().flex().items_center().justify_center().rounded(6).text_color(t.muted).hover(s => s.bg(t.hover).text_color(t.foreground))
++    return div().id(id).when(Boolean(tip), el => el.tooltip(tip)) /* odsod: tip */.size(26).flex_none().flex().items_center().justify_center().rounded(6).text_color(t.muted).hover(s => s.bg(t.hover).text_color(t.foreground))
+       .on_mouse_down("left", (_e, cx) => cx.stop_propagation()).on_click(action).child(label);
+   }
+   render() {
+     const t = theme();
+     const collapsed = narrow();
+     if (props()?.footer) {
+-      const row = (id, icon, label, dim, action) => h_flex().id(id).h(28).px(8).gap(9).items_center().rounded(8)
+-        .when(collapsed, el => el.relative().w(32).px(0).justify_center().tooltip(label))
+-        .text_color(dim ? t.dim : t.muted).hover(s => s.bg(t.hover).text_color(t.foreground)).cursor_pointer()
+-        .on_click(action).child(svg(`mods/workspace-chrome/${icon}.svg`).size(14))
+-        .when(!collapsed, el => el.child(label));
+-      const ready = div().size(6).rounded_full().bg(t.accent);
+-      return v_flex().size_full().bg(t.chrome).border_t(1).border_color(t.border).px(8).pt(4).pb(8).text_size(13)
+-        .when(collapsed, el => el.px(0).items_center())
+-        .child(row("settings", "settings", "Settings", false, () => run("app.settings"))
+-          .when(Boolean(updates().app.ready), el => el.child(collapsed ? ready.absolute().top(5).right(6) : ready)))
+-        .child(row("machine", "plus", "Add machine", true, () => run("mod.open", { name: "machine-add" })));
++      // odsod: the sidebar's only button row (layout.jq drops its top row). On the
++      // rail it keeps settings; the agents list's » unfolds the sidebar.
++      const icon = (name) => svg(`mods/workspace-chrome/${name}.svg`).size(15);
++      const settings = this.button("settings", icon("settings"), () => run("app.settings"), "Settings").relative()
++        .when(Boolean(updates().app.ready), el => el.child(div().absolute().top(4).right(4).size(6).rounded_full().bg(t.accent)));
++      return h_flex().size_full().bg(t.chrome).border_t(1).border_color(t.border).px(8).gap(2).items_center()
++        .when(collapsed, el => el.px(0).justify_center().child(settings))
++        .when(!collapsed, el => el
++          .child(this.button("space-new", icon("plus"), () => run("space.new"), "New space"))
++          .child(this.button("search", icon("search"), () => run("mod.open", { name: "odsod-picker" }), "Search"))
++          .child(div().flex_1())
++          .child(this.button("machine", icon("server"), () => run("mod.open", { name: "machine-add" }), "Add machine"))
++          .child(settings)
++          .child(this.button("sidebar-toggle", icon("sidebar"), toggleSidebar, "Collapse sidebar")));
      }
      return h_flex().size_full().bg(t.chrome).pl(collapsed ? 6 : 14).pr(10).gap(4).items_center().text_size(13.5)
        .when(window()?.platform === "macos" && !window()?.fullscreen && !collapsed, el => el.pl(76))
--      .when(!collapsed, el => el.child(h_flex().flex_1().gap(8).items_center().child(image("frame/welcome/herdr.png").size(20).rounded(5)).child(div().font_semibold().text_color(t.foreground).child("Herdr"))))
--      .when(!collapsed, el => el.child(this.button("search", svg("mods/workspace-chrome/search.svg").size(15), () => run("mod.open", { name: "picker" }))))
-+      .when(!collapsed, el => el.child(div().flex_1()))
-+      // odsod: new space here; the spaces list has no title row for it.
-+      .when(!collapsed, el => el.child(this.button("space-new", svg("mods/workspace-chrome/plus.svg").size(15), () => run("space.new"))))
-+      .when(!collapsed, el => el.child(this.button("search", svg("mods/workspace-chrome/search.svg").size(15), () => run("mod.open", { name: "odsod-picker" }))))
-       // On the macOS rail the traffic lights fill the row; the agents list's » unfolds it.
-       .when(!(collapsed && window()?.platform === "macos"), el => el.child(this.button("sidebar-toggle", svg("mods/workspace-chrome/sidebar.svg").size(15), toggleSidebar)));
-   }

@@ -119,7 +119,8 @@
     (a unified diff of its `main.js`, `a/` and `b/` prefixes).
     `herdr:patch-mods` rebuilds `odsod-<mod>` from the shipped mod plus the
     patch, and `layouts/odsod-main.json` from the shipped `main` with those
-    mods swapped in. `herdr-patch-mods.path` reruns it whenever the app
+    mods swapped in, filtered by `herdr/app/patches/layout.jq` (it drops the
+    sidebar's top row). `herdr-patch-mods.path` reruns it whenever the app
     rewrites `installed.json`, so upstream changes arrive on their own. A
     patch that no longer applies keeps the last good build and sends a
     desktop notification: fix the patch against the new shipped file.
