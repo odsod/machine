@@ -32,7 +32,11 @@ function M.setup()
     view = { width = 30 },
     renderer = {
       group_empty = true,
-      icons = { show = { file = false, folder = false, folder_arrow = true, git = false } },
+      -- Plain Unicode arrows: the terminal font has no Nerd Font icons.
+      icons = {
+        show = { file = false, folder = false, folder_arrow = true, git = false },
+        glyphs = { folder = { arrow_closed = "▸", arrow_open = "▾" } },
+      },
     },
   })
 
