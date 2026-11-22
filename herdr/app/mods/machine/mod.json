@@ -1,0 +1,5 @@
+{
+  "place": "none",
+  "title": "Machine agent",
+  "overlay": { "kind": "popup", "at": "top", "offset": 50, "width": 620 }
+}
