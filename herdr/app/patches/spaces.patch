@@ -78,7 +78,7 @@
        const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
        const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
        const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
-+        .when(!collapsed, el => el.mt(24)) // odsod: as above each section in odsod-agents
++        .when(!collapsed && m !== null, el => el.mt(24)) // odsod: as above each section in odsod-agents; not at the top, where the inset matches the left one
          .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
          .cursor_pointer().hover(s => s.bg(t.hover))
          .on_click((_e, cx) => {
@@ -141,7 +141,7 @@
 -          .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14))))
 -      .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
 +          .on_click(() => run("space.new")).child(svg("mods/workspace-chrome/plus.svg").size(14)))))
-+      .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pt(collapsed ? 0 : 8) /* odsod: no row above */.pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
++      .child(v_flex().flex_1().min_h(0).px(collapsed ? 0 : 8).pt(collapsed ? 0 : 13) /* odsod: no row above; 13 puts the first ink 20px down: the light header needs 4px more than the 16px left inset to look equal */.pb(14).overflow_y_scrollbar().mode("always").track_scroll(this.scroll)
          // A block above (another mod's) growing, or the window resizing, shrinks this list and can push the active space out.
          .on_size_change((_size, cx) => { if (this.activeAt >= 0) { this.scroll.scroll_to_item(this.activeAt); cx.notify(); } })
          .on_mouse_up("left", (_e, cx) => { this.pressed = null; cx.notify(); })
