@@ -317,6 +317,7 @@ depends = [
   "herdr:setup-core",
   "herdr:sync-machines",
   "herdr:patch-mods",
+  "herdr:machine-agent",
   "tools:link",
 ]
 run = """

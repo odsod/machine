@@ -1,0 +1,9 @@
+[Unit]
+Description=Start the machine agent once herdr-core is up
+
+[Path]
+# The core's socket; it appears when the core starts (after a reboot, with the app).
+PathExists=%t/herdr-core/default.sock
+
+[Install]
+WantedBy=default.target

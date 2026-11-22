@@ -12,6 +12,8 @@ herdr_skip_machines = "odsod-hx99g"
 "~/.config/herdr-app/mods/space/mod.json" = "../../herdr/app/mods/space/mod.json"
 "~/.config/herdr-app/mods/links/main.js" = "../../herdr/app/mods/links/main.js"
 "~/.config/herdr-app/mods/links/mod.json" = "../../herdr/app/mods/links/mod.json"
+"~/.config/herdr-app/mods/machine/main.js" = "../../herdr/app/mods/machine/main.js"
+"~/.config/herdr-app/mods/machine/mod.json" = "../../herdr/app/mods/machine/mod.json"
 "~/.local/share/applications/herdr-app.desktop" = "../../herdr/app/herdr-app.desktop"
 "~/.local/bin/clone-repo" = "../../herdr/clone-repo"
 "~/.local/bin/herdr-space" = "../../herdr/herdr-space"
@@ -20,9 +22,12 @@ herdr_skip_machines = "odsod-hx99g"
 "~/.local/bin/xdg-open" = "../../herdr/xdg-open"
 "~/.local/bin/herdr-patch-mods" = "../../herdr/patch-mods"
 "~/.local/bin/herdr-relogin" = "../../herdr/herdr-relogin"
+"~/.local/bin/herdr-machine-agent" = "../../herdr/machine-agent"
 "~/.config/herdr-app-patches" = "../../herdr/app/patches"
 "~/.config/systemd/user/herdr-patch-mods.path" = "../../herdr/herdr-patch-mods.path"
 "~/.config/systemd/user/herdr-patch-mods.service" = "../../herdr/herdr-patch-mods.service"
+"~/.config/systemd/user/herdr-machine-agent.path" = "../../herdr/herdr-machine-agent.path"
+"~/.config/systemd/user/herdr-machine-agent.service" = "../../herdr/herdr-machine-agent.service"
 
 [tasks."herdr:sync-machines"]
 description = "Save missing Tailscale peers as Herdr machines"
@@ -40,4 +45,11 @@ run = """
 systemctl --user daemon-reload
 systemctl --user enable --now herdr-patch-mods.path
 HERDR_MOD_PATCHES="$REPO_DIR/herdr/app/patches" exec "$REPO_DIR/herdr/patch-mods"
+"""
+
+[tasks."herdr:machine-agent"]
+description = "Start the machine agent whenever herdr-core comes up"
+run = """
+systemctl --user daemon-reload
+systemctl --user enable --now herdr-machine-agent.path
 """

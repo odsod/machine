@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Start or repair this computer's machine agent: the terminal named `machine`
+# in space `machine`, tab `machine`, running Claude in the machine repo's
+# original checkout. Safe to run any time. With arguments, send them to it as
+# one message once Claude is up.
+#
+# A kept terminal outlives a reboot as a shell in the same place, so a fresh
+# start and a repair take the same path: a shell named `machine`, then
+# `claude` typed into it (the login shell's environment, aliases included).
+set -euo pipefail
+
+repo=$HOME/Code/github.com/odsod/machine
+log() { echo "[herdr-machine-agent] $*" >&2; }
+get() { hc get machine --json 2>/dev/null | jq -r "$1 // empty"; }
+
+hc server status >/dev/null 2>&1 || {
+  log "no herdr-core running"
+  exit 1
+}
+
+state=$(get .state || true)
+if [[ $state != live ]]; then
+  [[ -n $state ]] && hc rm machine >/dev/null 2>&1 || true
+  hc run --bg --keep --no-parent --name machine \
+    --label herdr.space=machine --label herdr.tab=machine --cwd "$repo" >/dev/null
+  log "started a shell named machine"
+fi
+
+if [[ $(get .status.app) != claude-code ]]; then
+  case $(get .foreground.name) in
+  "" | fish | bash | zsh | sh) ;;
+  *)
+    log "machine runs $(get .foreground.name), not a shell: left alone"
+    exit 1
+    ;;
+  esac
+  hc send machine claude >/dev/null
+  log "started claude"
+  # Claude reports its status once it is up; a message sent before that can be dropped.
+  for _ in $(seq 60); do
+    [[ $(get .status.app) == claude-code ]] && break
+    sleep 1
+  done
+fi
+
+(($#)) && hc send machine "$*" >/dev/null
+exit 0
