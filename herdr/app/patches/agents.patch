@@ -13,7 +13,7 @@
 +// than to what comes before it.
 +// A section header is one row (28) with its title in the top 24, so the room
 +// left over goes below it, toward the repos it holds. sectionGap goes above
-+// every section, the first too, as above each machine in odsod-spaces.
++// every section but the first, as above each machine in odsod-spaces.
 +// place + placeGap = one row.
 +const ROW = { section: 28, sectionPad: 4, sectionGap: 24, place: 16, placeGap: 12 };
 +// odsod: ~/Code/<host>/<org>/<repo> is a repo's original checkout and
@@ -134,7 +134,7 @@
      const rows = collapsed
        ? list.flatMap(withKids)
 -      : groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : g.members.flatMap(withKids))]);
-+      : groups.flatMap((g, n) => [byPriority ? header(g).pt(0).pb(ROW.sectionPad).h(ROW.section).font_semibold().text_size(10.5).mt(ROW.sectionGap) : header(g), ...(this.folded.has(g.id) ? [] : members(g))]);
++      : groups.flatMap((g, n) => [byPriority ? header(g).pt(0).pb(ROW.sectionPad).h(ROW.section).font_semibold().text_size(10.5).when(n > 0, (el) => el.mt(ROW.sectionGap)) : header(g), ...(this.folded.has(g.id) ? [] : members(g))]);
  
      return v_flex()
        .size_full()
@@ -172,7 +172,7 @@
          el.child(div().px(12).text_size(12).text_color(t.dim).child("No agent status yet. Agents show up here when they report their status. Older versions and agents inside tmux may not.")),
        )
 -      .child(v_flex().id("ag-list").flex_1().min_h(0).px(collapsed ? 0 : 8).overflow_y_scrollbar().mode("always").children(rows))
-+      .child(v_flex().id("ag-list").flex_1().min_h(0).px(collapsed ? 0 : 8).pt(collapsed ? 0 : 8) /* odsod: room under the divider, no title row */.overflow_y_scrollbar().mode("always").children(rows))
++      .child(v_flex().id("ag-list").flex_1().min_h(0).px(collapsed ? 0 : 8).pt(collapsed ? 0 : 13) /* odsod: no title row; 13 puts the first ink 20px under the divider, as in odsod-spaces */.overflow_y_scrollbar().mode("always").children(rows))
        .when(collapsed, (el) =>
          el.child(
            h_flex()
