@@ -37,6 +37,9 @@ const BINDINGS = [
   ["ctrl+o", "Clone a repo", "terminal.open", { argv: ["clone-repo"], name: "clone" }],
   ["ctrl+c", "Pick a link", "mod.open", { name: "links" }],
   ["ctrl+q", "Detach (close window)", "window.close"],
+  ["ctrl+a", "Ask the machine agent", "machine", { action: "ask" }],
+  ["ctrl+p", "Peek at the machine agent", "machine", { action: "peek" }],
+  ["ctrl+g", "Go to the machine agent", "machine", { action: "go" }],
   ...Array.from({ length: 10 }, (_, i) => [
     String(i),
     `Tab ${i === 0 ? 10 : i}`,
@@ -46,7 +49,7 @@ const BINDINGS = [
 ];
 // The one-line hint. Keep it in step with BINDINGS.
 const HINT =
-  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · t start · e close · o clone · c link · q detach";
+  "h j k l focus · s v split · d close · z zoom · n b tab · w new · m rename · f goto · t start · e close · o clone · c link · q detach · a ask · p peek · g go";
 
 export default class Prefix extends View {
   init(_props, cx) {
@@ -99,7 +102,20 @@ export default class Prefix extends View {
     const [, , command, args = {}] = binding;
     this.dismiss();
     // "space" opens the space dialog's confirm for the current space.
-    if (command === "space")
+    // "machine" opens the machine mod: a text box to ask, or (peek, go) an
+    // empty popup that acts and closes itself.
+    if (command === "machine")
+      openOverlay({
+        mod: "machine",
+        kind: "popup",
+        at: "top",
+        offset: 50,
+        width: args.action === "ask" ? 620 : 1,
+        height: args.action === "ask" ? undefined : 1,
+        frame: args.action === "ask" ? undefined : "none",
+        props: args,
+      });
+    else if (command === "space")
       openOverlay({ mod: "space", kind: "dialog", width: 520, height: 260, props: args });
     else run(command, args);
   }
