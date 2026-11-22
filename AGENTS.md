@@ -141,6 +141,41 @@
     features that simplify `mise/conf.d/` or `tasks/`, and upgrade via
     `mise upgrade aqua:jdx/mise`.
 
+## Machine Agent
+
+Every agent in this repo follows this section. "Machine agent" is what we
+call it; Herdr calls it `machine`. There is no leader: the Herdr cores and
+the repo are the state, and any machine agent can manage them.
+
+- **Who**: on every machine, the terminal named `machine` in space and tab
+  `machine`, running Claude in this original checkout. Address it as
+  `machine` there and `<host>/machine` from elsewhere (`hc send`, `hc get`).
+- **Start**: `herdr-machine-agent` (`herdr/machine-agent`) starts or repairs
+  it and is safe to run any time. `herdr-machine-agent.path` runs it when
+  herdr-core comes up, and the sidebar row runs it on a click. After a
+  reboot, the kept terminal comes back as a shell, and the script types
+  `claude` into it.
+- **Sidebar** (`odsod-spaces`): each machine's row stands for its `machine`
+  space and shows the agent's status. Sections follow `HOSTS`. The `machine`
+  space comes first on its machine, so every client, mobile too, lists it at
+  the top.
+- **Where**: work in this original checkout. Edit here, ship through a PR
+  from a change on `main`, and apply from here. Other agents may use
+  workspaces for parallel work.
+- **Scope**: manage your own machine. Reach another one
+  (`hc exec --on <host>`, `hc file ... --on <host>`) when asked, or to bring
+  it to `main@origin` after your own merge. An offline machine catches up
+  when it reconnects. Applying is idempotent, so overlap is harmless.
+- **Memory**: the repo is the only memory. A rule worth keeping becomes a
+  change here. Read live state (`herdr-app ls`, `hc ls`, `hc machine ls`,
+  `jj workspace list`) instead of remembering it.
+- **Context**: delegate long reads, builds and edits to child agents
+  (`hc --skill`) and ask for short reports.
+- **Messages**: the `machine` mod sends text that ends in
+  `[sent from space ...]`. "This space" means that space.
+- **Keys**: `Ctrl+U a` asks the `machine` of the focused space's machine,
+  `Ctrl+U p` peeks at it, `Ctrl+U g` goes to its space.
+
 ## Agents and Skills
 
 - `mise run update-skills` updates vendored global skills in `agents/` and

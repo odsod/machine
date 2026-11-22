@@ -1,0 +1,9 @@
+[Unit]
+Description=Start or repair the machine agent (the terminal named machine)
+
+[Service]
+Type=oneshot
+# Once per boot: a core restart keeps its terminals, and the sidebar row
+# repairs the agent on a click.
+RemainAfterExit=yes
+ExecStart=%h/.local/bin/herdr-machine-agent
