@@ -1,0 +1,23 @@
+[tasks."wacom:setup"]
+description = "Install per-host Wacom tablet tweaks"
+run = """
+case "$(uname -n)" in
+odsod-desktop)
+  # systemd 262 tags USB devices behind a fixed hub as internal, so the tablet's
+  # touch surface becomes an internal touchpad. libinput then never rotates it
+  # when the pen turns left-handed. Mark Wacom touch surfaces as external.
+  hwdb='touchpad:usb:v056ap*
+ ID_INPUT_TOUCHPAD_INTEGRATION=external'
+  file=/etc/udev/hwdb.d/61-wacom-touchpad-external.hwdb
+  if [ "$(cat "$file" 2>/dev/null)" != "$hwdb" ]; then
+    echo "[wacom] Marking the Wacom touch surface as external..."
+    printf '%s\\n' "$hwdb" | sudo tee "$file" > /dev/null
+    sudo systemd-hwdb update
+    sudo udevadm trigger --action=change --subsystem-match=input --property-match=ID_VENDOR_ID=056a
+  fi
+  ;;
+*)
+  echo "[wacom] $(uname -n) is unlisted; nothing to do"
+  ;;
+esac
+"""
