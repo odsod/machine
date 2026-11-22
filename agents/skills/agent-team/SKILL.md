@@ -134,14 +134,18 @@ Spawn a worker only when its unit is next. Reuse an idle member of the right kin
 
 Put the first task in `hc run`: a send to a booting agent can be dropped. Options go before the program.
 
+Start each worker in a tab of this space, one tab per topic: workers on the same topic (a council, two researchers) share a tab. The label sets the tab's id, which is global across spaces: prefix it with the space. Rename the tab once so the user sees the topic.
+
 ```bash
 trust-workspace "$PWD"   # trust this dir in every harness (idempotent)
 t="$(hc run --bg --json --name "$team-impl" --cwd "$PWD" \
+  --label herdr.space="$space" --label herdr.tab="$space-impl" \
   pi "Implement <unit>. Write /tmp/agent-team/<team>/impl.md. Stop when done." | jq -r .address)"
+herdr-app do tab.rename --id "$space-impl" --name impl
 hc wait "$t" --timeout <seconds that fit the unit>
 ```
 
-Workers end when this terminal ends. They have no pane: the app lists them under this tab, and the user can peek at one. Show a worker beside this pane only when the user wants to watch it: `herdr-app do terminal.keep --terminal "$t" --place right`. For a group such as a council, ask before you open a tab for it.
+Workers end when this terminal ends, and a tab closes when its last worker ends. Run builds, tests and watchers hidden (no labels).
 
 `hc wait` waits until the agent stops working. An agent that reports no status (`hc get "$t"` shows `status: null`, as codex can) makes `hc wait` wait for exit: read its screen with `hc read "$t"` instead. Before you act on a stuck worker, read the screen:
 
