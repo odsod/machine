@@ -294,10 +294,11 @@ lock = "machine-apply"
 run = ["mise bootstrap --yes", "mise reshim", { task = "clean" }]
 
 [tasks.bootstrap]
-description = "Post-install setup: media, graphics, desktop apps, GPU services, KDE, keyboard, auth"
+description = "Post-install setup: media, graphics, wacom, desktop apps, GPU services, KDE, keyboard, auth"
 depends = [
   "media:setup",
   "graphics:setup",
+  "wacom:setup",
   "slack:setup",
   "zoom:setup",
   "yaak:setup",
