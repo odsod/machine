@@ -1,21 +1,32 @@
 --- a/main.js
 +++ b/main.js
-@@ -63,6 +63,14 @@
+@@ -63,6 +63,25 @@
  const sortOf = () => SORTS.find((s) => s.id === shared("agents.sort")) ?? SORTS[0];
  const SECTION = { 4: "Needs you", 3: "Done", 2: "Working", 1: "Idle" };
  const SECTION_STATUS = { 4: "blocked", 3: "done", 2: "working" };
++// odsod: the priority view's vertical rhythm, on a 4px grid. Each level gets
++// the next step of an 8px scale, and a header sits closer to what it names
++// than to what comes before it.
++// A section header is one row (28) with its title in the top 24, so the room
++// left over goes below it, toward the repos it holds. place + placeGap = one row.
++const ROW = { section: 28, sectionPad: 4, sectionGap: 24, place: 16, placeGap: 12 };
 +// odsod: ~/Code/<host>/<org>/<repo> is a repo's original checkout and
 +// ~/Workspaces/<host>/<org>/<repo>/<name> its workspaces (same as odsod-spaces).
++// A space made elsewhere (at ~) goes by where its first terminal is now.
 +const ROOT = /^(.*)\/(Code|Workspaces)\/([^/]+\/[^/]+\/[^/]+)(?:\/(.+))?$/;
-+function root(s) {
-+  const m = ROOT.exec((s.folder ?? "").replace(/\/+$/, ""));
-+  if (!m || (m[2] === "Code") === Boolean(m[4])) return null;
-+  return { key: JSON.stringify([s.machine ?? null, m[3]]), label: m[3].split("/").slice(1).join("/"), rest: m[4] ?? null };
++function root(s, ps) {
++  const at = (path, loose) => {
++    const m = ROOT.exec((path ?? "").replace(/\/+$/, ""));
++    if (!m || (m[2] === "Workspaces" && !m[4]) || (m[2] === "Code" && m[4] && !loose)) return null;
++    return { key: JSON.stringify([s.machine ?? null, m[3]]), label: m[3].split("/").slice(1).join("/"), rest: m[2] === "Code" ? null : m[4] };
++  };
++  const tabs = new Set((s.tabs ?? []).map((c) => c.id));
++  return at(s.folder, false) ?? at(ps.find((p) => tabs.has(p.tab) && p.cwd)?.cwd, true);
 +}
  
  function duration(ms) {
    const m = Math.floor(ms / 60000);
-@@ -74,7 +82,7 @@
+@@ -74,7 +93,7 @@
  
  // The agent's icon from the app's program table: a one-color glyph or a picture.
  function icon(p, size, color) {
@@ -24,12 +35,13 @@
    return p.tint ? svg(p.icon).size(size).flex_none().text_color(color) : image(p.icon).w(size).h(size).flex_none();
  }
  
-@@ -237,7 +245,19 @@
+@@ -237,7 +256,20 @@
      const byPriority = sort.id === "priority";
      const urgency = new Map(list.map((a) => [a.address, Math.max(this.rank(a), ...this.tree(all, a.address).map((s) => RANK[kidStatus(s.t, this.listed)] ?? 0))]));
      const rankOf = (a) => urgency.get(a.address);
 +    // odsod: a workspace goes by its folder under the repo, an original by <org>/<repo>.
-+    const roots = new Map(spaces().map(s => [s.id, root(s)]));
++    const ps = panes();
++    const roots = new Map(spaces().map(s => [s.id, root(s, ps)]));
 +    const short = (a) => { const r = roots.get(a.space); return r ? (r.rest ?? r.label) : a.space_name; };
 +    const placeOf = (a) => roots.get(a.space)?.key ?? a.space;
      if (byPriority) list = [...list].sort((x, y) => rankOf(y) - rankOf(x) || this.since(y) - this.since(x) || y.seq - x.seq);
@@ -44,7 +56,16 @@
      const pinned = list.filter((a) => a.pinned);
      const rest = list.filter((a) => !a.pinned);
      list = [...pinned, ...rest];
-@@ -335,8 +355,10 @@
+@@ -280,7 +312,7 @@
+     // agent's own title, never an automatic tab number unless two rows would
+     // otherwise read the same.
+     // Read the pane snapshot once: every host read copies the whole list into JS.
+-    const leads = leadPanes(panes());
++    const leads = leadPanes(ps); // odsod: read once, above
+     const tabs = new Map(spaces().flatMap(s => s.tabs).map(tab => [tab.id, tab]));
+     const labels = new Map(list.map(a => {
+       const tab = tabs.get(a.tab);
+@@ -335,12 +367,14 @@
          .child(svg(`mods/workspace-chrome/${isPinned ? "pin-off" : "pin"}.svg`).size(13));
        // Under a space header the space goes without saying; an automatic tab number says nothing.
        // Without a space header above (priority, pinned) the row names its space.
@@ -57,7 +78,12 @@
        return h_flex()
          .id(`ag-${a.address}`)
          .px(8)
-@@ -361,9 +383,9 @@
+-        .h(30)
++        .h(28) // odsod: was 30; on the 4px grid
+         .flex_none()
+         .rounded(8)
+         .items_center()
+@@ -361,9 +395,9 @@
              cx.notify();
            })).child(pic)))
          .child(h_flex().flex_1().min_w(0).gap(5).items_center()
@@ -70,7 +96,7 @@
          .when(subs.length > 0, el => el.child(fold(a, subs)))
          .when(this.hovered === a.address, el => el.child(pin))
          .when(this.hovered !== a.address && Boolean(when), el => el.child(div().flex_none().text_size(11).text_color(t.dim).child(duration(now - when))))
-@@ -375,9 +397,9 @@
+@@ -375,9 +409,9 @@
      const groups = pinned.length ? [{ id: "pinned", label: "Pinned", status: null, members: pinned }] : [];
      for (const a of rest) {
        const r = rankOf(a) || RANK.idle;
@@ -78,11 +104,11 @@
 +      const id = byPriority ? `sec-${r}` : `sp-${placeOf(a)}`; // odsod: by repo
        if (groups.at(-1)?.id === id) groups.at(-1).members.push(a);
 -      else groups.push({ id, label: byPriority ? SECTION[r] : a.space_name || "", status: byPriority ? SECTION_STATUS[r] : null, members: [a] });
-+      else groups.push({ id, label: byPriority ? SECTION[r] : roots.get(a.space)?.label ?? (a.space_name || ""), status: byPriority ? SECTION_STATUS[r] : null, members: [a] });
++      else groups.push({ id, label: byPriority ? SECTION[r].toUpperCase() : roots.get(a.space)?.label ?? (a.space_name || ""), status: byPriority ? SECTION_STATUS[r] ?? "muted" /* odsod: idle in t.muted */ : null, members: [a] });
      }
  
      // A group's header; it folds the group. Folded, it says how many and the most urgent state.
-@@ -407,9 +429,22 @@
+@@ -407,9 +441,22 @@
            .when(!byPriority && top && top !== "idle", (el) => el.child(this.status(t, { status: top }, true)))
            .child(svg("mods/workspace-chrome/chevron-right.svg").size(11).flex_none().text_color(t.dim)));
      };
@@ -93,20 +119,20 @@
 +      else out.push({ k, label: roots.get(a.space)?.label ?? (a.space_name || ""), machine: a.address.includes("/") ? a.address.split("/")[0] : null, members: [a] });
 +      return out;
 +    }, []);
-+    const placeHeader = (g, p, n) => h_flex().id(`${g.id}:${p.k}`).px(8).h(18).when(n > 0, (el) => el.mt(6)).flex_none().items_center()
++    const placeHeader = (g, p, n) => h_flex().id(`${g.id}:${p.k}`).px(8).h(ROW.place).when(n > 0, (el) => el.mt(ROW.placeGap)).flex_none().items_center()
 +      .gap(6).text_size(11).text_color(t.dim).child(div().flex_1().min_w(0).truncate().child(p.label))
 +      .when(Boolean(p.machine), (el) => el.child(div().flex_none().child(p.machine)));
 +    const members = (g) => byPriority
-+      ? places(g).map((p, n) => v_flex().flex_none().pl(8).child(placeHeader(g, p, n)).child(v_flex().pl(8).children(p.members.flatMap(withKids))))
++      ? places(g).flatMap((p, n) => [placeHeader(g, p, n), ...p.members.flatMap(withKids)])
 +      : g.members.flatMap(withKids);
      const rows = collapsed
        ? list.flatMap(withKids)
 -      : groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : g.members.flatMap(withKids))]);
-+      : groups.flatMap((g) => [header(g), ...(this.folded.has(g.id) ? [] : members(g))]);
++      : groups.flatMap((g, n) => [byPriority ? header(g).pt(0).pb(ROW.sectionPad).h(ROW.section).font_semibold().text_size(10.5).when(n > 0, (el) => el.mt(ROW.sectionGap)) : header(g), ...(this.folded.has(g.id) ? [] : members(g))]);
  
      return v_flex()
        .size_full()
-@@ -417,7 +452,7 @@
+@@ -417,7 +464,7 @@
        .bg(t.chrome)
        .border_t(1)
        .border_color(t.border)
