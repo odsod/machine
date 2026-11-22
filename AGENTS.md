@@ -171,10 +171,9 @@ the repo are the state, and any machine agent can manage them.
   `jj workspace list`) instead of remembering it.
 - **Context**: delegate long reads, builds and edits to child agents
   (`hc --skill`) and ask for short reports.
-- **Messages**: the `machine` mod sends text that ends in
-  `[sent from space ...]`. "This space" means that space.
-- **Keys**: `Ctrl+U a` asks the `machine` of the focused space's machine,
-  `Ctrl+U p` peeks at it, `Ctrl+U g` goes to its space.
+- **Keys**: `Ctrl+U Ctrl+M` shows the `machine` space of the focused space's
+  machine and starts the agent when none runs. From that space, it goes back
+  to the space you came from.
 
 ## Agents and Skills
 
