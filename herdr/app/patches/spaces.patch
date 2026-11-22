@@ -1,6 +1,15 @@
 --- a/main.js
 +++ b/main.js
-@@ -33,6 +33,21 @@
+@@ -5,7 +5,7 @@
+ 
+ import { View, div, svg } from "gpui-kit";
+ import { v_flex, h_flex, ScrollHandle } from "gpui-base";
+-import { spaces, machines, panes, run, openOverlay, exec, hc, theme, shared, setShared, watchFolder, window, layout } from "herdr";
++import { spaces, machines, panes, terminals, run, openOverlay, exec, hc, home, theme, shared, setShared, watchFolder, window, layout } from "herdr";
+ 
+ function find(node, id) {
+   if (node?.id === id) return node;
+@@ -33,6 +33,37 @@
  const railCell = (el) => h_flex().flex_none().justify_center().child(el);
  const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
  const base = (path) => path.replace(/\/+$/, "").split("/").pop();
@@ -19,10 +28,35 @@
 +  };
 +  return at(s.folder, false) ?? at(cwd, true);
 +}
++// odsod: each machine's row stands for its machine agent: the terminal named
++// `machine` in space `machine` (see "Machine Agent" in odsod/machine's
++// AGENTS.md). `herdr-machine-agent` starts or repairs it on that machine.
++const ENSURE = `${home()}/.local/bin/herdr-machine-agent`; // homes match across machines
++const qualify = (m, id) => (m ? `${m}/${id}` : id);
++const isAgent = (w) => w.id === qualify(w.machine ?? null, "machine");
++const agentSpace = (m) => spaces().find((s) => s.id === qualify(m, "machine")) ?? null;
++const agentIn = (m) => terminals().find((t) => t.name === "machine" && t.state === "live" && (t.address.includes("/") ? t.address.split("/")[0] : null) === m) ?? null;
++// Machine sections in this order, then the rest by name.
++const HOSTS = ["odsod-desktop", "odsod-x1-carbon"];
++// Show it, after starting or repairing it there when it isn't running.
++function goAgent(m) {
++  const show = () => run("space.select", { id: qualify(m, "machine") });
++  if (agentIn(m)) return show();
++  exec(ENSURE, [], { on: m, timeout: 90000 }).then((r) => r.code === 0 && show()).catch(() => {});
++}
  // Changes made outside Herdr (an editor's save, a commit in another app): looked
  // for this often, in repos the list shows, while the window is in front.
  const FALLBACK = 60000;
-@@ -300,19 +315,22 @@
+@@ -81,6 +112,8 @@
+     this.scroll = ScrollHandle.new(); // the list's position: the active space is brought into view through it
+     this.activeAt = -1; // the active space's place among the list's children (headers and rows), -1 when not drawn
+     this.machines = [];
++    this.hostname = null; // odsod: this computer's row says its name
++    cx.spawn(async (cx) => { try { const r = await exec("uname", ["-n"]); if (r.code === 0) { this.hostname = r.stdout.trim(); cx.notify(); } } catch {} });
+     try {
+       this.reconnecting = JSON.parse(localStorage.getItem("machines.reconnecting") ?? "{}");
+       if (!this.reconnecting || typeof this.reconnecting !== "object" || Array.isArray(this.reconnecting)) this.reconnecting = {};
+@@ -300,19 +333,30 @@
      const sp = spaces(), ps = panes();
      const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
      for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
@@ -33,7 +67,8 @@
 -    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
 +    // odsod: group by root() instead of git: the original checkout's space, or a
 +    // header standing in for it, then its workspaces.
-+    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w, place(w, ps)) }));
++    // odsod: the machine agent's space is its machine's row, not in a group.
++    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w, place(w, ps)) })).filter((r) => !isAgent(r.w));
 +    const all = [];
 +    const placed = new Set();
      for (const r of list) {
@@ -43,6 +78,7 @@
 -      placed.add(r.g.repo);
 -      const kids = list.filter((k) => nested(k) && k.g.repo === r.g.repo);
 -      kids.forEach((k, n) => out.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
+-    }
 +      if (!r.root) { all.push({ ...r, tree: null }); continue; }
 +      if (placed.has(r.root.key)) continue;
 +      placed.add(r.root.key);
@@ -51,12 +87,19 @@
 +      const kids = group.filter((k) => k !== main);
 +      all.push(main ? { ...main, tree: null } : { head: r.root, w: { id: `root:${r.root.key}`, machine: r.root.machine } });
 +      kids.forEach((k, n) => all.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
-     }
-+    const out = all.filter((r) => !r.head);
++    }
++    // odsod: the machine agent's space first on its machine, so every client,
++    // mobile too, lists it at the top there.
++    const rest = all.filter((r) => !r.head);
++    const out = [...new Set(sp.map((w) => w.machine ?? null))].flatMap((m) => [
++      ...sp.filter((w) => isAgent(w) && (w.machine ?? null) === m).map((w) => ({ w })),
++      ...rest.filter((r) => (r.w.machine ?? null) === m),
++    ]);
++    this.nameAgentTabs(sp);
      // Simulate the batch so later indexes include earlier moves. An attempted
      // write can lose a sync conflict: allow the echo to settle before retrying.
      const order = sp.map(w => w.id);
-@@ -332,13 +350,15 @@
+@@ -332,13 +376,27 @@
        }
        this.ordering.machines = [...moved];
      }
@@ -64,6 +107,18 @@
 +    // odsod: headers stay in the list only above a workspace that is shown.
 +    const shown = all.filter(r => r.head || this.shown.has(r.w.id));
 +    return shown.filter((r, n) => !r.head || shown[n + 1]?.tree);
++  }
++
++  // odsod: the machine agent's tab is called `machine` everywhere (agents
++  // panel, mobile). A rename lands through the core: ask again after a while.
++  nameAgentTabs(sp) {
++    this.naming ??= {};
++    for (const w of sp.filter(isAgent)) {
++      const tab = (w.tabs ?? []).find((t) => t.id === qualify(w.machine ?? null, "machine"));
++      if (!tab || tab.name === "machine" || Date.now() - (this.naming[tab.id] ?? 0) < 5000) continue;
++      this.naming[tab.id] = Date.now();
++      run("tab.rename", { id: tab.id, name: "machine" });
++    }
    }
  
    // The rows, under a header per machine once one isn't this computer.
@@ -74,15 +129,79 @@
      // Where the active space's row lands among the children this returns: the list scrolls by its direct
      // children, and machine headers, login notes and loading rows count too.
      this.activeAt = -1;
-@@ -367,6 +387,7 @@
+@@ -355,8 +413,12 @@
+       this.activeAt = rows.findIndex(r => r.w.active);
+       return rows.map(draw);
+     }
+-    const machineNames = [null, ...remote];
+-    return machineNames.flatMap((m) => {
++    // odsod: by HOSTS, this computer by its name; others after, this computer first.
++    const rank = (m) => { const i = HOSTS.indexOf(m ?? this.hostname); return i < 0 ? HOSTS.length + (m === null ? 0 : 1) : i; };
++    const machineNames = [null, ...remote].sort((a, b) => rank(a) - rank(b) || (a ?? "").localeCompare(b ?? ""));
++    return machineNames.flatMap((m, at) => {
++      // odsod: the machine agent's space is this row.
++      const agentAt = agentSpace(m), agent = agentIn(m);
+       const mine = rows.filter((r) => (r.w.machine ?? null) === m);
+       const repair = this.reconnecting[m];
+       const machine = this.machines.find(k => k.name === m) ?? repair?.machine;
+@@ -367,20 +429,20 @@
        const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
        const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
        const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
-+        .when(!collapsed && m !== null, el => el.mt(24)) // odsod: as above each section in odsod-agents; not at the top, where the inset matches the left one
-         .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
+-        .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : "This computer"))
++        .rounded(collapsed ? 6 : 8).when(Boolean(agentAt?.active), el => el.bg(t.selected).text_color(t.foreground)) // odsod: shows the machine agent
++        .when(!collapsed && at > 0, el => el.mt(24)) // odsod: as above each section in odsod-agents; not at the top, where the inset matches the left one
++        .when(collapsed, el => el.mt(4).w(RAIL_CELL).justify_center().rounded(6).tooltip(login ? `${m} needs a login: run ${login}. Click for Copy.` : m ? `${m} · ${connected ? "connected" : (machine?.state ?? "asleep").replace(/_/g, " ")}` : (this.hostname ?? "This computer")))
          .cursor_pointer().hover(s => s.bg(t.hover))
          .on_click((_e, cx) => {
-@@ -425,7 +446,7 @@
+           if (collapsed && login) { run("app.settings", { section: "machines" }); return; }
+-          folded ? this.folded.delete(m) : this.folded.add(m);
+-          localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
+-          cx.notify();
++          if (connected) goAgent(m); // odsod: was folding; the chevron folds
+         })
+         .when(machine?.keeps_running_after_logout === false, el => el.child(div().id(`machine-logout-${m}`)
+           .flex_none().text_color(t.blocked).tooltip("Agents stop when you disconnect. Click for the fix.")
+           .on_click((_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "machine-add", kind: "dialog", width: 560 }); }).child("⚠")))
+         .when(!collapsed, el => el.child(icon))
+         .when(collapsed, el => el.child(div().relative().flex_none().child(icon).when(Boolean(m), el => el.child(badge))))
+-        .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? "This computer"))
++        .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? this.hostname ?? "This computer"))
+           .when(!connected && !rebuilt && !login, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
+           .when(rebuilt, el => el.child(h_flex().flex_none().gap(3).items_center()
+             .child(div().max_w(140).truncate().child(repair?.error || "rebuilt ·"))
+@@ -391,8 +453,16 @@
+               .child(repair?.busy ? "Connecting…" : "Connect"))))
+           .when(connected, el => el.child(div().id(`machine-add-${m ?? "local"}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
+             .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", { machine: m ?? "" }); }).child("+")))
+-          .child(div().size(6).rounded(3).flex_none().bg(connected ? t.ansi2 : t.dim))
+-          .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11).flex_none()));
++          // odsod: the machine agent's status while it runs, else whether the machine answers.
++          .child(div().size(6).rounded(3).flex_none().bg(!connected ? t.dim : agent?.status ? tone(t, agent.status) : t.ansi2))
++          .child(div().id(`machine-fold-${m ?? "local"}`).flex_none().p(2).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
++            .on_click((_e, cx) => {
++              cx.stop_propagation();
++              folded ? this.folded.delete(m) : this.folded.add(m);
++              localStorage.setItem("machines.folded", JSON.stringify([...this.folded]));
++              cx.notify();
++            })
++            .child(svg(`mods/workspace-chrome/chevron-${folded ? "right" : "down"}.svg`).size(11))));
+       const empty = h_flex().id(`machine-new-${m ?? "local"}`).h(28).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().rounded(7)
+         .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
+         .on_click(() => run("space.new", { machine: m ?? "" }))
+@@ -410,9 +480,10 @@
+             .text_size(11).text_color(t.foreground).bg(t.raised).cursor_pointer().hover(s => s.bg(t.hover))
+             .on_click((_e, cx) => { cx.stop_propagation(); cx.write_to_clipboard(login); this.copiedLogin = login; cx.notify(); })
+             .child(this.copiedLogin === login ? "Copied" : "Copy")))] : [];
+-      const items = [cell(head), ...guidance, ...(folded ? [] : mine.length ? mine.map(draw) : [loading(m) ? loadingRow(m) : cell(empty)])];
++      const items = [cell(head), ...guidance, ...(folded ? [] : mine.length ? mine.map(draw) : agentAt ? [] : [loading(m) ? loadingRow(m) : cell(empty)])];
+       const first = folded ? -1 : mine.findIndex(r => r.w.active);
+       if (first >= 0) this.activeAt = before + 1 + guidance.length + first;
++      else if (agentAt?.active) this.activeAt = before;
+       before += items.length;
+       return items;
+     });
+@@ -425,7 +496,7 @@
    gitTail(g, tree, name, t) {
      const raw = g.branch ?? "detached";
      const same = (a) => a.toLowerCase() === name.toLowerCase();
@@ -91,7 +210,7 @@
      const repo = tree || same(g.name) ? "" : g.name;
      const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
      return h_flex()
-@@ -441,7 +462,8 @@
+@@ -441,7 +512,8 @@
        .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
    }
  
@@ -101,7 +220,7 @@
      const on = w.active;
      const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
      const colors = shared("space.colors") ?? {};
-@@ -492,12 +514,21 @@
+@@ -492,12 +564,21 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
@@ -126,7 +245,7 @@
    compact({ w, i }, t) {
      return railCell(h_flex()
        .id(`space-${w.id}`)
-@@ -537,13 +568,14 @@
+@@ -537,13 +618,14 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
