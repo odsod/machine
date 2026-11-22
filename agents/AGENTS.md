@@ -33,8 +33,6 @@ Dev tools: mise via `odsod/machine` (`~/.local/share/mise/` shims). Don't instal
 Prefer: `rg` not grep, `fd` not find, `uv` not pip, `oxfmt` for JS/TS/JSON/YAML/HTML/CSS/MD,
 `magick`/`identify` for images. Timing: `hyperfine`. JWTs: `jwt decode`.
 PDFs: `pdftotext` for text, `pdftoppm` + `tesseract` for OCR.
-Show the user an image: `chafa -f kitty <png>` in a new Herdr tab
-(`herdr-app do tab.new`). Bash output never renders images.
 Phone camera photos: `/nfs/media/Photos/Oscar's Pixel 9 Pro/` (Syncthing to NAS, NFS automount).
 
 Web: `defuddle parse <url> --md --frontmatter -l en` first.
@@ -49,11 +47,31 @@ Put temporary or ephemeral artifacts in `/tmp`.
 Owner/repo from `~/Code/<host>/<owner>/<repo>`,
 `~/Workspaces/<host>/<owner>/<repo>/<branch>`, or `jj git remote list`.
 
-Terminals run in the Herdr app on herdr-core (`HC_TERMINAL_ID`). When asked about Herdr,
-read `hc --skill` (terminals, agents) and `herdr-app --skill` (window) first.
-Never stop or restart a core unless asked, and never start one from an agent shell:
-its terminals inherit that shell's environment.
-Load `/agent-team` when asked to compose or run a multi-agent team.
+## Herdr
+
+You run in a terminal in the Herdr app (spaces > tabs > panes) on herdr-core.
+Your address is `$HC_TERMINAL_ID`. `herdr-app` changes what the user sees;
+`hc` runs and talks to programs and agents.
+
+- Your space: `herdr-app ls | jq -r --arg t "$HC_TERMINAL_ID" '.spaces[] | select(any(.tabs[].terminals[]; .terminal==$t)) | .id'`.
+- New tab: `herdr-app do tab.new --space <your space> --name <name> --argv '[...]'`.
+  Always pass `--space`: the default is the selected space, often not yours.
+  Open tabs and splits only when asked. Close them with `tab.close --id <id> --confirmed true`.
+- See the window yourself: `herdr-app shot /tmp/shot.png`, then read the PNG.
+- Never stop or restart a core or the app unless asked. Never start a core from an agent shell:
+  its terminals would inherit your shell's environment.
+- For anything else (splits, focus, mods, layouts, remote machines, agents),
+  read `herdr-app --skill` (window) or `hc --skill` (programs, agents) first.
+  Load `/agent-team` to compose or run a multi-agent team.
+
+### Images and drawings
+
+Bash output never renders images. Herdr terminals render Kitty graphics.
+
+- Show an image: `herdr-app do tab.new --space <your space> --name <name> --argv '["sh","-c","chafa -f kitty <png>; read x"]'`.
+  Shrink photos first: `magick <in> -auto-orient -resize 1600x1600 <out>`.
+- Drawings: write SVG from a short Python script (to scale, real units, labels and legend),
+  render with `magick -density 96 <svg> <png>`, read the PNG to check it, fix overlaps, then show it.
 
 ## Skills
 
