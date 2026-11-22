@@ -5,9 +5,13 @@ group = "root"
 mode = "0644"
 
 [tasks."keyboard:setup"]
-description = "Register custom XKB keyboard layout"
+description = "Register custom XKB keyboard layout; held keys repeat"
 run = """
 grep -q odsod /usr/share/X11/xkb/rules/evdev.xml || \
   sudo sed -i 's#</layoutList>#<layout><configItem><name>odsod</name><languageList><iso639Id>eng</iso639Id></languageList></configItem></layout></layoutList>#' \
   /usr/share/X11/xkb/rules/evdev.xml
+# A held key repeats (vim motions) instead of opening the accent picker of
+# the plasma-keyboard input method.
+kwriteconfig6 --file kcminputrc --group Keyboard --key KeyRepeat repeat
+kwriteconfig6 --file plasmakeyboardrc --group General --key diacriticsPopupEnabled false
 """
