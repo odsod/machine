@@ -35,6 +35,11 @@ fc-cache -f
 [tasks."kde:setup-colors"]
 description = "Apply the Nord color scheme"
 run = """
+# plasma-apply-colorscheme is a Qt GUI app and aborts without a display.
+if [ -z "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]; then
+  echo "[kde] No display; skipping color scheme. Rerun from the desktop."
+  exit 0
+fi
 # plasma-apply-colorscheme does nothing when the scheme is already set, so drop
 # the key to force a full write. It also skips the accent tint this way, which
 # turns selected text black on a mid-blue background.
