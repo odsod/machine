@@ -23,10 +23,15 @@ odsod-x1-carbon)
 odsod-desktop)
   # Match the PCI device itself: a drm rule also matches every connector and
   # logs "Could not chase sysfs attribute" for each. Coldplug sends "add" for
-  # the bound device, and a later rebind sends "bind".
-  echo "[graphics] Radeon dGPU - installing udev perf rule..."
-  printf 'ACTION=="add|bind", SUBSYSTEM=="pci", DRIVER=="amdgpu", ATTR{power_dpm_force_performance_level}="high"\\n' \\
-    | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
+  # the bound device, and a later rebind sends "bind". dracut copies the rule
+  # into the initramfs, where amdgpu loads, so rebuild it when the rule changes.
+  rule='ACTION=="add|bind", SUBSYSTEM=="pci", DRIVER=="amdgpu", ATTR{power_dpm_force_performance_level}="high"'
+  if [ "$(cat /etc/udev/rules.d/30-amdgpu-perf.rules 2>/dev/null)" != "$rule" ] ||
+    [ "$(sudo lsinitrd -f etc/udev/rules.d/30-amdgpu-perf.rules 2>/dev/null)" != "$rule" ]; then
+    echo "[graphics] Radeon dGPU - installing udev perf rule..."
+    printf '%s\\n' "$rule" | sudo tee /etc/udev/rules.d/30-amdgpu-perf.rules > /dev/null
+    sudo dracut -f
+  fi
   ;;
 *)
   echo "[graphics] $(uname -n) is unlisted; nothing to do"
