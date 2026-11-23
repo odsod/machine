@@ -99,7 +99,7 @@ sudo install -m 0755 "$(mise where github:fish-shell/fish-shell)/fish" /usr/loca
 "github:github/gh-stack" = { version = "latest", bin = "gh-stack" }
 "github:googleworkspace/cli" = "latest"
 "github:ludviglundgren/qbittorrent-cli" = "latest"
-"github:odsod/recorder" = "latest"
+"github:odsod/daemon" = "latest"
 "github:schpet/linear-cli" = "latest"
 "github:shaharia-lab/slackcli" = "latest"
 "github:traefik/yaegi" = "latest"

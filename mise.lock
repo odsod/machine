@@ -727,20 +727,22 @@ checksum = "sha256:f8ee5cf476353095388857cbe7a57bbafbc32e3a32e8c96d0e804a2b60d2d
 url = "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v2.3.0/qbittorrent-cli_2.3.0_windows_amd64.tar.gz"
 url_api = "https://api.github.com/repos/ludviglundgren/qbittorrent-cli/releases/assets/460628306"
 
-[[tools."github:odsod/recorder"]]
+[[tools."github:odsod/daemon"]]
 version = "2026.9.0"
-backend = "github:odsod/recorder"
+backend = "github:odsod/daemon"
 specifiers = ["latest"]
 
-[tools."github:odsod/recorder"."platforms.linux-x64"]
+[tools."github:odsod/daemon"."platforms.linux-x64"]
 checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9159"
-url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
+checksum_source = "mise-versions"
+url = "https://github.com/odsod/daemon/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/odsod/daemon/releases/assets/565254202"
 
-[tools."github:odsod/recorder"."platforms.linux-x64-musl"]
+[tools."github:odsod/daemon"."platforms.linux-x64-musl"]
 checksum = "sha256:52ddfbf60ada1db3607e3efbf75e0571f332951bc08842f69a14f93b67dc9159"
-url = "https://github.com/odsod/recorder/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/recorder/releases/assets/565254202"
+checksum_source = "mise-versions"
+url = "https://github.com/odsod/daemon/releases/download/v2026.9.0/recorder_2026.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/odsod/daemon/releases/assets/565254202"
 
 [[tools."github:schpet/linear-cli"]]
 version = "3.1.0"
