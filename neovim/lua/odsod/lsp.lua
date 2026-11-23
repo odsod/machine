@@ -26,6 +26,19 @@ function M.setup()
     "buf_ls",
   })
 
+  -- Neovim 0.12 bug: completion's on_reload re-enables the first client ID it
+  -- saw, even after that client died (e.g. `buf lsp serve` panics). A later
+  -- buffer reload (`checktime`) then fails with "invalid client ID".
+  -- Remove once on Neovim 0.13 (fixed by neovim/neovim#42135, not backported).
+  local completion_enable = vim.lsp.completion.enable
+  ---@diagnostic disable-next-line: duplicate-set-field
+  vim.lsp.completion.enable = function(enable, client_id, bufnr, opts)
+    if enable and not vim.lsp.get_client_by_id(client_id) then
+      return
+    end
+    return completion_enable(enable, client_id, bufnr, opts)
+  end
+
   local lsp_attach_group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true })
   vim.api.nvim_create_autocmd("LspAttach", {
     group = lsp_attach_group,
