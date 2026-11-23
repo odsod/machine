@@ -6,6 +6,10 @@
 // - The second key works with or without ctrl: `prefix ctrl+h` and `prefix h`.
 // - Every key closes the hint, as in the TUI: no repeat window.
 // - The hint is a one-line bar; `?` shows the whole list.
+// - ctrl+r searches the scrollback, as copy mode did in the TUI. Rename a tab
+//   with F2.
+//   The app has no vi copy mode yet; add one here (or adopt upstream's) once
+//   herdrdev/herdr-app#1287 ships a copy cursor and exact selections.
 //
 // `herdr-app commands` lists what BINDINGS can run. Detach is `window.close`,
 // since the core keeps the terminals running.
@@ -30,7 +34,7 @@ const BINDINGS = [
   ["ctrl+n", "Next tab", "tab.next"],
   ["ctrl+b", "Previous tab", "tab.prev"],
   ["ctrl+w", "New tab", "tab.new"],
-  ["ctrl+r", "Rename tab", "tab.rename"],
+  ["ctrl+r", "Search scrollback", "terminal.search"],
   ["ctrl+f", "Goto picker", "mod.open", { name: "odsod-picker" }],
   ["ctrl+t", "Start a space", "mod.open", { name: "space" }],
   ["ctrl+e", "Close this space", "space", { confirm: true }],
