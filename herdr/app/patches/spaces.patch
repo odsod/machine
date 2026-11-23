@@ -44,10 +44,10 @@
 +  if (agentIn(m)) return show();
 +  exec(ENSURE, [], { on: m, timeout: 90000 }).then((r) => r.code === 0 && show()).catch(() => {});
 +}
- // Changes made outside Herdr (an editor's save, a commit in another app): looked
- // for this often, in repos the list shows, while the window is in front.
- const FALLBACK = 60000;
-@@ -81,6 +112,8 @@
+ // A repo's name from its git folder: the folder holding .git, a bare repo's own
+ // name, or the folder holding a hidden bare repo (<project>/.bare).
+ const repoName = (common) => {
+@@ -88,6 +119,8 @@
      this.scroll = ScrollHandle.new(); // the list's position: the active space is brought into view through it
      this.activeAt = -1; // the active space's place among the list's children (headers and rows), -1 when not drawn
      this.machines = [];
@@ -56,7 +56,7 @@
      try {
        this.reconnecting = JSON.parse(localStorage.getItem("machines.reconnecting") ?? "{}");
        if (!this.reconnecting || typeof this.reconnecting !== "object" || Array.isArray(this.reconnecting)) this.reconnecting = {};
-@@ -300,19 +333,30 @@
+@@ -307,19 +340,30 @@
      const sp = spaces(), ps = panes();
      const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
      for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
@@ -99,7 +99,7 @@
      // Simulate the batch so later indexes include earlier moves. An attempted
      // write can lose a sync conflict: allow the echo to settle before retrying.
      const order = sp.map(w => w.id);
-@@ -332,13 +376,27 @@
+@@ -339,13 +383,27 @@
        }
        this.ordering.machines = [...moved];
      }
@@ -129,7 +129,7 @@
      // Where the active space's row lands among the children this returns: the list scrolls by its direct
      // children, and machine headers, login notes and loading rows count too.
      this.activeAt = -1;
-@@ -355,8 +413,12 @@
+@@ -362,8 +420,12 @@
        this.activeAt = rows.findIndex(r => r.w.active);
        return rows.map(draw);
      }
@@ -144,7 +144,7 @@
        const mine = rows.filter((r) => (r.w.machine ?? null) === m);
        const repair = this.reconnecting[m];
        const machine = this.machines.find(k => k.name === m) ?? repair?.machine;
-@@ -367,20 +429,20 @@
+@@ -374,20 +436,20 @@
        const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
        const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
        const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
@@ -170,7 +170,7 @@
            .when(!connected && !rebuilt && !login, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
            .when(rebuilt, el => el.child(h_flex().flex_none().gap(3).items_center()
              .child(div().max_w(140).truncate().child(repair?.error || "rebuilt ·"))
-@@ -391,8 +453,16 @@
+@@ -398,8 +460,16 @@
                .child(repair?.busy ? "Connecting…" : "Connect"))))
            .when(connected, el => el.child(div().id(`machine-add-${m ?? "local"}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
              .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", { machine: m ?? "" }); }).child("+")))
@@ -189,7 +189,7 @@
        const empty = h_flex().id(`machine-new-${m ?? "local"}`).h(28).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().rounded(7)
          .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
          .on_click(() => run("space.new", { machine: m ?? "" }))
-@@ -410,9 +480,10 @@
+@@ -417,9 +487,10 @@
              .text_size(11).text_color(t.foreground).bg(t.raised).cursor_pointer().hover(s => s.bg(t.hover))
              .on_click((_e, cx) => { cx.stop_propagation(); cx.write_to_clipboard(login); this.copiedLogin = login; cx.notify(); })
              .child(this.copiedLogin === login ? "Copied" : "Copy")))] : [];
@@ -201,7 +201,7 @@
        before += items.length;
        return items;
      });
-@@ -425,7 +496,7 @@
+@@ -432,7 +503,7 @@
    gitTail(g, tree, name, t) {
      const raw = g.branch ?? "detached";
      const same = (a) => a.toLowerCase() === name.toLowerCase();
@@ -210,7 +210,7 @@
      const repo = tree || same(g.name) ? "" : g.name;
      const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
      return h_flex()
-@@ -441,7 +512,8 @@
+@@ -448,7 +519,8 @@
        .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
    }
  
@@ -220,7 +220,7 @@
      const on = w.active;
      const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
      const colors = shared("space.colors") ?? {};
-@@ -492,12 +564,21 @@
+@@ -499,12 +571,21 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
@@ -245,7 +245,7 @@
    compact({ w, i }, t) {
      return railCell(h_flex()
        .id(`space-${w.id}`)
-@@ -537,13 +618,14 @@
+@@ -544,13 +625,14 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
