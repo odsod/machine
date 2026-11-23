@@ -29,7 +29,7 @@ import {
   theme,
 } from "herdr";
 
-const TYPES = ["Workspace", "Code", "Activity", "Project", "Vault"];
+const TYPES = ["Workspace", "Code", "Activity", "Project"];
 const AGENTS = ["claude", "codex", "agy", "pi"];
 const MAX_ROWS = 200;
 const PLACEHOLDERS = {

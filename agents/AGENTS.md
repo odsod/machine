@@ -57,7 +57,7 @@
 - Fork a new workstream without moving focus:
   `herdr-space start workspace <host>/<org>/<repo> <bookmark> --prompt "<task>"`
   (`--agent codex|agy|pi`, `--on <machine>`). Other kinds take a name only:
-  `code <host>/<org>/<repo>`, `activity|project|vault <name>`.
+  `code <host>/<org>/<repo>`, `activity|project <name>`.
 - Inspect window: `herdr-app shot /tmp/shot.png`, then read the PNG.
 - Never stop or restart `herdr-core` or `herdr-app` unless asked. Never start a
   core from an agent shell (terminals inherit your env).

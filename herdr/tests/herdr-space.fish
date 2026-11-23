@@ -73,12 +73,11 @@ set -l kept (printf '%s' "$out" | jq -r .kept)
 test -n "$kept"; or fail "remove kept no commit: $out"
 jj -R "$repo" log -r "$kept" --no-graph -T 'empty' | string match -q false; or fail "kept commit $kept is not visible"
 
-# folders: a new project gets a date prefix, an unknown vault fails
+# folders: a new project gets a date prefix
 set out (run_helper prepare project demo); or fail "prepare project failed"
 set -l project (date '+%Y-%m-%d')-demo
 printf '%s' "$out" | jq -e --arg l "$project" '.label == $l' >/dev/null; or fail "project printed $out"
 test -d "$HOME/Projects/$project"; or fail "project folder missing"
-run_helper prepare vault nope >/dev/null 2>&1; and fail "prepare made a vault"
 run_helper dirs project | jq -e --arg n "$project" '.[0].name == $n' >/dev/null; or fail "dirs does not list $project"
 
 # start: prepare, then a new unfocused space with the agent and its task
