@@ -932,25 +932,25 @@ backend = "go:mvdan.cc/gofumpt"
 specifiers = ["latest"]
 
 [[tools."http:herdr-app"]]
-version = "0.1.16"
+version = "0.1.17"
 backend = "http:herdr-app"
 specifiers = ["latest"]
 
 [tools."http:herdr-app"."platforms.linux-arm64"]
-checksum = "sha256:efeef4f1759b0e8900f205c2c22b14287a112f874406539b4ea1b3be24b73631"
-url = "https://releases.herdr.dev/app/0.1.16/herdr-app-linux-aarch64.tar.gz"
+checksum = "sha256:a8c06bf7a3fce06a73a9a50e709250aac8f442fedcc6c49f3157b76dd8dd6d93"
+url = "https://releases.herdr.dev/app/0.1.17/herdr-app-linux-aarch64.tar.gz"
 
 [tools."http:herdr-app"."platforms.linux-arm64-musl"]
-checksum = "sha256:efeef4f1759b0e8900f205c2c22b14287a112f874406539b4ea1b3be24b73631"
-url = "https://releases.herdr.dev/app/0.1.16/herdr-app-linux-aarch64.tar.gz"
+checksum = "sha256:a8c06bf7a3fce06a73a9a50e709250aac8f442fedcc6c49f3157b76dd8dd6d93"
+url = "https://releases.herdr.dev/app/0.1.17/herdr-app-linux-aarch64.tar.gz"
 
 [tools."http:herdr-app"."platforms.linux-x64"]
-checksum = "blake3:68f424aee50e2fc59a84771b9b269e4661de173031b2f48e1b7a1df854bc1be1"
-url = "https://releases.herdr.dev/app/0.1.16/herdr-app-linux-x86_64.tar.gz"
+checksum = "sha256:2188f4d7d5cf041450dbdbf2e14649244b1a6274a1080bdd97fa7bc450e65ca1"
+url = "https://releases.herdr.dev/app/0.1.17/herdr-app-linux-x86_64.tar.gz"
 
 [tools."http:herdr-app"."platforms.linux-x64-musl"]
-checksum = "sha256:282d2632196b238206cfe66bfb61c0faf299ca1c91843bd076521bbe36571216"
-url = "https://releases.herdr.dev/app/0.1.16/herdr-app-linux-x86_64.tar.gz"
+checksum = "sha256:2188f4d7d5cf041450dbdbf2e14649244b1a6274a1080bdd97fa7bc450e65ca1"
+url = "https://releases.herdr.dev/app/0.1.17/herdr-app-linux-x86_64.tar.gz"
 
 [[tools."http:herdr-core"]]
 version = "0.1.21"
