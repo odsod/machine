@@ -162,21 +162,22 @@
 | `~/Workspaces` | jj workspaces | `<host>/<org>/<repo>/<branch>` |
 | `~/Activities` | no end date   | `<name>`                       |
 | `~/Projects`   | time-limited  | `<YYYY-MM-DD>-<name>`          |
-| `~/Vaults`     | Obsidian      | `<name>`                       |
 
 - Provisioning lives in `~/Code/github.com/odsod/machine`. `~/.agents` symlinks
   to its `agents/` dir (this file and global skills); commit changes there.
-- `~/Vaults` syncs with Syncthing, not git. Never init a repo there.
 - Day-job repos and their cross-repo release flow: see that repo's own
   `AGENTS.md`.
 
 ## Vault
 
-- Path: `~/Vaults/odsod` (schema and ingest workflow live in its `AGENTS.md`).
-- "check the vault": `obsidian vault="odsod" search query="..."`; read
+- Path: `~/Code/git.lan/odsod/brain` (schema and ingest workflow live in its
+  `AGENTS.md`). It is a jj repo; the recorder writes into it.
+- "check the vault": `obsidian vault="brain" search query="..."`; read
   `summary:` first.
-- "update the vault": run the ingest workflow in `~/Vaults/odsod/AGENTS.md`.
-- "save this to the vault": write `~/Vaults/odsod/inbox/<slug>.md` (descriptive
-  slug, no dates). For web pages, run `defuddle parse <url> --md -o <path>`,
-  then add `title`, `url`, and `captured` frontmatter. Save only on an explicit
+- "update the vault": `jj git fetch` and rebase first, run the ingest workflow
+  in its `AGENTS.md`, then commit and push to `main` (recorder output included).
+- "save this to the vault": write `~/Code/git.lan/odsod/brain/inbox/<slug>.md`
+  (descriptive slug, no dates). For web pages, run
+  `defuddle parse <url> --md -o <path>`, then add `title`, `url`, and
+  `captured` frontmatter. Save only on an explicit
   ask and only if it stays useful in another project or month.
