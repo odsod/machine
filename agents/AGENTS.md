@@ -175,7 +175,8 @@
 - "check the vault": `obsidian vault="brain" search query="..."`; read
   `summary:` first.
 - "update the vault": `jj git fetch` and rebase first, run the ingest workflow
-  in its `AGENTS.md`, then commit and push to `main` (recorder output included).
+  in its `AGENTS.md`, then commit (recorder output included) and open a PR.
+  `main` is protected and merges fast-forward only; see its "Commit format".
 - "save this to the vault": write `~/Code/git.lan/odsod/brain/inbox/<slug>.md`
   (descriptive slug, no dates). For web pages, run
   `defuddle parse <url> --md -o <path>`, then add `title`, `url`, and
