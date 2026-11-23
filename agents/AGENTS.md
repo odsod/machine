@@ -56,8 +56,8 @@
   tests and watchers hidden (no labels).
 - Fork a new workstream without moving focus:
   `herdr-space start workspace <host>/<org>/<repo> <bookmark> --prompt "<task>"`
-  (`--agent codex|agy|pi`, `--on <machine>`). Other kinds take a name only:
-  `code <host>/<org>/<repo>`, `activity|project <name>`.
+  (`--agent codex|agy|pi`, `--on <machine>`). `code <host>/<org>/<repo>` takes
+  the repo only.
 - Inspect window: `herdr-app shot /tmp/shot.png`, then read the PNG.
 - Never stop or restart `herdr-core` or `herdr-app` unless asked. Never start a
   core from an agent shell (terminals inherit your env).
@@ -160,11 +160,11 @@
 | -------------- | ------------- | ------------------------------ |
 | `~/Code`       | jj originals  | `<host>/<org>/<repo>`          |
 | `~/Workspaces` | jj workspaces | `<host>/<org>/<repo>/<branch>` |
-| `~/Activities` | no end date   | `<name>`                       |
-| `~/Projects`   | time-limited  | `<YYYY-MM-DD>-<name>`          |
 
 - Provisioning lives in `~/Code/github.com/odsod/machine`. `~/.agents` symlinks
   to its `agents/` dir (this file and global skills); commit changes there.
+- Non-code work (research, documents, one-off tasks) goes in a vault repo under
+  `~/Code`, never in loose folders. Each vault has its own `AGENTS.md`.
 - Day-job repos and their cross-repo release flow: see that repo's own
   `AGENTS.md`.
 

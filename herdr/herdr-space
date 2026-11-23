@@ -5,7 +5,6 @@
 #   herdr-space repos                     [{repo}] ranked by recent use
 #   herdr-space bookmarks <repo>          [{name, remote, epoch}] newest first
 #   herdr-space fetch <repo>              jj git fetch from origin (10s limit)
-#   herdr-space dirs <kind>               [{name, epoch}] newest first
 #   herdr-space prepare <kind> <name> [<bookmark>]
 #                                         makes the folder, trusts it: {path, label}
 #   herdr-space linear                    [{kind, id, label}] open issues and projects
@@ -21,8 +20,8 @@
 #                                         --focus it shows the space, and shows an
 #                                         existing one for the folder instead of failing
 #
-# <kind> is workspace, code, activity or project. <repo> and <name> for
-# workspace and code are relative to ~/Code: <host>/<org>/<repo>.
+# <kind> is workspace or code. <repo> and <name> are relative to ~/Code:
+# <host>/<org>/<repo>.
 
 source (path dirname (realpath (status filename)))/lib.fish
 or begin
@@ -151,25 +150,6 @@ function cmd_fetch --argument-names repo_rel
     echo '{}'
 end
 
-function _kind_root --argument-names kind
-    switch $kind
-        case activity
-            echo "$HOME/Activities"
-        case project
-            echo "$HOME/Projects"
-        case '*'
-            _fail "Unknown folder kind: $kind"
-    end
-end
-
-function cmd_dirs --argument-names kind
-    set -l root (_kind_root $kind)
-    for d in $root/*/
-        test -d "$d"; or continue
-        printf '%s\t%s\n' (stat -c '%Y' "$d") (path basename "$d")
-    end | sort -t \t -k1,1nr | awk -F '\t' '{ print $2 "\t" $1 }' | _tsv_json name 'epoch#'
-end
-
 function cmd_linear
     command -q linear; or begin
         echo '[]'
@@ -285,20 +265,6 @@ function cmd_prepare --argument-names kind name bookmark
             _record_repo_use "$name"
             _trust "$path"
             _emit_space "$path" (string join / -- (string split / -- "$name")[-2..-1])
-        case activity project
-            string match -rq '^[^/]+$' -- "$name"; and test "$name" != . -a "$name" != ..
-            or _fail "Invalid folder name: $name"
-            set -l root (_kind_root $kind)
-            set -l path "$root/$name"
-            if not test -d "$path"
-                if test $kind = project; and not string match -rq '^[0-9]{4}-[0-9]{2}-[0-9]{2}-' -- "$name"
-                    set name (date '+%Y-%m-%d')-$name
-                    set path "$root/$name"
-                end
-                mkdir -p "$path"; or _fail "Failed to create $path"
-            end
-            _trust "$path"
-            _emit_space "$path" "$name"
         case '*'
             _fail "Unknown kind: $kind"
     end
@@ -431,8 +397,6 @@ switch "$argv[1]"
         cmd_bookmarks $argv[2]
     case fetch
         cmd_fetch $argv[2]
-    case dirs
-        cmd_dirs $argv[2]
     case prepare
         cmd_prepare $argv[2..-1]
     case linear
