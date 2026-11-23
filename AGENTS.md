@@ -86,12 +86,13 @@
   `herdr-core` in `~/.local/bin` to the pinned build and warns on a stale core.
   Restart by hand at a safe point with `hc server restart` (terminals survive;
   streams reattach).
-- Herdr app (`http:herdr-app`): still self-updates in place, so it can run
-  ahead of `mise.lock`. Drop this caveat once upstream ships
-  [herdrdev/herdr-app#459](https://github.com/herdrdev/herdr-app/pull/459)
-  (fixes [#136](https://github.com/herdrdev/herdr-app/issues/136)),
-  [#207](https://github.com/herdrdev/herdr-app/issues/207), or
-  [#395](https://github.com/herdrdev/herdr-app/issues/395).
+- Herdr app (`http:herdr-app`): `mise` owns updates. `env.sh` points
+  `HERDR_RELEASES_URL` at a dead address, so the app finds no update (it would
+  stage one beside the mise install). Bump with
+  `mise upgrade http:herdr-app`, then restart the app. Swap the override for a
+  setting once upstream ships
+  [herdrdev/herdr-app#459](https://github.com/herdrdev/herdr-app/pull/459) or
+  [#207](https://github.com/herdrdev/herdr-app/issues/207).
 - Herdr mods: shipped mods and layouts overwrite on app start. Patch via
   `herdr/app/patches/<mod>.patch` (unified diff of `main.js`, `a/` and `b/`
   prefixes) and `herdr/app/patches/layout.jq`. `herdr:patch-mods` (run by

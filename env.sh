@@ -29,6 +29,9 @@ export GOOGLE_CLOUD_LOCATION="global"
 # go — GOPATH/bin for `go install`-ed binaries (mise manages GOROOT)
 export PATH="$HOME/go/bin:$PATH"
 
+# herdr-app: mise owns updates; a dead releases URL stops the app's self-update
+export HERDR_RELEASES_URL="http://127.0.0.1:9"
+
 # java
 export JAVA_HOME="/usr/lib/jvm/java-25-openjdk"
 export MAVEN_HOME="/usr/share/maven"
