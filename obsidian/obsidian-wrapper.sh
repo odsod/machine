@@ -21,15 +21,15 @@ fi
 
 CLI="${OBSIDIAN_CLI:-$CLI_BIN}"
 SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/.obsidian-cli.sock"
-DEFAULT_VAULT="odsod"
+DEFAULT_VAULT="brain"
 
 if [ ! -S "$SOCK" ]; then
   mkdir -p "$HOME/.config/obsidian"
   config="$HOME/.config/obsidian/obsidian.json"
   [ -f "$config" ] || echo '{}' >"$config"
-  jq --arg path "$HOME/Vaults/odsod" \
+  jq --arg path "$HOME/Code/git.lan/odsod/brain" \
     'if (.vaults // {} | to_entries | map(select(.value.path == $path)) | length) == 0
-       then .vaults.odsod = {"path": $path, "open": true} else . end | .cli = true' \
+       then .vaults.brain = {"path": $path, "open": true} else . end | .cli = true' \
     "$config" >"$config.tmp" && mv "$config.tmp" "$config"
 
   WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}" obsidian-app >/dev/null 2>&1 &

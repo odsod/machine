@@ -9,10 +9,10 @@
     "timeoutS": 180
   },
   "transcript": {
-    "outputDir": "~/Vaults/odsod/raw/transcripts"
+    "outputDir": "~/Code/git.lan/odsod/brain/raw/transcripts"
   },
   "segments": {
-    "outputDir": "~/Vaults/odsod/inbox"
+    "outputDir": "~/Code/git.lan/odsod/brain/inbox"
   },
   "dedup": {
     "threshold": 0.6
