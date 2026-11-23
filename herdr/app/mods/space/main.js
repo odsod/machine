@@ -29,7 +29,7 @@ import {
   theme,
 } from "herdr";
 
-const TYPES = ["Workspace", "Code", "Activity", "Project"];
+const TYPES = ["Workspace", "Code"];
 const AGENTS = ["claude", "codex", "agy", "pi"];
 const MAX_ROWS = 200;
 const PLACEHOLDERS = {
@@ -144,9 +144,7 @@ export default class Space extends View {
     if (this.tab === "close") return ["workspaces", ["workspaces"]];
     if (this.step === "bookmark") return [`bookmarks:${this.repo}`, ["bookmarks", this.repo]];
     if (this.step === "linear") return null;
-    const type = TYPES[this.type];
-    if (type === "Workspace" || type === "Code") return ["repos", ["repos"]];
-    return [`dirs:${type}`, ["dirs", type.toLowerCase()]];
+    return ["repos", ["repos"]];
   }
 
   load(cx, fresh = false) {
@@ -239,9 +237,7 @@ export default class Space extends View {
       rows = data.map((d) => ({ key: d.name, label: d.name, right: ago(d.epoch), item: d }));
     }
     rows = rows.filter((r) => matches(q, r.label));
-    const creates =
-      this.tab === "start" &&
-      (this.step === "bookmark" || ["Activity", "Project"].includes(TYPES[this.type]));
+    const creates = this.tab === "start" && this.step === "bookmark";
     if (creates && q && !rows.some((r) => r.label === q || r.label === `${q}@origin`)) {
       rows.unshift({ key: `new:${q}`, label: `new: ${q}`, tone: "muted", create: q });
     }
