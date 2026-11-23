@@ -20,8 +20,9 @@
 
 ## Server Flags
 
-- `--vad` + `--vad-model ggml-silero-v6.2.0.bin`: Server-side Silero VAD filters
-  non-speech before decoding (primary hallucination defense).
+- No `--vad`: the odsod daemon runs Silero VAD client-side and sends one
+  utterance per request; its cleanup filters catch hallucinations. The VAD
+  model still downloads, so a revert needs no network.
 - `--language auto`: Supports mixed English and Swedish audio.
 - `--suppress-nst`: Suppresses non-speech tokens (`[Music]`, `[Applause]`)
   emitted on ambient noise.
