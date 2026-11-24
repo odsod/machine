@@ -9,7 +9,7 @@
  
  function find(node, id) {
    if (node?.id === id) return node;
-@@ -33,6 +33,37 @@
+@@ -33,6 +33,56 @@
  const railCell = (el) => h_flex().flex_none().justify_center().child(el);
  const where = (s, ps) => JSON.stringify([s.machine ?? null, place(s, ps)]);
  const base = (path) => path.replace(/\/+$/, "").split("/").pop();
@@ -30,24 +30,43 @@
 +}
 +// odsod: each machine's row stands for its machine agent: the terminal named
 +// `machine` in space `machine` (see "Machine Agent" in odsod/machine's
-+// AGENTS.md). `herdr-machine-agent` starts or repairs it on that machine.
++// AGENTS.md). A row per vault under it stands for that vault's agent, named
++// and placed the same way. `herdr-machine-agent --agent <name>` starts or
++// repairs one on that machine.
 +const ENSURE = `${home()}/.local/bin/herdr-machine-agent`; // homes match across machines
 +const qualify = (m, id) => (m ? `${m}/${id}` : id);
-+const isAgent = (w) => w.id === qualify(w.machine ?? null, "machine");
-+const agentSpace = (m) => spaces().find((s) => s.id === qualify(m, "machine")) ?? null;
-+const agentIn = (m) => terminals().find((t) => t.name === "machine" && t.state === "live" && (t.address.includes("/") ? t.address.split("/")[0] : null) === m) ?? null;
++const VAULTS = [["brain", "brain"], ["house", "house"], ["company", "building-2"]]; // [agent, icon in mods/machine/]
++const AGENTS = ["machine", ...VAULTS.map(([name]) => name)];
++const agentName = (w) => AGENTS.find((name) => w.id === qualify(w.machine ?? null, name)) ?? null;
++const isAgent = (w) => agentName(w) !== null;
++const agentSpace = (m, name = "machine") => spaces().find((s) => s.id === qualify(m, name)) ?? null;
++const agentIn = (m, name = "machine") => terminals().find((t) => t.name === name && t.state === "live" && (t.address.includes("/") ? t.address.split("/")[0] : null) === m) ?? null;
++// Agents being started, by space id: {id: ms}. Shared with the machine mod
++// (the prefix), so a row spins at once, whoever asked. Stale after 2 minutes.
++const STARTING = "agents.starting";
++const setStarting = (id, on) => {
++  const s = { ...(shared(STARTING) ?? {}) };
++  if (on) s[id] = Date.now(); else delete s[id];
++  setShared(STARTING, s);
++};
++const starting = (m, name = "machine") => Date.now() - ((shared(STARTING) ?? {})[qualify(m, name)] ?? 0) < 120000;
++const spinner = (t) => svg("mods/workspace-chrome/spinner.svg").size(13).flex_none().text_color(t.working).spin(900);
 +// Machine sections in this order, then the rest by name.
 +const HOSTS = ["odsod-desktop", "odsod-x1-carbon"];
 +// Show it, after starting or repairing it there when it isn't running.
-+function goAgent(m) {
-+  const show = () => run("space.select", { id: qualify(m, "machine") });
-+  if (agentIn(m)) return show();
-+  exec(ENSURE, [], { on: m, timeout: 90000 }).then((r) => r.code === 0 && show()).catch(() => {});
++function goAgent(m, name = "machine") {
++  const show = () => run("space.select", { id: qualify(m, name) });
++  if (agentIn(m, name)) return show();
++  if (starting(m, name)) return;
++  setStarting(qualify(m, name), true);
++  exec(ENSURE, ["--agent", name], { on: m, timeout: 90000 })
++    .then((r) => { setStarting(qualify(m, name), false); r.code === 0 && show(); })
++    .catch(() => setStarting(qualify(m, name), false));
 +}
  // A repo's name from its git folder: the folder holding .git, a bare repo's own
  // name, or the folder holding a hidden bare repo (<project>/.bare).
  const repoName = (common) => {
-@@ -88,6 +119,8 @@
+@@ -88,6 +138,8 @@
      this.scroll = ScrollHandle.new(); // the list's position: the active space is brought into view through it
      this.activeAt = -1; // the active space's place among the list's children (headers and rows), -1 when not drawn
      this.machines = [];
@@ -56,7 +75,7 @@
      try {
        this.reconnecting = JSON.parse(localStorage.getItem("machines.reconnecting") ?? "{}");
        if (!this.reconnecting || typeof this.reconnecting !== "object" || Array.isArray(this.reconnecting)) this.reconnecting = {};
-@@ -307,19 +340,30 @@
+@@ -307,19 +359,30 @@
      const sp = spaces(), ps = panes();
      const ready = (w) => this.shown.has(w.id) || where(w, ps) in this.git || Date.now() - (this.born[w.id] ??= Date.now()) > 1500;
      for (const w of sp) if (!this.shown.has(w.id) && ready(w)) this.shown.add(w.id);
@@ -67,7 +86,7 @@
 -    const placed = new Set(); // repos whose worktrees are listed (under the first of its spaces)
 +    // odsod: group by root() instead of git: the original checkout's space, or a
 +    // header standing in for it, then its workspaces.
-+    // odsod: the machine agent's space is its machine's row, not in a group.
++    // odsod: the agents' spaces are their machine's rows, not in a group.
 +    const list = sp.map((w, i) => ({ w, i, g: this.git[where(w, ps)] ?? null, root: root(w, place(w, ps)) })).filter((r) => !isAgent(r.w));
 +    const all = [];
 +    const placed = new Set();
@@ -88,18 +107,18 @@
 +      all.push(main ? { ...main, tree: null } : { head: r.root, w: { id: `root:${r.root.key}`, machine: r.root.machine } });
 +      kids.forEach((k, n) => all.push({ ...k, tree: n === kids.length - 1 ? "└─" : "├─" }));
 +    }
-+    // odsod: the machine agent's space first on its machine, so every client,
-+    // mobile too, lists it at the top there.
++    // odsod: the agents' spaces first on their machine (machine, then vaults),
++    // so every client, mobile too, lists them at the top there.
 +    const rest = all.filter((r) => !r.head);
 +    const out = [...new Set(sp.map((w) => w.machine ?? null))].flatMap((m) => [
-+      ...sp.filter((w) => isAgent(w) && (w.machine ?? null) === m).map((w) => ({ w })),
++      ...sp.filter((w) => isAgent(w) && (w.machine ?? null) === m).sort((a, b) => AGENTS.indexOf(agentName(a)) - AGENTS.indexOf(agentName(b))).map((w) => ({ w })),
 +      ...rest.filter((r) => (r.w.machine ?? null) === m),
 +    ]);
 +    this.nameAgentTabs(sp);
      // Simulate the batch so later indexes include earlier moves. An attempted
      // write can lose a sync conflict: allow the echo to settle before retrying.
      const order = sp.map(w => w.id);
-@@ -339,13 +383,27 @@
+@@ -339,13 +402,28 @@
        }
        this.ordering.machines = [...moved];
      }
@@ -109,15 +128,16 @@
 +    return shown.filter((r, n) => !r.head || shown[n + 1]?.tree);
 +  }
 +
-+  // odsod: the machine agent's tab is called `machine` everywhere (agents
-+  // panel, mobile). A rename lands through the core: ask again after a while.
++  // odsod: an agent's tab is called after it everywhere (agents panel,
++  // mobile). A rename lands through the core: ask again after a while.
 +  nameAgentTabs(sp) {
 +    this.naming ??= {};
 +    for (const w of sp.filter(isAgent)) {
-+      const tab = (w.tabs ?? []).find((t) => t.id === qualify(w.machine ?? null, "machine"));
-+      if (!tab || tab.name === "machine" || Date.now() - (this.naming[tab.id] ?? 0) < 5000) continue;
++      const name = agentName(w);
++      const tab = (w.tabs ?? []).find((t) => t.id === qualify(w.machine ?? null, name));
++      if (!tab || tab.name === name || Date.now() - (this.naming[tab.id] ?? 0) < 5000) continue;
 +      this.naming[tab.id] = Date.now();
-+      run("tab.rename", { id: tab.id, name: "machine" });
++      run("tab.rename", { id: tab.id, name });
 +    }
    }
  
@@ -129,7 +149,7 @@
      // Where the active space's row lands among the children this returns: the list scrolls by its direct
      // children, and machine headers, login notes and loading rows count too.
      this.activeAt = -1;
-@@ -362,8 +420,12 @@
+@@ -362,8 +440,12 @@
        this.activeAt = rows.findIndex(r => r.w.active);
        return rows.map(draw);
      }
@@ -144,7 +164,7 @@
        const mine = rows.filter((r) => (r.w.machine ?? null) === m);
        const repair = this.reconnecting[m];
        const machine = this.machines.find(k => k.name === m) ?? repair?.machine;
-@@ -374,20 +436,20 @@
+@@ -374,20 +456,20 @@
        const icon = svg(`mods/workspace-chrome/${m ? "server" : "monitor"}.svg`).size(13).flex_none();
        const badge = div().absolute().right(-3).bottom(-2).size(6).rounded(3).border_1().border_color(t.chrome).bg(connected ? t.ansi2 : t.dim);
        const head = h_flex().id(`machine-${m ?? "local"}`).h(26).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().text_size(11).text_color(t.dim)
@@ -163,14 +183,16 @@
          .when(machine?.keeps_running_after_logout === false, el => el.child(div().id(`machine-logout-${m}`)
            .flex_none().text_color(t.blocked).tooltip("Agents stop when you disconnect. Click for the fix.")
            .on_click((_e, cx) => { cx.stop_propagation(); openOverlay({ mod: "machine-add", kind: "dialog", width: 560 }); }).child("⚠")))
-         .when(!collapsed, el => el.child(icon))
-         .when(collapsed, el => el.child(div().relative().flex_none().child(icon).when(Boolean(m), el => el.child(badge))))
+-        .when(!collapsed, el => el.child(icon))
+-        .when(collapsed, el => el.child(div().relative().flex_none().child(icon).when(Boolean(m), el => el.child(badge))))
 -        .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? "This computer"))
++        .when(!collapsed, el => el.child(starting(m) ? spinner(t) : icon)) // odsod: spins while its agent starts
++        .when(collapsed, el => el.child(div().relative().flex_none().child(starting(m) ? spinner(t) : icon).when(Boolean(m), el => el.child(badge))))
 +        .when(!collapsed, el => el.child(div().flex_1().truncate().child(m ?? this.hostname ?? "This computer"))
            .when(!connected && !rebuilt && !login, el => el.child(div().flex_none().child((machine?.state ?? "asleep").replace(/_/g, " "))))
            .when(rebuilt, el => el.child(h_flex().flex_none().gap(3).items_center()
              .child(div().max_w(140).truncate().child(repair?.error || "rebuilt ·"))
-@@ -398,8 +460,16 @@
+@@ -398,8 +480,16 @@
                .child(repair?.busy ? "Connecting…" : "Connect"))))
            .when(connected, el => el.child(div().id(`machine-add-${m ?? "local"}`).flex_none().px(4).rounded(4).hover(s => s.bg(t.hover).text_color(t.foreground))
              .on_click((_e, cx) => { cx.stop_propagation(); run("space.new", { machine: m ?? "" }); }).child("+")))
@@ -189,19 +211,24 @@
        const empty = h_flex().id(`machine-new-${m ?? "local"}`).h(28).flex_none().px(collapsed ? 0 : 8).gap(7).items_center().rounded(7)
          .text_size(12).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))
          .on_click(() => run("space.new", { machine: m ?? "" }))
-@@ -417,9 +487,10 @@
+@@ -417,9 +507,14 @@
              .text_size(11).text_color(t.foreground).bg(t.raised).cursor_pointer().hover(s => s.bg(t.hover))
              .on_click((_e, cx) => { cx.stop_propagation(); cx.write_to_clipboard(login); this.copiedLogin = login; cx.notify(); })
              .child(this.copiedLogin === login ? "Copied" : "Copy")))] : [];
 -      const items = [cell(head), ...guidance, ...(folded ? [] : mine.length ? mine.map(draw) : [loading(m) ? loadingRow(m) : cell(empty)])];
-+      const items = [cell(head), ...guidance, ...(folded ? [] : mine.length ? mine.map(draw) : agentAt ? [] : [loading(m) ? loadingRow(m) : cell(empty)])];
++      // odsod: the vault agents' rows, right under the machine agent's.
++      const vaults = connected && !folded ? VAULTS.map(([name, glyph]) => this.vault(m, name, glyph, t, collapsed)) : [];
++      const vaultAt = connected && !folded ? VAULTS.findIndex(([name]) => agentSpace(m, name)?.active) : -1;
++      const items = [cell(head), ...vaults, ...guidance, ...(folded ? [] : mine.length ? mine.map(draw) : agentAt ? [] : [loading(m) ? loadingRow(m) : cell(empty)])];
        const first = folded ? -1 : mine.findIndex(r => r.w.active);
-       if (first >= 0) this.activeAt = before + 1 + guidance.length + first;
+-      if (first >= 0) this.activeAt = before + 1 + guidance.length + first;
++      if (first >= 0) this.activeAt = before + 1 + vaults.length + guidance.length + first;
++      else if (vaultAt >= 0) this.activeAt = before + 1 + vaultAt;
 +      else if (agentAt?.active) this.activeAt = before;
        before += items.length;
        return items;
      });
-@@ -432,7 +503,7 @@
+@@ -432,7 +527,7 @@
    gitTail(g, tree, name, t) {
      const raw = g.branch ?? "detached";
      const same = (a) => a.toLowerCase() === name.toLowerCase();
@@ -210,7 +237,7 @@
      const repo = tree || same(g.name) ? "" : g.name;
      const where = [repo, branch].filter(Boolean).join(" \u00b7 ");
      return h_flex()
-@@ -448,7 +519,8 @@
+@@ -448,7 +543,8 @@
        .when(g.behind > 0, (el) => el.child(div().flex_none().text_color(t.ansi1).child(`\u2193${g.behind}`)));
    }
  
@@ -220,7 +247,7 @@
      const on = w.active;
      const fromIndex = this.pressed === null ? -1 : spaces().findIndex(s => s.id === this.pressed);
      const colors = shared("space.colors") ?? {};
-@@ -499,12 +571,21 @@
+@@ -499,12 +595,39 @@
            .gap(9)
            .items_center()
            .when(Boolean(tree), el => el.pl(22).child(svg("mods/workspace-chrome/branch.svg").size(13).flex_none().text_color(t.dim)))
@@ -242,10 +269,28 @@
 +      .child(div().min_w(0).truncate().text_color(t.muted).child(head.label));
 +  }
 +
++  // odsod: a vault agent's row. A click shows it, after starting or repairing
++  // it there when it isn't running; its dot is the agent's status.
++  vault(m, name, glyph, t, collapsed) {
++    const on = Boolean(agentSpace(m, name)?.active), agent = agentIn(m, name), busy = starting(m, name);
++    const icon = busy ? spinner(t) : svg(`mods/machine/${glyph}.svg`).size(13).flex_none();
++    const el = h_flex().id(`vault-${m ?? "local"}-${name}`).flex_none().items_center().cursor_pointer()
++      .text_color(on ? t.foreground : t.muted)
++      .when(on, (el) => el.bg(t.selected))
++      .when(!on, (el) => el.hover((s) => s.bg(t.hover)))
++      .on_click(() => goAgent(m, name));
++    if (collapsed) return railCell(el.w(RAIL_CELL).h(26).rounded(6).justify_center().tooltip(name).child(icon));
++    return el.h(rowHeight({ tree: null })).px(8).gap(9).rounded(8)
++      .child(icon)
++      .child(div().flex_1().min_w(0).truncate().child(name))
++      .when(busy, (el) => el.child(div().flex_none().text_color(t.dim).child("starting…")))
++      .child(div().size(6).rounded(3).flex_none().bg(agent?.status ? tone(t, agent.status) : t.dim));
++  }
++
    compact({ w, i }, t) {
      return railCell(h_flex()
        .id(`space-${w.id}`)
-@@ -544,13 +625,14 @@
+@@ -544,13 +667,14 @@
        this.revealedAt = this.activeAt;
        if (this.activeAt >= 0) this.scroll.scroll_to_item(this.activeAt);
      }
