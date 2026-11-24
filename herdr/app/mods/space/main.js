@@ -105,7 +105,8 @@ export default class Space extends View {
     }
     this.handle = cx.focus_handle();
     this.handle.focus();
-    cx.timer.after(100, () => this.input.focus());
+    // The confirm view draws no search field: keep focus on the dialog.
+    cx.timer.after(100, () => (this.confirm ? this.handle : this.input).focus());
     if (checking()) return;
     cx.spawn(async (cx) => {
       const r = await exec("hostname", ["-s"]).catch(() => null);
@@ -171,9 +172,8 @@ export default class Space extends View {
   }
 
   // The jj workspace a space shows: its folder or a pane's live folder.
-  spacesAt(path) {
-    const all = panes();
-    return spaces().filter((s) => {
+  spacesAt(path, all = panes(), list = spaces()) {
+    return list.filter((s) => {
       if ((s.machine ?? null) !== (this.machine ?? null)) return false;
       if (under(s.folder, path)) return true;
       const tabs = new Set(s.tabs.map((t) => t.id));
@@ -187,10 +187,14 @@ export default class Space extends View {
     const data = this.data();
     const wss = Array.isArray(data) ? data : [];
     const cur = this.currentSpace();
-    const mine = spaces().filter((s) => (s.machine ?? null) === (this.machine ?? null));
+    // Read panes and spaces once: per-row host calls blow the render deadline.
+    const all = panes();
+    const list = spaces();
+    const shown = new Map(wss.map((w) => [w.path, this.spacesAt(w.path, all, list)]));
+    const mine = list.filter((s) => (s.machine ?? null) === (this.machine ?? null));
     mine.sort((a, b) => (b.id === cur?.id) - (a.id === cur?.id));
     const rows = mine.map((s) => {
-      const ws = wss.find((w) => this.spacesAt(w.path).some((x) => x.id === s.id));
+      const ws = wss.find((w) => shown.get(w.path).some((x) => x.id === s.id));
       return {
         key: `space:${s.id}`,
         label: s.name,
@@ -201,7 +205,7 @@ export default class Space extends View {
       };
     });
     for (const w of wss) {
-      if (this.spacesAt(w.path).length) continue;
+      if (shown.get(w.path).length) continue;
       rows.push({
         key: w.path,
         label: `${w.repo.split("/").pop()}/${w.name}`,
