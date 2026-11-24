@@ -145,16 +145,6 @@ url = "https://github.com/obsidianmd/obsidian-releases/releases/download/v{{ ver
 version_list_url = "https://api.github.com/repos/obsidianmd/obsidian-releases/releases?per_page=20"
 version_expr = 'fromJSON(body) | filter({ any(#.assets, { #.name startsWith "Obsidian-" && #.name endsWith ".AppImage" }) }) | map({ trimPrefix(#.tag_name, "v") })'
 
-# Vibe Typer publishes one unversioned AppImage. The changelog names the
-# version, so a pin older than the newest release fails its checksum: bump it.
-[tools."http:vibetyper"]
-version = "latest"
-version_order = "semver"
-url = "https://cdn.vibetyper.com/releases/linux/VibeTyper.AppImage"
-version_list_url = "https://vibetyper.com/changelog"
-version_regex = 'Version <!-- -->(\d+\.\d+\.\d+)'
-
-
 # Herdr app and herdr-core: releases.herdr.dev only. latest.json names the
 # newest version; manifest.json holds each target's sha256. The app still
 # updates itself in place: see AGENTS.md (Herdr app) for the upstream issues.

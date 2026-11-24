@@ -31,7 +31,6 @@ obsidian="$(mise where http:obsidian)"
 link "$(echo "$obsidian"/Obsidian-*.AppImage)" "$bin/obsidian-app"
 # The obsidian wrapper extracts obsidian-cli next to the AppImage on first use.
 [ -e "$obsidian/obsidian-cli" ] && link "$obsidian/obsidian-cli" "$bin/obsidian-cli"
-link "$(mise where http:vibetyper)/VibeTyper.AppImage" "$bin/vibetyper"
 link "$(mise where http:herdr-app)/herdr-app.svg" "$data/icons/hicolor/scalable/apps/herdr-app.svg"
 # gh runs `gh stack` only from its extension dir. A symlinked dir is a local
 # extension, which `gh extension upgrade` refuses to touch.
