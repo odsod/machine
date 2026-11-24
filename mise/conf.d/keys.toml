@@ -1,52 +1,8 @@
-[bootstrap.files."/etc/systemd/system/odsod-keys.service"]
-source = "../../keys/odsod-keys.service"
-owner = "root"
-group = "root"
-mode = "0644"
-replace = true
-notify = ["odsod-keys"]
-
+# The odsod-daemon keys service replaces odsod-keys
+# (`sudo odsodctl install --system`, odsod/daemon ADR-0007). Keep the old
+# service stopped and disabled, so `mise run apply` never starts a second
+# keyboard grabber. Rollback: `sudo systemctl disable --now
+# odsod-daemon-keys.service && sudo systemctl enable --now odsod-keys.service`.
 [bootstrap.services.odsod-keys]
-state = "running"
-enabled = true
-on_change = "restart"
-
-[tasks."keys:install"]
-description = "Build and converge odsod-keys service"
-depends = ["keys:build"]
-run = "mise bootstrap files services"
-
-[tasks."keys:build"]
-description = "Compile and install odsod-keys binary"
-run = """
-cd "$REPO_DIR/keys"
-sudo dnf install -y -q gcc kernel-headers
-gcc -O2 -Wall -Wextra -Werror -o odsod-keys odsod-keys.c
-sudo install -m 0755 odsod-keys /usr/local/bin/odsod-keys
-rm odsod-keys
-"""
-
-[tasks."keys:deploy"]
-description = "Build and restart service"
-depends = ["keys:build"]
-run = "sudo systemctl restart odsod-keys.service"
-
-[tasks."keys:status"]
-description = "Show service status"
-run = "systemctl status odsod-keys.service"
-
-[tasks."keys:log"]
-description = "Follow service logs"
-run = "journalctl -u odsod-keys.service -f"
-
-[tasks."keys:stop"]
-description = "Stop the service"
-run = "sudo systemctl stop odsod-keys.service"
-
-[tasks."keys:uninstall"]
-description = "Disable and remove everything"
-run = """
-sudo systemctl disable --now odsod-keys.service 2>/dev/null || true
-sudo rm -f /usr/local/bin/odsod-keys /etc/systemd/system/odsod-keys.service
-sudo systemctl daemon-reload
-"""
+state = "stopped"
+enabled = false
