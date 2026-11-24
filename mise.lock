@@ -341,6 +341,49 @@ checksum = "sha256:bbef561f5cfc8e778649b65e69c9c6e4c836c0fbe83ee3d0a5128091d797e
 url = "https://github.com/eza-community/eza/releases/download/v0.23.5/eza.exe_x86_64-pc-windows-gnu.tar.gz"
 url_api = "https://api.github.com/repos/eza-community/eza/releases/assets/471228877"
 
+[[tools."forgejo:gitea/tea"]]
+version = "0.16.0"
+backend = "forgejo:gitea/tea"
+specifiers = ["latest"]
+
+[tools."forgejo:gitea/tea".options]
+api_url = "https://gitea.com/api/v1"
+
+[tools."forgejo:gitea/tea"."platforms.linux-arm64"]
+checksum = "sha256:0e14a036322eeb1fc55e266acafeb8490e523ed99f9232034ae74861e2339879"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-linux-arm64"
+url_api = "https://gitea.com/attachments/9c32617f-ee47-4dca-b4f7-28c248b4cec2"
+
+[tools."forgejo:gitea/tea"."platforms.linux-arm64-musl"]
+checksum = "sha256:0e14a036322eeb1fc55e266acafeb8490e523ed99f9232034ae74861e2339879"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-linux-arm64"
+url_api = "https://gitea.com/attachments/9c32617f-ee47-4dca-b4f7-28c248b4cec2"
+
+[tools."forgejo:gitea/tea"."platforms.linux-x64"]
+checksum = "sha256:9c142c8a0b31485eea2387031c1c404f12b7141075eb4ffbd7ced49441590636"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-linux-amd64"
+url_api = "https://gitea.com/attachments/268de7f7-d240-4259-8515-f94bc351d1cc"
+
+[tools."forgejo:gitea/tea"."platforms.linux-x64-musl"]
+checksum = "sha256:9c142c8a0b31485eea2387031c1c404f12b7141075eb4ffbd7ced49441590636"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-linux-amd64"
+url_api = "https://gitea.com/attachments/268de7f7-d240-4259-8515-f94bc351d1cc"
+
+[tools."forgejo:gitea/tea"."platforms.macos-arm64"]
+checksum = "sha256:f7f70f57dac1616d17edc0d010469648222642bf3462e09c05bca26b38f3dfdb"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-darwin-arm64"
+url_api = "https://gitea.com/attachments/a6fcda0d-ccc2-41d8-b1d1-31b3edaf71ec"
+
+[tools."forgejo:gitea/tea"."platforms.macos-x64"]
+checksum = "sha256:792fd7866a79ebb74d6cdbc01af0d8263e1814a0354911cf1e210fbec16f5bfb"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-darwin-amd64"
+url_api = "https://gitea.com/attachments/6e5a5990-ea58-4a34-8230-0a67a53cde9a"
+
+[tools."forgejo:gitea/tea"."platforms.windows-x64"]
+checksum = "sha256:3f42442c77ed8fee218186376cb2bfdfc52a4d2d5ecbf08c5552a290d3d08fdd"
+url = "https://gitea.com/gitea/tea/releases/download/v0.16.0/tea-0.16.0-windows-amd64.exe"
+url_api = "https://gitea.com/attachments/dbbc8363-7abf-42d3-be69-4fca0c375eb0"
+
 [[tools.fx]]
 version = "40.0.2"
 backend = "aqua:antonmedv/fx"

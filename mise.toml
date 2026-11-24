@@ -104,6 +104,10 @@ sudo install -m 0755 "$(mise where github:fish-shell/fish-shell)/fish" /usr/loca
 "github:shaharia-lab/slackcli" = "latest"
 "github:traefik/yaegi" = "latest"
 
+# Tools via Forgejo/Gitea releases. tea (Gitea/Forgejo CLI for git.lan) ships
+# binaries on gitea.com only; go install fails on its replace directives.
+"forgejo:gitea/tea" = { version = "latest", api_url = "https://gitea.com/api/v1", bin = "tea" }
+
 # Desktop/infra tools
 antigravity-cli = "latest"
 awscli = "latest"
