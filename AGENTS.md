@@ -107,6 +107,10 @@
   locally or `<host>/machine` remotely. Start or repair it any time with
   `herdr-machine-agent`. No leader exists: the Herdr cores and this repo hold
   all state.
+- Vault agents (`brain`, `house`, `company`) follow the same scheme in their
+  original checkouts: `herdr-machine-agent --agent <name>` starts or repairs
+  one (clones a missing vault). The prefix toggles them (`m`, `b`, `o`, `c`),
+  and the sidebar lists them under each machine's row.
 - Work in this original checkout: edit here, ship PRs from a change on `main`,
   and run `mise run apply` from here (other agents may use workspaces for
   parallel work).

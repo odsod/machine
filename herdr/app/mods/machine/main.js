@@ -1,7 +1,9 @@
-// Toggle to the machine and back: show the machine agent of the focused
-// space's machine, the terminal named `machine` in space `machine` (see
-// "Machine Agent" in the repo's AGENTS.md), or, from that space, the space
-// you came from. `herdr-machine-agent` starts or repairs the agent there.
+// Toggle to an agent and back: show the agent named `props().agent`
+// (`machine`, the default, or a vault: `brain`, `house`, `company`) of the
+// focused space's machine, the terminal of that name in the space of that name
+// (see "Machine Agent" in the repo's AGENTS.md), or, from that space, the
+// space you came from. `herdr-machine-agent --agent <name>` starts or repairs
+// the agent there.
 import { View, div } from "gpui-kit";
 import {
   checking,
@@ -22,24 +24,35 @@ const ENSURE = `${home()}/.local/bin/herdr-machine-agent`; // homes match across
 
 const machineOf = (address) => (address.includes("/") ? address.split("/")[0] : null);
 const qualify = (machine, id) => (machine ? `${machine}/${id}` : id);
+const AGENTS = ["machine", "brain", "house", "company"];
+// Agents being started, by space id: {id: ms}. The sidebar (odsod-spaces)
+// spins the agent's row while its id is here.
+const STARTING = "agents.starting";
+const setStarting = (id, on) => {
+  const s = { ...(shared(STARTING) ?? {}) };
+  if (on) s[id] = Date.now();
+  else delete s[id];
+  setShared(STARTING, s);
+};
 
-// The focused space's machine (null: this computer) and its `machine` terminal.
-const target = () => {
+// The focused space's machine (null: this computer) and its agent's terminal.
+const target = (name) => {
   // focused() can be null while this popup holds focus: then the shown space.
   const here = spaces().find((s) => s.id === focused()?.space) ?? spaces().find((s) => s.active);
   const machine = here?.machine ?? null;
   const term = terminals().find(
-    (t) => t.name === "machine" && t.state === "live" && machineOf(t.address) === machine,
+    (t) => t.name === name && t.state === "live" && machineOf(t.address) === machine,
   );
-  return { here, machine, term, space: qualify(machine, "machine") };
+  const agentHere = AGENTS.some((a) => here?.id === qualify(machine, a));
+  return { name, here, agentHere, machine, term, space: qualify(machine, name) };
 };
 
 // Start or repair it there.
 const ensure = (t) =>
-  exec(ENSURE, [], { on: t.machine, timeout: 90000 }).then((r) => {
+  exec(ENSURE, ["--agent", t.name], { on: t.machine, timeout: 90000 }).then((r) => {
     if (r.code !== 0)
       notify({
-        title: "machine",
+        title: t.name,
         body: r.stderr.trim() || "herdr-machine-agent failed",
         level: "error",
       });
@@ -59,17 +72,26 @@ export default class Machine extends View {
   }
 
   act() {
-    const t = target();
+    const t = target(props().agent ?? "machine");
     if (t.here && t.here.id === t.space) {
       // shared, not localStorage: each popup the prefix opens gets its own store.
       const back = shared("machine.back");
       if (back && spaces().some((s) => s.id === back)) run("space.select", { id: back });
       return this.dismiss();
     }
-    if (t.here) setShared("machine.back", t.here.id);
+    // Back goes to the last space that isn't an agent's, so hopping between
+    // agents still returns there.
+    if (t.here && !t.agentHere) setShared("machine.back", t.here.id);
     const show = () => run("space.select", { id: t.space });
     // No terminal: this popup stays until there is one.
-    if (!t.term) return ensure(t).then((ok) => (ok && show(), this.dismiss()));
+    if (!t.term) {
+      setStarting(t.space, true);
+      return ensure(t).then((ok) => {
+        setStarting(t.space, false);
+        if (ok) show();
+        this.dismiss();
+      });
+    }
     // A terminal can be a shell with no Claude (after a reboot, or Claude
     // exited): repair it in the background. exec starts at the call, before
     // closing cancels this view's tasks.
