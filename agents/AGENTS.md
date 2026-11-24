@@ -161,24 +161,44 @@
 | `~/Code`       | jj originals  | `<host>/<org>/<repo>`          |
 | `~/Workspaces` | jj workspaces | `<host>/<org>/<repo>/<branch>` |
 
-- Provisioning lives in `~/Code/github.com/odsod/machine`. `~/.agents` symlinks
-  to its `agents/` dir (this file and global skills); commit changes there.
-- Non-code work (research, documents, one-off tasks) goes in a vault repo under
-  `~/Code`, never in loose folders. Each vault has its own `AGENTS.md`.
+- `~/.agents` symlinks to `machine`'s `agents/` dir (this file and global
+  skills); commit changes there.
+- Non-code work (research, documents, one-off tasks) goes in a central repo
+  below, never in loose folders.
 - Day-job repos and their cross-repo release flow: see that repo's own
   `AGENTS.md`.
 
-## Vault
+## Central repos
 
-- Path: `~/Code/git.lan/odsod/brain` (schema and ingest workflow live in its
-  `AGENTS.md`). It is a jj repo; the recorder writes into it.
-- "check the vault": `obsidian vault="brain" search query="..."`; read
-  `summary:` first.
-- "update the vault": `jj git fetch` and rebase first, run the ingest workflow
-  in its `AGENTS.md`, then commit (recorder output included) and open a PR.
-  `main` is protected and merges fast-forward only; see its "Commit format".
-- "save this to the vault": write `~/Code/git.lan/odsod/brain/inbox/<slug>.md`
-  (descriptive slug, no dates). For web pages, run
-  `defuddle parse <url> --md -o <path>`, then add `title`, `url`, and
-  `captured` frontmatter. Save only on an explicit
-  ask and only if it stays useful in another project or month.
+The user names these repos by short name ("check the house repo", "put this in
+my brain"). Each lives at `~/Code/<path>` and has its own `AGENTS.md`: read it
+before you work there. If a clone is missing, run
+`jj git clone <url> ~/Code/<path>`.
+
+| Name      | Path                       | Holds                                                         |
+| --------- | -------------------------- | ------------------------------------------------------------- |
+| `machine` | `github.com/odsod/machine` | Machine provisioning, global agent rules, skills              |
+| `daemon`  | `github.com/odsod/daemon`  | System daemon for the workflow: recorder, keys, KDE shortcuts |
+| `brain`   | `git.lan/odsod/brain`      | Second brain (Obsidian vault)                                 |
+| `house`   | `git.lan/odsod/house`      | The house: systems, hosts, documents, procedures              |
+| `company` | `git.lan/odsod/company`    | The user's own company vault                                  |
+
+- Small or limited edits you make yourself: work in the original
+  `~/Code/<path>`, also when one task edits several of these repos.
+- Work forked off to a new autonomous agent ("start a new `<name>`
+  workspace"): run
+  `herdr-space start workspace <path> <bookmark> --prompt "<task>"`. It makes
+  the jj workspace `~/Workspaces/<path>/<bookmark>` and opens a new space with
+  the agent in it. Name the bookmark after the task; ask if the task is
+  unclear.
+- "check `<name>`": search that repo with `rg`; in `brain`, use
+  `obsidian vault="brain" search query="..."` and read `summary:` first.
+- "put this in `<name>`" or "save this to `<name>`" (`brain`, `house`,
+  `company`): write `~/Code/<path>/inbox/<slug>.md` (descriptive slug, no
+  dates). For web pages, run `defuddle parse <url> --md -o <path>`, then add
+  `title`, `url`, and `captured` frontmatter. Save only on an explicit ask.
+- "update `<name>`": `jj git fetch` and rebase first, follow the ingest or
+  change workflow in its `AGENTS.md`, then commit and open a PR. Never push
+  `main`.
+- `brain`: the `daemon` recorder writes into it; commit recorder output with
+  your ingest. `main` merges fast-forward only; see its "Commit format".
