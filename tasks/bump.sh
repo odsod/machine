@@ -44,7 +44,7 @@ while [ $# -gt 0 ]; do
     echo "  -n, --dry-run  Preview bumps without changing files"
     echo "  -h, --help     Show this help message"
     echo
-    echo "Targets: neovim, yaak, slack, zoom, endpoint-verification, llama, whisper"
+    echo "Targets: neovim, yaak, slack, zoom, endpoint-verification"
     exit 0
     ;;
   -*)
@@ -58,14 +58,13 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# No targets means a full bump: every pin, including the GPU services, the
-# Neovim plugin lock, and the mise-managed [tools]. An explicit target bumps
+# No targets means a full bump: every pin, the Neovim plugin lock, and the mise-managed [tools]. An explicit target bumps
 # only that pin.
 tools=1
 if [ ${#targets[@]} -gt 0 ]; then
   tools=0
 else
-  targets=(neovim yaak slack zoom endpoint-verification llama whisper)
+  targets=(neovim yaak slack zoom endpoint-verification)
 fi
 
 # 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
@@ -90,7 +89,7 @@ fi
 # that defines the named pin.
 pin_file() {
   case "$1" in
-  slack | zoom | yaak | llama | whisper | endpoint-verification)
+  slack | zoom | yaak | endpoint-verification)
     echo "$REPO_DIR/mise/conf.d/$1.toml"
     ;;
   *)
@@ -220,16 +219,6 @@ bump_target() {
       check_target_url="https://packages.cloud.google.com/apt/${ev_deb}"
     fi
     ;;
-  llama)
-    pinned="$(sed -n 's/^llama_version = "\(.*\)"$/\1/p' "$(pin_file llama)")"
-    latest="$(mise run --output interleave --quiet llama:discover | tail -1)"
-    check_target_url="https://github.com/ggml-org/llama.cpp/archive/refs/tags/v${latest}.tar.gz"
-    ;;
-  whisper)
-    pinned="$(sed -n 's/^whisper_version = "\(.*\)"$/\1/p' "$(pin_file whisper)")"
-    latest="$(mise run --output interleave --quiet whisper:discover | tail -1)"
-    check_target_url="https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v${latest}.tar.gz"
-    ;;
   *)
     echo "Unknown target: $name" >&2
     return 1
@@ -273,12 +262,6 @@ bump_target() {
     sed -i "s|^endpoint_verification_version = \".*\"|endpoint_verification_version = \"$latest\"|" "$(pin_file endpoint-verification)"
     sed -i "s|^endpoint_verification_deb = \".*\"|endpoint_verification_deb = \"$ev_deb\"|" "$(pin_file endpoint-verification)"
     sed -i "s|^endpoint_verification_sha256 = \".*\"|endpoint_verification_sha256 = \"$ev_sha256\"|" "$(pin_file endpoint-verification)"
-    ;;
-  llama)
-    sed -i "s/^llama_version = \".*\"/llama_version = \"$latest\"/" "$(pin_file llama)"
-    ;;
-  whisper)
-    sed -i "s/^whisper_version = \".*\"/whisper_version = \"$latest\"/" "$(pin_file whisper)"
     ;;
   esac
 
