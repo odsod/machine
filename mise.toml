@@ -292,7 +292,7 @@ lock = "machine-apply"
 run = ["mise bootstrap --yes", "mise reshim", { task = "clean" }]
 
 [tasks.bootstrap]
-description = "Post-install setup: media, graphics, wacom, desktop apps, ROCm build packages, KDE, keyboard, auth"
+description = "Post-install setup: media, graphics, wacom, desktop apps, ROCm build packages, NFS, KDE, keyboard, auth"
 depends = [
   "media:setup",
   "graphics:setup",
@@ -301,6 +301,7 @@ depends = [
   "zoom:setup",
   "yaak:setup",
   "rocm:setup",
+  "nfs:setup",
   "swap:setup",
   "tmp:setup",
   "kde:setup-fonts",

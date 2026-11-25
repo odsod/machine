@@ -1,0 +1,4 @@
+[tasks."nfs:setup"]
+description = "Unmount NFS before sleep; laptops reach the NAS over the tailnet"
+lock = true
+run = 'exec "$REPO_DIR/nfs/setup.sh"'
