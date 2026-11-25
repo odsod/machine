@@ -1,0 +1,4 @@
+[tasks."rocm:setup"]
+description = "Install ROCm build packages for the daemon's inference servers"
+lock = true
+run = 'exec "$REPO_DIR/rocm/setup.sh"'

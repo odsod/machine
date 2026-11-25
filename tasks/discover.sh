@@ -76,8 +76,6 @@ row zoom "$PINNED_ZOOM" "$(
     grep -oP '/prod/\K[0-9][0-9.]*'
 )"
 
-row llama "$PINNED_LLAMA" "$(topic_discover llama | tail -1)"
-row whisper "$PINNED_WHISPER" "$(topic_discover whisper | tail -1)"
 row endpoint-verification "$PINNED_EV" \
   "$(topic_discover endpoint-verification | sed -n 's/^endpoint_verification_version = "\(.*\)"$/\1/p')"
 

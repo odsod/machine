@@ -273,7 +273,7 @@ replace = true
 
 [tasks.discover]
 description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_LLAMA = "{{vars.llama_version}}", PINNED_WHISPER = "{{vars.whisper_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
+env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
 run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
@@ -292,7 +292,7 @@ lock = "machine-apply"
 run = ["mise bootstrap --yes", "mise reshim", { task = "clean" }]
 
 [tasks.bootstrap]
-description = "Post-install setup: media, graphics, wacom, desktop apps, GPU services, KDE, keyboard, auth"
+description = "Post-install setup: media, graphics, wacom, desktop apps, ROCm build packages, KDE, keyboard, auth"
 depends = [
   "media:setup",
   "graphics:setup",
@@ -300,8 +300,7 @@ depends = [
   "slack:setup",
   "zoom:setup",
   "yaak:setup",
-  "llama:setup",
-  "whisper:setup",
+  "rocm:setup",
   "swap:setup",
   "tmp:setup",
   "kde:setup-fonts",

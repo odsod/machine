@@ -75,10 +75,9 @@
   (replaces the mise binary and desyncs `mise.lock`).
 - Desktop apps: pin RPM-only apps in `[vars]` in `mise/conf.d/<app>.toml`; use
   `http:` tools in `mise.toml` for direct downloads.
-- GPU services (`llama`, `whisper`): pin the newest semver tag without `v`
-  (`1.0.0-b12359-b1b770d`, never bare `bNNNN`). Never run `clean` before
-  `apply` (`apply` rebuilds and restarts before `clean` deletes old source
-  trees).
+- GPU inference servers (whisper-server, llama-server): the `odsod/daemon`
+  repo owns them (ADR-0023, `odsodctl inference setup`). This repo only
+  installs their ROCm build packages on the desktop (`rocm:setup`).
 
 ## Herdr
 
