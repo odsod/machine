@@ -29,3 +29,17 @@ mode = "0644"
 state = "running"
 enabled = true
 on_change = "reload_or_restart"
+
+# SELinux module for ../../ssh/sshd-session-home.cil. Reinstall on change.
+[bootstrap.hooks.post-packages]
+run = """
+if command -v selinuxenabled >/dev/null && selinuxenabled; then
+  cil="$REPO_DIR/ssh/sshd-session-home.cil"
+  stamp="$HOME/.local/share/odsod/machine/data/selinux/sshd-session-home.sha256"
+  if ! sha256sum -c --status "$stamp" 2>/dev/null || ! sudo semodule -l | grep -qx sshd-session-home; then
+    sudo semodule -i "$cil"
+    mkdir -p "$(dirname "$stamp")"
+    sha256sum "$cil" > "$stamp"
+  fi
+fi
+"""

@@ -1,0 +1,4 @@
+; Silence a harmless denial: OpenSSH 10.6 sshd-session reads /home at each
+; login, and selinux-policy 45.24 does not allow it. The read stays denied;
+; only the audit alert goes away. Remove when Fedora's policy covers it.
+(dontaudit sshd_session_t home_root_t (dir (read)))
