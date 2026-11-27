@@ -1,11 +1,8 @@
 #!/usr/bin/env fish
 
-# herdr-core terminals outlive the desktop session that started them. Take the
-# display and D-Bus address from the user manager, not the stale environment.
-if test -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY"
-    exec /usr/bin/xdg-open $argv
-end
-
+# herdr-core terminals outlive the desktop session that started them, and they
+# get the display but not KDE_SESSION_VERSION, so xdg-open falls back to the
+# KDE 3 kfmclient. Always take the desktop environment from the user manager.
 set -l desktop_run (status dirname)/desktop-run
 if test -x "$desktop_run"
     exec "$desktop_run" /usr/bin/xdg-open $argv
