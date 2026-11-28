@@ -1,0 +1,18 @@
+# odsod-daemon: the owner's system daemon (odsod/daemon). This topic installs
+# and upgrades it (odsod/daemon ADR-0006). Each host keeps its own
+# ~/.config/odsod-daemon/config.json; no repo links it.
+[vars]
+# The daemon's .python-version. mise's global python is newer and has no
+# onnxruntime wheels.
+daemon_python = "3.14"
+
+[bootstrap.packages]
+"dnf:gcc" = "latest"
+"dnf:kernel-headers" = "latest"
+"dnf:libnotify" = "latest"
+
+[tasks."daemon:setup"]
+description = "Install or upgrade odsod-daemon to a ref (default main)"
+usage = 'arg "[ref]" default="main"'
+env = { DAEMON_PYTHON = "{{vars.daemon_python}}" }
+run = 'exec "$REPO_DIR/daemon/setup.sh" "${usage_ref}"'
