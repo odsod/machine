@@ -1,6 +1,7 @@
 [vars]
 # The apt pool keeps delisted builds, so pinning filename and checksum makes
-# this install reproducible. All three values come from `mise run discover`.
+# this install reproducible. All three values come from
+# `mise run endpoint-verification:discover`; `mise run bump` writes them.
 endpoint_verification_version = "1765828494702-842239260"
 endpoint_verification_deb = "pool/endpoint-verification/endpoint-verification_1765828494702-842239260_amd64_3bcef7ad4e9e6bf8b16dae869190fca7.deb"
 endpoint_verification_sha256 = "2ea825143fd56a10d6ae3a3f2719cd47833479f7dd3faa6eed7f62ce2d0ac664"

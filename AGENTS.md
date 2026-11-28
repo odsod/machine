@@ -12,8 +12,7 @@
   `<topic>/mise.toml`.
 - Keep dependencies one-way (`mise/conf.d/<topic>.toml` -> `<topic>/`): pass
   `[vars]` via task `env = { ... }`, and read only env vars in `<topic>/`
-  scripts. Only `tasks/discover.sh` and `tasks/bump.sh` read or write
-  `mise/conf.d/*.toml`.
+  scripts. Only `tasks/bump.sh` reads or writes `mise/conf.d/*.toml`.
 - `~/.config/mise/conf.d` symlinks to `mise/conf.d/`. `mise` resolves relative
   paths against `config_path.parent()` without canonicalizing symlinks, so
   `../../<topic>/` works only inside `mise/conf.d/*.toml`.
@@ -51,18 +50,15 @@
 
 ## Version Bumping
 
-- `mise run discover`: compares pins against upstream and runs `mise outdated`
-  (needs `gh auth status`; aborts on open PRs on `origin`). A `?` row means
-  upstream changed release format: fix the probe in `tasks/discover.sh` or
-  `<topic>:discover` first.
 - `mise run bump [<name>] [--dry-run]`: runs `mise upgrade --bump` (using
-  `gh auth token` as `GITHUB_TOKEN`) and updates pins in `mise/conf.d/*.toml`,
-  `mise.lock`, and `neovim/nvim-pack-lock.json`. Does not apply changes.
+  `gh auth token` as `GITHUB_TOKEN`; aborts on open PRs on `origin`) and
+  updates pins in `mise/conf.d/*.toml`, `mise.lock`, and
+  `neovim/nvim-pack-lock.json`. Does not apply changes.
 - `mise run update-skills`: updates vendored global skills in `agents/` and
   rewrites `agents/.skill-lock.json`.
-- After bumping: run `mise run apply`; verify `mise run discover` shows all
-  `ok`, `mise bootstrap --dry-run` has no pending work, and GPU `/health`
-  answers on `127.0.0.1:8178` and `127.0.0.1:8179`.
+- After bumping: run `mise run apply`; verify `mise bootstrap --dry-run` has
+  no pending work and GPU `/health` answers on `127.0.0.1:8178` and
+  `127.0.0.1:8179`.
 - `mise` upgrade: read release notes
   (`defuddle parse https://github.com/jdx/mise/releases/tag/v<version> --md`),
   adopt simplifying features, run `mise upgrade aqua:jdx/mise`, then

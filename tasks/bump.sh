@@ -298,9 +298,6 @@ fi
 echo "[bump] Formatting configs..."
 (cd "$REPO_DIR" && mise fmt --all)
 
-echo "[bump] Verifying discovery..."
-mise run discover
-
 # Print one "name: old -> new" line per mise tool and Neovim plugin that changed
 # between the snapshot and the working copy.
 lock_changes() {
