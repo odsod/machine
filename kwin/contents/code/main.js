@@ -65,7 +65,7 @@ const shortcuts = [
   },
 
   {
-    actionId: ["kwin", "[odsod] recorder-note", "KWin", ""],
+    actionId: ["kwin", "[odsod] note", "KWin", ""],
     key: "Meta+W",
     kind: "command",
     command: [
@@ -114,7 +114,7 @@ const shortcuts = [
     kind: "app",
     command: [
       "google-chrome",
-      "--user-data-dir=/home/odsod/.local/share/odsod/machine/data/google-chrome/recorder",
+      "--user-data-dir=/home/odsod/.local/share/odsod/machine/data/google-chrome/meet",
       "--app=https://meet.google.com",
       "--remote-debugging-port=9224",
     ],
