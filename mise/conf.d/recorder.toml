@@ -1,4 +1,0 @@
-[dotfiles]
-"~/.config/recorder/config.json" = "../../recorder/config.json"
-"~/.local/bin/recorder-note" = "../../recorder/recorder-note"
-
