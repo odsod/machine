@@ -151,8 +151,11 @@ version_expr = 'fromJSON(body) | filter({ any(#.assets, { #.name startsWith "Obs
 
 # Herdr app and herdr-core: releases.herdr.dev only. latest.json names the
 # newest version; manifest.json holds each target's sha256. The app still
-# updates itself in place: see AGENTS.md (Herdr app) for the upstream issues.
-# herdr:setup-core links hc and herdr-core into ~/.local/bin.
+# updates itself in place: see env.sh (HERDR_RELEASES_URL) for the upstream
+# issue. herdr:setup-core links hc and herdr-core into ~/.local/bin.
+# Watch after bumping (adopt, then drop the line):
+# - herdrdev/herdr-app#666 pane.equalize: bind in herdr/app/keys.json (#540).
+# - herdrdev/herdr-app#551 pane.arrange presets, like tmux select-layout.
 [tools."http:herdr-core"]
 version = "latest"
 version_list_url = "https://releases.herdr.dev/core/latest.json"

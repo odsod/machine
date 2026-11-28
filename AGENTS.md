@@ -58,7 +58,8 @@
   rewrites `agents/.skill-lock.json`.
 - After bumping: run `mise run apply`; verify `mise bootstrap --dry-run` has
   no pending work and GPU `/health` answers on `127.0.0.1:8178` and
-  `127.0.0.1:8179`.
+  `127.0.0.1:8179`. Check the upstream watch lists beside bumped tools in
+  `mise.toml`.
 - `mise` upgrade: read release notes
   (`defuddle parse https://github.com/jdx/mise/releases/tag/v<version> --md`),
   adopt simplifying features, run `mise upgrade aqua:jdx/mise`, then
