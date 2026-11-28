@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Disk swap tier. Sizes are per host; unlisted hosts keep Fedora's zram-only
-# default. The swapfile is headroom against OOM, not capacity.
+# default. The swapfile is headroom against OOM, not capacity. The /etc/fstab
+# entry is a [bootstrap.files] block in mise.toml.
 #
 # Every host runs Fedora Workstation, so the root is btrfs on LUKS and
 # `btrfs filesystem mkswapfile` handles the nodatacow and preallocation rules
@@ -33,15 +34,6 @@ if command -v selinuxenabled >/dev/null && selinuxenabled; then
     sudo semanage fcontext -a -t swapfile_t '/swap(/.*)?'
   fi
   sudo restorecon -RF "$(dirname "$path")"
-fi
-
-# The fstab entry is a [bootstrap.files] block now. Drop the lines this script
-# used to append. Remove this once every host has applied it.
-if grep -qxF "$path none swap sw,pri=50 0 0" /etc/fstab; then
-  echo "[swap] removing the old $path lines from /etc/fstab"
-  sudo sed -i -e '\|^# Disk swap tier, managed by odsod/machine$|d' \
-    -e "\\|^$path none swap sw,pri=50 0 0\$|d" /etc/fstab
-  sudo systemctl daemon-reload
 fi
 
 sudo swapon -a
