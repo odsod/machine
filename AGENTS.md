@@ -71,10 +71,9 @@
   (replaces the mise binary and desyncs `mise.lock`).
 - Desktop apps: pin RPM-only apps in `[vars]` in `mise/conf.d/<app>.toml`; use
   `http:` tools in `mise.toml` for direct downloads.
-- odsod-daemon: `daemon:setup [ref]` (`daemon/setup.sh`, run by `apply`)
-  installs or upgrades it to `main` and runs `odsodctl install`. It owns the
-  global shortcuts and their KWin script; `kwin/` keeps only window rules and
-  focus policy.
+- odsod-daemon: the `odsod/daemon` repo owns the daemon, its global
+  shortcuts and their KWin script. `daemon:setup [ref]` (`daemon/setup.sh`,
+  run by `apply`) installs it at `main` and runs `odsodctl install`.
 - GPU inference servers (whisper-server, llama-server): the `odsod/daemon`
   repo owns them (ADR-0023, `odsodctl inference setup`). This repo only
   installs their ROCm build packages on the desktop (`rocm:setup`).

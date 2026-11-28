@@ -1,6 +1,5 @@
-# The odsod-daemon session service owns the global shortcuts and their KWin
-# script (odsod/daemon ADR-0008). This topic keeps the KWin settings that are
-# not shortcuts.
+# KWin window rules and focus policy. Global shortcuts belong to odsod/daemon
+# (ADR-0008).
 [tasks."kwin:install"]
 description = "Configure KWin focus policy and window rules"
 depends = ["kwin:configure", "kwin:window-rules"]

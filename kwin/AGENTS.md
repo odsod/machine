@@ -1,8 +1,7 @@
 # KWin
 
-The odsod-daemon session service owns the global shortcuts and their KWin
-script (odsod/daemon ADR-0008). This topic keeps the window rules, the focus
-policy, and the Chrome app icons.
+Window rules, focus policy, and Chrome app icons for KWin. Global shortcuts
+belong to `odsod/daemon` (ADR-0008).
 
 ## Chrome Window Icons
 
