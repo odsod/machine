@@ -2,8 +2,8 @@
 // (`machine`, the default, or a vault: `brain`, `house`, `company`) of the
 // focused space's machine, the terminal of that name in the space of that name
 // (see "Machine Agent" in the repo's AGENTS.md), or, from that space, the
-// space you came from. `herdr-machine-agent --agent <name>` starts or repairs
-// the agent there.
+// space you came from. Only with no live terminal there does
+// `herdr-machine-agent --agent <name>` set the agent up from scratch.
 import { View, div } from "gpui-kit";
 import {
   checking,
@@ -92,11 +92,8 @@ export default class Machine extends View {
         this.dismiss();
       });
     }
-    // A terminal can be a shell with no Claude (after a reboot, or Claude
-    // exited): repair it in the background. exec starts at the call, before
-    // closing cancels this view's tasks.
+    // A terminal is left as it is: a shell with no Claude stays a shell.
     show();
-    ensure(t);
     this.dismiss();
   }
 
