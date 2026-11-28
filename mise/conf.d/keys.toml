@@ -1,8 +1,0 @@
-# The odsod-daemon keys service replaces odsod-keys
-# (`sudo odsodctl install --system`, odsod/daemon ADR-0007). Keep the old
-# service stopped and disabled, so `mise run apply` never starts a second
-# keyboard grabber. Rollback: `sudo systemctl disable --now
-# odsod-daemon-keys.service && sudo systemctl enable --now odsod-keys.service`.
-[bootstrap.services.odsod-keys]
-state = "stopped"
-enabled = false

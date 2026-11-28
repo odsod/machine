@@ -1,32 +1,8 @@
 # KWin
 
-## Architecture
-
-- **`contents/code/main.js`**: KWin script that binds `Meta+<key>` shortcuts,
-  toggles app windows by `resourceClass` or `resourceName`, remaps window
-  actions, and sets `noBorder`.
-- **`odsod-kwin-dbus-service.py`**: User D-Bus service (`io.github.odsod.kwin`)
-  that launches apps, registers global shortcuts in `KGlobalAccel`, and
-  forwards script logs to the journal.
-- **Shortcut kinds**: `builtin` (KWin action), `app` (focus or launch),
-  `command` (fire and forget), `callback` (inline JS).
-
-## Development
-
-- Full install and reload: `mise run kwin:install`
-- Reload after editing `main.js`: `mise run kwin:install-package && mise run kwin:enable-plugin`
-- Tail D-Bus logs: `mise run kwin:tail`
-- Dump all open window classes to the journal: `Meta+;`
-
-## Chrome Window Classes on Wayland
-
-- **Normal mode (no `--app`)**: Chromium passes `--class=<Name>` to Wayland
-  `xdg_toplevel_set_app_id`. Pair `--user-data-dir` with `--class` to get an
-  isolated profile with a controllable `resourceClass`:
-  `google-chrome --user-data-dir="$HOME/.local/share/..." --class=MyApp "$URL"`
-- **`--app=<url>` mode**: Chromium ignores `--class` and sets the Wayland
-  `app_id` to `chrome-<host>__-<profile>`. Match these windows in `main.js`
-  with `resourceClassIncludes: "<host>"`.
+The odsod-daemon session service owns the global shortcuts and their KWin
+script (odsod/daemon ADR-0008). This topic keeps the window rules, the focus
+policy, and the Chrome app icons.
 
 ## Chrome Window Icons
 
@@ -38,7 +14,8 @@ window falls back to the generic Wayland icon.
   `~/.local/share/applications/` by `[dotfiles]` in
   `mise/conf.d/google-chrome.toml`.
 - Name each file `chrome-<host>__-Default.desktop` so it matches the app_id.
-  Keep its `Exec=` in sync with the launch command in `main.js`. Write paths
+  Keep its `Exec=` in sync with the launch command in the daemon's
+  `shortcuts.json`. Write paths
   in full: desktop files do not expand `$HOME`.
 - `Icon=` is `odsod-chrome-<name>`, from the brand-colored marks in
   `google-chrome/icons/`, linked into the user hicolor theme. Their `viewBox`
@@ -58,7 +35,7 @@ and rounded corners, with no titlebar. Run `mise run kwin:window-rules`, or
 - `chrome-apps`: regex `wmclass` match on `^chrome-.*__-`. This covers every
   Chrome app window and not the normal browser window (`google-chrome`).
 - `slack`: exact `wmclass` match on `slack`. Slack is an X11 window; the rule
-  wins over the `noBorder` flag that `main.js` sets for it.
+  wins over the `noBorder` flag that the daemon's shortcut sets for it.
 - `spotify`: exact `wmclass` match on `com.spotify.Client` (Flatpak). This drops
   the Breeze titlebar that Spotify would otherwise get.
 - `keepassxc`: exact `wmclass` match on `org.keepassxc.KeePassXC`. The Qt app
