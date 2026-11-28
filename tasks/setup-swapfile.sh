@@ -35,12 +35,12 @@ if command -v selinuxenabled >/dev/null && selinuxenabled; then
   sudo restorecon -RF "$(dirname "$path")"
 fi
 
-if ! grep -qF "$path none swap" /etc/fstab; then
-  echo "[swap] adding $path to /etc/fstab"
-  {
-    echo "# Disk swap tier, managed by odsod/machine"
-    printf '%s none swap sw,pri=50 0 0\n' "$path"
-  } | sudo tee -a /etc/fstab
+# The fstab entry is a [bootstrap.files] block now. Drop the lines this script
+# used to append. Remove this once every host has applied it.
+if grep -qxF "$path none swap sw,pri=50 0 0" /etc/fstab; then
+  echo "[swap] removing the old $path lines from /etc/fstab"
+  sudo sed -i -e '\|^# Disk swap tier, managed by odsod/machine$|d' \
+    -e "\\|^$path none swap sw,pri=50 0 0\$|d" /etc/fstab
   sudo systemctl daemon-reload
 fi
 

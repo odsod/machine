@@ -21,6 +21,9 @@ lockfile = true
 # The bump flow takes releases the day they ship, so keep the cooldown off.
 minimum_release_age = "0s"
 trusted_config_paths = ["~/Activities", "~/Code", "~/Projects", "~/Workspaces"]
+# Workspaces come and go weekly; forget their configs (and the tool versions
+# they keep) two weeks after the last load.
+prune.forget_unused_after = "14d"
 
 [settings.python]
 uv_venv_auto = "source"
@@ -136,6 +139,8 @@ version_list_url = "https://www.soapui.org/downloads/latest-release/"
 version_regex = 'SoapUI-(\d+\.\d+\.\d+)-linux-bin\.tar\.gz'
 strip_components = 1
 bin_path = "bin"
+# bin/ also holds installer and uninstaller scripts; keep them off PATH.
+filter_bins = ["soapui.sh", "testrunner.sh"]
 
 [tools."http:obsidian"]
 version = "latest"
@@ -255,6 +260,14 @@ group = "root"
 mode = "0644"
 replace = true
 
+# Disk swap tier: tasks/setup-swapfile.sh creates the file per host. nofail
+# keeps a host without the file booting cleanly.
+[bootstrap.files."/etc/fstab"]
+id = "swap"
+block = """
+/swap/swapfile none swap sw,pri=50,nofail 0 0
+"""
+
 [bootstrap.files."/etc/yum.repos.d/mise.repo"]
 content = """
 [mise-repo]
@@ -269,11 +282,6 @@ group = "root"
 mode = "0644"
 phase = "pre-packages"
 replace = true
-
-[tasks.discover]
-description = "Compare every pinned version with the latest upstream release"
-env = { PINNED_SLACK = "{{vars.slack_version}}", PINNED_ZOOM = "{{vars.zoom_version}}", PINNED_YAAK = "{{vars.yaak_version}}", PINNED_EV = "{{vars.endpoint_verification_version}}" }
-run = 'exec "$REPO_DIR/tasks/discover.sh"'
 
 [tasks.bump]
 description = "Upgrade mise tools and bump every self-managed pin"
@@ -362,6 +370,9 @@ mise fmt --all --check
 oxlint --ignore-pattern '.agents/**' --ignore-pattern 'agents/skills/**' .
 oxfmt --check '!**/.mise/**' '!**/.agents/**' '!**/agents/skills/**' '!neovim/nvim-pack-lock.json' '!agents/.skill-lock.json' '!pi/settings.json' '!mise.toml' '!mise/conf.d/**'
 mise config ls >/dev/null
+# This file is the global config on hosts and a project config in CI; pin it
+# as global so both check the same tools. Every host is linux-x64.
+MISE_GLOBAL_CONFIG_FILE="$REPO_DIR/mise.toml" mise lock --global --check --platform linux-x64
 """
 
 
