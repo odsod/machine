@@ -87,10 +87,7 @@
 - Herdr app (`http:herdr-app`): `mise` owns updates. `env.sh` points
   `HERDR_RELEASES_URL` at a dead address, so the app finds no update (it would
   stage one beside the mise install). Bump with
-  `mise upgrade http:herdr-app`, then restart the app. Swap the override for a
-  setting once upstream ships
-  [herdrdev/herdr-app#459](https://github.com/herdrdev/herdr-app/pull/459) or
-  [#207](https://github.com/herdrdev/herdr-app/issues/207).
+  `mise upgrade http:herdr-app`, then restart the app.
 - Herdr mods: shipped mods and layouts overwrite on app start. Patch via
   `herdr/app/patches/<mod>.patch` (unified diff of `main.js`, `a/` and `b/`
   prefixes) and `herdr/app/patches/layout.jq`. `herdr:patch-mods` (run by
