@@ -771,29 +771,6 @@ checksum = "sha256:f8ee5cf476353095388857cbe7a57bbafbc32e3a32e8c96d0e804a2b60d2d
 url = "https://github.com/ludviglundgren/qbittorrent-cli/releases/download/v2.3.0/qbittorrent-cli_2.3.0_windows_amd64.tar.gz"
 url_api = "https://api.github.com/repos/ludviglundgren/qbittorrent-cli/releases/assets/460628306"
 
-[[tools."github:odsod/daemon"]]
-version = "2026.11.8"
-backend = "github:odsod/daemon"
-specifiers = ["latest"]
-unsupported_platforms = [
-    "linux-arm64",
-    "linux-arm64-musl",
-    "macos-arm64",
-    "macos-x64",
-    "windows-x64",
-]
-
-[tools."github:odsod/daemon"."platforms.linux-x64"]
-checksum = "sha256:e7d86a3522d27936c430af5350d06509561f7e782cd42809e3d56f1389cff211"
-url = "https://github.com/odsod/daemon/releases/download/v2026.11.8/daemon_2026.11.8_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/daemon/releases/assets/784489231"
-
-[tools."github:odsod/daemon"."platforms.linux-x64-musl"]
-checksum = "sha256:e7d86a3522d27936c430af5350d06509561f7e782cd42809e3d56f1389cff211"
-checksum_source = "mise-versions"
-url = "https://github.com/odsod/daemon/releases/download/v2026.11.8/daemon_2026.11.8_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/odsod/daemon/releases/assets/784489231"
-
 [[tools."github:schpet/linear-cli"]]
 version = "3.1.0"
 backend = "github:schpet/linear-cli"

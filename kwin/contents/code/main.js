@@ -68,7 +68,11 @@ const shortcuts = [
     actionId: ["kwin", "[odsod] recorder-note", "KWin", ""],
     key: "Meta+W",
     kind: "command",
-    command: ["recorder-note"],
+    command: [
+      "sh",
+      "-c",
+      't=$(kdialog --title Note --geometry 420 --inputbox Note:) && [ -n "$t" ] && printf %s "$t" | odsodctl note -',
+    ],
   },
 
   {
