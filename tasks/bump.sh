@@ -67,6 +67,18 @@ else
   targets=(neovim yaak slack zoom endpoint-verification)
 fi
 
+# A bump that starts on an empty, undescribed jj change ends by describing it
+# with every bumped version. Snapshot the lockfiles to diff against at the end.
+describe=0
+if [ "$dry_run" -eq 0 ] && [ -d "$REPO_DIR/.jj" ] &&
+  [ "$(jj -R "$REPO_DIR" log -r @ --no-graph -T 'empty && description == ""')" = true ]; then
+  describe=1
+  snapshot="$(mktemp -d)"
+  trap 'rm -rf "$snapshot"' EXIT
+  cp "$REPO_DIR/mise.lock" "$REPO_DIR/neovim/nvim-pack-lock.json" "$snapshot/"
+fi
+pin_changes=()
+
 # 1. mise-managed tools. `--bump` moves the runtime major prefixes too, which is
 # the point of a full bump. GITHUB_TOKEN keeps `mise lock` from dropping
 # platforms under GitHub rate limits.
@@ -243,6 +255,7 @@ bump_target() {
   fi
 
   echo "[bump] $name: $pinned -> $latest"
+  pin_changes+=("$name: $pinned -> $latest")
   if [ "$dry_run" -eq 1 ]; then
     changed_count=$((changed_count + 1))
     return 0
@@ -287,5 +300,46 @@ echo "[bump] Formatting configs..."
 
 echo "[bump] Verifying discovery..."
 mise run discover
+
+# Print one "name: old -> new" line per mise tool and Neovim plugin that changed
+# between the snapshot and the working copy.
+lock_changes() {
+  python3 - "$snapshot" "$REPO_DIR" <<'PY'
+import json, sys, tomllib
+
+old_dir, repo = sys.argv[1], sys.argv[2]
+
+def tools(path):
+    with open(path, "rb") as f:
+        lock = tomllib.load(f).get("tools", {})
+    return {name: ", ".join(sorted(e["version"] for e in entries)) for name, entries in lock.items()}
+
+def plugins(path):
+    with open(path) as f:
+        return {name: spec["rev"][:12] for name, spec in json.load(f)["plugins"].items()}
+
+for old, new in [
+    (tools(f"{old_dir}/mise.lock"), tools(f"{repo}/mise.lock")),
+    (plugins(f"{old_dir}/nvim-pack-lock.json"), plugins(f"{repo}/neovim/nvim-pack-lock.json")),
+]:
+    for name in sorted(old.keys() | new.keys()):
+        if old.get(name) != new.get(name):
+            print(f"{name}: {old.get(name, 'none')} -> {new.get(name, 'none')}")
+PY
+}
+
+if [ "$describe" -eq 1 ]; then
+  message="feat: bump deps"$'\n'
+  while IFS= read -r line; do
+    [ -n "$line" ] && message+=$'\n'"- $line"
+  done < <(
+    lock_changes
+    printf '%s\n' "${pin_changes[@]}"
+  )
+  jj -R "$REPO_DIR" describe -r @ -m "$message"
+  echo "[bump] Described @:"
+  # shellcheck disable=SC2001
+  echo "$message" | sed 's/^/  /'
+fi
 
 echo "[bump] Versions bumped. Run: mise run apply"
